@@ -24,6 +24,9 @@ const LoginScreen = () => {
     navigation.navigate('Signup')
   }
 
+  const handleForgotPassword=()=>{
+    navigation.navigate('ForgotPassword')
+  }
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
      {/* <View style={styles.container}></View> */}
@@ -51,10 +54,11 @@ const LoginScreen = () => {
             }
             onPress={handleLogin}
           >
-            <Text style={{ color: config.tertiaryColor,textAlign:'center' , fontSize: PixelRatio.getFontScale()*18}}>Login</Text>
+            <Text style={{ color: config.tertiaryColor,textAlign:'center' , fontSize: PixelRatio.getFontScale()*18}}>Next</Text>
           </TouchableOpacity>
-          
-            <Text style={styles.forgotPassword}>Forgot your password?</Text>
+          <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={handleRegister}>
               
             <Text style={styles.register}>Register</Text>
@@ -136,11 +140,13 @@ const styles = StyleSheet.create({
     backgroundColor: config.secondaryColor, // Set background color directly
   },
   forgotPassword:{
-    justifyContent:'flex-end', 
-    textDecorationLine: 'underline',
+    justifyContent:'flex-end',
     width:'90%',
-    textAlign:'right',
     marginTop:20, 
+  },
+  forgotPasswordText:{
+    textDecorationLine: 'underline',
+    textAlign:'right',
     fontSize:PixelRatio.getFontScale() * 18
   },
   register:{

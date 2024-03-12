@@ -5,6 +5,7 @@ import SplashScreen from '../screens/SplashScreen';
 import Login from '../screens/LoginScreen';
 import { StyleSheet } from 'react-native';
 import Signup from '../screens/SignupScreen';
+import forgotPassword from '../screens/ForgotPassword';
 
 const Stack = createStackNavigator();
 

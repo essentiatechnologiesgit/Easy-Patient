@@ -1,6 +1,6 @@
 export default {
     splashScreen: require('./assets/splash.jpg'),
-    primaryColor: '#FF5733',
+    primaryColor: '#82848D',
     textColorHeadings:'#2A2A31',
     // primaryColor: '#3498db',
     secondaryColor: '#C1AB60',

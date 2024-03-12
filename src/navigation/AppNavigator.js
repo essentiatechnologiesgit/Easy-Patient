@@ -6,6 +6,7 @@ import Login from '../screens/LoginScreen';
 import { StyleSheet } from 'react-native';
 import Signup from '../screens/SignupScreen';
 import forgotPassword from '../screens/ForgotPassword';
+import ForgotPassword from '../screens/ForgotPassword';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,8 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
         <Stack.Screen style={styles.container} name="Login" component={Login} />
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
+        <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} />
+        {/* <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

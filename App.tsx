@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {View, StyleSheet, ImageBackground,Image} from 'react-native'; // Add necessary imports
-import Header from './components/Header';
-import AppNavigator from './navigation/AppNavigator';
+import Header from './src/components/Header';
+import AppNavigator from './src/navigation/AppNavigator';
 import config from './config';
 
 const App: React.FC = () => {

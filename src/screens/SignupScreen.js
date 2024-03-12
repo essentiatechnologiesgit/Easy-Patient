@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
-import config from '../config';
+import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox'
 import { ScrollView } from 'react-native-gesture-handler';

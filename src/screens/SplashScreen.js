@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Image, View, StyleSheet, Dimensions, Text} from 'react-native';
-import config from '../config';
+import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 

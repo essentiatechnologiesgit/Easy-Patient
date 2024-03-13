@@ -8,11 +8,12 @@ import { FloatingLabelInput } from 'react-native-floating-label-input';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState('');
-  const [text, setText] = useState('')
+  const [email, setEmail] = useState('');
+  const [fullName,setFullName] = useState('');
+  const [DOB,setDOB]=useState('')
   // const [password, setPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false)
-  const [showForm, setShowForm] = useState(true)
+  const [showForm, setShowForm] = useState(false)
   const handleRegister = () => {
     // Replace with your actual validation and login logic (e.g., API call)
     setShowForm(true)
@@ -37,8 +38,9 @@ const SignupScreen = () => {
           <TextInput
             style={styles.inputEmail}
             placeholder="E-mail"
-            value={username}
-            onChangeText={setUsername}
+            value={email}
+            onChangeText={text=>setEmail(text)}
+
           />
           <View style={styles.checkbox}>
             <CheckBox
@@ -68,42 +70,49 @@ const SignupScreen = () => {
         }
         {
           showForm &&
-          <ScrollView contentContainerStyle={{ width: '100%', alignItems: 'center' }}>
+          <ScrollView style={{width:'100%'}} contentContainerStyle={{  alignItems: 'center' }}>
             <View style={styles.signupFormContainer}>
+              <View style={styles.floatingLabel}>
               <FloatingLabelInput
+             
                 label={'E-mail'}
                 inputStyles={styles.inputStyles}
                 labelStyles={{paddingHorizontal:0}}
                 customLabelStyles={styles.customLabelStyles}
-                value={username}
-                onChangeText={value => setUsername(value)}
+                value={email}
+                onChangeText={value => setEmail(value)}
                 containerStyles={styles.containerStyles}
               />
+              </View>
+              <View style={styles.floatingLabel}>
               <FloatingLabelInput
                 label={'Full Name'}
                 inputStyles={styles.inputStyles}
                 customLabelStyles={styles.customLabelStyles}
-                value={username}
-                onChangeText={value => setUsername(value)}
+                value={fullName}
+                onChangeText={value => setFullName(value)}
                 containerStyles={styles.containerStyles}
               />
+              </View>
+              <View style={styles.floatingLabel}>
               <FloatingLabelInput
                 label={'Date Of Birth'}
                 maskType={'date'}
                 inputStyles={styles.inputStyles}
                 customLabelStyles={styles.customLabelStyles}
-                value={username}
-                onChangeText={value => setUsername(value)}
+                value={DOB}
+                onChangeText={value => setDOB(value)}
                 containerStyles={styles.containerStyles}
               />
-              <FloatingLabelInput
+              </View>
+              {/* <FloatingLabelInput
                 label={'E-mail'}
                 inputStyles={styles.inputStyles}
                 customLabelStyles={styles.customLabelStyles}
                 value={username}
                 onChangeText={value => setUsername(value)}
                 containerStyles={styles.containerStyles}
-              />
+              /> */}
 
 
             </View>
@@ -139,9 +148,11 @@ const styles = StyleSheet.create({
   },
   signupFormContainer: {
     flex: 1,
-    width: '90%',
+    width: '100%',
     height: '100%',
     alignItems: 'center',
+    flexDirection:'column',
+   
   },
   inputEmail: {
     marginTop: '10%',
@@ -242,11 +253,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   floatingLabel: {
-    borderBottomWidth: 1,
-    borderTopWidth: 0,
-    borderRightWidth: 0,
-    borderLeftWidth: 0,
-    borderColor: 'rgba(0,0,0,0)'
+    marginBottom:5,
+    width:'90%',
+    height:'100%',
+    flex:1
   },
   containerStyles:{
     fontSize:PixelRatio.getFontScale()*18,

@@ -130,7 +130,6 @@ const SignupScreen = () => {
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const formattedDate = `${year}-${month}-${day}`;
-
       let data = qs.stringify({
         'email': email,
         'fullname': fullName,
@@ -141,7 +140,7 @@ const SignupScreen = () => {
       let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://api-patient-hm.easy-health.app/patient/',
+        url: 'https://api-patient-dev.easy-health.app/patient/',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='

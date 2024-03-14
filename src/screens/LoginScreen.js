@@ -28,7 +28,7 @@ const LoginScreen = () => {
       setErrorMessage("Invalid email");
     }
     if(checkEmailExist(username)){
-
+  
     }
     // else if(!password){
     //   setPasswordError(true);
@@ -41,7 +41,7 @@ const LoginScreen = () => {
   };
 
   const checkEmailExist = () =>{
-    
+
   }
 
   const validateEmail = (email) => {

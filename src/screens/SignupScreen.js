@@ -6,27 +6,40 @@ import CheckBox from '@react-native-community/checkbox'
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { Calendar } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
-
+import ValidationError from '../components/ValidationError';
+import axios from 'axios';
+import ModalLoader from '../components/ModalLoader';
+import qs from 'qs';
+import AlertIcon from '../components/AlertIcon';
 const SignupScreen = () => {
   const navigation = useNavigation();
   const [placeholderLabelAnim] = useState(new Animated.Value(selectedGender ? 1 : 0));
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  // const [password, setPassword] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const [showForm, setShowForm] = useState(false)
-  const [date, setDate] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
+  //input feilds 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [date, setDate] = useState("");
+  const [selectedGender, setSelectedGender] = useState('');
+  //validation feilds
+  const [emailError, setEmailError] = useState(false);
+  const [fullNameError, setFullNameError] = useState(false);
+  const [dateError, setDateError] = useState(false);
+  const [genderError, setGenderError] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [PasswordMatch, setPasswordMatch] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
   const handleRegister = () => {
-    // Replace with your actual validation and login logic (e.g., API call)
     setShowForm(true)
   };
 
@@ -34,13 +47,10 @@ const SignupScreen = () => {
     navigation.goBack();
   }
 
-  const [selectedGender, setSelectedGender] = useState('');
-
   const genders = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
+    { label: 'Male', value: 'M' },
+    { label: 'Female', value: 'F' },
   ];
-
 
   const handleOpen = () => setIsOpen(!isOpen);
 
@@ -55,7 +65,6 @@ const SignupScreen = () => {
     }).start();
   };
 
-
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
@@ -67,9 +76,92 @@ const SignupScreen = () => {
     setShowDatePicker(true);
   };
 
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+  // Form Submit Function 
+  const handleConfirm = () => {
 
+    setEmailError(false);
+    setFullNameError(false);
+    setDateError(false);
+    setGenderError(false);
+    setConfirmPasswordError(false);
+    setPasswordError(false);
+    setPasswordMatch(false);
+    setErrorMessage("");
+    setInvalidEmail(false);
+    if (!email) {
+      setEmailError(true);
+      setErrorMessage("Please provide email");
+    }
+    else if (!validateEmail(email)) {
+      setInvalidEmail(true);
+      setErrorMessage("Invalid email");
+    }
+    else if (!fullName) {
+      setFullNameError(true);
+      setErrorMessage("Please provide Full Name");
+    }
+    else if (!date) {
+      setDateError(true);
+      setErrorMessage("Please select date of Birth");
+    }
 
+    else if (!selectedGender) {
+      setGenderError(true);
+      setErrorMessage("Please select gender");
+    }
+    else if (!password) {
+      setPasswordError(true);
+      setErrorMessage("Please provide password");
+    }
+    else if (!confirmPassword) {
+      setConfirmPasswordError(true);
+      setErrorMessage("Please provide Confirm Password");
+    }
+    else if (confirmPassword != password) {
+      setPasswordMatch(true);
+      setErrorMessage("Passwords dosent match");
+    }
+    else {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
 
+      let data = qs.stringify({
+        'email': email,
+        'fullname': fullName,
+        'date_of_birth': formattedDate,
+        'gender': selectedGender,
+        'password': password
+      });
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://api-patient-hm.easy-health.app/patient/',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
+        },
+        data: data
+      };
+
+      axios.request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+
+          if (response.data.created) {
+            setShowLoader(true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
       {/* <View style={styles.container}></View> */}
@@ -123,7 +215,20 @@ const SignupScreen = () => {
                     onChangeText={value => setEmail(value)}
                     containerStyles={styles.containerStyles}
                   />
+                  {emailError && !email && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
+                  {invalidEmail && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
                 </View>
+
                 <View style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Full Name'}
@@ -133,6 +238,12 @@ const SignupScreen = () => {
                     onChangeText={value => setFullName(value)}
                     containerStyles={styles.containerStyles}
                   />
+                  {fullNameError && !fullName && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
                 </View>
                 <View style={styles.floatingLabel}>
                   <TouchableOpacity onPress={handlePressDatePicker}>
@@ -141,14 +252,20 @@ const SignupScreen = () => {
                         <Text>Date Of Birth</Text>
                       ) : (
                         <TextInput
-                          style={{ ...styles.inputStyles, marginTop: -15, marginBottom: 10 }}
+                          style={{ ...styles.inputStyles, marginTop: -15, marginBottom: 10, left: 5 }}
                           placeholder="Date Of Birth"
                           editable={false}
-                          value={date ? date.toDateString() : ""} // Ensure `date` is not null before using `toDateString()`
+                          value={date ? date.toDateString() : ""}
                         />
                       )}
                       {date && (
                         <Text style={{ marginBottom: 10, color: 'black' }}>{date.toDateString()}</Text>
+                      )}
+                      {dateError && !date && (
+                        <>
+                          <AlertIcon />
+                          <ValidationError errorMessage={errorMessage} />
+                        </>
                       )}
                     </View>
                   </TouchableOpacity>
@@ -163,7 +280,7 @@ const SignupScreen = () => {
                     textColor="red"
                   />
                 )}
-                <View style={{ ...styles.floatingLabel, borderBottomWidth: 1, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
+                <View style={{ ...styles.floatingLabel, borderBottomWidth: 1, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5, left: 2 }}>
                   <Animated.Text
                     style={[
                       styles.placeholderLabel,
@@ -178,7 +295,7 @@ const SignupScreen = () => {
                           {
                             scale: placeholderLabelAnim.interpolate({
                               inputRange: [0, 1],
-                              outputRange: [1, 0.9],
+                              outputRange: [0.95, 0.9],
                             }),
                           },
                         ],
@@ -205,6 +322,12 @@ const SignupScreen = () => {
                       fontSize: PixelRatio.getFontScale() * 18,
                     }}
                   />
+                  {genderError && !selectedGender && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
                 </View>
                 <View style={styles.floatingLabel}>
                   <FloatingLabelInput
@@ -219,6 +342,13 @@ const SignupScreen = () => {
                     customHidePasswordComponent={<View></View>}
                     customShowPasswordComponent={<View></View>}
                   />
+
+                  {passwordError && !password && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
                 </View>
                 <View style={styles.floatingLabel}>
                   <FloatingLabelInput
@@ -228,20 +358,34 @@ const SignupScreen = () => {
                     value={confirmPassword}
                     onChangeText={value => setConfirmPassword(value)}
                     containerStyles={styles.containerStyles}
-                  // isPassword={true}
-
+                    isPassword={true}
+                    customHidePasswordComponent={<View></View>}
+                    customShowPasswordComponent={<View></View>}
                   />
+                  {confirmPasswordError && !confirmPassword && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
+                  {PasswordMatch && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
                 </View>
                 <View style={{ width: '100%', marginTop: 40 }}>
-                  <CustomizedButton buttonColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
                 </View>
                 <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>
               </View>
             </ScrollView>
 
-
           </>
         }
+        {showLoader && <ModalLoader />}
+
       </View>
 
 
@@ -257,6 +401,7 @@ const styles = StyleSheet.create({
     // paddingTop: 20,
     marginTop: '20%'
   },
+
   placeholderLabel: {
     position: 'absolute',
     left: -2,
@@ -269,7 +414,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    fontSize: 16,
+    fontSize: PixelRatio.getFontScale() * 18,
     color: '#888',
     zIndex: 1,
     paddingHorizontal: 8,
@@ -278,7 +423,7 @@ const styles = StyleSheet.create({
   },
   labelFloating: {
     top: -PixelRatio.getFontScale() * 4,
-    fontSize: 12,
+    fontSize: PixelRatio.getFontScale() * 18,
   },
   dropdownPicker: {
     backgroundColor: 'transparent',

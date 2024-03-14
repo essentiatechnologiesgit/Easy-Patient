@@ -1,35 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground,Image,PixelRatio,TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
-
+import AlertIcon from '../components/AlertIcon';
+import ValidationError from '../components/ValidationError';
 const LoginScreen = () => {
-  const navigation=useNavigation();
+  const navigation = useNavigation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPasswordInput, setShowPasswordInput]=useState(false)
+  const [showPasswordInput, setShowPasswordInput] = useState(false)
+  const [usernameError, setUsernameError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [invalidEmail , setInvalidEmail] = useState(false);
   const handleLogin = () => {
-    // Replace with your actual validation and login logic (e.g., API call)
-    if (username === 'admin' && password === 'test') {
-      navigation.navigate('Dashboard')
-    } else if(username === 'admin'){
-      setShowPasswordInput(true)
+    setUsernameError(false);
+    setPasswordError(false);
+    setInvalidEmail(false);
+    setErrorMessage("");
+
+    if (!username) {
+      setUsernameError(true);
+      setErrorMessage("provide E-mail");
     }
-    else {
-      alert('Invalid username or password!');
+    else if (!validateEmail(username)) {
+      setInvalidEmail(true);
+      setErrorMessage("Invalid email");
     }
+    if(checkEmailExist(username)){
+
+    }
+    // else if(!password){
+    //   setPasswordError(true);
+    //   setErrorMessage("provide password");
+    // }
+    // else{
+
+    // }
+
   };
 
-  const handleRegister=()=>{
+  const checkEmailExist = () =>{
+    
+  }
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+  const handleRegister = () => {
     navigation.navigate('Signup')
   }
 
-  const handleForgotPassword=()=>{
+  const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword')
   }
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-     {/* <View style={styles.container}></View> */}
+      {/* <View style={styles.container}></View> */}
       <View style={styles.container}>
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
@@ -40,6 +68,22 @@ const LoginScreen = () => {
           value={username}
           onChangeText={setUsername}
         />
+        <View style={{width:'100%', right:30, bottom:10  }}>
+        {usernameError && !username && (
+          <>
+            <AlertIcon />
+            <ValidationError errorMessage={errorMessage} />
+          </>
+        )}
+        </View>
+        <View style={{width:'100%', right:30, bottom:10  }}>
+        {invalidEmail  && (
+          <>
+            <AlertIcon />
+            <ValidationError errorMessage={errorMessage} />
+          </>
+        )}
+        </View>
         {showPasswordInput && <TextInput
           style={styles.inputPassword}
           placeholder="Password"
@@ -47,24 +91,24 @@ const LoginScreen = () => {
           onChangeText={setPassword}
         />}
 
-        
+
         <TouchableOpacity
-            style={
-              styles.loginButton
-            }
-            onPress={handleLogin}
-          >
-            <Text style={{ color: config.tertiaryColor,textAlign:'center' , fontSize: PixelRatio.getFontScale()*18}}>Next</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleRegister}>
-              
-            <Text style={styles.register}>Register</Text>
-            </TouchableOpacity>
+          style={
+            styles.loginButton
+          }
+          onPress={handleLogin}
+        >
+          <Text style={{ color: config.tertiaryColor, textAlign: 'center', fontSize: PixelRatio.getFontScale() * 18 }}>Next</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+          <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleRegister}>
+
+          <Text style={styles.register}>Register</Text>
+        </TouchableOpacity>
       </View>
-      
+
       {/* <View style={styles.container}>
       
       </View>  */}
@@ -79,7 +123,7 @@ const styles = StyleSheet.create({
     justifyContent: 'top',
     alignItems: 'center',
     // paddingTop: 20,
-    marginTop:'20%'
+    marginTop: '20%'
   },
   title: {
     fontSize: 24,
@@ -93,7 +137,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderBottomWidth: 2,
     width: '90%',
-    fontSize:PixelRatio.getFontScale()*18,
+    fontSize: PixelRatio.getFontScale() * 18,
     borderBottomColor: config.secondaryColor,
   },
   inputPassword: {
@@ -104,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderBottomWidth: 2,
     width: '90%',
-    fontSize:PixelRatio.getFontScale()*18,
+    fontSize: PixelRatio.getFontScale() * 18,
     borderBottomColor: config.secondaryColor,
   },
   backgroundImage: {
@@ -127,32 +171,32 @@ const styles = StyleSheet.create({
     color: config.textColorHeadings,
   },
   loginButton: {
-    width:'90%',
-    height:40,
-    marginTop:40,
-    justifyContent:'center',
-    alignItems:'center',
+    width: '90%',
+    height: 40,
+    marginTop: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderTopLeftRadius: 30,
     borderBottomLeftRadius: 30,
     borderTopRightRadius: 30,
     borderBottomRightRadius: 30,
-    fontSize:PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 18,
     backgroundColor: config.secondaryColor, // Set background color directly
   },
-  forgotPassword:{
-    justifyContent:'flex-end',
-    width:'90%',
-    marginTop:20, 
+  forgotPassword: {
+    justifyContent: 'flex-end',
+    width: '90%',
+    marginTop: 20,
   },
-  forgotPasswordText:{
+  forgotPasswordText: {
     textDecorationLine: 'underline',
-    textAlign:'right',
-    fontSize:PixelRatio.getFontScale() * 18
+    textAlign: 'right',
+    fontSize: PixelRatio.getFontScale() * 18
   },
-  register:{
-    paddingTop:'15%',
+  register: {
+    paddingTop: '15%',
     textDecorationLine: 'underline',
-    color:config.secondaryColor,
+    color: config.secondaryColor,
     fontSize: PixelRatio.getFontScale() * 18
   }
 });

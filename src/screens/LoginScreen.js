@@ -5,9 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import AlertIcon from '../components/AlertIcon';
 import ValidationError from '../components/ValidationError';
 import Snackbar from '../components/Snackbar';
+import EmailIcon from '../assets/email.svg';
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Svg, { Path } from 'react-native-svg';
 import qs from 'qs';
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -22,6 +24,7 @@ const LoginScreen = () => {
   const [snackbarKey, setSnackbarKey] = useState(0);
   const [showLoader, setShowLoader] = useState(false);
   const [emailExist, setEmailExist] = useState(true);
+  const [ButtonText, setButtonText] = useState('Next');
   const handleLogin = () => {
     setUsernameError(false);
     setPasswordError(false);
@@ -40,6 +43,7 @@ const LoginScreen = () => {
       checkEmailExist();
     }
     else if (!password) {
+
       setPasswordError(true);
       setErrorMessage("provide password");
     }
@@ -54,7 +58,6 @@ const LoginScreen = () => {
       'username': username,
       'password': password
     });
-  
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -65,7 +68,6 @@ const LoginScreen = () => {
       },
       data: data
     };
-  
     try {
       const response = await axios.request(config);
       console.log(JSON.stringify(response.data));
@@ -76,7 +78,7 @@ const LoginScreen = () => {
       console.log(error);
     }
   }
-  
+
 
 
   const handleShowSnackbar = (message) => {
@@ -94,6 +96,7 @@ const LoginScreen = () => {
       const response = await axios.get(`https://api-patient-dev.easy-health.app/patient/${username}`);
       if (response.data.registered === true) {
         setEmailExist(false);
+        setButtonText("Login");
         setShowPasswordInput(true);
       } else {
         handleShowSnackbar("Incorrect Username/E-mail");
@@ -124,12 +127,17 @@ const LoginScreen = () => {
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
         <Text style={styles.login}>Login</Text>
+
         <TextInput
           style={styles.inputEmail}
           placeholder="E-mail"
           value={username}
           onChangeText={setUsername}
         />
+        {/* <Svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke={config.primaryColor} strokeWidth="1" />
+        </Svg> */}
+
         <View style={{ width: '100%', right: 30, bottom: 10 }}>
           {usernameError && !username && (
             <>
@@ -152,6 +160,7 @@ const LoginScreen = () => {
               style={styles.inputPassword}
               placeholder="Password"
               value={password}
+              secureTextEntry={true}
               onChangeText={setPassword}
             />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
@@ -172,7 +181,7 @@ const LoginScreen = () => {
           }
           onPress={handleLogin}
         >
-          <Text style={{ color: config.tertiaryColor, textAlign: 'center', fontSize: PixelRatio.getFontScale() * 18 }}>Next</Text>
+          <Text style={{ color: config.tertiaryColor, textAlign: 'center', fontSize: PixelRatio.getFontScale() * 18 }}>{ButtonText}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
           <Text style={styles.forgotPasswordText}>Forgot your password?</Text>

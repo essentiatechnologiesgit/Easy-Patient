@@ -43,6 +43,15 @@ const SignupScreen = () => {
     setShowForm(true)
   };
 
+  let formattedDate = '';
+  if (date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    formattedDate = `${day}/${month}/${year}`;
+  }
+  
+
   const handleLogin = () => {
     navigation.goBack();
   }
@@ -82,6 +91,32 @@ const SignupScreen = () => {
   };
   // Form Submit Function 
   const handleConfirm = () => {
+    // fetch("https://api-patient-dev.easy-health.app/patient/", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/x-www-form-urlencoded",
+    //     "Authorization": "Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=="
+    //   },
+    //   body: "email=syedmisbahali1111@gmail.com" +
+    //     "&fullname=Cinho Mobile" +
+    //     "&date_of_birth=1984-02-22" +
+    //     "&gender=M" +
+    //     "&password=123456" +
+    //     "&device=GALAXY",
+    //   redirect: "follow"
+    // })
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+    //     return response.text();
+    //   })
+    //   .then((result) => {
+    //     console.log(result);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error:', error);
+    //   });
 
     setEmailError(false);
     setFullNameError(false);
@@ -108,7 +143,6 @@ const SignupScreen = () => {
       setDateError(true);
       setErrorMessage("Please select date of Birth");
     }
-
     else if (!selectedGender) {
       setGenderError(true);
       setErrorMessage("Please select gender");
@@ -126,10 +160,7 @@ const SignupScreen = () => {
       setErrorMessage("Passwords dosent match");
     }
     else {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
+
       let data = qs.stringify({
         'email': email,
         'fullname': fullName,
@@ -236,6 +267,7 @@ const SignupScreen = () => {
                     value={fullName}
                     onChangeText={value => setFullName(value)}
                     containerStyles={styles.containerStyles}
+                    
                   />
                   {fullNameError && !fullName && (
                     <>
@@ -248,17 +280,19 @@ const SignupScreen = () => {
                   <TouchableOpacity onPress={handlePressDatePicker}>
                     <View style={{ ...styles.containerStyles }}>
                       {date ? (
-                        <Text>Date Of Birth</Text>
+                        <Text style={{ marginBottom: 10 }}>Date Of Birth</Text>
                       ) : (
                         <TextInput
-                          style={{ ...styles.inputStyles, marginTop: -15, marginBottom: 10, left: 5 }}
+                          style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
                           placeholder="Date Of Birth"
+                          placeholderTextColor={config.primaryColor}
                           editable={false}
-                          value={date ? date.toDateString() : ""}
+                          value={date ? formattedDate : ""}
+                          
                         />
                       )}
                       {date && (
-                        <Text style={{ marginBottom: 10, color: 'black' }}>{date.toDateString()}</Text>
+                        <Text style={{ ...styles.inputStyles, marginTop: -32 }}>{formattedDate}</Text>
                       )}
                       {dateError && !date && (
                         <>
@@ -279,7 +313,7 @@ const SignupScreen = () => {
                     textColor="red"
                   />
                 )}
-                <View style={{ ...styles.floatingLabel, borderBottomWidth: 1, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5, left: 2 }}>
+                <View style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5}}>
                   <Animated.Text
                     style={[
                       styles.placeholderLabel,
@@ -287,7 +321,7 @@ const SignupScreen = () => {
                         transform: [
                           {
                             translateY: placeholderLabelAnim.interpolate({
-                              inputRange: [0, 1],
+                              inputRange: [0, 1.5],
                               outputRange: [0, -25],
                             }),
                           },
@@ -298,16 +332,29 @@ const SignupScreen = () => {
                             }),
                           },
                         ],
+                        // Apply margin left conditionally
+                        marginLeft: placeholderLabelAnim.interpolate({
+                          inputRange: [0, 1.5],
+                          outputRange: [0, -5], // Move the text to the left after animation
+                        }),
+                        // Interpolate font size
+                        fontSize: placeholderLabelAnim.interpolate({
+                          inputRange: [0, 1.5],
+                          outputRange: [PixelRatio.getFontScale() * 18, PixelRatio.getFontScale() * 16], // Change font size after animation
+                        }),
                       },
-                    ]}>
+                    ]}
+                  >
                     Select Gender
                   </Animated.Text>
+
                   <DropDownPicker
                     items={genders}
                     value={selectedGender}
                     onSelectItem={handleSelect}
                     placeholder=""
                     open={isOpen}
+                    showArrowIcon={false}
                     onOpen={handleOpen}
                     onClose={handleOpen}
                     listMode="SCROLLVIEW"
@@ -315,7 +362,8 @@ const SignupScreen = () => {
                       backgroundColor: styles.primaryColor,
                       borderWidth: 0,
                       left: -7,
-                      width: "103%"
+                      top: 8,
+                      color: config.primaryColor,
                     }}
                     textStyle={{
                       fontSize: PixelRatio.getFontScale() * 18,
@@ -375,7 +423,7 @@ const SignupScreen = () => {
                   )}
                 </View>
                 <View style={{ width: '100%', marginTop: 40 }}>
-                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
                 </View>
                 <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>
               </View>
@@ -403,18 +451,19 @@ const styles = StyleSheet.create({
 
   placeholderLabel: {
     position: 'absolute',
-    left: -2,
-    top: 16, // Adjust this value as needed
+    left: 0,
+    top: 14,
     fontSize: PixelRatio.getFontScale() * 18,
-    color: 'grey',
+    color: config.primaryColor,
     zIndex: 1,
+    lineHeight: PixelRatio.getFontScale() * 20,
   },
   label: {
     position: 'absolute',
     left: 0,
     top: 0,
     fontSize: PixelRatio.getFontScale() * 18,
-    color: '#888',
+    color: config.primaryColor,
     zIndex: 1,
     paddingHorizontal: 8,
     backgroundColor: '#fff',
@@ -431,7 +480,7 @@ const styles = StyleSheet.create({
     borderBottomColor: config.secondaryColor,
   },
   dropdownTextStyle: {
-    color: 'grey',
+    color: config.primaryColor,
     fontSize: PixelRatio.getFontScale() * 18,
   },
   button: {
@@ -482,6 +531,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'column',
 
+  },
+
+  FocusStyling:{
+    color:config.primaryColor,
   },
   inputEmail: {
     marginTop: '10%',
@@ -579,12 +632,12 @@ const styles = StyleSheet.create({
     left: 10,
     top: 10,
     fontSize: 16,
-    color: 'gray',
+    color: config.primaryColor,
   },
   input: {
     padding: 10,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: config.primaryColor,
     borderRadius: 5,
     fontSize: 16,
   },
@@ -597,7 +650,6 @@ const styles = StyleSheet.create({
   containerStyles: {
     fontSize: PixelRatio.getFontScale() * 18,
     borderWidth: 0,
-    borderBottomWidth: 3,
     height: '100%',
     paddingVertical: 0,
     paddingHorizontal: 0,

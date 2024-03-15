@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const CustomButton = ({ buttonColor, textColor, text, onPress }) => {
+const CustomButton = ({ buttonColor, borderColor ,textColor, text, onPress }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: buttonColor }]}
+        style={[styles.button, { backgroundColor: buttonColor,borderColor:borderColor }]}
         onPress={onPress}
       >
         <Text style={[styles.text, { color: textColor }]}>{text}</Text>
@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
+    borderWidth:1,
     width: '80%',
     elevation: 3,
     borderRadius: 30,

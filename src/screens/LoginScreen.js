@@ -4,6 +4,8 @@ import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import AlertIcon from '../components/AlertIcon';
 import ValidationError from '../components/ValidationError';
+import Snackbar from '../components/Snackbar';
+import ModalLoader from '../components/ModalLoader';
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState('');
@@ -12,13 +14,17 @@ const LoginScreen = () => {
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [invalidEmail , setInvalidEmail] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarKey, setSnackbarKey] = useState(0);
+  const [showLoader , setShowLoader] = useState(false);
+
   const handleLogin = () => {
     setUsernameError(false);
     setPasswordError(false);
     setInvalidEmail(false);
     setErrorMessage("");
-
+    setSnackbarMessage('');
     if (!username) {
       setUsernameError(true);
       setErrorMessage("provide E-mail");
@@ -27,22 +33,37 @@ const LoginScreen = () => {
       setInvalidEmail(true);
       setErrorMessage("Invalid email");
     }
-    if(checkEmailExist(username)){
-  
+    else if (checkEmailExist(username)) {
+      handleShowSnackbar("Incorrect Username/E-mail")
     }
-    // else if(!password){
-    //   setPasswordError(true);
-    //   setErrorMessage("provide password");
-    // }
-    // else{
-
-    // }
-
+    else if (!showPasswordInput) {
+      setShowPasswordInput(true);
+    }
+    else if (!password) {
+      setPasswordError(true);
+      setErrorMessage("provide password");
+    }
+    else {
+      console.warn("Done");
+    }
   };
 
-  const checkEmailExist = () =>{
+  const handleShowSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarKey((prevKey) => prevKey + 1);
+  };
 
-  }
+  const checkEmailExist = async () => {
+    setShowLoader(true);
+    setTimeout(() => {
+      setTimeout(() => {
+        setShowLoader(false);
+        return true;
+      }, 2000);
+    }, 2000);
+    
+  };
+  
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,7 +78,7 @@ const LoginScreen = () => {
   }
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-      {/* <View style={styles.container}></View> */}
+      {showLoader && <ModalLoader />}
       <View style={styles.container}>
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
@@ -68,30 +89,42 @@ const LoginScreen = () => {
           value={username}
           onChangeText={setUsername}
         />
-        <View style={{width:'100%', right:30, bottom:10  }}>
-        {usernameError && !username && (
-          <>
-            <AlertIcon />
-            <ValidationError errorMessage={errorMessage} />
-          </>
-        )}
+        <View style={{ width: '100%', right: 30, bottom: 10 }}>
+          {usernameError && !username && (
+            <>
+              <AlertIcon />
+              <ValidationError errorMessage={errorMessage} />
+            </>
+          )}
         </View>
-        <View style={{width:'100%', right:30, bottom:10  }}>
-        {invalidEmail  && (
-          <>
-            <AlertIcon />
-            <ValidationError errorMessage={errorMessage} />
-          </>
-        )}
+        <View style={{ width: '100%', right: 30, bottom: 10 }}>
+          {invalidEmail && (
+            <>
+              <AlertIcon />
+              <ValidationError errorMessage={errorMessage} />
+            </>
+          )}
         </View>
-        {showPasswordInput && <TextInput
-          style={styles.inputPassword}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-        />}
+        {showPasswordInput &&
+          <>
+            <TextInput
+              style={styles.inputPassword}
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+            />
+            <View style={{ width: '100%', right: 30, bottom: 10 }}>
+              {passwordError && !password && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+            </View>
+          </>
+        }
 
-
+        {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
         <TouchableOpacity
           style={
             styles.loginButton

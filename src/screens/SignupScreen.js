@@ -12,7 +12,9 @@ import ValidationError from '../components/ValidationError';
 import axios from 'axios';
 import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
+import Svg, { Path } from 'react-native-svg';
 import AlertIcon from '../components/AlertIcon';
+import OtpInput from '../components/OTPInput';
 const SignupScreen = () => {
   const navigation = useNavigation();
   const [placeholderLabelAnim] = useState(new Animated.Value(selectedGender ? 1 : 0));
@@ -23,6 +25,9 @@ const SignupScreen = () => {
   const [showForm, setShowForm] = useState(false)
   const [errorMessage, setErrorMessage] = useState('');
   const [showLoader, setShowLoader] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+ 
   //input feilds 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,8 +44,14 @@ const SignupScreen = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [PasswordMatch, setPasswordMatch] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
+  const [verifyOTP, setVerifyOTP] = useState(false);
   const handleRegister = () => {
-    setShowForm(true)
+    setShowForm(true);
+    // setVerifyOTP(true);
+  };
+  const handleOtpChange = (otpValue) => {
+    setOtp(otpValue);
+    // console.warn(otpValue);
   };
 
   let formattedDate = '';
@@ -50,7 +61,33 @@ const SignupScreen = () => {
     const day = String(date.getDate()).padStart(2, '0');
     formattedDate = `${day}/${month}/${year}`;
   }
-  
+
+  const handleOTPSend = () => {
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `https://api-patient-dev.easy-health.app/o/forgot-password/${email}`,
+      headers: {
+        'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
+      }
+    };
+
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  const handleEmailFocus = () => {
+    setIsEmailFocused(true);
+  };
+
+  const handleEmailBlur = () => {
+    setIsEmailFocused(false);
+  };
 
   const handleLogin = () => {
     navigation.goBack();
@@ -91,33 +128,6 @@ const SignupScreen = () => {
   };
   // Form Submit Function 
   const handleConfirm = () => {
-    // fetch("https://api-patient-dev.easy-health.app/patient/", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/x-www-form-urlencoded",
-    //     "Authorization": "Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=="
-    //   },
-    //   body: "email=syedmisbahali1111@gmail.com" +
-    //     "&fullname=Cinho Mobile" +
-    //     "&date_of_birth=1984-02-22" +
-    //     "&gender=M" +
-    //     "&password=123456" +
-    //     "&device=GALAXY",
-    //   redirect: "follow"
-    // })
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       throw new Error('Network response was not ok');
-    //     }
-    //     return response.text();
-    //   })
-    //   .then((result) => {
-    //     console.log(result);
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error:', error);
-    //   });
-
     setEmailError(false);
     setFullNameError(false);
     setDateError(false);
@@ -160,38 +170,94 @@ const SignupScreen = () => {
       setErrorMessage("Passwords dosent match");
     }
     else {
+      checkEmailRegistration();
+    }
+  };
 
+  const checkEmailRegistration = async () => {
+    try {
+      setShowLoader(true);
+      const response = await axios.get(`https://api-patient-dev.easy-health.app/patient/${email}`);
+      if (response.data.registered === true) {
+        setShowLoader(false);
+        handleShowSnackbar("The informed email is already in use. Please try using another one.");
+      } else {
+        RegisterAccount();
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      setShowLoader(false);
+    }
+  }
+
+  const handleVerifyOTP = () => {
+    if (!otp) {
+      handleShowSnackbar("Invalid OTP");
+    } else {
       let data = qs.stringify({
         'email': email,
-        'fullname': fullName,
-        'date_of_birth': formattedDate,
-        'gender': selectedGender,
-        'password': password
+        'code': otp
       });
       let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://api-patient-dev.easy-health.app/patient/',
+        url: 'https://api-patient-dev.easy-health.app/patient/verify-otp',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
         },
         data: data
       };
-
       axios.request(config)
         .then((response) => {
           console.log(JSON.stringify(response.data));
-
-          if (response.data.created) {
-            setShowLoader(true);
+          if (response.data.valid === true) {
+            // navigate to Dashboard
+          } else {
+            handleShowSnackbar("Invalid OTP");
           }
         })
         .catch((error) => {
           console.log(error);
         });
     }
-  };
+  }
+
+  const RegisterAccount = () => {
+
+    let data = qs.stringify({
+      'email': email,
+      'fullname': fullName,
+      'date_of_birth': formattedDate,
+      'gender': selectedGender,
+      'password': password
+    });
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://api-patient-dev.easy-health.app/patient/',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
+      },
+      data: data
+    };
+
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+
+        if (response.data.created) {
+          setShowLoader(false);
+          setVerifyOTP(true);
+          setShowForm(false);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
       {/* <View style={styles.container}></View> */}
@@ -199,13 +265,20 @@ const SignupScreen = () => {
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
         <Text style={styles.signup}>Signup</Text>
-        {!showForm && <View style={styles.signupContainer} >
-          <TextInput
-            style={styles.inputEmail}
-            placeholder="E-mail"
-            value={email}
-            onChangeText={text => setEmail(text)}
-          />
+        {!showForm && !verifyOTP && <View style={styles.signupContainer} >
+        <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
+            <Svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 24 24" style={styles.icon}>
+              <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke="black" strokeWidth="1" />
+            </Svg>
+            <TextInput
+              style={styles.inputEmail}
+              placeholder="E-mail"
+              value={email}
+              onChangeText={setEmail}
+              onFocus={handleEmailFocus}
+              onBlur={handleEmailBlur}
+            />
+          </View>
           <View style={styles.checkbox}>
             <CheckBox
               value={termsAccepted}
@@ -267,7 +340,7 @@ const SignupScreen = () => {
                     value={fullName}
                     onChangeText={value => setFullName(value)}
                     containerStyles={styles.containerStyles}
-                    
+
                   />
                   {fullNameError && !fullName && (
                     <>
@@ -288,7 +361,7 @@ const SignupScreen = () => {
                           placeholderTextColor={config.primaryColor}
                           editable={false}
                           value={date ? formattedDate : ""}
-                          
+
                         />
                       )}
                       {date && (
@@ -313,7 +386,7 @@ const SignupScreen = () => {
                     textColor="red"
                   />
                 )}
-                <View style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5}}>
+                <View style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
                   <Animated.Text
                     style={[
                       styles.placeholderLabel,
@@ -431,6 +504,29 @@ const SignupScreen = () => {
 
           </>
         }
+        {
+          verifyOTP &&
+          <>
+            <View style={styles.TextContainer}>
+              <Text style={styles.TextContainerText}>You will receive a code at the registered email. Enter the code below.</Text>
+            </View>
+            <View style={styles.OTPContainer}>
+              <OtpInput onChange={handleOtpChange} />
+            </View>
+            <View style={{ width: '100%', marginTop: 40 }}>
+              <CustomizedButton onPress={handleVerifyOTP} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+            </View>
+            <View style={{ marginTop: '8%' }}><Text style={styles.codeText}>Didn't receive the code?</Text><Text style={styles.codeText}>Click here:</Text></View>
+            <View style={{ marginTop: '7%' }}>
+              <TouchableOpacity onPress={handleOTPSend}>
+                <Text style={[styles.codeText, { textDecorationLine: 'underline', color: config.secondaryColor }]}>
+                  Resend Code
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+
         {showLoader && <ModalLoader />}
 
       </View>
@@ -448,7 +544,15 @@ const styles = StyleSheet.create({
     // paddingTop: 20,
     marginTop: '20%'
   },
-
+  inputContainer: {
+    marginTop:'4%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    fontSize: PixelRatio.getFontScale() * 18,
+    borderBottomColor: config.secondaryColor,
+    borderBottomWidth: 2,
+    width: '90%',
+  },
   placeholderLabel: {
     position: 'absolute',
     left: 0,
@@ -457,6 +561,31 @@ const styles = StyleSheet.create({
     color: config.primaryColor,
     zIndex: 1,
     lineHeight: PixelRatio.getFontScale() * 20,
+  },
+  TextContainer: {
+    width: '80%',
+    marginTop: 40,
+  },
+  TextContainerText: {
+    fontSize: PixelRatio.getFontScale() * 18,
+    textAlign: 'center',
+  },
+  inputEmail: {
+    flex: 1,
+    fontSize: PixelRatio.getFontScale() * 18,
+  },
+  icon: {
+    marginRight: 2,
+  },
+  focusedInput: {
+    borderBottomWidth:3,
+  },
+  OTPContainer: {
+    marginTop: 50,
+  },
+  codeText: {
+    fontSize: PixelRatio.getFontScale() * 18,
+    textAlign: 'center',
   },
   label: {
     position: 'absolute',
@@ -533,20 +662,10 @@ const styles = StyleSheet.create({
 
   },
 
-  FocusStyling:{
-    color:config.primaryColor,
+  FocusStyling: {
+    color: config.primaryColor,
   },
-  inputEmail: {
-    marginTop: '10%',
-    height: 40,
-    borderWidth: 0,
-    padding: 10,
-    marginBottom: 10,
-    borderBottomWidth: 2,
-    width: '90%',
-    fontSize: PixelRatio.getFontScale() * 18,
-    borderBottomColor: config.secondaryColor,
-  },
+
   backLink: {
     fontSize: PixelRatio.getFontScale() * 18,
     color: config.secondaryColor,
@@ -581,7 +700,7 @@ const styles = StyleSheet.create({
   signup: {
     fontWeight: 'bold',
     fontSize: PixelRatio.getFontScale() * 22,
-    marginTop: 10,
+    marginTop: '6%',
     color: config.textColorHeadings,
   },
   loginButton: {
@@ -615,8 +734,9 @@ const styles = StyleSheet.create({
     fontSize: PixelRatio.getFontScale() * 18
   },
   checkbox: {
+    marginTop:'4%',
     width: '90%',
-    justifyContent: 'center',
+    justifyContent: 'left',
     textAlign: 'left',
     flexDirection: 'row'
   },

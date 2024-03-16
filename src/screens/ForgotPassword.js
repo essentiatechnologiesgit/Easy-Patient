@@ -9,6 +9,7 @@ import AlertIcon from '../components/AlertIcon';
 import ValidationError from '../components/ValidationError';
 import OtpInput from '../components/OTPInput';
 import Snackbar from '../components/Snackbar';
+import Svg, { Path } from 'react-native-svg';
 import qs from 'qs';
 const ForgotPassword = () => {
   const navigation = useNavigation();
@@ -25,7 +26,8 @@ const ForgotPassword = () => {
   const [otp, setOtp] = useState('');
   const [InvalidOTP, setInvalidOTP] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState(null)
+  const [password, setPassword] = useState(null);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [ConfirmPass, setConfirmPass] = useState(null)
   const [passwordInput, setPasswordInput] = useState(true);
   const [passwordError, setPasswordError] = useState(false);
@@ -69,34 +71,40 @@ const ForgotPassword = () => {
       }
     }
   }
+  const handleEmailFocus = () => {
+    setIsEmailFocused(true);
+  };
 
+  const handleEmailBlur = () => {
+    setIsEmailFocused(false);
+  };
   const changePassword = () => {
 
     let data = qs.stringify({
       'username': 'carlos.eduardo@essentia.com.br',
       'change_key': '7413',
-      'new_password': 'abc123' 
+      'new_password': 'abc123'
     });
-    
+
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
       url: 'https://api-patient-dev.easy-health.app/o/reset-password',
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded', 
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
       },
-      data : data
+      data: data
     };
-    
+
     axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
   }
 
   const VerifyOTP = () => {
@@ -121,7 +129,7 @@ const ForgotPassword = () => {
           setShowPassword(true);
           setOTPbox(false);
           setInvalidOTP(false);
-        }else{
+        } else {
           handleShowSnackbar("Invalid OTP");
         }
       })
@@ -192,12 +200,19 @@ const ForgotPassword = () => {
         <Text style={styles.signup}>Forgot Password</Text>
         {!OTPbox && !showPassword &&
           <>
-            <TextInput
-              style={styles.inputEmail}
-              placeholder="E-mail"
-              value={username}
-              onChangeText={setUsername}
-            />
+            <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
+              <Svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 24 24" style={styles.icon}>
+                <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke="black" strokeWidth="1" />
+              </Svg>
+              <TextInput
+                style={styles.inputEmail}
+                placeholder="E-mail"
+                value={username}
+                onChangeText={setUsername}
+                onFocus={handleEmailFocus}
+                onBlur={handleEmailBlur}
+              />
+            </View>
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
               {usernameError && !username && (
                 <>
@@ -304,17 +319,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
   },
-
-  inputEmail: {
-    marginTop: '10%',
-    height: 40,
-    borderWidth: 0,
-    padding: 10,
-    marginBottom: 10,
-    borderBottomWidth: 2,
-    width: '90%',
+  inputContainer: {
+    marginTop:'6%',
+    flexDirection: 'row',
+    alignItems: 'center',
     fontSize: PixelRatio.getFontScale() * 18,
     borderBottomColor: config.secondaryColor,
+    borderBottomWidth: 2,
+    width: '90%',
+  },
+  inputEmail: {
+    flex: 1,
+    fontSize: PixelRatio.getFontScale() * 18,
+  },
+  icon: {
+    marginRight: 2,
+  },
+  focusedInput: {
+    borderBottomWidth:3,
   },
   inputConfirmPass: {
     marginTop: '1%',

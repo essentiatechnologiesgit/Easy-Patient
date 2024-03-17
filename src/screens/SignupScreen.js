@@ -10,6 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
 import ValidationError from '../components/ValidationError';
 import axios from 'axios';
+import Snackbar from '../components/Snackbar';
 import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
 import Svg, { Path } from 'react-native-svg';
@@ -27,7 +28,8 @@ const SignupScreen = () => {
   const [showLoader, setShowLoader] = useState(false);
   const [otp, setOtp] = useState('');
   const [isEmailFocused, setIsEmailFocused] = useState(false);
- 
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarKey, setSnackbarKey] = useState(0);
   //input feilds 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -182,6 +184,7 @@ const SignupScreen = () => {
         setShowLoader(false);
         handleShowSnackbar("The informed email is already in use. Please try using another one.");
       } else {
+        console.log("email checked");
         RegisterAccount();
       }
 
@@ -190,6 +193,10 @@ const SignupScreen = () => {
       setShowLoader(false);
     }
   }
+  const handleShowSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarKey((prevKey) => prevKey + 1);
+  };
 
   const handleVerifyOTP = () => {
     if (!otp) {
@@ -214,6 +221,7 @@ const SignupScreen = () => {
           console.log(JSON.stringify(response.data));
           if (response.data.valid === true) {
             // navigate to Dashboard
+            navigation.navigate("Dashboard");
           } else {
             handleShowSnackbar("Invalid OTP");
           }
@@ -225,14 +233,20 @@ const SignupScreen = () => {
   }
 
   const RegisterAccount = () => {
-
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    formattedDate = `${year}-${month}-${day}`;
+    console.log(email);
     let data = qs.stringify({
       'email': email,
       'fullname': fullName,
       'date_of_birth': formattedDate,
       'gender': selectedGender,
-      'password': password
+      'password': password,
+      'device': 'GALAXY' 
     });
+    console.log(data);
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -247,21 +261,26 @@ const SignupScreen = () => {
     axios.request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
-
+        console.log("registration here");
         if (response.data.created) {
           setShowLoader(false);
           setVerifyOTP(true);
           setShowForm(false);
         }
+       setShowLoader(false); 
       })
       .catch((error) => {
         console.log(error);
+        setShowLoader(false); 
       });
   }
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
       {/* <View style={styles.container}></View> */}
+  
       <View style={styles.container}>
+      {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
+      
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
         <Text style={styles.signup}>Signup</Text>

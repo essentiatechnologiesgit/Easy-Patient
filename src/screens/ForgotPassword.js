@@ -14,7 +14,8 @@ import qs from 'qs';
 const ForgotPassword = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isConfirmPassFocused, setIsConfirmPassFocused] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarKey, setSnackbarKey] = useState(0);
@@ -41,6 +42,21 @@ const ForgotPassword = () => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
+  const handlePasswordFocus = () => {
+    setIsPasswordFocused(true);
+  };
+
+  const handlePasswordBlur = () => {
+    setIsPasswordFocused(false);
+  };
+
+  const handleConfirmPassFocus = () => {
+    setIsConfirmPassFocused(true);
+  };
+
+  const handleConfirmPassBlur = () => {
+    setIsConfirmPassFocused(false);
+  };
 
   const handleConfirm = () => {
     setUsernameError(false);
@@ -66,7 +82,6 @@ const ForgotPassword = () => {
         setConfirmPasswordError(true);
         setErrorMessage("Incorrect Confirm Password");
       } else {
-        console.log("changePassword called");
         changePassword();
       }
     }
@@ -81,9 +96,9 @@ const ForgotPassword = () => {
   const changePassword = () => {
 
     let data = qs.stringify({
-      'username': 'carlos.eduardo@essentia.com.br',
-      'change_key': '7413',
-      'new_password': 'abc123'
+      'username': username,
+      'change_key': otp,
+      'new_password': password
     });
 
     let config = {
@@ -100,8 +115,11 @@ const ForgotPassword = () => {
     axios.request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        navigation.navigate("Dashboard");
       })
       .catch((error) => {
+        handleShowSnackbar('Error! try again');
+        navigation.goBack();
         console.log(error);
       });
 
@@ -232,11 +250,15 @@ const ForgotPassword = () => {
         {showPassword &&
           <>
             <TextInput
-              style={styles.inputEmail}
+              style={[
+                styles.inputConfirmPass,
+                isPasswordFocused && styles.focusedInput,
+              ]}
               placeholder="Password"
-              value={password}
               onChangeText={setPassword}
               secureTextEntry={true}
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
             />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
 
@@ -248,12 +270,16 @@ const ForgotPassword = () => {
               )}
             </View>
             <TextInput
-              style={styles.inputConfirmPass}
-              placeholder="Confirm Password"
-              value={ConfirmPass}
-              onChangeText={setConfirmPass}
-              secureTextEntry={true}
-            />
+        style={[
+          styles.inputConfirmPass,
+          isConfirmPassFocused && styles.focusedInput,
+        ]}
+        placeholder="Confirm Password"
+        onChangeText={setConfirmPass}
+        secureTextEntry={true}
+        onFocus={handleConfirmPassFocus}
+        onBlur={handleConfirmPassBlur}
+      />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
               {confirmPasswordError && !ConfirmPass && (
                 <>
@@ -296,9 +322,11 @@ const ForgotPassword = () => {
           <>
             <View style={{ marginTop: '8%' }}><Text style={styles.codeText}>Didn't receive the code?</Text><Text style={styles.codeText}>Click here:</Text></View>
             <View style={{ marginTop: '7%' }}>
+              <TouchableOpacity onPress={sendOTP}>
               <Text style={[styles.codeText, { textDecorationLine: 'underline', color: config.secondaryColor }]}>
                 Resend Code
               </Text>
+              </TouchableOpacity>
             </View>
           </>
         }
@@ -320,7 +348,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputContainer: {
-    marginTop:'6%',
+    marginTop: '6%',
     flexDirection: 'row',
     alignItems: 'center',
     fontSize: PixelRatio.getFontScale() * 18,
@@ -332,11 +360,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: PixelRatio.getFontScale() * 18,
   },
+  focusedInput: {
+    borderBottomWidth: 4, // Increased border bottom width when focused
+  },
   icon: {
     marginRight: 2,
   },
   focusedInput: {
-    borderBottomWidth:3,
+    borderBottomWidth: 3,
   },
   inputConfirmPass: {
     marginTop: '1%',

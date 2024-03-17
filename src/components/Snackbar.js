@@ -44,21 +44,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         paddingVertical: 10,
+        paddingHorizontal:25,
         borderRadius: 20,
         position: 'absolute',
         zIndex: 9999,
         width: '80%',
-        top: '50%',
+        bottom:'20%'
       },
       logoContainer: {
         backgroundColor: 'white',
         borderRadius: 10,
         padding: 1.5,
-        marginRight: 8, 
+        marginRight: 8,
+    
       },
       logo: {
         height: 20,
         width: 20,
+       
       },
       message: {
         color: '#fff',

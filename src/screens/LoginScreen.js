@@ -157,14 +157,12 @@ const LoginScreen = () => {
               onChangeText={setUsername}
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
-              // caretHidden={true} // Set to true if you want to hide the cursor
-              caretColor="red" // Set the color of the cursor
             />
           </View>
         </View>
 
 
-        <View style={{ width: '100%', right: 30, bottom: 10 }}>
+        <View style={{ width: '100%', right: 30, bottom: 0 }}>
           {usernameError && !username && (
             <>
               <AlertIcon />
@@ -172,7 +170,7 @@ const LoginScreen = () => {
             </>
           )}
         </View>
-        <View style={{ width: '100%', right: 30, bottom: 10 }}>
+        <View style={{ width: '100%', right: 30, bottom: 0 }}>
           {invalidEmail && (
             <>
               <AlertIcon />

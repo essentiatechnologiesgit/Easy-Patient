@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
       },
       errorText: {
         textAlign: 'right',
+        color:'black'
       },
       triangle: {
         position: 'absolute',

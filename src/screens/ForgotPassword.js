@@ -215,7 +215,9 @@ const ForgotPassword = () => {
       <View style={styles.container}>
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
-        <Text style={styles.signup}>Forgot Password</Text>
+        {!showPassword &&
+          <Text style={styles.signup}>Forgot Password</Text>
+        }
         {!OTPbox && !showPassword &&
           <>
             <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
@@ -226,12 +228,14 @@ const ForgotPassword = () => {
                 style={styles.inputEmail}
                 placeholder="E-mail"
                 value={username}
-                onChangeText={setUsername}
+                onChangeText={(text) => setUsername(text.trim())}
                 onFocus={handleEmailFocus}
                 onBlur={handleEmailBlur}
+                placeholderTextColor="gray"
+                color="black"
               />
             </View>
-            <View style={{ width: '100%', right: 30, bottom: 10 }}>
+            <View style={{ width: '100%', right: 30, bottom: 0 }}>
               {usernameError && !username && (
                 <>
                   <AlertIcon />
@@ -249,16 +253,19 @@ const ForgotPassword = () => {
         }
         {showPassword &&
           <>
+            <View style={{ marginTop: 55 }}></View>
             <TextInput
               style={[
                 styles.inputConfirmPass,
                 isPasswordFocused && styles.focusedInput,
               ]}
               placeholder="Password"
-              onChangeText={setPassword}
+              onChangeText={(text) => setPassword(text.trim())}
               secureTextEntry={true}
               onFocus={handlePasswordFocus}
               onBlur={handlePasswordBlur}
+              placeholderTextColor="gray"
+              color="black"
             />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
 
@@ -270,16 +277,18 @@ const ForgotPassword = () => {
               )}
             </View>
             <TextInput
-        style={[
-          styles.inputConfirmPass,
-          isConfirmPassFocused && styles.focusedInput,
-        ]}
-        placeholder="Confirm Password"
-        onChangeText={setConfirmPass}
-        secureTextEntry={true}
-        onFocus={handleConfirmPassFocus}
-        onBlur={handleConfirmPassBlur}
-      />
+              style={[
+                styles.inputConfirmPass,
+                isConfirmPassFocused && styles.focusedInput,
+              ]}
+              placeholder="Confirm Password"
+              onChangeText={setConfirmPass}
+              secureTextEntry={true}
+              onFocus={handleConfirmPassFocus}
+              onBlur={handleConfirmPassBlur}
+              placeholderTextColor="gray"
+              color="black"
+            />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
               {confirmPasswordError && !ConfirmPass && (
                 <>
@@ -323,9 +332,9 @@ const ForgotPassword = () => {
             <View style={{ marginTop: '8%' }}><Text style={styles.codeText}>Didn't receive the code?</Text><Text style={styles.codeText}>Click here:</Text></View>
             <View style={{ marginTop: '7%' }}>
               <TouchableOpacity onPress={sendOTP}>
-              <Text style={[styles.codeText, { textDecorationLine: 'underline', color: config.secondaryColor }]}>
-                Resend Code
-              </Text>
+                <Text style={[styles.codeText, { textDecorationLine: 'underline', color: config.secondaryColor }]}>
+                  Resend Code
+                </Text>
               </TouchableOpacity>
             </View>
           </>
@@ -387,6 +396,7 @@ const styles = StyleSheet.create({
   TextContainerText: {
     fontSize: PixelRatio.getFontScale() * 18,
     textAlign: 'center',
+    color: 'gray',
   },
   backgroundImage: {
     flex: 1,
@@ -404,6 +414,7 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: PixelRatio.getFontScale() * 18,
     textAlign: 'center',
+    color: 'gray'
   },
   subLogo: {
     marginTop: 10,

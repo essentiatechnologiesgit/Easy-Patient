@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         alignItems: 'center', 
     },
     text: {
-
+        color:'gray',
         marginLeft: 20, 
         fontSize: PixelRatio.getFontScale() * 18,
     }

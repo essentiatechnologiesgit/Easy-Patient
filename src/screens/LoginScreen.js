@@ -57,6 +57,7 @@ const LoginScreen = () => {
   };
 
   const Login = async () => {
+    setShowLoader(true);
     let data = qs.stringify({
       'grant_type': 'password',
       'username': username,
@@ -75,10 +76,13 @@ const LoginScreen = () => {
     try {
       const response = await axios.request(config);
       await AsyncStorage.setItem('loginResponse', JSON.stringify(response.data));
+      setShowLoader(false);
       navigation.navigate("Dashboard");
       setUsername('');
       setPassword('');
     } catch (error) {
+      setShowLoader(false);
+      handleShowSnackbar("Invalid username or password");  
       console.log(error);
     }
   }
@@ -154,9 +158,11 @@ const LoginScreen = () => {
               style={styles.inputEmail}
               placeholder="E-mail"
               value={username}
-              onChangeText={setUsername}
+              onChangeText={(text) => setUsername(text.trim())}
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
+              placeholderTextColor="gray" 
+              color="black"
             />
           </View>
         </View>
@@ -193,6 +199,8 @@ const LoginScreen = () => {
                   onChangeText={setPassword}
                   onFocus={handlePasswordFocus}
                   onBlur={handlePasswordBlur}
+                  placeholderTextColor="gray" 
+                  color="black"
                 />
               </View>
             </View>
@@ -255,6 +263,7 @@ const styles = StyleSheet.create({
   inputEmail: {
     flex: 1,
     fontSize: PixelRatio.getFontScale() * 18,
+    color: 'red',
   },
   inputPassword: {
     flex: 1,
@@ -305,7 +314,8 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     textDecorationLine: 'underline',
     textAlign: 'right',
-    fontSize: PixelRatio.getFontScale() * 18
+    fontSize: PixelRatio.getFontScale() * 18,
+    color:'grey',
   },
   register: {
     paddingTop: '15%',

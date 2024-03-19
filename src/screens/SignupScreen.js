@@ -48,7 +48,15 @@ const SignupScreen = () => {
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [verifyOTP, setVerifyOTP] = useState(false);
   const handleRegister = () => {
-    setShowForm(true);
+    setEmailError(false);
+      
+    if(!email){
+      setEmailError(true);
+      setErrorMessage("Incorrect E-mail/Username")
+    }else{
+      
+      setShowForm(true);
+    }
     // setVerifyOTP(true);
   };
   const handleOtpChange = (otpValue) => {
@@ -244,7 +252,7 @@ const SignupScreen = () => {
       'date_of_birth': formattedDate,
       'gender': selectedGender,
       'password': password,
-      'device': 'GALAXY' 
+      'device': 'GALAXY'
     });
     console.log(data);
     let config = {
@@ -267,25 +275,25 @@ const SignupScreen = () => {
           setVerifyOTP(true);
           setShowForm(false);
         }
-       setShowLoader(false); 
+        setShowLoader(false);
       })
       .catch((error) => {
         console.log(error);
-        setShowLoader(false); 
+        setShowLoader(false);
       });
   }
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
       {/* <View style={styles.container}></View> */}
-  
+
       <View style={styles.container}>
-      {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
-      
+        {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
+
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
         <Text style={styles.signup}>Signup</Text>
         {!showForm && !verifyOTP && <View style={styles.signupContainer} >
-        <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
+          <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
             <Svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 24 24" style={styles.icon}>
               <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke="black" strokeWidth="1" />
             </Svg>
@@ -293,11 +301,22 @@ const SignupScreen = () => {
               style={styles.inputEmail}
               placeholder="E-mail"
               value={email}
-              onChangeText={setEmail}
+              placeholderTextColor="gray"
+              color="black"
+              onChangeText={(text) => setEmail(text.trim())}
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
             />
+            
           </View>
+          <View style={{ width: '100%', right: 30, bottom: 0 }}>
+              {emailError && !email && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+            </View>
           <View style={styles.checkbox}>
             <CheckBox
               value={termsAccepted}
@@ -372,7 +391,7 @@ const SignupScreen = () => {
                   <TouchableOpacity onPress={handlePressDatePicker}>
                     <View style={{ ...styles.containerStyles }}>
                       {date ? (
-                        <Text style={{ marginBottom: 10 }}>Date Of Birth</Text>
+                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Date Of Birth</Text>
                       ) : (
                         <TextInput
                           style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
@@ -433,6 +452,10 @@ const SignupScreen = () => {
                         fontSize: placeholderLabelAnim.interpolate({
                           inputRange: [0, 1.5],
                           outputRange: [PixelRatio.getFontScale() * 18, PixelRatio.getFontScale() * 16], // Change font size after animation
+                        }),
+                        color: placeholderLabelAnim.interpolate({
+                          inputRange: [0, 1.5],
+                          outputRange: ['gray', config.secondaryColor], // Change font color after animation
                         }),
                       },
                     ]}
@@ -564,7 +587,7 @@ const styles = StyleSheet.create({
     marginTop: '20%'
   },
   inputContainer: {
-    marginTop:'4%',
+    marginTop: '4%',
     flexDirection: 'row',
     alignItems: 'center',
     fontSize: PixelRatio.getFontScale() * 18,
@@ -588,6 +611,7 @@ const styles = StyleSheet.create({
   TextContainerText: {
     fontSize: PixelRatio.getFontScale() * 18,
     textAlign: 'center',
+    color: 'gray'
   },
   inputEmail: {
     flex: 1,
@@ -597,7 +621,7 @@ const styles = StyleSheet.create({
     marginRight: 2,
   },
   focusedInput: {
-    borderBottomWidth:3,
+    borderBottomWidth: 3,
   },
   OTPContainer: {
     marginTop: 50,
@@ -605,6 +629,7 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: PixelRatio.getFontScale() * 18,
     textAlign: 'center',
+    color: 'gray',
   },
   label: {
     position: 'absolute',
@@ -689,7 +714,7 @@ const styles = StyleSheet.create({
     fontSize: PixelRatio.getFontScale() * 18,
     color: config.secondaryColor,
     textDecorationLine: 'underline',
-    marginTop: 50,
+    marginTop: 30,
   },
   inputPassword: {
     marginTop: 10,
@@ -753,7 +778,7 @@ const styles = StyleSheet.create({
     fontSize: PixelRatio.getFontScale() * 18
   },
   checkbox: {
-    marginTop:'4%',
+    marginTop: '4%',
     width: '90%',
     justifyContent: 'left',
     textAlign: 'left',
@@ -762,6 +787,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: PixelRatio.getFontScale() * 18,
     padding: 2,
+    color: 'gray',
     flexDirection: 'row',
     textAlign: 'center',
     alignItems: 'center',

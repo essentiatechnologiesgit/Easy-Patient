@@ -25,6 +25,9 @@ const Dashboard = () => {
             console.error('Error retrieving loginResponse from AsyncStorage:', error);
         }
     }
+    handleLogout = () => {
+        navigation.navigate('Login');
+    }
 
     useEffect(() => {
         getLoginResponse();
@@ -36,6 +39,9 @@ const Dashboard = () => {
                 <View style={styles.HeaderContainer}>
                     <Image source={config.logo} style={styles.logo}></Image>
                     <Image source={profileIcon} style={styles.Profilelogo}></Image>
+                    <TouchableOpacity  onPress={handleLogout}>
+                        <Text>Logout</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.NameContainer}>
                     <Text style={styles.nameHeading}>Hello {name}!</Text>

@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         backgroundColor: '#FFFFFF',
-        justifyContent: 'space-around',
+        justifyContent: 'space-evenly',
         borderWidth: 1,
         borderColor: '#00000033',
         elevation: 1,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         height: 2,
         backgroundColor: '#707070',
         top: 0,
-        left: 10,
+        left: 12,
     },
 });
 

@@ -21,9 +21,9 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderWidth:1,
-    width: '80%',
+    width: '90%',
     elevation: 3,
     borderRadius: 30,
   },

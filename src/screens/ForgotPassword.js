@@ -94,7 +94,7 @@ const ForgotPassword = () => {
     setIsEmailFocused(false);
   };
   const changePassword = () => {
-
+    setShowLoader(true);
     let data = qs.stringify({
       'username': username,
       'change_key': otp,
@@ -115,9 +115,11 @@ const ForgotPassword = () => {
     axios.request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        setShowLoader(false);
         navigation.navigate("Dashboard");
       })
       .catch((error) => {
+        setShowLoader(false);
         handleShowSnackbar('Error! try again');
         navigation.goBack();
         console.log(error);
@@ -316,7 +318,7 @@ const ForgotPassword = () => {
         <View style={{ width: '100%', marginTop: 40 }}>
           <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
         </View>
-        {!OTPbox &&
+        {!OTPbox && !showPassword &&
           <>
             <TouchableOpacity onPress={handleRegister}>
               <Text style={styles.login}>Register</Text>
@@ -360,33 +362,35 @@ const styles = StyleSheet.create({
     marginTop: '6%',
     flexDirection: 'row',
     alignItems: 'center',
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     borderBottomColor: config.secondaryColor,
     borderBottomWidth: 2,
     width: '90%',
   },
   inputEmail: {
+    marginBottom:-8,
     flex: 1,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
   },
   focusedInput: {
     borderBottomWidth: 4, // Increased border bottom width when focused
   },
   icon: {
+    marginBottom:-7,
     marginRight: 2,
   },
   focusedInput: {
     borderBottomWidth: 3,
   },
   inputConfirmPass: {
-    marginTop: '1%',
+    // marginTop: '1%',
     height: 40,
     borderWidth: 0,
-    padding: 10,
-    marginBottom: 10,
+    padding: 0,
+    marginBottom: 15,
     borderBottomWidth: 2,
     width: '90%',
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     borderBottomColor: config.secondaryColor,
   },
   TextContainer: {
@@ -394,7 +398,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   TextContainerText: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     textAlign: 'center',
     color: 'gray',
   },
@@ -404,24 +408,28 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   OTPContainer: {
-    marginTop: 50,
+    marginTop: 40,
   },
   logo: {
+    height:58,
     borderColor: '#fff',
     resizeMode: 'contain',
     zIndex: 999,
+  },
+  subLogo: {
+    height:19,
+    width:180,
+    marginTop: 10,
   },
   codeText: {
     fontSize: PixelRatio.getFontScale() * 18,
     textAlign: 'center',
     color: 'gray'
   },
-  subLogo: {
-    marginTop: 10,
-  },
+
   signup: {
     fontWeight: 'bold',
-    fontSize: PixelRatio.getFontScale() * 22,
+    fontSize: PixelRatio.getFontScale() * 18,
     marginTop: 30,
     color: config.textColorHeadings,
   },
@@ -429,7 +437,7 @@ const styles = StyleSheet.create({
     paddingTop: '15%',
     textDecorationLine: 'underline',
     color: config.secondaryColor,
-    fontSize: PixelRatio.getFontScale() * 18
+    fontSize: PixelRatio.getFontScale() * 15
   },
 });
 

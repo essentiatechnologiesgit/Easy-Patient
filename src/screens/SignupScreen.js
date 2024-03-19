@@ -49,13 +49,13 @@ const SignupScreen = () => {
   const [verifyOTP, setVerifyOTP] = useState(false);
   const handleRegister = () => {
     setEmailError(false);
-      
+    
     if(!email){
       setEmailError(true);
       setErrorMessage("Incorrect E-mail/Username")
-    }else{
-      
-      setShowForm(true);
+    }
+    else{
+      setShowForm(true); 
     }
     // setVerifyOTP(true);
   };
@@ -217,12 +217,12 @@ const SignupScreen = () => {
       let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://api-patient-dev.easy-health.app/patient/verify-otp',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+        url: 'https://api-patient-dev.easy-health.app/patient/activate',
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded', 
           'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
         },
-        data: data
+        data : data
       };
       axios.request(config)
         .then((response) => {
@@ -323,7 +323,7 @@ const SignupScreen = () => {
               onValueChange={() => { setTermsAccepted(!termsAccepted) }}
               tintColors={{ true: config.secondaryColor }}
             />
-            <Text style={styles.text}>I accept the </Text><Text style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
+            <Text style={styles.textt}>I accept the </Text><Text style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
           </View>
           <TouchableOpacity
             style={[termsAccepted ? { backgroundColor: config.secondaryColor } : { backgroundColor: 'rgba(0,0,0,0)' },
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
     marginTop: '4%',
     flexDirection: 'row',
     alignItems: 'center',
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     borderBottomColor: config.secondaryColor,
     borderBottomWidth: 2,
     width: '90%',
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 14,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     color: config.primaryColor,
     zIndex: 1,
     lineHeight: PixelRatio.getFontScale() * 20,
@@ -609,15 +609,17 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   TextContainerText: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     textAlign: 'center',
     color: 'gray'
   },
   inputEmail: {
+    marginBottom:-8,
     flex: 1,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
   },
   icon: {
+    marginBottom:-8,
     marginRight: 2,
   },
   focusedInput: {
@@ -627,7 +629,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   codeText: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     textAlign: 'center',
     color: 'gray',
   },
@@ -635,7 +637,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     color: config.primaryColor,
     zIndex: 1,
     paddingHorizontal: 8,
@@ -644,7 +646,7 @@ const styles = StyleSheet.create({
   },
   labelFloating: {
     top: -PixelRatio.getFontScale() * 4,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
   },
   dropdownPicker: {
     backgroundColor: 'transparent',
@@ -654,7 +656,7 @@ const styles = StyleSheet.create({
   },
   dropdownTextStyle: {
     color: config.primaryColor,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
   },
   button: {
     marginTop: 10,
@@ -711,7 +713,7 @@ const styles = StyleSheet.create({
   },
 
   backLink: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     color: config.secondaryColor,
     textDecorationLine: 'underline',
     marginTop: 30,
@@ -724,7 +726,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderBottomWidth: 2,
     width: '90%',
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     borderBottomColor: config.secondaryColor,
   },
   backgroundImage: {
@@ -733,17 +735,18 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   logo: {
+    
     borderColor: '#fff',
     resizeMode: 'contain',
     zIndex: 999,
   },
   subLogo: {
-    marginTop: 10,
+    marginTop: 15,
   },
 
   signup: {
     fontWeight: 'bold',
-    fontSize: PixelRatio.getFontScale() * 22,
+    fontSize: PixelRatio.getFontScale() * 20,
     marginTop: '6%',
     color: config.textColorHeadings,
   },
@@ -760,7 +763,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: config.secondaryColor,
     borderColor: config.secondaryColor,
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     // backgroundColor: 'rgba(0,0,0,0)', // Set background color directly
   },
   forgotPassword: {
@@ -769,13 +772,13 @@ const styles = StyleSheet.create({
     width: '90%',
     textAlign: 'right',
     marginTop: 20,
-    fontSize: PixelRatio.getFontScale() * 18
+    fontSize: PixelRatio.getFontScale() * 17
   },
   login: {
     paddingTop: '15%',
     textDecorationLine: 'underline',
     color: config.secondaryColor,
-    fontSize: PixelRatio.getFontScale() * 18
+    fontSize: PixelRatio.getFontScale() * 15
   },
   checkbox: {
     marginTop: '4%',
@@ -785,7 +788,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   text: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
+    padding: 2,
+    color: config.secondaryColor,
+    flexDirection: 'row',
+    textAlign: 'center',
+    alignItems: 'center',
+  },
+  textt: {
+    fontSize: PixelRatio.getFontScale() * 17,
     padding: 2,
     color: 'gray',
     flexDirection: 'row',
@@ -813,7 +824,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   containerStyles: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     borderWidth: 0,
     height: '100%',
     paddingVertical: 0,
@@ -825,13 +836,14 @@ const styles = StyleSheet.create({
     colorFocused: config.secondaryColor,
     colorBlurred: config.primaryColor,
     fontSizeFocused: PixelRatio.getFontScale() * 14,
-    fontSizeBlurred: PixelRatio.getFontScale() * 18,
+    fontSizeBlurred: PixelRatio.getFontScale() * 17,
     paddingVertical: 0,
     paddingHorizontal: 0,
+    
     marginVertical: 0
   },
   inputStyles: {
-    fontSize: PixelRatio.getFontScale() * 18,
+    fontSize: PixelRatio.getFontScale() * 17,
     paddingBottom: 0,
     paddingHorizontal: 0,
     paddingTop: 30,

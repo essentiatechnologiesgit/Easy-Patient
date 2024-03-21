@@ -47,22 +47,27 @@ const SignupScreen = () => {
   const [PasswordMatch, setPasswordMatch] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [verifyOTP, setVerifyOTP] = useState(false);
+  const [pLengthError, setPLengthError] = useState(false);
+  const [cpLengthError, setCPLengthError] = useState(false);
   const handleRegister = () => {
     setEmailError(false);
-    
-    if(!email){
+    setInvalidEmail(false);
+    if (!email) {
       setEmailError(true);
       setErrorMessage("Incorrect E-mail/Username")
+    } else if (!validateEmail(email)) {
+      setInvalidEmail(true);
+      setErrorMessage("Invalid email");
     }
-    else{
-      setShowForm(true); 
+    else {
+      setShowForm(true);
     }
-    // setVerifyOTP(true);
   };
   const handleOtpChange = (otpValue) => {
     setOtp(otpValue);
-    // console.warn(otpValue);
   };
+
+
 
   let formattedDate = '';
   if (date) {
@@ -100,7 +105,7 @@ const SignupScreen = () => {
   };
 
   const handleLogin = () => {
-    navigation.goBack();
+    navigation.navigate("Login");
   }
 
   const genders = [
@@ -141,6 +146,8 @@ const SignupScreen = () => {
     setEmailError(false);
     setFullNameError(false);
     setDateError(false);
+    setCPLengthError(false);
+    setPLengthError(false);
     setGenderError(false);
     setConfirmPasswordError(false);
     setPasswordError(false);
@@ -169,11 +176,19 @@ const SignupScreen = () => {
     }
     else if (!password) {
       setPasswordError(true);
-      setErrorMessage("Please provide password");
+      setErrorMessage("Please provide Password");
+    }
+    else if (password.length < 5) {
+      setPLengthError(true);
+      setErrorMessage("Please provide 5 digits password");
     }
     else if (!confirmPassword) {
       setConfirmPasswordError(true);
       setErrorMessage("Please provide Confirm Password");
+    }
+    else if (confirmPassword.length < 5) {
+      setCPLengthError(true);
+      setErrorMessage("Please provide 5 digits password");
     }
     else if (confirmPassword != password) {
       setPasswordMatch(true);
@@ -218,11 +233,11 @@ const SignupScreen = () => {
         method: 'post',
         maxBodyLength: Infinity,
         url: 'https://api-patient-dev.easy-health.app/patient/activate',
-        headers: { 
-          'Content-Type': 'application/x-www-form-urlencoded', 
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
           'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
         },
-        data : data
+        data: data
       };
       axios.request(config)
         .then((response) => {
@@ -294,9 +309,6 @@ const SignupScreen = () => {
         <Text style={styles.signup}>Signup</Text>
         {!showForm && !verifyOTP && <View style={styles.signupContainer} >
           <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
-            <Svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 24 24" style={styles.icon}>
-              <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke="black" strokeWidth="1" />
-            </Svg>
             <TextInput
               style={styles.inputEmail}
               placeholder="E-mail"
@@ -307,16 +319,22 @@ const SignupScreen = () => {
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
             />
-            
+
           </View>
           <View style={{ width: '100%', right: 30, bottom: 0 }}>
-              {emailError && !email && (
-                <>
-                  <AlertIcon />
-                  <ValidationError errorMessage={errorMessage} />
-                </>
-              )}
-            </View>
+            {emailError && !email && (
+              <>
+                <AlertIcon />
+                <ValidationError errorMessage={errorMessage} />
+              </>
+            )}
+            {invalidEmail && (
+              <>
+                <AlertIcon />
+                <ValidationError errorMessage={errorMessage} />
+              </>
+            )}
+          </View>
           <View style={styles.checkbox}>
             <CheckBox
               value={termsAccepted}
@@ -511,6 +529,12 @@ const SignupScreen = () => {
                       <ValidationError errorMessage={errorMessage} />
                     </>
                   )}
+                  {pLengthError && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
                 </View>
                 <View style={styles.floatingLabel}>
                   <FloatingLabelInput
@@ -525,6 +549,12 @@ const SignupScreen = () => {
                     customShowPasswordComponent={<View></View>}
                   />
                   {confirmPasswordError && !confirmPassword && (
+                    <>
+                      <AlertIcon />
+                      <ValidationError errorMessage={errorMessage} />
+                    </>
+                  )}
+                  {cpLengthError  && (
                     <>
                       <AlertIcon />
                       <ValidationError errorMessage={errorMessage} />
@@ -614,12 +644,12 @@ const styles = StyleSheet.create({
     color: 'gray'
   },
   inputEmail: {
-    marginBottom:-8,
+    marginBottom: -8,
     flex: 1,
     fontSize: PixelRatio.getFontScale() * 17,
   },
   icon: {
-    marginBottom:-8,
+    marginBottom: -8,
     marginRight: 2,
   },
   focusedInput: {
@@ -735,7 +765,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   logo: {
-    
     borderColor: '#fff',
     resizeMode: 'contain',
     zIndex: 999,
@@ -839,7 +868,7 @@ const styles = StyleSheet.create({
     fontSizeBlurred: PixelRatio.getFontScale() * 17,
     paddingVertical: 0,
     paddingHorizontal: 0,
-    
+
     marginVertical: 0
   },
   inputStyles: {

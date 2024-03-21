@@ -25,7 +25,7 @@ const FolderSlider = () => {
                     <View style={styles.smallContainer}>
                     </View>
                     <Image source={fork} style={styles.logo}></Image>
-                    <View style={{ marginLeft: 10 }}>
+                    <View style={{ marginLeft: 10 ,marginTop:-3 }}>
                         <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Meal Plans</Text>
                         <Text style={styles.files}>0  files</Text>
                     </View>
@@ -71,16 +71,16 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     heading:{
-        fontSize: PixelRatio.getFontScale() * 22,
+        fontSize: PixelRatio.getFontScale() * 20,
         color: config.textColorHeadings,
-        marginBottom:10,
-        fontWeight:'bold',
+        marginBottom:-10,
+        fontWeight:'500',
     },
     scrollViewContent: {
         alignItems: "center",
     },
     folderHeading: {
-        fontSize: PixelRatio.getFontScale() * 18,
+        fontSize: PixelRatio.getFontScale() * 16,
         color: "black",
 
     },
@@ -89,30 +89,30 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
     },
     FolderContainer: {
-        width: 143,
-        height: 105,
+        width: 145,
+        height: 90,
         borderRadius: 14,
         marginRight: 20,
         opacity: 1,
         backgroundColor: 'white',
-        elevation:3,
+        elevation:0,
     },
     logo: {
         top: -10,
-        height: 30,
-        width: 30,
+        height: 25,
+        width: 25,
         marginLeft: 10,
     },
     filelogo: {
         top: -10,
-        height: 32,
-        width: 26,
+        height: 25,
+        width: 20,
         marginLeft: 10,
     },
     heartlogo: {
         top: -10,
-        height: 30,
-        width: 34,
+        height: 26,
+        width: 30,
         marginLeft: 10,
     },
     smallContainer: {

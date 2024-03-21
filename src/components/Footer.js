@@ -1,82 +1,73 @@
 import React, { useRef, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, PixelRatio, Animated } from 'react-native';
 import more from '../assets/more.png';
-import home from '../assets/home.png';
+import home from '../assets/homeLight.png';
+import homeDark from '../assets/homeDark.png';
+
 import calendar from '../assets/calendar.png';
+import calendarDark from '../assets/calendarDark.png';
 import jar from '../assets/jar.png';
+import jarLight from '../assets/jarLight.png';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 const Footer = () => {
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const indicatorX = useRef(new Animated.Value(0)).current;
-    const [activeTab, setActiveTab] = useState('');
+    const [activeTab, setActiveTab] = useState(0);
     const moveIndicator = (index) => {
         setActiveTab(index);
-        if (index !== 3) {
-            let touchableWidth = 0;
-            if (index === 2) {
-                touchableWidth = index === 0 ? 0 : (index / 3) * 112;
-            } else {
-                touchableWidth = index === 0 ? 0 : (index / 3) * 100;
-            }
-            Animated.spring(indicatorX, {
-                toValue: touchableWidth,
-                useNativeDriver: false,
-            }).start();
-            setIndicatorPosition(touchableWidth);
-        }
+
     };
 
     return (
         <>
             <View style={styles.container}>
+            
                 <TouchableOpacity
                     style={styles.touchable}
-                    onPress={() => moveIndicator(0)}
-                >
-                    <Image source={home} style={
+                    onPress={() => moveIndicator(0)}>
+                    <Image source={activeTab === 0 ? homeDark : home} style={
                         [styles.icon,
                         activeTab === 1 && styles.activeTabIcon
-                        ]
-                    }></Image>
-                    <Text style={styles.text}>Home</Text>
+                        ]}>
+                    </Image>
+                    {activeTab === 0 && <View style={styles.borderHome} />}
+
+                    <Text style={activeTab === 0 ? styles.textDark : styles.text}>Home</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.touchable}
                     onPress={() => moveIndicator(1)}
                 >
-                    <Image source={jar} style={styles.icon}></Image>
-                    <Text style={styles.text}>Reminders</Text>
+                    {activeTab === 1 && <View style={styles.borderReminder} />}
+                    <Image
+                        source={activeTab === 1 ? jar : jarLight}
+                        style={styles.iconR}
+                    />
+                    <Text
+                        style={activeTab === 1 ? styles.textDark : styles.text}
+                    >
+                        Reminders
+                    </Text>
                 </TouchableOpacity>
+
+
                 <TouchableOpacity
                     style={styles.touchable}
                     onPress={() => moveIndicator(2)}
                 >
-                    <Image source={calendar} style={styles.icon}></Image>
-                    <Text style={styles.text}>Appointments</Text>
+                    {activeTab === 2 && <View style={styles.border} />}
+
+                    <Image source={activeTab === 2 ? calendarDark : calendar} style={styles.iconA}></Image>
+                    <Text style={activeTab === 2 ? styles.textDark : styles.text}>Appointments</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.touchable}
-                    onPress={() => moveIndicator(3)}
                 >
-                    <Image source={more} style={styles.icon}></Image>
+                    <Image source={more} style={styles.iconM}></Image>
                     <Text style={styles.text}>Mails</Text>
                 </TouchableOpacity>
-                <Animated.View
-                    style={[
-                        styles.indicator,
-                        {
-                            transform: [
-                                {
-                                    translateX: Animated.multiply(indicatorX, PixelRatio.getFontScale() * 3).interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: [0, 1],
-                                    }),
-                                },
-                            ],
-                            width: '15%',
-                        },
-                    ]}
-                />
+
             </View >
         </>
     );
@@ -85,28 +76,76 @@ const Footer = () => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#9CA29926',
         justifyContent: 'space-evenly',
-        borderWidth: 1,
-        borderColor: '#00000033',
-        elevation: 1,
+        borderTopColor: '#00000033',
+        // borderColor: '#00000033',
+        elevation: 2,
         position: 'relative',
+        height: 62,
     },
-    activeTabIcon:{
-        // color:"#55565C",
+    textDark: {
+        color: "#55565C",
     },
+    iconR: {
+        top:3,
+        height: 28,
+        width: 24,
+    },
+    iconA: {
+        top:2,
+        height: 26,
+        width: 24,
+    },
+    
     touchable: {
         alignItems: 'center',
         justifyContent: 'center',
+        alignContent:'center',
         paddingVertical: 8,
         paddingHorizontal: 16,
+        position: 'relative', 
+    },
+    borderHome: {
+        position: 'absolute',
+        top: 0,
+        left: 10,
+        right: 10,
+        height: 3,
+        backgroundColor: '#707070',
+        marginTop: 2, // Adjust this value to control the distance between the border and the content
+    },
+    borderReminder: {
+        position: 'absolute',
+        top: 0,
+        left: 20,
+        right: 20,
+        height: 3,
+        backgroundColor: '#707070',
+        marginTop: 2, // Adjust this value to control the distance between the border and the content
+    },
+    border: {
+        position: 'absolute',
+        top: 0,
+        left: 30,
+        right: 30,
+        height: 3,
+        backgroundColor: '#707070',
+        marginTop: 2, // Adjust this value to control the distance between the border and the content
     },
     icon: {
-        height: 29,
-        width: 29,
+        // top:1,
+        height: 25,
+        width: 25,
+    },
+    iconM: {
+        top:1,
+        height: 25,
+        width: 25,
     },
     text: {
         fontSize: PixelRatio.getFontScale() * 14,
+        color: '#55565CB3',
     },
     indicator: {
         position: 'absolute',

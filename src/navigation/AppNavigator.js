@@ -6,6 +6,7 @@ import Login from '../screens/LoginScreen';
 import { StyleSheet } from 'react-native';
 import Signup from '../screens/SignupScreen';
 import ForgotPassword from '../screens/ForgotPassword';
+import Profile from '../screens/Profile';
 import Dashboard from '../screens/Dashboard';
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
         <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} />
+        <Stack.Screen style={styles.container} name="Profile" component={Profile} />
       </Stack.Navigator>
     </NavigationContainer>
   );

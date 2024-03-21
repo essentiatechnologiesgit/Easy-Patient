@@ -18,24 +18,26 @@ const Medications = () => {
 
 const styles = StyleSheet.create({
     heading: {
-        fontSize: PixelRatio.getFontScale() * 22,
+        fontSize: PixelRatio.getFontScale() * 20,
         color: config.textColorHeadings,
         marginBottom: 10,
-        fontWeight: 'bold',
+        fontWeight: '500',
+        marginLeft:16,
     },
     emptyText:{
-        fontSize: PixelRatio.getFontScale() * 18,
+        fontSize: PixelRatio.getFontScale() * 17,
         padding:6,
+        color:'#82848D',
         textAlign:'center',
     },
     container:{
         backgroundColor:'white',
         justifyContent:'center',
         alignItems:'center',
+        alignSelf:'center',
         minHeight:120,
         borderRadius:12,
-        marginLeft:6,
-        marginRight:18,
+        width:'92%',
     },
 });
 

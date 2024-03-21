@@ -33,6 +33,11 @@ const ForgotPassword = () => {
   const [passwordInput, setPasswordInput] = useState(true);
   const [passwordError, setPasswordError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [matchError, setMatchError] = useState(false);
+  const [validePassword, setValidPassword] = useState(false);
+  const [pLengthError, setPLengthError] = useState(false);
+  const [cpLengthError, setCPLengthError] = useState(false);
+
   const handleOtpChange = (otpValue) => {
     setOtp(otpValue);
     // console.warn(otpValue);
@@ -60,6 +65,10 @@ const ForgotPassword = () => {
 
   const handleConfirm = () => {
     setUsernameError(false);
+    setMatchError(false);
+    setCPLengthError(false);
+    setPLengthError(false);
+    setConfirmPasswordError(false);
     setErrorMessage('');
     if (!username) {
       setUsernameError(true);
@@ -78,11 +87,27 @@ const ForgotPassword = () => {
       if (!password) {
         setPasswordError(true);
         setErrorMessage("Incorrect Password");
-      } else if (!ConfirmPass) {
+      }
+      else if (password.length < 5) {
+        setPLengthError(true);
+        setErrorMessage("Please provide 5 digits password");
+      }
+      else if (!ConfirmPass) {
         setConfirmPasswordError(true);
         setErrorMessage("Incorrect Confirm Password");
-      } else {
-        changePassword();
+      }
+      else if (ConfirmPass.length < 5) {
+        setCPLengthError(true);
+        setErrorMessage("Please provide 5 digits password");
+      }
+      else {
+        if (password != ConfirmPass) {
+          setMatchError(true);
+          setErrorMessage("Passwords does not match");
+        }
+        else {
+          changePassword();
+        }
       }
     }
   }
@@ -125,6 +150,22 @@ const ForgotPassword = () => {
         console.log(error);
       });
 
+  }
+  function validatePassword(password) {
+    const letterRegex = /[a-zA-Z]/;
+    const digitRegex = /\d/;
+
+    if (password.length < 5) {
+      console.log("count error");
+      return false;
+    }
+    const containsLetter = letterRegex.test(password);
+    const containsDigit = digitRegex.test(password);
+    if (!containsLetter || !containsDigit) {
+      console.log("letter d error");
+      return false;
+    }
+    return true;
   }
 
   const VerifyOTP = () => {
@@ -223,9 +264,6 @@ const ForgotPassword = () => {
         {!OTPbox && !showPassword &&
           <>
             <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
-              <Svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 24 24" style={styles.icon}>
-                <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke="black" strokeWidth="1" />
-              </Svg>
               <TextInput
                 style={styles.inputEmail}
                 placeholder="E-mail"
@@ -270,8 +308,13 @@ const ForgotPassword = () => {
               color="black"
             />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
-
               {passwordError && !password && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+              {pLengthError && (
                 <>
                   <AlertIcon />
                   <ValidationError errorMessage={errorMessage} />
@@ -291,8 +334,22 @@ const ForgotPassword = () => {
               placeholderTextColor="gray"
               color="black"
             />
-            <View style={{ width: '100%', right: 30, bottom: 10 }}>
+            <View style={{ width: '100%', right: 30, bottom: 15 }}>
               {confirmPasswordError && !ConfirmPass && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+            </View>
+            <View style={{ width: '100%', right: 30, bottom: 15 }}>
+              {matchError && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+              {cpLengthError && (
                 <>
                   <AlertIcon />
                   <ValidationError errorMessage={errorMessage} />
@@ -368,7 +425,7 @@ const styles = StyleSheet.create({
     width: '90%',
   },
   inputEmail: {
-    marginBottom:-8,
+    marginBottom: -8,
     flex: 1,
     fontSize: PixelRatio.getFontScale() * 17,
   },
@@ -376,7 +433,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4, // Increased border bottom width when focused
   },
   icon: {
-    marginBottom:-7,
+    marginBottom: -7,
     marginRight: 2,
   },
   focusedInput: {
@@ -411,14 +468,14 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   logo: {
-    height:58,
+    height: 58,
     borderColor: '#fff',
     resizeMode: 'contain',
     zIndex: 999,
   },
   subLogo: {
-    height:19,
-    width:180,
+    height: 19,
+    width: 180,
     marginTop: 10,
   },
   codeText: {

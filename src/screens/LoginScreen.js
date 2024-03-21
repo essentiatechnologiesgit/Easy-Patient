@@ -151,9 +151,6 @@ const LoginScreen = () => {
         <Text style={styles.login}>Login</Text>
         <View style={styles.FormContainer}>
           <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
-            <Svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 24 24" style={styles.icon}>
-              <Path d="M22 6.27V18H2V6.27l9.99 7.36L22 6.27zM12 13.36L3.09 7.12H20.91L12 13.36z" fill="none" stroke="black" strokeWidth="1" />
-            </Svg>
             <TextInput
               style={styles.inputEmail}
               placeholder="E-mail"

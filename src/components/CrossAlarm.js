@@ -1,15 +1,21 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
-const CrossAlarm = () => {
+import React, { useState } from 'react';
+import { TouchableWithoutFeedback, Text, View, StyleSheet } from 'react-native';
+import BottomModal from './BottomModal';
+const CrossAlarm = ({ time }) => {
+    const [modalVisible, setModalVisible] = useState(false);
     return (
-        <View style={styles.container}>
-            <View style={styles.circle}>
-                <View style={[styles.line, styles.lineDiagonal]} />
-                <View style={[styles.line, styles.lineDiagonal, styles.lineRotated]} />
-            </View>
-            <Text style={styles.text}>21:06 - Alarm</Text>
-        </View>
+        <>
+            <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+                <View style={styles.container}>
+                    <View style={styles.circle}>
+                        <View style={[styles.line, styles.lineDiagonal]} />
+                        <View style={[styles.line, styles.lineDiagonal, styles.lineRotated]} />
+                    </View>
+                    <Text style={styles.text}>{time} - Alarm</Text>
+                </View>
+            </TouchableWithoutFeedback>
+            <BottomModal visible={modalVisible} modalfor={"CrossAlarm"} onClose={() => setModalVisible(false)} />
+        </>
     );
 };
 
@@ -23,6 +29,7 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         alignSelf: 'center',
+
     },
     text: {
         marginLeft: 8,

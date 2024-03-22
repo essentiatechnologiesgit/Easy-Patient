@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, Button, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, findNodeHandle, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox'
@@ -17,6 +17,7 @@ import Svg, { Path } from 'react-native-svg';
 import AlertIcon from '../components/AlertIcon';
 import OtpInput from '../components/OTPInput';
 const SignupScreen = () => {
+  const scrollViewRef = useRef();
   const navigation = useNavigation();
   const [placeholderLabelAnim] = useState(new Animated.Value(selectedGender ? 1 : 0));
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -37,6 +38,7 @@ const SignupScreen = () => {
   const [fullName, setFullName] = useState('');
   const [date, setDate] = useState("");
   const [selectedGender, setSelectedGender] = useState('');
+  const errorRefs = useRef([]);
   //validation feilds
   const [emailError, setEmailError] = useState(false);
   const [fullNameError, setFullNameError] = useState(false);
@@ -68,6 +70,14 @@ const SignupScreen = () => {
   };
 
 
+  const handleScrollToError = (index) => {
+    const errorRef = errorRefs.current[index];
+    if (errorRef) {
+      errorRef.measure((x, y, width, height, pageX, pageY) => {
+        scrollViewRef.current.scrollTo({ y: pageY, animated: true });
+      });
+    }
+  };
 
   let formattedDate = '';
   if (date) {
@@ -130,7 +140,6 @@ const SignupScreen = () => {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === 'ios');
     setDate(currentDate);
-
   };
 
   const handlePressDatePicker = () => {
@@ -157,42 +166,52 @@ const SignupScreen = () => {
     if (!email) {
       setEmailError(true);
       setErrorMessage("Please provide email");
+      handleScrollToError(0);
     }
     else if (!validateEmail(email)) {
       setInvalidEmail(true);
       setErrorMessage("Invalid email");
+      handleScrollToError(0);
     }
     else if (!fullName) {
       setFullNameError(true);
       setErrorMessage("Please provide Full Name");
+      handleScrollToError(0);
     }
     else if (!date) {
       setDateError(true);
       setErrorMessage("Please select date of Birth");
+      handleScrollToError(1);
     }
     else if (!selectedGender) {
       setGenderError(true);
       setErrorMessage("Please select gender");
+      handleScrollToError(2);
     }
     else if (!password) {
       setPasswordError(true);
       setErrorMessage("Please provide Password");
+      handleScrollToError(5);
     }
     else if (password.length < 5) {
       setPLengthError(true);
       setErrorMessage("Please provide 5 digits password");
+      handleScrollToError(5);
     }
     else if (!confirmPassword) {
       setConfirmPasswordError(true);
       setErrorMessage("Please provide Confirm Password");
+      handleScrollToError(5);
     }
     else if (confirmPassword.length < 5) {
       setCPLengthError(true);
       setErrorMessage("Please provide 5 digits password");
+      handleScrollToError(5);
     }
     else if (confirmPassword != password) {
       setPasswordMatch(true);
       setErrorMessage("Passwords dosent match");
+      handleScrollToError(5);
     }
     else {
       checkEmailRegistration();
@@ -357,14 +376,17 @@ const SignupScreen = () => {
 
             <Text style={styles.login}>I already have an account</Text>
           </TouchableOpacity>
+         
         </View>
         }
         {
           showForm &&
           <>
-            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
+            <ScrollView ref={scrollViewRef} style={{ width: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
               <View style={styles.signupFormContainer}>
-                <View style={styles.floatingLabel}>
+                <View
+                ref={(ref) => (errorRefs.current[0] = ref)}
+                style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'E-mail'}
                     inputStyles={styles.inputStyles}
@@ -373,6 +395,7 @@ const SignupScreen = () => {
                     value={email}
                     onChangeText={value => setEmail(value)}
                     containerStyles={styles.containerStyles}
+                    
                   />
                   {emailError && !email && (
                     <>
@@ -388,7 +411,9 @@ const SignupScreen = () => {
                   )}
                 </View>
 
-                <View style={styles.floatingLabel}>
+                <View
+                ref={(ref) => (errorRefs.current[1] = ref)}
+                style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Full Name'}
                     inputStyles={styles.inputStyles}
@@ -405,7 +430,9 @@ const SignupScreen = () => {
                     </>
                   )}
                 </View>
-                <View style={styles.floatingLabel}>
+                <View
+                ref={(ref) => (errorRefs.current[2] = ref)}
+                style={styles.floatingLabel}>
                   <TouchableOpacity onPress={handlePressDatePicker}>
                     <View style={{ ...styles.containerStyles }}>
                       {date ? (
@@ -442,7 +469,9 @@ const SignupScreen = () => {
                     textColor="red"
                   />
                 )}
-                <View style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
+                <View
+                ref={(ref) => (errorRefs.current[3] = ref)}
+                style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
                   <Animated.Text
                     style={[
                       styles.placeholderLabel,
@@ -509,7 +538,9 @@ const SignupScreen = () => {
                     </>
                   )}
                 </View>
-                <View style={styles.floatingLabel}>
+                <View
+                ref={(ref) => (errorRefs.current[5] = ref)}
+                style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Password'}
                     inputStyles={styles.inputStyles}
@@ -536,7 +567,9 @@ const SignupScreen = () => {
                     </>
                   )}
                 </View>
-                <View style={styles.floatingLabel}>
+                <View
+                ref={(ref) => (errorRefs.current[5] = ref)}
+                style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Confirm Password'}
                     inputStyles={styles.inputStyles}
@@ -570,7 +603,7 @@ const SignupScreen = () => {
                 <View style={{ width: '100%', marginTop: 40 }}>
                   <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
                 </View>
-                <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>
+                <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>  
               </View>
             </ScrollView>
 
@@ -747,6 +780,7 @@ const styles = StyleSheet.create({
     color: config.secondaryColor,
     textDecorationLine: 'underline',
     marginTop: 30,
+    marginBottom:30,
   },
   inputPassword: {
     marginTop: 10,
@@ -807,7 +841,8 @@ const styles = StyleSheet.create({
     paddingTop: '15%',
     textDecorationLine: 'underline',
     color: config.secondaryColor,
-    fontSize: PixelRatio.getFontScale() * 15
+    fontSize: PixelRatio.getFontScale() * 15,
+    
   },
   checkbox: {
     marginTop: '4%',

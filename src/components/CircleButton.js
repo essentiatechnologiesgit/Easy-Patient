@@ -2,9 +2,14 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Text } from 'react-native';
 import config from '../../config';
 
-const CircleButton = ({ onPress }) => {
+const CircleButton = () => {
+
+  const hadnleOnPress = () =>{
+    
+  }
+
   return (
-    <TouchableOpacity onPress={onPress} style={styles.button}>
+    <TouchableOpacity onPress={hadnleOnPress} style={styles.button}>
       <Text style={styles.text}>+</Text>
     </TouchableOpacity>
   );

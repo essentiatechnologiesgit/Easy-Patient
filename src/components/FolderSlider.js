@@ -34,8 +34,8 @@ const FolderSlider = () => {
                     <View style={styles.smallContainer}>
                     </View>
                     <Image source={fileCapsule} style={styles.filelogo}></Image>
-                    <View style={{ marginLeft: 10, }}>
-                        <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">prescriptions</Text>
+                    <View style={{ marginLeft: 10,marginTop:-5}}>
+                        <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
                         <Text style={styles.files}>0  files</Text>
                     </View>
                 </View>
@@ -43,7 +43,7 @@ const FolderSlider = () => {
                     <View style={styles.smallContainer}>
                     </View>
                     <Image source={fileAdd} style={styles.filelogo}></Image>
-                    <View style={{ marginLeft: 10, }}>
+                    <View style={{ marginLeft: 10,marginTop:-5 }}>
                         <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Guidelines</Text>
                         <Text style={styles.files}>0  files</Text>
                     </View>
@@ -52,7 +52,7 @@ const FolderSlider = () => {
                     <View style={styles.smallContainer}>
                     </View>
                     <Image source={heartBeat} style={styles.heartlogo}></Image>
-                    <View style={{ marginLeft: 10, }}>
+                    <View style={{ marginLeft: 10, marginTop:-5}}>
                         <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                             Health Recommendations
                         </Text>

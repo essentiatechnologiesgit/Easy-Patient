@@ -8,6 +8,7 @@ import Signup from '../screens/SignupScreen';
 import ForgotPassword from '../screens/ForgotPassword';
 import Profile from '../screens/Profile';
 import Dashboard from '../screens/Dashboard';
+import SideBar from '../screens/SideBar';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -15,7 +16,7 @@ const AppNavigator = () => {
     <NavigationContainer style={styles.container}>
       <Stack.Navigator style={styles.container}
         screenOptions={{
-          headerShown: false, 
+          headerShown: false,
         }}>
         {/* <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
         <Stack.Screen style={styles.container} name="Login" component={Login} />
@@ -23,6 +24,8 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} /> */}
         <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} />
         <Stack.Screen style={styles.container} name="Profile" component={Profile} />
+        <Stack.Screen style={styles.container} name="SideBar" component={SideBar} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

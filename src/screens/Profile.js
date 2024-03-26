@@ -13,23 +13,20 @@ import axios from 'axios';
 import Snackbar from '../components/Snackbar';
 import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
-import Svg, { Path } from 'react-native-svg';
 import AlertIcon from '../components/AlertIcon';
-import OtpInput from '../components/OTPInput';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 
 const Profile = () => {
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [fullName, setFullName] = useState('');
     const [date, setDate] = useState("");
     const [selectedGender, setSelectedGender] = useState('');
     const errorRefs = useRef([]);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarKey, setSnackbarKey] = useState(0);
     //validation feilds
     const [emailError, setEmailError] = useState(false);
     const [fullNameError, setFullNameError] = useState(false);
@@ -42,21 +39,27 @@ const Profile = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [showLoader, setShowLoader] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
+    const [accessToken, setAccessToken] = useState('');
     const genders = [
-        { label: 'Male', value: 'M' },
-        { label: 'Female', value: 'F' },
+        { label: 'Male', value: 'm' },
+        { label: 'Female', value: 'f' },
     ];
 
     useEffect(() => {
-        let access_token =getAccessToken();
-        getUserDetails(access_token);
-    }, [])
+        const fetchData = async () => {
+            const access_token = await getAccessToken();
+            setAccessToken(access_token);
+            getUserDetails(access_token);
 
-    getAccessToken = async () =>{
+        };
+        fetchData();
+    }, []);
+
+    const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         return responseObject.access_token;
-    }
+    };
 
     const getUserDetails = (access_token) => {
         let config = {
@@ -69,16 +72,16 @@ const Profile = () => {
         };
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
+                // console.log(JSON.stringify(response.data));
                 setEmail(response.data.username);
                 setFullName(response.data.name);
                 const [year, month, date] = response.data.birth_date.split("-");
                 const formattedDate = `${date}/${month}/${year}`;
                 setDate(formattedDate);
                 if (response.data.gender == 'm')
-                    handleSelect({ "label": "Male", "value": "M" })
+                    handleSelect({ "label": "Male", "value": "m" })
                 else {
-                    handleSelect({ "label": "Female", "value": "F" })
+                    handleSelect({ "label": "Female", "value": "f" })
                 }
             })
             .catch((error) => {
@@ -94,7 +97,6 @@ const Profile = () => {
     };
 
     const handleSelect = (item) => {
-
         setSelectedGender(item.value);
         setIsOpen(false);
         setPlaceholderVisible(false);
@@ -105,7 +107,6 @@ const Profile = () => {
         }).start();
     };
     const onChange = (event, selectedDate) => {
-
         const currentDate = selectedDate || date;
         setShowDatePicker(Platform.OS === 'ios');
         const year = currentDate.getFullYear();
@@ -122,10 +123,16 @@ const Profile = () => {
         return regex.test(email);
     };
 
+    const handleShowSnackbar = (message) => {
+        setSnackbarMessage(message);
+        setSnackbarKey((prevKey) => prevKey + 1);
+    };
+
     const handleConfirm = () => {
         setEmailError(false);
         setFullNameError(false);
         setDateError(false);
+        setSnackbarMessage('');
         setGenderError(false);
         setDateError(false);
         setErrorMessage('');
@@ -149,48 +156,45 @@ const Profile = () => {
             setSelectedGender(true);
             setErrorMessage("Please provide Gender");
         } else {
-             let data = qs.stringify({
+            setShowLoader(true);
+            let data = qs.stringify({
                 'fullname': fullName,
                 'email': email,
                 'date_of_birth': date,
                 'gender': selectedGender
             });
-            console.log(data);
             let config = {
                 method: 'put',
                 maxBodyLength: Infinity,
                 url: 'https://api-patient-dev.easy-health.app/patient',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer f74231c8dd60fe614775738d306a4998005589f9'
+                    'Authorization': `Bearer ${accessToken}`
                 },
                 data: data
             };
-
             axios.request(config)
                 .then((response) => {
-                    console.log(JSON.stringify(response.data));
+                    handleShowSnackbar("Profile Updated");
                 })
                 .catch((error) => {
                     console.log(error);
+                })
+                .finally(() => {
+                    setShowLoader(false);
                 });
-
         }
     }
 
     const handlePassword = () => {
-
     }
 
     return (
         <>
             <View style={styles.container}>
                 <BackHeader name={"Profile"} />
-
                 <View style={styles.formContainer}>
                     <Image source={profileIcon} style={styles.Profilelogo} />
-
-
                     <ScrollView ref={scrollViewRef} style={{ width: '94%', alignSelf: 'center' }} contentContainerStyle={{ alignItems: 'center', marginTop: 28, }}>
                         <View style={styles.signupFormContainer}>
                             <View
@@ -356,12 +360,12 @@ const Profile = () => {
                             </View>
 
                         </View>
+                        {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
                     </ScrollView>
-
                 </View>
                 {showLoader && <ModalLoader />}
-            </View>
 
+            </View>
         </>
     );
 };

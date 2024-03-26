@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, PixelRatio, Animated }
 import more from '../assets/more.png';
 import home from '../assets/homeLight.png';
 import homeDark from '../assets/homeDark.png';
-
+import { useNavigation } from '@react-navigation/native';
 import calendar from '../assets/calendar.png';
 import calendarDark from '../assets/calendarDark.png';
 import jar from '../assets/jar.png';
@@ -11,13 +11,17 @@ import jarLight from '../assets/jarLight.png';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 const Footer = () => {
+    const navigation = useNavigation();
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const indicatorX = useRef(new Animated.Value(0)).current;
     const [activeTab, setActiveTab] = useState(0);
     const moveIndicator = (index) => {
         setActiveTab(index);
-
     };
+
+    const navigateSidebar = ()=> {
+        navigation.navigate("SideBar");
+    }
 
     return (
         <>
@@ -63,6 +67,7 @@ const Footer = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.touchable}
+                    onPress={()=>navigateSidebar()}
                 >
                     <Image source={more} style={styles.iconM}></Image>
                     <Text style={styles.text}>Mails</Text>

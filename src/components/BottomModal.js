@@ -5,9 +5,10 @@ import config from '../../config';
 import SnoozeNotify from './SnoozeNotify';
 import CancelledAlarm from './CancelledAlarm';
 // Did you take you Medicine
-const BottomModal = ({ visible, onClose, modalfor }) => {
+const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfor, reloadFunction }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
-
+   
+    // console.warn(AlarmId);
     useEffect(() => {
         setTimeBoxes(false);
     }, [onClose])
@@ -18,6 +19,7 @@ const BottomModal = ({ visible, onClose, modalfor }) => {
     const handleCloseModal = () => {
         onClose();
     };
+
     return (
         <Modal
             animationType="fade"
@@ -34,9 +36,9 @@ const BottomModal = ({ visible, onClose, modalfor }) => {
                 <View style={{ backgroundColor: '#edf1f7', padding: 20 }}>
                     {
                         modalfor === "CrossAlarm" ?
-                            <CancelledAlarm onCloseModal={handleCloseModal} />
+                            <CancelledAlarm AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction} />
                             :
-                            <SnoozeNotify onCloseModal={handleCloseModal} />
+                            <SnoozeNotify  AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction}  />
                     }
                 </View>
             </View>

@@ -1,34 +1,45 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import { TouchableWithoutFeedback, StyleSheet, Text, Image, View } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
-import leftArrow from '../assets/leftArrow.png';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+
 import CrossBellIcon from '../assets/crossBell.png';
 import BottomModal from './BottomModal';
-const CrossBell = ({ time, prescriptionText }) => {
+import Svg, { Path } from 'react-native-svg';
+const CrossBell = ({ medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
     const handleBackPress = () => {
         navigation.goBack();
     }
 
-    handlePopUp = () => {
-        console.warn("er");
-    }
-
     return (
         <>
-            <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
-                <View style={styles.container}>
-                    <View style={styles.child}>
-                        <Image source={CrossBellIcon} style={styles.bell}></Image>
-                        <Text style={styles.text}>{time} - Alarm </Text>
+            {
+                !taken &&
+
+                <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+                    <View style={styles.container}>
+                        <View style={styles.child}>
+                            <Image source={CrossBellIcon} style={styles.bell}></Image>
+                            <Text style={styles.text}>{time} - Alarm </Text>
+                        </View>
+                        <View style={styles.reminder}><Text style={styles.text}>{prescriptionText}</Text></View>
                     </View>
-                    <View style={styles.reminder}><Text style={styles.text}>{prescriptionText}</Text></View>
+                </TouchableWithoutFeedback>
+            }
+            {
+                taken &&
+                <View style={styles.containerSuccess}>
+                    <Svg width="23" height="22" viewBox="0 0 24 24">
+                        <Path fill="#50B76C" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" />
+                    </Svg>
+                    <Text style={styles.text}>{time} - Alarm </Text>
                 </View>
-            </TouchableWithoutFeedback>
-            <BottomModal visible={modalVisible} modalfor={"CrossBell"} onClose={() => setModalVisible(false)} />
+            }
+
+
+            <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} />
         </>
     );
 };
@@ -43,7 +54,15 @@ const styles = StyleSheet.create({
         height: 80,
         padding: 10,
         alignSelf: 'center',
-
+    },
+    containerSuccess: {
+        flexDirection: 'row',
+        borderRadius: 6,
+        backgroundColor: 'white',
+        width: '92%',
+        height: 40,
+        padding: 10,
+        alignSelf: 'center',
     },
     text: {
         color: 'black',

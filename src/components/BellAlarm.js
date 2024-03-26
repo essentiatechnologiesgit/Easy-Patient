@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import BellIcon from '../assets/bellIcon.png';
-const BellAlarm = ({time}) => {
+const BellAlarm = ({time,Medicine}) => {
     const navigation = useNavigation();
     const handleBackPress = () => {
         navigation.goBack();
@@ -15,7 +15,7 @@ const BellAlarm = ({time}) => {
         <>
             <View style={styles.container}>
                 <Image source={BellIcon} style={styles.bell}></Image>
-                <Text style={styles.text}>{time} - Alarm </Text>
+                <Text style={styles.text}>{time} - {Medicine} </Text>
             </View>
         </>
     );

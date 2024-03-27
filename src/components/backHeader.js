@@ -7,13 +7,26 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 const BackHeader = ({ name }) => {
     const navigation = useNavigation();
     const handleBackPress = () => {
-        navigation.goBack();
+        if (name == "Profile") {
+            navigation.navigate('Dashboard', {
+                isChanged: true,
+            });
+        } else if (name == "Photo") {
+            navigation.navigate('Profile', {
+                isChanged: true,
+            });
+        }
+        else {
+            navigation.goBack();
+        }
+
+
     }
 
     return (
         <>
             <View style={styles.container}>
-                <TouchableOpacity onPress={ handleBackPress } style={styles.back}>
+                <TouchableOpacity onPress={handleBackPress} style={styles.back}>
                     <Image source={leftArrow} style={styles.arrow}></Image>
                 </TouchableOpacity>
                 <Text style={styles.head}>{name}</Text>

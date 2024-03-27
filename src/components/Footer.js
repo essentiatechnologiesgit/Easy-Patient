@@ -1,79 +1,88 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, PixelRatio, Animated } from 'react-native';
 import more from '../assets/more.png';
-import home from '../assets/homeLight.png';
+
 import homeDark from '../assets/homeDark.png';
 import { useNavigation } from '@react-navigation/native';
 import calendar from '../assets/calendar.png';
 import calendarDark from '../assets/calendarDark.png';
+import home from '../assets/homeLight.png';
 import jar from '../assets/jar.png';
 import jarLight from '../assets/jarLight.png';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-const Footer = () => {
+const Footer = (props) => {
     const navigation = useNavigation();
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const indicatorX = useRef(new Animated.Value(0)).current;
     const [activeTab, setActiveTab] = useState(0);
-    const moveIndicator = (index) => {
-        setActiveTab(index);
-    };
+   
+    useEffect(() => {
+        setActiveTab(props.prop);
+      }, [props.prop]);
 
-    const navigateSidebar = ()=> {
+    const navigateSidebar = () => {
         navigation.navigate("SideBar");
     }
 
     return (
         <>
             <View style={styles.container}>
-            
+
                 <TouchableOpacity
                     style={styles.touchable}
-                    onPress={() => moveIndicator(0)}>
+                    onPress={() => {
+                        // moveIndicator(0);
+                        navigation.navigate("Dashboard");
+                    }}>
                     <Image source={activeTab === 0 ? homeDark : home} style={
-                        [styles.icon,
-                        activeTab === 1 && styles.activeTabIcon
-                        ]}>
-                    </Image>
-                    {activeTab === 0 && <View style={styles.borderHome} />}
+                    [styles.icon,
+                    activeTab === 1 && styles.activeTabIcon
+                    ]}>
+                </Image>
+                {activeTab === 0 && <View style={styles.borderHome} />}
 
-                    <Text style={activeTab === 0 ? styles.textDark : styles.text}>Home</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.touchable}
-                    onPress={() => moveIndicator(1)}
+                <Text style={activeTab === 0 ? styles.textDark : styles.text}>Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.touchable}
+                onPress={() => {
+                    // moveIndicator(1),
+                    navigation.navigate("Reminders");}}
+            >
+                {activeTab === 1 && <View style={styles.borderReminder} />}
+                <Image
+                    source={activeTab === 1 ? jar : jarLight}
+                    style={styles.iconR}
+                />
+                <Text
+                    style={activeTab === 1 ? styles.textDark : styles.text}
                 >
-                    {activeTab === 1 && <View style={styles.borderReminder} />}
-                    <Image
-                        source={activeTab === 1 ? jar : jarLight}
-                        style={styles.iconR}
-                    />
-                    <Text
-                        style={activeTab === 1 ? styles.textDark : styles.text}
-                    >
-                        Reminders
-                    </Text>
-                </TouchableOpacity>
+                    Reminders
+                </Text>
+            </TouchableOpacity>
 
 
-                <TouchableOpacity
-                    style={styles.touchable}
-                    onPress={() => moveIndicator(2)}
-                >
-                    {activeTab === 2 && <View style={styles.border} />}
+            <TouchableOpacity
+                style={styles.touchable}
+                onPress={() => {
+                    // moveIndicator(2),
+                    navigation.navigate("Appointments");}}
+            >
+                {activeTab === 2 && <View style={styles.border} />}
 
-                    <Image source={activeTab === 2 ? calendarDark : calendar} style={styles.iconA}></Image>
-                    <Text style={activeTab === 2 ? styles.textDark : styles.text}>Appointments</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.touchable}
-                    onPress={()=>navigateSidebar()}
-                >
-                    <Image source={more} style={styles.iconM}></Image>
-                    <Text style={styles.text}>Mails</Text>
-                </TouchableOpacity>
+                <Image source={activeTab === 2 ? calendarDark : calendar} style={styles.iconA}></Image>
+                <Text style={activeTab === 2 ? styles.textDark : styles.text}>Appointments</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.touchable}
+                onPress={() => navigateSidebar()}
+            >
+                <Image source={more} style={styles.iconM}></Image>
+                <Text style={styles.text}>Mails</Text>
+            </TouchableOpacity>
 
-            </View >
+        </View >
         </>
     );
 };
@@ -93,23 +102,23 @@ const styles = StyleSheet.create({
         color: "#55565C",
     },
     iconR: {
-        top:3,
+        top: 3,
         height: 28,
         width: 24,
     },
     iconA: {
-        top:2,
+        top: 2,
         height: 26,
         width: 24,
     },
-    
+
     touchable: {
         alignItems: 'center',
         justifyContent: 'center',
-        alignContent:'center',
+        alignContent: 'center',
         paddingVertical: 8,
         paddingHorizontal: 16,
-        position: 'relative', 
+        position: 'relative',
     },
     borderHome: {
         position: 'absolute',
@@ -144,7 +153,7 @@ const styles = StyleSheet.create({
         width: 25,
     },
     iconM: {
-        top:1,
+        top: 1,
         height: 25,
         width: 25,
     },

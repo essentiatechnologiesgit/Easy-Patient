@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, RefreshControl, ScrollView, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import FolderSlider from '../components/FolderSlider';
 import Notifications from '../components/Notifications';
 import BellAlarm from '../components/BellAlarm';
@@ -12,24 +12,41 @@ import axios from 'axios';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../components/Footer';
+import ImageLogo from '../components/ImageLogo'
+import { BackHandler } from 'react-native';
+import Snackbar from '../components/Snackbar';
 const Dashboard = () => {
     const navigation = useNavigation();
+    const [backPressed, setBackPressed] = useState(false);
+    const route = useRoute();
     const [name, setName] = useState('');
     const [medicines, setMedicines] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [alarmComponents, setAlarmComponents] = useState([]);
-
+    const [image, setImage] = useState('');
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarKey, setSnackbarKey] = useState(0);
     useEffect(() => {
         const fetchData = async () => {
             await getLoginResponse();
             await getMedicinesAndSupplements();
         };
-    
+
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            await getLoginResponse();
+        };
 
-    
+        fetchData();
+    }, [route]);
+
+      const handleShowSnackbar = (message) => {
+        setSnackbarMessage(message);
+        setSnackbarKey((prevKey) => prevKey + 1);
+      };
 
     const getLoginResponse = async () => {
         try {
@@ -37,6 +54,7 @@ const Dashboard = () => {
             if (loginResponse !== null) {
                 const responseObject = JSON.parse(loginResponse);
                 setName(responseObject.user.full_name);
+                setImage(responseObject.user.profile_pic);
             } else {
                 console.log('No loginResponse found in AsyncStorage');
             }
@@ -61,7 +79,7 @@ const Dashboard = () => {
                     }
                 };
                 const response = await axios.request(config);
-                // console.log(response.data);
+                console.log(response.data);
                 await setMedicines(response.data);
                 renderAlarmComponents();
             }
@@ -73,25 +91,23 @@ const Dashboard = () => {
     const renderAlarmComponents = async () => {
         try {
             const existingAlarms = JSON.parse(await AsyncStorage.getItem('Alarms')) || [];
-            
             const allAlarmComponents = [];
-            const idCountMap = {}; // Map to track ID count for each medicine ID
-            
-            medicines.forEach(medicine => {
-                const { start_time, frequency, name, id } = medicine;
-                const startTimeDate = moment(start_time).format('YYYY-MM-DD'); 
+            const idCountMap = {};
+            medicines?.forEach(medicine => {
+                const { start_time, frequency, name, id, dosage } = medicine;
+                const startTimeDate = moment(start_time).format('YYYY-MM-DD');
                 const currentTime = moment();
                 const nextAlarmTime = moment(start_time);
-        
+
                 if (moment(start_time).isSame(moment(), 'day')) {
                     while (nextAlarmTime.isBefore(moment().endOf('day'))) {
                         let alarmData = {};
                         if (nextAlarmTime.isSameOrBefore(currentTime)) {
-                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, componentType: 'CrossAlarm', id: id };
+                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, dosage, componentType: 'CrossAlarm', id: id };
                         } else if (nextAlarmTime.isBetween(currentTime, moment(currentTime).add(frequency, 'hours'), 'minute')) {
-                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, componentType: 'CrossBell', id: id };
+                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, dosage, componentType: 'CrossBell', id: id };
                         } else {
-                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, componentType: 'BellAlarm', id: id };
+                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, dosage, componentType: 'BellAlarm', id: id };
                         }
                         allAlarmComponents.push(alarmData);
                         nextAlarmTime.add(frequency, 'hours');
@@ -99,34 +115,32 @@ const Dashboard = () => {
                 }
                 idCountMap[id] = idCountMap[id] ? idCountMap[id] + 1 : 1; // Increment ID count for the current medicine ID
             });
-        
+
             const filteredAlarmComponents = allAlarmComponents.filter(alarm => !existingAlarms.find(existingAlarm => existingAlarm.id === alarm.id));
-    
             if (filteredAlarmComponents.length > 0) {
                 const updatedAlarmsArray = existingAlarms.concat(filteredAlarmComponents);
-                
+
                 updatedAlarmsArray.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
-    
+
                 const alarmsById = {};
-                updatedAlarmsArray.forEach(alarm => {
-                    const { id, medicine, time } = alarm;
+                updatedAlarmsArray?.forEach(alarm => {
+                    const { id, medicine, time, dosage } = alarm;
                     const startTimeDate = moment(time, 'HH:mm').format('YYYY-MM-DD');
-                    
+
                     if (!alarmsById[id]) {
-                        alarmsById[id] = { id, medicine, times: [], days: [] };
+                        alarmsById[id] = { id, medicine, dosage, times: [], days: [] };
                     }
-                
+
                     if (!alarmsById[id].days.includes(startTimeDate)) {
                         alarmsById[id].days.push(startTimeDate);
                     }
-                    
+
                     const idCount = idCountMap[id];
                     alarmsById[id].times.push({ time, id: idCount, taken: false });
-                    idCountMap[id]++; 
+                    idCountMap[id]++;
                 });
-                
+
                 const updatedAlarmsData = Object.values(alarmsById);
-                console.log(JSON.stringify(updatedAlarmsData, null, 2)); // Stringify the array for better readability
                 try {
                     await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsData));
                 } catch (error) {
@@ -140,42 +154,79 @@ const Dashboard = () => {
         }
     };
 
+
     const renderTimeComponents = async () => {
         try {
             const allAlarmComponents = [];
             const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
-            AlarmsArray.forEach(alarm => {
-                const { days, times, medicine, id } = alarm;
-                const currentTime = moment();
-                days.forEach(day => {
-                    times.forEach(timeObj => { 
-                        const { time, id: timeId ,taken } = timeObj;
-                        const alarmTime = moment(`${day} ${time}`, 'YYYY-MM-DD HH:mm');
-                        let alarmComponent;
-                        if (alarmTime.isSameOrBefore(currentTime)) {              
-                            alarmComponent = <CrossAlarm time={alarmTime.format('HH:mm')} medicineId={id} id={timeId} Medicine={medicine} taken={taken} reloadFunction={renderTimeComponents} />;
-                        } else if (alarmTime.isBetween(currentTime, moment(currentTime).add(1, 'hour'))) {
-                            alarmComponent = <CrossBell time={alarmTime.format('HH:mm')} id={timeId} Medicine={medicine} medicineId={id} taken={taken} reloadFunction={renderTimeComponents} />;
-                        } else {
-                            alarmComponent = <BellAlarm time={alarmTime.format('HH:mm')} id={timeId} Medicine={medicine} medicineId={id} taken={taken} reloadFunction={renderTimeComponents} />;
-                        }
-                        allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
+            if (AlarmsArray) {
+                AlarmsArray?.forEach((alarm) => {
+                    const { days, times, medicine, id, dosage } = alarm;
+                    const currentTime = moment();
+                    days.forEach((day) => {
+                        times.forEach((timeObj) => {
+                            const { time, id: timeId, taken } = timeObj;
+                            const alarmTime = moment(`${day} ${time}`, 'YYYY-MM-DD HH:mm');
+                            let remainingTime = alarmTime.diff(currentTime, 'minutes');
+                            if (remainingTime < 0) {
+                                remainingTime = 0;
+                            }
+                            let alarmComponent;
+                            if (alarmTime.isSameOrBefore(currentTime)) {
+                                alarmComponent = (
+                                    <CrossAlarm
+                                        time={alarmTime.format('HH:mm')}
+                                        medicineId={id}
+                                        id={timeId}
+                                        Medicine={medicine}
+                                        taken={taken}
+                                        reloadFunction={renderTimeComponents}
+                                    />
+                                );
+                            } else if (alarmTime.isBetween(currentTime, moment(currentTime).add(1, 'hour'))) {
+                                alarmComponent = (
+                                    <CrossBell
+                                        remainingTime={remainingTime}
+                                        time={alarmTime.format('HH:mm')}
+                                        id={timeId}
+                                        dosage={dosage}
+                                        Medicine={medicine}
+                                        medicineId={id}
+                                        taken={taken}
+                                        reloadFunction={renderTimeComponents}
+                                    />
+                                );
+                            } else {
+                                alarmComponent = (
+                                    <BellAlarm
+                                        time={alarmTime.format('HH:mm')}
+                                        id={timeId}
+                                        Medicine={medicine}
+                                        medicineId={id}
+                                        taken={taken}
+                                        reloadFunction={renderTimeComponents}
+                                    />
+                                );
+                            }
+                            allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
+                        });
                     });
                 });
-            });
-    
+            }
+
+
             allAlarmComponents.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
             const components = allAlarmComponents.map((item, index) => (
                 <View style={styles.component} key={index}>
                     {item.component}
                 </View>
             ));
-            setAlarmComponents(components); 
+            setAlarmComponents(components);
         } catch (error) {
             console.error('Error rendering alarm components:', error);
         }
     };
-    
+
 
     useEffect(() => {
         renderTimeComponents();
@@ -186,7 +237,7 @@ const Dashboard = () => {
         setRefreshing(true);
         try {
             // await AsyncStorage.setItem('Alarms', JSON.stringify(""));
-            // await getMedicinesAndSupplements();
+            await getMedicinesAndSupplements();
             renderTimeComponents();
         } catch (error) {
             console.error('Error refreshing medicines:', error);
@@ -195,6 +246,8 @@ const Dashboard = () => {
         }
     };
 
+
+
     return (
         <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
             <ScrollView
@@ -202,9 +255,16 @@ const Dashboard = () => {
             >
                 <View style={styles.headerContainer}>
                     <Image source={config.logo} style={styles.logo} />
-                    <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profileButton}>
-                        <Image source={profileIcon} style={styles.profileLogo} />
-                    </TouchableOpacity>
+                    {
+                        image &&
+                        <ImageLogo imageURI={image} />
+                    }
+                    {
+                        !image &&
+                        <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profileButton}>
+                            <Image source={profileIcon} style={styles.ProfileLogo} />
+                        </TouchableOpacity>
+                    }
                 </View>
                 <View style={styles.nameContainer}>
                     <Text style={styles.nameHeading}>Hello {name}!</Text>
@@ -217,14 +277,13 @@ const Dashboard = () => {
                     <View style={styles.sliderContainer}>
                         <FolderSlider />
                     </View>
-                    
+
                     {alarmComponents}
-                   
-
-
                 </View>
             </ScrollView>
-            <Footer />
+            {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
+       
+            <Footer prop={0} />
         </ImageBackground>
     );
 };
@@ -260,7 +319,7 @@ const styles = StyleSheet.create({
         width: '10%',
         resizeMode: 'contain',
     },
-    profileLogo: {
+    ProfileLogo: {
         width: '100%',
         height: '70%',
         resizeMode: 'contain',

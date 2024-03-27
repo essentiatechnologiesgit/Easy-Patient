@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -18,6 +18,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 
 const Profile = () => {
+    const route = useRoute();
+    const isChanged = route.params?.isChanged;
+
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [email, setEmail] = useState('');
@@ -40,6 +43,7 @@ const Profile = () => {
     const [showLoader, setShowLoader] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [accessToken, setAccessToken] = useState('');
+    const [image, setImage] = useState('');
     const genders = [
         { label: 'Male', value: 'm' },
         { label: 'Female', value: 'f' },
@@ -47,13 +51,24 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            console.log("again here");
             const access_token = await getAccessToken();
             setAccessToken(access_token);
             getUserDetails(access_token);
+        };
+        fetchData();
+    }, [route])
 
+    useEffect(() => {
+        const fetchData = async () => {
+            const access_token = await getAccessToken();
+            setAccessToken(access_token);
+            getUserDetails(access_token);
         };
         fetchData();
     }, []);
+
+
 
     const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -72,7 +87,7 @@ const Profile = () => {
         };
         axios.request(config)
             .then((response) => {
-                // console.log(JSON.stringify(response.data));
+                setImage(response.data.picture);
                 setEmail(response.data.username);
                 setFullName(response.data.name);
                 const [year, month, date] = response.data.birth_date.split("-");
@@ -189,13 +204,21 @@ const Profile = () => {
     const handlePassword = () => {
     }
 
+    handlePhotoNavigation = () => {
+        navigation.navigate('EditImage', {
+            imageURI: image,
+        });
+    }
+
     return (
         <>
             <View style={styles.container}>
                 <BackHeader name={"Profile"} />
                 <View style={styles.formContainer}>
-                    <Image source={profileIcon} style={styles.Profilelogo} />
-                    <ScrollView ref={scrollViewRef} style={{ width: '94%', alignSelf: 'center' }} contentContainerStyle={{ alignItems: 'center', marginTop: 28, }}>
+                    <TouchableOpacity onPress={() => handlePhotoNavigation()}>
+                        <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
+                    </TouchableOpacity>
+                    <ScrollView ref={scrollViewRef} style={{ width: '94%', alignSelf: 'center' }} contentContainerStyle={{ alignItems: 'center', marginTop: 45, }}>
                         <View style={styles.signupFormContainer}>
                             <View
                                 ref={(ref) => (errorRefs.current[0] = ref)}
@@ -340,7 +363,8 @@ const Profile = () => {
                                         color: config.primaryColor,
                                     }}
                                     textStyle={{
-                                        fontSize: PixelRatio.getFontScale() * 18,
+                                        fontSize: PixelRatio.getFontScale() * 17,
+                                        color: config.textColorHeadings,
                                     }}
                                 />
                                 {genderError && !selectedGender && (
@@ -377,9 +401,12 @@ const styles = StyleSheet.create({
         // justifyContent:'center',
     },
     Profilelogo: {
-        height: 100,
-        width: 100,
+        height: 90,
+        width: 90,
         alignSelf: 'center',
+        borderRadius: 48,
+        borderColor: config.secondaryColor,
+        borderWidth: 1,
     },
     formContainer: {
         marginTop: '8%',
@@ -509,7 +536,6 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems: 'center',
         flexDirection: 'column',
-
     },
 
     FocusStyling: {

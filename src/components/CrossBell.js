@@ -6,25 +6,24 @@ import { useNavigation } from '@react-navigation/native';
 import CrossBellIcon from '../assets/crossBell.png';
 import BottomModal from './BottomModal';
 import Svg, { Path } from 'react-native-svg';
-const CrossBell = ({ medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
+const CrossBell = ({ remainingTime,dosage,medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
     const handleBackPress = () => {
         navigation.goBack();
     }
-
+    
     return (
         <>
             {
                 !taken &&
-
                 <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
                     <View style={styles.container}>
                         <View style={styles.child}>
                             <Image source={CrossBellIcon} style={styles.bell}></Image>
-                            <Text style={styles.text}>{time} - Alarm </Text>
+                            <Text style={styles.text}>{time} - {Medicine} </Text>
                         </View>
-                        <View style={styles.reminder}><Text style={styles.text}>{prescriptionText}</Text></View>
+                        <View style={styles.reminder}><Text style={styles.prescriptionText}>Take {dosage} {Medicine} in {remainingTime}m</Text></View>
                     </View>
                 </TouchableWithoutFeedback>
             }
@@ -37,8 +36,6 @@ const CrossBell = ({ medicineId, time, id, Medicine, taken, reloadFunction, pres
                     <Text style={styles.text}>{time} - Alarm </Text>
                 </View>
             }
-
-
             <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} />
         </>
     );
@@ -64,10 +61,10 @@ const styles = StyleSheet.create({
         padding: 10,
         alignSelf: 'center',
     },
-    text: {
-        color: 'black',
-        textAlign: 'center',
-    },
+    // text: {
+    //     color: 'gray',
+    //     textAlign: 'center',
+    // },
     reminder: {
         alignSelf: 'center',
         justifyContent: 'center',
@@ -83,6 +80,11 @@ const styles = StyleSheet.create({
     text: {
         marginLeft: 8,
         color: 'black',
+    },
+    prescriptionText:{
+        color:'black',
+        fontWeight:'400',
+        fontSize:12,
     },
     bell: {
         height: 20,

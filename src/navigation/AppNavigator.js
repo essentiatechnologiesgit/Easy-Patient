@@ -18,6 +18,7 @@ import Prescriptions from '../screens/Prescriptions';
 import Reminders from '../screens/Reminders';
 import Appointments from '../screens/Appointments';
 import Configure from '../screens/Configure';
+import AddReminder from '../screens/AddReminder';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -42,6 +43,7 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="Appointments" component={Appointments} />  
         <Stack.Screen style={styles.container} name="Reminders" component={Reminders} />  
         <Stack.Screen style={styles.container} name="Configure" component={Configure} />  
+        <Stack.Screen style={styles.container} name="AddReminder" component={AddReminder} />  
         
         {/* <Stack.Screen style={styles.container} name="Practice" component={Practice} />   */}
           

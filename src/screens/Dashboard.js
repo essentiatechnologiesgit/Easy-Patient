@@ -15,6 +15,7 @@ import Footer from '../components/Footer';
 import ImageLogo from '../components/ImageLogo'
 import { BackHandler } from 'react-native';
 import Snackbar from '../components/Snackbar';
+import Medications from '../components/Medications';
 const Dashboard = () => {
     const navigation = useNavigation();
     const [backPressed, setBackPressed] = useState(false);
@@ -30,6 +31,8 @@ const Dashboard = () => {
         const fetchData = async () => {
             await getLoginResponse();
             await getMedicinesAndSupplements();
+            // await renderAlarmComponents();
+            renderTimeComponents();
         };
 
         fetchData();
@@ -38,29 +41,24 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             await getLoginResponse();
+            await getMedicinesAndSupplements();
+            renderTimeComponents();
+
         };
 
         fetchData();
     }, [route]);
 
-      const handleShowSnackbar = (message) => {
+    const handleShowSnackbar = (message) => {
         setSnackbarMessage(message);
         setSnackbarKey((prevKey) => prevKey + 1);
-      };
+    };
 
     const getLoginResponse = async () => {
-        try {
-            const loginResponse = await AsyncStorage.getItem('loginResponse');
-            if (loginResponse !== null) {
-                const responseObject = JSON.parse(loginResponse);
-                setName(responseObject.user.full_name);
-                setImage(responseObject.user.profile_pic);
-            } else {
-                console.log('No loginResponse found in AsyncStorage');
-            }
-        } catch (error) {
-            console.error('Error retrieving loginResponse from AsyncStorage:', error);
-        }
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        setName(responseObject.user.full_name);
+        setImage(responseObject.user.profile_pic);
     }
 
     const getMedicinesAndSupplements = async () => {
@@ -79,81 +77,13 @@ const Dashboard = () => {
                     }
                 };
                 const response = await axios.request(config);
-                console.log(response.data);
-                await setMedicines(response.data);
-                renderAlarmComponents();
+                setMedicines(response.data);
+
             }
         } catch (error) {
             console.error('Error retrieving medicines:', error);
         }
     }
-
-    const renderAlarmComponents = async () => {
-        try {
-            const existingAlarms = JSON.parse(await AsyncStorage.getItem('Alarms')) || [];
-            const allAlarmComponents = [];
-            const idCountMap = {};
-            medicines?.forEach(medicine => {
-                const { start_time, frequency, name, id, dosage } = medicine;
-                const startTimeDate = moment(start_time).format('YYYY-MM-DD');
-                const currentTime = moment();
-                const nextAlarmTime = moment(start_time);
-
-                if (moment(start_time).isSame(moment(), 'day')) {
-                    while (nextAlarmTime.isBefore(moment().endOf('day'))) {
-                        let alarmData = {};
-                        if (nextAlarmTime.isSameOrBefore(currentTime)) {
-                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, dosage, componentType: 'CrossAlarm', id: id };
-                        } else if (nextAlarmTime.isBetween(currentTime, moment(currentTime).add(frequency, 'hours'), 'minute')) {
-                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, dosage, componentType: 'CrossBell', id: id };
-                        } else {
-                            alarmData = { time: nextAlarmTime.format('HH:mm'), medicine: name, dosage, componentType: 'BellAlarm', id: id };
-                        }
-                        allAlarmComponents.push(alarmData);
-                        nextAlarmTime.add(frequency, 'hours');
-                    }
-                }
-                idCountMap[id] = idCountMap[id] ? idCountMap[id] + 1 : 1; // Increment ID count for the current medicine ID
-            });
-
-            const filteredAlarmComponents = allAlarmComponents.filter(alarm => !existingAlarms.find(existingAlarm => existingAlarm.id === alarm.id));
-            if (filteredAlarmComponents.length > 0) {
-                const updatedAlarmsArray = existingAlarms.concat(filteredAlarmComponents);
-
-                updatedAlarmsArray.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
-
-                const alarmsById = {};
-                updatedAlarmsArray?.forEach(alarm => {
-                    const { id, medicine, time, dosage } = alarm;
-                    const startTimeDate = moment(time, 'HH:mm').format('YYYY-MM-DD');
-
-                    if (!alarmsById[id]) {
-                        alarmsById[id] = { id, medicine, dosage, times: [], days: [] };
-                    }
-
-                    if (!alarmsById[id].days.includes(startTimeDate)) {
-                        alarmsById[id].days.push(startTimeDate);
-                    }
-
-                    const idCount = idCountMap[id];
-                    alarmsById[id].times.push({ time, id: idCount, taken: false });
-                    idCountMap[id]++;
-                });
-
-                const updatedAlarmsData = Object.values(alarmsById);
-                try {
-                    await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsData));
-                } catch (error) {
-                    console.error('Error saving alarms to AsyncStorage:', error);
-                }
-            } else {
-                console.log('No new alarms to add.');
-            }
-        } catch (error) {
-            console.error('Error rendering alarm components:', error);
-        }
-    };
-
 
     const renderTimeComponents = async () => {
         try {
@@ -161,7 +91,7 @@ const Dashboard = () => {
             const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
             if (AlarmsArray) {
                 AlarmsArray?.forEach((alarm) => {
-                    const { days, times, medicine, id, dosage } = alarm;
+                    const { days, times, medicine, id, dosage, frequency } = alarm;
                     const currentTime = moment();
                     days.forEach((day) => {
                         times.forEach((timeObj) => {
@@ -171,8 +101,10 @@ const Dashboard = () => {
                             if (remainingTime < 0) {
                                 remainingTime = 0;
                             }
+                            let afterTime;
                             let alarmComponent;
-                            if (alarmTime.isSameOrBefore(currentTime)) {
+
+                            if (alarmTime.isBefore(currentTime)) {
                                 alarmComponent = (
                                     <CrossAlarm
                                         time={alarmTime.format('HH:mm')}
@@ -182,8 +114,10 @@ const Dashboard = () => {
                                         taken={taken}
                                         reloadFunction={renderTimeComponents}
                                     />
+
+
                                 );
-                            } else if (alarmTime.isBetween(currentTime, moment(currentTime).add(1, 'hour'))) {
+                            } else if (alarmTime.isBetween(currentTime, moment(currentTime).add(frequency, 'hour')) || alarmTime.isSame(currentTime)) {
                                 alarmComponent = (
                                     <CrossBell
                                         remainingTime={remainingTime}
@@ -195,8 +129,10 @@ const Dashboard = () => {
                                         taken={taken}
                                         reloadFunction={renderTimeComponents}
                                     />
+
                                 );
                             } else {
+                                afterTime = alarmTime.format('HH:mm');
                                 alarmComponent = (
                                     <BellAlarm
                                         time={alarmTime.format('HH:mm')}
@@ -227,12 +163,6 @@ const Dashboard = () => {
         }
     };
 
-
-    useEffect(() => {
-        renderTimeComponents();
-    }, []);
-
-
     const handleRefresh = async () => {
         setRefreshing(true);
         try {
@@ -245,8 +175,6 @@ const Dashboard = () => {
             setRefreshing(false);
         }
     };
-
-
 
     return (
         <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
@@ -271,18 +199,28 @@ const Dashboard = () => {
                     <Text style={styles.nameSideHeading}>Welcome to Easy Patient</Text>
                 </View>
                 <View style={styles.parentView}>
-                    {/* <View style={styles.component}>
-                        <Notifications />
-                    </View> */}
                     <View style={styles.sliderContainer}>
                         <FolderSlider />
                     </View>
+                    {
+                        !alarmComponents.length > 0 &&
+                        <View style={styles.component}>
+                            <Medications />
+                        </View>
+                    }
 
-                    {alarmComponents}
+                    {
+                        alarmComponents.map((component, index) => (
+                            <View style={styles.component} key={index}>
+                                {component}
+                            </View>
+                        ))
+                    }
+
                 </View>
             </ScrollView>
             {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
-       
+
             <Footer prop={0} />
         </ImageBackground>
     );

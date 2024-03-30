@@ -59,31 +59,7 @@ const styles = StyleSheet.create({
     container: {
         gap: 10,
     },
-    buttonA: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 7,
-        borderWidth: 1,
-        width: '43%', // Adjust as needed
-        borderRadius: 30,
-        backgroundColor: config.white,
-        borderColor: config.secondaryColor,
-    },
-    buttonT: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 6,
-        borderWidth: 1,
-        width: '30%', // Adjust as needed
-        borderRadius: 30,
-        backgroundColor: config.white,
-        borderColor: config.secondaryColor,
-    },
-    font: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: 'black',
-    },
+
     textA: {
         fontSize: 16,
         fontWeight: 'bold',

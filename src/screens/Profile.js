@@ -68,8 +68,6 @@ const Profile = () => {
         fetchData();
     }, []);
 
-
-
     const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
@@ -202,6 +200,7 @@ const Profile = () => {
     }
 
     const handlePassword = () => {
+        navigation.navigate("ChangePassword");
     }
 
     handlePhotoNavigation = () => {
@@ -220,6 +219,25 @@ const Profile = () => {
                     </TouchableOpacity>
                     <ScrollView ref={scrollViewRef} style={{ width: '94%', alignSelf: 'center' }} contentContainerStyle={{ alignItems: 'center', marginTop: 45, }}>
                         <View style={styles.signupFormContainer}>
+                        <View
+                                ref={(ref) => (errorRefs.current[1] = ref)}
+                                style={styles.floatingLabel}>
+                                <FloatingLabelInput
+                                    label={'Full Name'}
+                                    inputStyles={styles.inputStyles}
+                                    customLabelStyles={styles.customLabelStyles}
+                                    value={fullName}
+                                    onChangeText={value => setFullName(value)}
+                                    containerStyles={styles.containerStyles}
+
+                                />
+                                {fullNameError && !fullName && (
+                                    <>
+                                        <AlertIcon />
+                                        <ValidationError errorMessage={errorMessage} />
+                                    </>
+                                )}
+                            </View>
                             <View
                                 ref={(ref) => (errorRefs.current[0] = ref)}
                                 style={styles.floatingLabel}>
@@ -246,25 +264,7 @@ const Profile = () => {
                                     </>
                                 )}
                             </View>
-                            <View
-                                ref={(ref) => (errorRefs.current[1] = ref)}
-                                style={styles.floatingLabel}>
-                                <FloatingLabelInput
-                                    label={'Full Name'}
-                                    inputStyles={styles.inputStyles}
-                                    customLabelStyles={styles.customLabelStyles}
-                                    value={fullName}
-                                    onChangeText={value => setFullName(value)}
-                                    containerStyles={styles.containerStyles}
-
-                                />
-                                {fullNameError && !fullName && (
-                                    <>
-                                        <AlertIcon />
-                                        <ValidationError errorMessage={errorMessage} />
-                                    </>
-                                )}
-                            </View>
+                           
                             <View
                                 ref={(ref) => (errorRefs.current[2] = ref)}
                                 style={styles.floatingLabel}>

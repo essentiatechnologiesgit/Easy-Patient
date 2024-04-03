@@ -73,10 +73,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     heading:{
-        fontSize: PixelRatio.getFontScale() * 20,
+        fontSize: PixelRatio.getFontScale() * 22,
         color: config.textColorHeadings,
         marginBottom:-10,
-        fontWeight:'500',
+        fontWeight:'400',
     },
     scrollViewContent: {
         alignItems: "center",

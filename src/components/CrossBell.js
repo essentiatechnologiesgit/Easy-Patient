@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { TouchableWithoutFeedback, StyleSheet, Text, Image, View } from 'react-native';
+import { TouchableWithoutFeedback, Button, StyleSheet, Text, Image, View, Platform } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
-
 import CrossBellIcon from '../assets/crossBell.png';
 import BottomModal from './BottomModal';
 import Svg, { Path } from 'react-native-svg';
-const CrossBell = ({ remainingTime,dosage,medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
+const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
     const handleBackPress = () => {
         navigation.goBack();
     }
-    
+
+
+
+
     return (
         <>
             {
@@ -36,6 +38,7 @@ const CrossBell = ({ remainingTime,dosage,medicineId, time, id, Medicine, taken,
                     <Text style={styles.text}>{time} - Alarm </Text>
                 </View>
             }
+            {/* <Button title="Display Notification" onPress={onDisplayNotification} /> */}
             <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} />
         </>
     );
@@ -81,10 +84,10 @@ const styles = StyleSheet.create({
         marginLeft: 8,
         color: 'black',
     },
-    prescriptionText:{
-        color:'black',
-        fontWeight:'400',
-        fontSize:12,
+    prescriptionText: {
+        color: 'black',
+        fontWeight: '400',
+        fontSize: 12,
     },
     bell: {
         height: 20,

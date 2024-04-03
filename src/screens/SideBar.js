@@ -53,7 +53,7 @@ const SideBar = () => {
                 </TouchableOpacity>
             </View>
             <ScrollView>
-                <View style={{ marginBottom: 15 }}>
+                <View style={{ marginBottom: 15, marginTop: 5, }}>
                     <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -67,51 +67,77 @@ const SideBar = () => {
                 </View>
                 <View style={styles.horizontalLine}></View>
                 <View style={styles.containerList}>
-                    <TouchableOpacity onPress={()=>navigation.navigate("Appointments")} style={styles.appointments}>
-                        <View style={styles.navigate}>
-                            <Image source={calendar} style={styles.calendar}></Image>
-                            <Text style={styles.sideText}>Appointments</Text>
-                        </View>
-                        <Text style={styles.sideText}>{'>'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>navigation.navigate("Reminders")} style={styles.appointments}>
-                        <View style={styles.navigate}>
-                            <Image source={medicine} style={styles.jar}></Image>
-                            <Text style={styles.sideText}>Reminders</Text>
-                        </View>
-                        <Text style={styles.sideText}>{'>'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>navigation.navigate("Prescriptions")} style={styles.appointments}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Prescriptions")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={fileCapsule} style={styles.file}></Image>
                             <Text style={styles.sideText}>Prescriptions</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity  onPress={()=>navigation.navigate("Guidelines")} style={styles.appointments}>
-                        <View style={styles.navigate}>
-                            <Image source={fileAdd} style={styles.file}></Image>
-                            <Text style={styles.sideText}>Guidelines</Text>
-                        </View>
-                        <Text style={styles.sideText}>{'>'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity  onPress={()=>navigation.navigate("MealPlans")} style={styles.appointments}>
+                    <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={fork} style={styles.fork}></Image>
                             <Text style={styles.sideText}>Meal Plans</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity  onPress={()=>navigation.navigate("HealthRecommendation")} style={styles.appointments}>
+                    <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={fileAdd} style={styles.file}></Image>
+                            <Text style={styles.sideText}>Prediction of Exams</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Reminders")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={medicine} style={styles.jar}></Image>
+                            <Text style={styles.sideText}>Reminders</Text>
+                        </View>
+
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Appointments")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={calendar} style={styles.calendar}></Image>
+                            <Text style={styles.sideText}>Appointments</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Reminders")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={heartBeat} style={styles.heart}></Image>
-                            <Text style={styles.sideText}>Health Recommendations</Text>
+                            <Text style={styles.sideText}>Body Assessments</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Reminders")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={fileCapsule} style={styles.file}></Image>
+                            <Text style={styles.sideText}>Guidelines</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Appointments")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={calendar} style={styles.calendar}></Image>
+                            <Text style={styles.sideText}>Reports</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Guidelines")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={fileAdd} style={styles.file}></Image>
+                            <Text style={styles.sideText}>Attestations/Declarations</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={[styles.horizontalLine, { marginTop: 35 }]}></View>
                 <View style={styles.containerList}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
+                        <Image source={configure} style={styles.configure}></Image>
+                        <Text style={styles.sideText}>Source App</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
                         <Image source={configure} style={styles.configure}></Image>
                         <Text style={styles.sideText}>Configure</Text>
@@ -134,8 +160,9 @@ const styles = StyleSheet.create({
     },
     navigate: {
         flexDirection: 'row',
-        gap: 16,
+        gap: 15,
         alignItems: 'center',
+        
     },
     fork: {
         height: 21,
@@ -146,7 +173,7 @@ const styles = StyleSheet.create({
         width: 16,
     },
     exit: {
-        left: 5,
+        left: 4,
         height: 24,
         width: 21,
     },
@@ -175,24 +202,27 @@ const styles = StyleSheet.create({
         color: 'white',
     },
     home: {
-        top:-5,
+        top: -5,
         height: 32,
         width: 31,
     },
     appointments: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        width:'99%',
+        alignSelf:'center',
     },
     horizontalLine: {
         borderBottomColor: 'white',
         borderBottomWidth: 1,
-        marginVertical: 10,
+        marginVertical: 2,
     },
     containerList: {
-        marginTop: 25,
-        gap: 40,
+        marginTop: 18,
+        gap: 20,
     },
     topHead: {
+        marginTop: -5,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
@@ -200,7 +230,7 @@ const styles = StyleSheet.create({
         height: 90,
         width: 90,
         alignSelf: 'center',
-        borderRadius: 48,
+        borderRadius: 45,
     },
     nameHeading: {
         color: 'white',

@@ -4,7 +4,6 @@ import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FolderSlider from '../components/FolderSlider';
-import Notifications from '../components/Notifications';
 import BellAlarm from '../components/BellAlarm';
 import CrossAlarm from '../components/CrossAlarm';
 import CrossBell from '../components/CrossBell';
@@ -85,6 +84,8 @@ const Dashboard = () => {
         }
     }
 
+
+
     const renderTimeComponents = async () => {
         try {
             const allAlarmComponents = [];
@@ -93,6 +94,7 @@ const Dashboard = () => {
                 AlarmsArray?.forEach((alarm) => {
                     const { days, times, medicine, id, dosage, frequency } = alarm;
                     const currentTime = moment();
+                 
                     days.forEach((day) => {
                         times.forEach((timeObj) => {
                             const { time, id: timeId, taken } = timeObj;
@@ -101,9 +103,7 @@ const Dashboard = () => {
                             if (remainingTime < 0) {
                                 remainingTime = 0;
                             }
-                            let afterTime;
                             let alarmComponent;
-
                             if (alarmTime.isBefore(currentTime)) {
                                 alarmComponent = (
                                     <CrossAlarm
@@ -114,10 +114,9 @@ const Dashboard = () => {
                                         taken={taken}
                                         reloadFunction={renderTimeComponents}
                                     />
-
-
                                 );
-                            } else if (alarmTime.isBetween(currentTime, moment(currentTime).add(frequency, 'hour')) || alarmTime.isSame(currentTime)) {
+                            }
+                            else if (alarmTime.isBetween(currentTime, moment(currentTime).add(frequency, 'hour'))) {
                                 alarmComponent = (
                                     <CrossBell
                                         remainingTime={remainingTime}
@@ -129,10 +128,8 @@ const Dashboard = () => {
                                         taken={taken}
                                         reloadFunction={renderTimeComponents}
                                     />
-
                                 );
                             } else {
-                                afterTime = alarmTime.format('HH:mm');
                                 alarmComponent = (
                                     <BellAlarm
                                         time={alarmTime.format('HH:mm')}
@@ -150,7 +147,6 @@ const Dashboard = () => {
                 });
             }
 
-
             allAlarmComponents.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
             const components = allAlarmComponents.map((item, index) => (
                 <View style={styles.component} key={index}>
@@ -162,6 +158,9 @@ const Dashboard = () => {
             console.error('Error rendering alarm components:', error);
         }
     };
+
+
+
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -202,6 +201,8 @@ const Dashboard = () => {
                     <View style={styles.sliderContainer}>
                         <FolderSlider />
                     </View>
+                    <Text style={styles.heading}>Todays Medications</Text>
+
                     {
                         !alarmComponents.length > 0 &&
                         <View style={styles.component}>
@@ -247,6 +248,7 @@ const styles = StyleSheet.create({
     },
     nameContainer: {
         marginLeft: 16,
+        marginTop: -5,
     },
     nameHeading: {
         fontWeight: '500',
@@ -256,6 +258,14 @@ const styles = StyleSheet.create({
     logo: {
         width: '10%',
         resizeMode: 'contain',
+    },
+    heading: {
+        fontSize: PixelRatio.getFontScale() * 22,
+        color: config.textColorHeadings,
+        marginBottom: 15,
+        marginTop: -5,
+        fontWeight: '400',
+        marginLeft: 16,
     },
     ProfileLogo: {
         width: '100%',

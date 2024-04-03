@@ -551,7 +551,7 @@ const AddReminder = () => {
                         <View style={styles.notifyContainer}>
                             <Text style={styles.NotifyMsg}>Allow Easy Patient to make sound notifications even when you cell phone is in silent mode.</Text>
                         </View>
-                        <View style={{ width: '100%', marginTop: 40 }}>
+                        <View style={{ width: '95%', marginTop: 35 }}>
                             <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
                         </View>
                     </View>
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
     },
     signupFormContainer: {
         flex: 1,
-        width: '100%',
+        width: '98%',
         height: '100%',
         alignItems: 'center',
         flexDirection: 'column',

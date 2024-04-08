@@ -21,6 +21,8 @@ import NotificationBackground from '../components/NotificationBackground';
 import Configure from '../screens/Configure';
 import AddReminder from '../screens/AddReminder';
 import ChangePassword from '../screens/ChangePassword';
+import TermsAndConditions from '../screens/TermsAndConditions';
+import DeleteAccount from '../screens/DeleteAccount';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -48,6 +50,8 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="AddReminder" component={AddReminder} />  
         <Stack.Screen style={styles.container} name="ChangePassword" component={ChangePassword} />  
         <Stack.Screen style={styles.container} name="NotificationBackground" component={NotificationBackground} />  
+        <Stack.Screen style={styles.container} name="TermsAndConditions" component={TermsAndConditions} />  
+        <Stack.Screen style={styles.container} name="DeleteAccount" component={DeleteAccount} />  
           
       </Stack.Navigator>
     </NavigationContainer>

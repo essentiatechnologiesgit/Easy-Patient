@@ -12,7 +12,7 @@ import calendar from '../assets/calendarWhite.png';
 import medicine from '../assets/medicineWhite.png';
 import HomeWhite from '../assets/homeWhite.png';
 import pen from '../assets/pen.png';
-
+import ConfirmationModal from '../components/ConfirmationModal';
 import configure from '../assets/configureWhite.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -28,6 +28,13 @@ const SideBar = () => {
         };
         fetchData();
     }, []);
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const toggleModal = () => {
+      setModalVisible(!isModalVisible);
+    };
+
+    
 
     const getUserDetails = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -38,8 +45,9 @@ const SideBar = () => {
     }
 
     const Logout = async () => {
-        await AsyncStorage.setItem('loginResponse', '');
-        navigation.navigate("Login");
+        toggleModal();
+        // await AsyncStorage.setItem('loginResponse', '');
+        // navigation.navigate("Login");
     }
 
     return (
@@ -147,6 +155,7 @@ const SideBar = () => {
                         <Text style={styles.sideText}>Exit</Text>
                     </TouchableOpacity>
                 </View>
+                <ConfirmationModal isVisible={isModalVisible} toggleModal={toggleModal} Modalfor={"logout"} />
             </ScrollView>
         </View>
     );

@@ -76,6 +76,7 @@ const LoginScreen = () => {
     try {
       const response = await axios.request(config);
       await AsyncStorage.setItem('loginResponse', JSON.stringify(response.data));
+     
       setShowLoader(false);
       navigation.navigate("Dashboard");
       setUsername('');
@@ -199,13 +200,13 @@ const LoginScreen = () => {
               </View>
             </View>
             <View style={{ width: '100%', right: 30, bottom: 0 }}>
-          {passwordError && !password && (
-            <>
-              <AlertIcon />
-              <ValidationError errorMessage={errorMessage} />
-            </>
-          )}
-        </View>
+              {passwordError && !password && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+            </View>
           </>
         }
 

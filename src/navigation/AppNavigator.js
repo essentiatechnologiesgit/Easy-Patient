@@ -17,7 +17,6 @@ import HealthRecommendation from '../screens/HealthRecommendation';
 import Prescriptions from '../screens/Prescriptions';
 import Reminders from '../screens/Reminders';
 import Appointments from '../screens/Appointments';
-import NotificationBackground from '../components/NotificationBackground';
 import Configure from '../screens/Configure';
 import AddReminder from '../screens/AddReminder';
 import ChangePassword from '../screens/ChangePassword';
@@ -49,7 +48,7 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="Configure" component={Configure} />  
         <Stack.Screen style={styles.container} name="AddReminder" component={AddReminder} />  
         <Stack.Screen style={styles.container} name="ChangePassword" component={ChangePassword} />  
-        <Stack.Screen style={styles.container} name="NotificationBackground" component={NotificationBackground} />  
+        {/* <Stack.Screen style={styles.container} name="NotificationBackground" component={NotificationBackground} />   */}
         <Stack.Screen style={styles.container} name="TermsAndConditions" component={TermsAndConditions} />  
         <Stack.Screen style={styles.container} name="DeleteAccount" component={DeleteAccount} />  
           

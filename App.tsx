@@ -3,12 +3,13 @@ import { View, StyleSheet, ImageBackground, Image } from 'react-native'; // Add 
 import Header from './src/components/Header';
 import AppNavigator from './src/navigation/AppNavigator';
 import config from './config';
+import BackgroundService from './src/components/BackgroundService';
 
 const App: React.FC = () => {
   useEffect(() => {
 
-    // Redirect to dashboard after 3 seconds
-    console.log("Image:", config.backgroundImage)// Assuming you have navigation setup
+    console.log("Image:", config.backgroundImage)
+    BackgroundService();
 
   }, []);
   return (
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backgroundImage: {
-    flex: 1, // Ensure the image covers the entire view
+    flex: 1, 
     resizeMode: 'stretch', // Adjust resize mode as needed (e.g., 'contain', 'stretch')
     width: '100%'
 

@@ -30,7 +30,6 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
                 </TouchableWithoutFeedback>
             }
 
-
             <BottomModal visible={modalVisible} time={time} taken={taken} medicineId={medicineId} AlarmId={id} modalfor={"CrossAlarm"} reloadFunction={reloadFunction} onClose={() => setModalVisible(false)} />
         </>
     );

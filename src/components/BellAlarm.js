@@ -1,11 +1,11 @@
 import React from 'react';
-import { PixelRatio, StyleSheet, Text, Image, View } from 'react-native';
+import { PixelRatio, StyleSheet, Text, Image, View, TouchableWithoutFeedback } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import BellIcon from '../assets/bellIcon.png';
-const BellAlarm = ({time,Medicine}) => {
+const BellAlarm = ({ time, Medicine, medicineId }) => {
     const navigation = useNavigation();
     const handleBackPress = () => {
         navigation.goBack();
@@ -13,31 +13,33 @@ const BellAlarm = ({time,Medicine}) => {
 
     return (
         <>
-            <View style={styles.container}>
-                <Image source={BellIcon} style={styles.bell}></Image>
-                <Text style={styles.text}>{time} - {Medicine} </Text>
-            </View>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate("UpdateReminder", { medicineId: medicineId })}>
+                <View style={styles.container}>
+                    <Image source={BellIcon} style={styles.bell}></Image>
+                    <Text style={styles.text}>{time} - {Medicine} </Text>
+                </View>
+            </TouchableWithoutFeedback>
         </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection:'row',
+        flexDirection: 'row',
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
         height: 40,
-        padding:10,
+        padding: 10,
         alignSelf: 'center',
     },
-    text:{
-        marginLeft:8,
-        color:'black',
+    text: {
+        marginLeft: 8,
+        color: 'black',
     },
-    bell:{
-        height:20,
-        width:20,
+    bell: {
+        height: 20,
+        width: 20,
     }
 });
 

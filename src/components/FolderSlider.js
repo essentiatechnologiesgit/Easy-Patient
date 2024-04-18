@@ -4,6 +4,9 @@ import Modal from "react-native-modal";
 import fork from '../assets/fork.png';
 import heartBeat from '../assets/heartBeat.png';
 import fileAdd from '../assets/fileAdd.png';
+import fileLife from '../assets/fileLife.png';
+import Scale from '../assets/Scale.png';
+import fileEdit from '../assets/fileEdit.png';
 import { useNavigation } from "@react-navigation/native";
 import fileCapsule from '../assets/fileCapsule.png';
 import config from "../../config";
@@ -13,56 +16,103 @@ const FolderSlider = () => {
     const navigation = useNavigation();
     return (
         <>
-        <Text style={styles.heading}>My Files</Text>
-        <ScrollView
-            ref={scrollViewRef}
-            horizontal
-            contentContainerStyle={styles.scrollViewContent}
-            snapToInterval={100}
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-        >
-            <View style={styles.container}>
-                <TouchableOpacity onPress={()=>navigation.navigate("MealPlans")} style={styles.FolderContainer}>
-                    <View style={styles.smallContainer}>
-                    </View>
-                    <Image source={fork} style={styles.logo}></Image>
-                    <View style={{ marginLeft: 10 ,marginTop:-3 }}>
-                        <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Meal Plans</Text>
-                        <Text style={styles.files}>0  files</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>navigation.navigate("Prescriptions")} style={styles.FolderContainer}>
-                    <View style={styles.smallContainer}>
-                    </View>
-                    <Image source={fileCapsule} style={styles.filelogo}></Image>
-                    <View style={{ marginLeft: 10,marginTop:-5}}>
-                        <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
-                        <Text style={styles.files}>0  files</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>navigation.navigate("Guidelines")} style={styles.FolderContainer}>
-                    <View style={styles.smallContainer}>
-                    </View>
-                    <Image source={fileAdd} style={styles.filelogo}></Image>
-                    <View style={{ marginLeft: 10,marginTop:-5 }}>
-                        <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Guidelines</Text>
-                        <Text style={styles.files}>0  files</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>navigation.navigate("HealthRecommendation")}  style={styles.FolderContainer}>
-                    <View style={styles.smallContainer}>
-                    </View>
-                    <Image source={heartBeat} style={styles.heartlogo}></Image>
-                    <View style={{ marginLeft: 10, marginTop:-5}}>
-                        <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                            Health Recommendations
-                        </Text>
-                        <Text style={styles.files}>0  files</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
+            <Text style={styles.heading}>My Files</Text>
+            <ScrollView
+                ref={scrollViewRef}
+                horizontal
+                contentContainerStyle={styles.scrollViewContent}
+                snapToInterval={100}
+                decelerationRate="fast"
+                showsHorizontalScrollIndicator={false}
+            >
+                <View style={styles.container}>
+                    
+                    <TouchableOpacity onPress={() => navigation.navigate("Prescriptions")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={fileCapsule} style={styles.filelogo}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={fork} style={styles.logo}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -3 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Meal Plans</Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("ExamRequest")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={heartBeat} style={styles.heartlogo}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
+                            Exam Requests
+                            </Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Guidelines")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={fileAdd} style={styles.filelogo}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Guidelines</Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+
+
+                    {/* <TouchableOpacity onPress={() => navigation.navigate("HealthRecommendation")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={fileEdit} style={styles.fileEdit}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
+                                Health Recommendations
+                            </Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity> */}
+                    <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={Scale} style={styles.Scale}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
+                            Body Assessments
+                            </Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Reports")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={fileLife} style={styles.filelogo}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
+                            Reports
+                            </Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("Attestations")} style={styles.FolderContainer}>
+                        <View style={styles.smallContainer}>
+                        </View>
+                        <Image source={fileEdit} style={styles.fileEdit}></Image>
+                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
+                            Attestations/Declarations
+                            </Text>
+                            <Text style={styles.files}>0  files</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         </>
     );
 };
@@ -72,11 +122,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
-    heading:{
+    heading: {
         fontSize: PixelRatio.getFontScale() * 22,
         color: config.textColorHeadings,
-        marginBottom:-10,
-        fontWeight:'400',
+        marginBottom: -10,
+        fontWeight: '400',
     },
     scrollViewContent: {
         alignItems: "center",
@@ -97,7 +147,7 @@ const styles = StyleSheet.create({
         marginRight: 20,
         opacity: 1,
         backgroundColor: 'white',
-        elevation:0,
+        elevation: 0,
     },
     logo: {
         top: -10,
@@ -110,11 +160,26 @@ const styles = StyleSheet.create({
         height: 25,
         width: 20,
         marginLeft: 10,
+      },
+      
+    Scale: {
+        top: -10,
+        height: 26,
+        width: 25,
+        marginLeft: 10,
+        transform: [{ rotate: '120deg' }],
+      
     },
     heartlogo: {
         top: -10,
         height: 26,
         width: 30,
+        marginLeft: 10,
+    },
+    fileEdit: {
+        top: -10,
+        height: 26,
+        width: 32,
         marginLeft: 10,
     },
     smallContainer: {

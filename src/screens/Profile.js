@@ -8,6 +8,7 @@ import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
+import ImagePicker from 'react-native-image-crop-picker';
 import ValidationError from '../components/ValidationError';
 import axios from 'axios';
 import Snackbar from '../components/Snackbar';
@@ -16,11 +17,11 @@ import qs from 'qs';
 import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
-
+import ProfileImagePopup from '../components/ProfileImagePopup';
 const Profile = () => {
     const route = useRoute();
     const isChanged = route.params?.isChanged;
-
+    const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [email, setEmail] = useState('');
@@ -86,6 +87,7 @@ const Profile = () => {
         axios.request(config)
             .then((response) => {
                 setImage(response.data.picture);
+                console.log(response.data.picture);
                 setEmail(response.data.username);
                 setFullName(response.data.name);
                 const [year, month, date] = response.data.birth_date.split("-");
@@ -108,6 +110,7 @@ const Profile = () => {
     const handlePressDatePicker = () => {
         setShowDatePicker(true);
     };
+    
 
     const handleSelect = (item) => {
         setSelectedGender(item.value);
@@ -187,7 +190,8 @@ const Profile = () => {
                 data: data
             };
             axios.request(config)
-                .then((response) => {
+                .then(async (response) => {
+                    await handleImageSave();
                     handleShowSnackbar("Profile Updated");
                 })
                 .catch((error) => {
@@ -196,6 +200,80 @@ const Profile = () => {
                 .finally(() => {
                     setShowLoader(false);
                 });
+        }
+    }
+
+    const getFileExtension = (fileUri) => {
+        if (!fileUri) {
+            return null;
+        }
+        const parts = fileUri.split('.');
+        return parts.length > 1 ? parts.pop() : null;
+    }
+
+    const handleEmptyImageSave = async () => {
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/patient/picture',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        };
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                updateProfilePicture('');
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    };
+
+    const updateProfilePicture = async (newProfilePic) => {
+        let loginResponse = await AsyncStorage.getItem('loginResponse');
+        loginResponse = JSON.parse(loginResponse);
+        loginResponse.user.profile_pic = newProfilePic;
+        const updatedLoginResponse = JSON.stringify(loginResponse);
+        // console.log(updatedLoginResponse);
+        await AsyncStorage.setItem('loginResponse', updatedLoginResponse);
+    };
+
+
+    const handleImageSave = async () => {
+        try {
+            if (!image) {
+                setShowLoader(false);
+                handleEmptyImageSave();
+                return;
+            }
+
+            const formData = new FormData();
+            const fileUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
+            const fileExtension = getFileExtension(fileUri) || 'jpg'; // Default extension 'jpg'
+            const fileName = `image.${fileExtension}`;
+
+            formData.append('file', {
+                uri: fileUri,
+                name: fileName,
+                type: `image/${fileExtension}`,
+            });
+
+            const headers = {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'multipart/form-data',
+            };
+            console.log(formData);
+
+            const response = await axios.post('https://api-patient-dev.easy-health.app/patient/upload', formData, {
+                headers: headers,
+            });
+            console.log(response);
+            updateProfilePicture(response.data.location);
+            // console.log('Image uploaded successfully:', response.data.location);
+
+        } catch (error) {
+            console.error('Error uploading image:', error);
         }
     }
 
@@ -209,17 +287,25 @@ const Profile = () => {
         });
     }
 
+    const handleEdit = () => {
+        setModalVisible(true);
+    }
+
     return (
         <>
             <View style={styles.container}>
+                <ProfileImagePopup visible={modalVisible} onClose={() => setModalVisible(false)} setImage={setImage} />
                 <BackHeader name={"Profile"} />
                 <View style={styles.formContainer}>
                     <TouchableOpacity onPress={() => handlePhotoNavigation()}>
                         <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={() => { handleEdit() }}>
+                        <Text style={styles.edit}>Edit</Text>
+                    </TouchableOpacity>
                     <ScrollView ref={scrollViewRef} style={{ width: '94%', alignSelf: 'center' }} contentContainerStyle={{ alignItems: 'center', marginTop: 45, }}>
                         <View style={styles.signupFormContainer}>
-                        <View
+                            <View
                                 ref={(ref) => (errorRefs.current[1] = ref)}
                                 style={styles.floatingLabel}>
                                 <FloatingLabelInput
@@ -249,7 +335,6 @@ const Profile = () => {
                                     value={email}
                                     onChangeText={value => setEmail(value)}
                                     containerStyles={styles.containerStyles}
-
                                 />
                                 {emailError && !email && (
                                     <>
@@ -264,7 +349,7 @@ const Profile = () => {
                                     </>
                                 )}
                             </View>
-                           
+
                             <View
                                 ref={(ref) => (errorRefs.current[2] = ref)}
                                 style={styles.floatingLabel}>
@@ -407,6 +492,13 @@ const styles = StyleSheet.create({
         borderRadius: 48,
         borderColor: config.secondaryColor,
         borderWidth: 1,
+    },
+    edit: {
+        color: config.secondaryColor,
+        textAlign: 'center',
+        marginTop: 20,
+        fontSize: PixelRatio.getFontScale() * 17,
+        textDecorationLine: 'underline',
     },
     formContainer: {
         marginTop: '8%',

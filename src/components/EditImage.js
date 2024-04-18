@@ -9,7 +9,6 @@ import gallery from '../assets/gallery.png';
 import ModalLoader from './ModalLoader';
 import axios from 'axios';
 import FormData from 'form-data';
-import fs from 'react-native-fs';
 import camera from '../assets/camera.png';
 import profileIcon from '../assets/profile.png';
 import { launchCamera } from 'react-native-image-picker';
@@ -44,26 +43,48 @@ const EditImage = ({ route }) => {
             }
         });
     };
-    const handleCameraLaunch = () => {
+    const handleCameraLaunch = async () => {
         const options = {
-            mediaType: 'photo',
-            includeBase64: false,
-            maxHeight: 2000,
-            maxWidth: 2000,
+          mediaType:'photo',
         };
-        launchCamera(options, response => {
-            if (response.didCancel) {
-                // console.log('User cancelled camera');
-                // console.warn("here");
-            } else if (response.error) {
-                // console.log('Camera Error: ', response.error);
-            } else {
-                let imageUri = response.uri || response.assets?.[0]?.uri;
-                setImage(imageUri);
-                // console.log(imageUri);
-            }
-        });
-    }
+    
+        try {
+          const response = await launchCamera(options);
+            console.log('pickedFile',response.assets[0].originalPath);
+            setImage(response.assets[0].originalPath);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+    //   const handleCameraLaunch = async () => {
+    
+      
+    //     const options = {
+    //       title: 'Select Image',
+    //       mediaType: 'photo',
+    //       cropping: true, // Enable cropping similar to gallery
+    //       cropperCircleOverlay: true, // Optional: Enable circular cropping
+    //       freeStyleCropEnabled: true, // Optional: Allow free-style cropping
+    //       cropperToolbarTitle: 'Edit Photo',
+    //       cropperToolbarColor: 'white',
+    //       cropperToolbarWidgetColor: 'black',
+    //       cropperActiveWidgetColor: 'black',
+    //       cropperStatusBarColor: 'white',
+    //       cropperStatusBarContentDark: false,
+    //       includeBase64: false, // Avoid including base64 data (not needed usually)
+    //       showCropFrame: true,
+    //       showCropGuidelines: true,
+    //     };
+      
+    //     try {
+    //       const image = await launchCamera(options);
+    //       if (!image.didCancel) {
+    //         setImage(image.path); // Set the image path in your state
+    //       }
+    //     } catch (error) {
+    //       console.error('Camera Error:', error);
+    //     }
+    //   };
 
     const updateProfilePicture = async (newProfilePic) => {
         let loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -97,8 +118,7 @@ const EditImage = ({ route }) => {
                 console.log(error);
             }).finally(()=>{
                 setShowLoader(false);
-            })
-            ;
+            });
     }
 
 
@@ -134,7 +154,7 @@ const EditImage = ({ route }) => {
             });
             updateProfilePicture(response.data.location);
             setShowLoader(false);
-            // console.log('Image uploaded successfully:', response.data.location);
+            console.log('Image uploaded successfully:', response.data.location);
 
         } catch (error) {
             setShowLoader(false);

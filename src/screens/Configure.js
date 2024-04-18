@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, Switch, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated,Alert, StyleSheet, Switch, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
+import { Linking, Platform } from 'react-native';
+import notifee, { AndroidImportance,AndroidBadgeIconType  } from '@notifee/react-native';
 
 const Configure = () => {
     const route = useRoute();
@@ -15,6 +17,55 @@ const Configure = () => {
     const [switch4, setSwitch4] = useState(true);
     const [switch5, setSwitch5] = useState(false);
 
+    const openBatteryOptimizationSettings = () => {
+        // let settingsURL;
+
+        // if (Platform.OS === 'android') {
+        //     settingsURL = 'battery optimization settings URL for Android';
+        // } else if (Platform.OS === 'ios') {
+        //     settingsURL = 'app-settings:';
+        // }
+
+        // if (settingsURL) {
+        //     Linking.openSettings();
+        // } else {
+        //     console.error('Battery optimization settings URL not supported on this platform');
+        // }
+
+        Alert.alert(
+            'Restrictions Detected',
+            'To ensure notifications are delivered, please disable battery optimization for the app.',
+            [
+              // 3. launch intent to navigate the user to the appropriate screen
+              {
+                text: 'OK, open settings',
+                onPress: async () => await notifee.openBatteryOptimizationSettings(),
+              },
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+            ],
+            { cancelable: false }
+          );
+    };
+    const AppearOnTop = () => {
+            let settingsURL;
+
+            if (Platform.OS === 'android') {
+                settingsURL = 'package:' + 'your.package.name' + '/notification';
+            } else if (Platform.OS === 'ios') {
+                settingsURL = 'app-settings:';
+            }
+
+            if (settingsURL) {
+                Linking.openSettings();
+            } else {
+                console.error('Settings URL not supported on this platform');
+            }
+        
+    }
     const toggleSwitch = async (number) => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
@@ -22,6 +73,11 @@ const Configure = () => {
 
         let configurations = await AsyncStorage.getItem('Configurations');
         configurations = configurations ? JSON.parse(configurations) : {};
+
+        // Ensure that configurations[userId] is initialized
+        if (!configurations[userId]) {
+            configurations[userId] = {};
+        }
 
         let newSwitchState;
         switch (number) {
@@ -34,6 +90,7 @@ const Configure = () => {
                 newSwitchState = !switch2;
                 setSwitch2(newSwitchState);
                 configurations[userId].switch2 = newSwitchState;
+                AppearOnTop();
                 break;
             case 3:
                 newSwitchState = !switch3;
@@ -44,6 +101,7 @@ const Configure = () => {
                 newSwitchState = !switch4;
                 setSwitch4(newSwitchState);
                 configurations[userId].switch4 = newSwitchState;
+                openBatteryOptimizationSettings();
                 break;
             case 5:
                 newSwitchState = !switch5;
@@ -83,7 +141,7 @@ const Configure = () => {
         const responseObject = JSON.parse(loginResponse);
         const email = responseObject.user.username;
 
-        navigation.navigate("DeleteAccount", {email})
+        navigation.navigate("DeleteAccount", { email })
     }
 
     return (

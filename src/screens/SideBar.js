@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
 import leftArrow from '../assets/leftArrow.png';
 import fork from '../assets/forkWhite.png';
+import { Email,openComposer } from 'react-native-email-link';
 import heartBeat from '../assets/heartWhite.png';
 import fileAdd from '../assets/fileAddWhite.png';
 import fileCapsule from '../assets/fileCapsuleWhite.png';
@@ -12,6 +13,10 @@ import calendar from '../assets/calendarWhite.png';
 import medicine from '../assets/medicineWhite.png';
 import HomeWhite from '../assets/homeWhite.png';
 import pen from '../assets/pen.png';
+import EmailIcon from '../assets/EmailIcon.png';
+import fileEditWhite from '../assets/fileEditWhite.png';
+
+import fileWhite from '../assets/fileWhite.png';
 import ConfirmationModal from '../components/ConfirmationModal';
 import configure from '../assets/configureWhite.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,6 +53,12 @@ const SideBar = () => {
         toggleModal();
         // await AsyncStorage.setItem('loginResponse', '');
         // navigation.navigate("Login");
+    }
+
+    const handleEmailPress = () =>{
+        openComposer({
+            to: "support@easy-health.app",
+          });
     }
 
     return (
@@ -89,10 +100,10 @@ const SideBar = () => {
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.appointments}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ExamRequest")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={fileAdd} style={styles.file}></Image>
-                            <Text style={styles.sideText}>Prediction of Exams</Text>
+                            <Image source={fileWhite} style={styles.file}></Image>
+                            <Text style={styles.sideText}>Exam Request</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
@@ -111,30 +122,31 @@ const SideBar = () => {
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Reminders")} style={styles.appointments}>
+
+                    <TouchableOpacity onPress={() => navigation.navigate("Guidelines")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={fileAdd} style={styles.file}></Image>
+                            <Text style={styles.sideText}>Guidelines</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={heartBeat} style={styles.heart}></Image>
                             <Text style={styles.sideText}>Body Assessments</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Reminders")} style={styles.appointments}>
-                        <View style={styles.navigate}>
-                            <Image source={fileCapsule} style={styles.file}></Image>
-                            <Text style={styles.sideText}>Guidelines</Text>
-                        </View>
-                        <Text style={styles.sideText}>{'>'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Appointments")} style={styles.appointments}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Reports")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={calendar} style={styles.calendar}></Image>
                             <Text style={styles.sideText}>Reports</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Guidelines")} style={styles.appointments}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Attestations")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={fileAdd} style={styles.file}></Image>
+                            <Image source={fileEditWhite} style={styles.fileEdit}></Image>
                             <Text style={styles.sideText}>Attestations/Declarations</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
@@ -142,9 +154,9 @@ const SideBar = () => {
                 </View>
                 <View style={[styles.horizontalLine, { marginTop: 35 }]}></View>
                 <View style={styles.containerList}>
-                    <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
-                        <Image source={configure} style={styles.configure}></Image>
-                        <Text style={styles.sideText}>Source App</Text>
+                    <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
+                        <Image source={EmailIcon} style={styles.mail}></Image>
+                        <Text style={styles.sideText}>Support App</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
                         <Image source={configure} style={styles.configure}></Image>
@@ -190,9 +202,17 @@ const styles = StyleSheet.create({
         height: 22,
         width: 22,
     },
+    mail: {
+        height: 20,
+        width: 20,
+    },
     file: {
         height: 25,
         width: 20,
+    },
+    fileEdit: {
+        height: 27,
+        width: 24,
     },
     jar: {
         height: 25,
@@ -204,7 +224,7 @@ const styles = StyleSheet.create({
     },
     calendar: {
         height: 22,
-        width: 21,
+        width: 20,
     },
     sideText: {
         fontSize: PixelRatio.getFontScale() * 18,

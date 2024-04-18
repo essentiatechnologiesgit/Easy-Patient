@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import SplashScreen from '../screens/SplashScreen';
 import Login from '../screens/LoginScreen';
 import { StyleSheet } from 'react-native';
@@ -13,6 +13,7 @@ import EditImage from '../components/EditImage';
 import Practice from '../components/Practice';
 import MealPlans from '../screens/MealPlans';
 import Guidelines from '../screens/Guidelines';
+import Attestations from '../screens/Attestations';
 import HealthRecommendation from '../screens/HealthRecommendation';
 import Prescriptions from '../screens/Prescriptions';
 import Reminders from '../screens/Reminders';
@@ -22,6 +23,14 @@ import AddReminder from '../screens/AddReminder';
 import ChangePassword from '../screens/ChangePassword';
 import TermsAndConditions from '../screens/TermsAndConditions';
 import DeleteAccount from '../screens/DeleteAccount';
+import UpdateReminder from '../screens/UpdateReminder';
+import ProfileAndHealth from '../screens/ProfileAndHealth';
+import HealthInformation from '../screens/HealthInformation';
+import BackgroundServices from '../screens/BackGroundServices';
+import ExamRequest from '../screens/ExamRequest';
+import Reports from '../screens/Reports';
+import BodyAssessments from '../screens/BodyAssessments';
+import MedicineImage from '../screens/MedicineImage';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -30,28 +39,39 @@ const AppNavigator = () => {
       <Stack.Navigator style={styles.container}
         screenOptions={{
           headerShown: false,
+          // cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // Set sliding animation
         }}>
+        {/* <Stack.Screen style={styles.container} name="BackgroundServices" component={BackgroundServices} />   */}
         {/* <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
         <Stack.Screen style={styles.container} name="Login" component={Login} />
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
         <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} /> */}
-        <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} /> 
+        <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} />
+        <Stack.Screen style={styles.container} name="ProfileAndHealth" component={ProfileAndHealth} />
         <Stack.Screen style={styles.container} name="Profile" component={Profile} />
         <Stack.Screen style={styles.container} name="SideBar" component={SideBar} />
-        <Stack.Screen style={styles.container} name="EditImage" component={EditImage} />  
-        <Stack.Screen style={styles.container} name="MealPlans" component={MealPlans} />  
-        <Stack.Screen style={styles.container} name="Prescriptions" component={Prescriptions} />  
-        <Stack.Screen style={styles.container} name="Guidelines" component={Guidelines} />  
-        <Stack.Screen style={styles.container} name="HealthRecommendation" component={HealthRecommendation} />  
-        <Stack.Screen style={styles.container} name="Appointments" component={Appointments} />  
-        <Stack.Screen style={styles.container} name="Reminders" component={Reminders} />  
-        <Stack.Screen style={styles.container} name="Configure" component={Configure} />  
-        <Stack.Screen style={styles.container} name="AddReminder" component={AddReminder} />  
-        <Stack.Screen style={styles.container} name="ChangePassword" component={ChangePassword} />  
+        <Stack.Screen style={styles.container} name="EditImage" component={EditImage} />
+        <Stack.Screen style={styles.container} name="MealPlans" component={MealPlans} />
+        <Stack.Screen style={styles.container} name="Prescriptions" component={Prescriptions} />
+        <Stack.Screen style={styles.container} name="Guidelines" component={Guidelines} />
+        <Stack.Screen style={styles.container} name="HealthRecommendation" component={HealthRecommendation} />
+        <Stack.Screen style={styles.container} name="Appointments" component={Appointments} />
+        <Stack.Screen style={styles.container} name="Reminders" component={Reminders} />
+        <Stack.Screen style={styles.container} name="Configure" component={Configure} />
+        <Stack.Screen style={styles.container} name="AddReminder" component={AddReminder} />
+        <Stack.Screen style={styles.container} name="ChangePassword" component={ChangePassword} />
         {/* <Stack.Screen style={styles.container} name="NotificationBackground" component={NotificationBackground} />   */}
-        <Stack.Screen style={styles.container} name="TermsAndConditions" component={TermsAndConditions} />  
-        <Stack.Screen style={styles.container} name="DeleteAccount" component={DeleteAccount} />  
-          
+        <Stack.Screen style={styles.container} name="UpdateReminder" component={UpdateReminder} />
+        <Stack.Screen style={styles.container} name="HealthInformation" component={HealthInformation} />
+        <Stack.Screen style={styles.container} name="Attestations" component={Attestations} />
+        <Stack.Screen style={styles.container} name="Reports" component={Reports} />
+        <Stack.Screen style={styles.container} name="BodyAssessments" component={BodyAssessments} />
+        <Stack.Screen style={styles.container} name="ExamRequest" component={ExamRequest} />
+        <Stack.Screen style={styles.container} name="MedicineImage" component={MedicineImage} />
+        
+        <Stack.Screen style={styles.container} name="TermsAndConditions" component={TermsAndConditions} />
+        <Stack.Screen style={styles.container} name="DeleteAccount" component={DeleteAccount} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

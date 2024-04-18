@@ -1,39 +1,46 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, Switch, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
-import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
 import CustomizedButton from '../components/CustomizedButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import ValidationError from '../components/ValidationError';
+import redDrop from '../assets/redDrop.png';
+import blackDrop from '../assets/blackDrop.png';
+import blueDrop from '../assets/blueDrop.png';
+import { readFile } from 'react-native-fs';
+import yellowDrink from '../assets/yellowDrink.png';
+import yellowDrop from '../assets/yellowDrop.png';
+import redDrink from '../assets/redDrink.png';
+import blueDrink from '../assets/blueDrink.png';
+import blackDrink from '../assets/blackDrink.png';
+import yellowMed from '../assets/yellowMed.png';
+import blueMed from '../assets/blueMed.png';
+import redMed from '../assets/redMed.png';
+import blackMed from '../assets/blackMed.png';
+import yellowCapsule from '../assets/yellowCapsule.png';
+import RNFS from 'react-native-fs';
+import blueCapsule from '../assets/blueCapsule.png';
+import redCapsule from '../assets/redCapsule.png';
+import blackCapsule from '../assets/blackCapsule.png';
 import moment from "moment";
 import axios from 'axios';
 import BottomModalPopup from '../components/BottomModalPopup';
-import Snackbar from '../components/Snackbar';
+
 import ModalLoader from '../components/ModalLoader';
-import qs from 'qs';
-import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
-import medicine from '../assets/medicine.png';
-const AddReminder = () => {
-    const route = useRoute();
+const AddReminder = ({ route }) => {
+    const { selectedImage, image } = route.params || { selectedImage: 1 };
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [placeholderLabelAnim] = useState(new Animated.Value(selectedDays ? 1 : 0));
-    const [termsAccepted, setTermsAccepted] = useState(false)
     const [isOpen, setIsOpen] = useState(false);
     const [placeholderVisible, setPlaceholderVisible] = useState(true);
-    const [showForm, setShowForm] = useState(false)
     const [errorMessage, setErrorMessage] = useState('');
     const [showLoader, setShowLoader] = useState(false);
-    const [otp, setOtp] = useState('');
-    const [isEmailFocused, setIsEmailFocused] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarKey, setSnackbarKey] = useState(0);
     const [MedicineName, setMedicineName] = useState('');
     const [days, setDays] = useState('');
     const [frequency, setFrequency] = useState('');
@@ -46,25 +53,17 @@ const AddReminder = () => {
     const [medicineError, setMedicineError] = useState(false);
     const [doseError, setDoseError] = useState(false);
     const [dateError, setDateError] = useState(false);
-    const [genderError, setGenderError] = useState(false);
-
     const [daysError, setDaysError] = useState('');
     const [frequencyError, setFrequencyError] = useState('');
-    const [PasswordMatch, setPasswordMatch] = useState(false);
-    const [invalidEmail, setInvalidEmail] = useState(false);
-    const [verifyOTP, setVerifyOTP] = useState(false);
-    const [pLengthError, setPLengthError] = useState(false);
-    const [cpLengthError, setCPLengthError] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
-    const [selectedDaysError, setSelectedDaysError] = useState(false);
     const [isNotify, setIsNotify] = useState(false);
     const [priority, setPriority] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [freNumber, setFreNumber] = useState('');
     const [duration, setDuration] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
     const [freNumberError, setFreNumberError] = useState('');
+    const [imagePath, setImagePath] = useState('');
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
     };
@@ -116,6 +115,14 @@ const AddReminder = () => {
 
     };
 
+    const getFileExtension = (fileUri) => {
+        if (!fileUri) {
+            return null;
+        }
+        const parts = fileUri.split('.');
+        return parts.length > 1 ? parts.pop() : null;
+    }
+
 
     const handleConfirm = async () => {
         setMedicineError(false);
@@ -142,18 +149,24 @@ const AddReminder = () => {
             setFreNumberError(true);
             setErrorMessage('Please enter the frequency');
         } else {
-            setShowLoader(true);
+            // setShowLoader(true);
+            const uriParts = image.split('.');
+            const fileType = uriParts[uriParts.length - 1];
 
             const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
             const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
 
-
-
             const loginResponse = await AsyncStorage.getItem('loginResponse');
             const responseObject = JSON.parse(loginResponse);
             const access_token = responseObject.access_token;
+            const userId = responseObject.user.user_id;
 
-            let data = new FormData();
+
+
+
+            const data = new FormData();
+
+
             data.append('name', MedicineName);
             data.append('dosage', dose);
             data.append('start_time', `${Newdate} ${Newtime}`);
@@ -162,9 +175,14 @@ const AddReminder = () => {
             data.append('days_of_the_week', '1,2,3');
             data.append('st_notification', !isNotify ? 0 : 1);
             data.append('st_critical', !priority ? 0 : 1);
-            data.append('file', '');
-            data.append('default_icon', '0');
+            // data.append('file', image ? image : selectedImage);
+            data.append('default_icon', selectedImage);
             data.append('medicine_schedules', 'test_string');
+            data.append('file', {
+                uri: image, 
+                name: 'medicine_image.jpg',
+                type: 'image/jpeg', 
+            });
 
             let config = {
                 method: 'post',
@@ -176,110 +194,148 @@ const AddReminder = () => {
                 },
                 data: data
             };
+            console.log(data);
             axios.request(config)
                 .then((response) => {
                     console.log(JSON.stringify(response.data));
-                    renderAlarmComponents(response.data);
-
-
+                    // renderAlarmComponents(response.data, userId);
                 })
                 .catch((error) => {
                     console.log(error);
                 })
                 .finally(() => {
                     setShowLoader(false);
-                    navigation.navigate('Dashboard', {
-                        isChanged: true,
-                    });
+                    // navigation.navigate('Dashboard', {
+                    //     isChanged: true,
+                    // });
                 });
         }
     }
 
-    const renderAlarmComponents = async (medicines) => {
+    const renderAlarmComponents = async (medicines, userId) => {
         try {
-            // Ensure medicines is an array
             medicines = Array.isArray(medicines) ? medicines : [medicines];
-    
+
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
             const existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
-    
+
             // Initialize variables
             const idDosageMedicineFrequencyMap = {};
-    
+
             // Process each medicine
             for (const medicine of medicines) {
-                const { start_time, frequency, name, id, dosage } = medicine;
+                const { start_time, frequency, name, id, dosage, picture_path } = medicine;
+
                 const startTimeDate = moment(start_time).format('YYYY-MM-DD');
                 const currentTime = moment();
                 const nextAlarmTime = moment(start_time);
-    
+
                 if (moment(start_time).isSame(moment(), 'day')) {
                     let timeId = 1; // Initialize timeId
-    
+
                     while (nextAlarmTime.isBefore(moment().endOf('day'))) {
                         const newAlarm = {
                             time: nextAlarmTime.format('HH:mm'),
                             medicine: name,
                             dosage,
                             id,
-                            frequency
+                            frequency,
+                            picture_path // Include picture_path in the alarm object
                         };
-    
+
                         // Create a key based on id, dosage, medicine, and frequency
                         const key = `${id}_${dosage}_${name}_${frequency}`;
-    
+
                         // Initialize times array if it doesn't exist
                         if (!idDosageMedicineFrequencyMap[key]) {
                             idDosageMedicineFrequencyMap[key] = {
                                 id,
                                 dosage,
                                 medicine: name,
+                                user_id: userId,
                                 frequency,
                                 times: [],
-                                days: []
+                                days: [],
+                                picture_path // Include picture_path in the medicine entry
                             };
                         }
-    
+
                         // Push the time to the times array with taken: false and timeId
                         idDosageMedicineFrequencyMap[key].times.push({ time: newAlarm.time, id: timeId, taken: false });
                         if (!idDosageMedicineFrequencyMap[key].days.includes(startTimeDate)) {
                             idDosageMedicineFrequencyMap[key].days.push(startTimeDate);
                         }
-    
+
                         nextAlarmTime.add(frequency, 'hours');
                         timeId++; // Increment timeId for the next time
                     }
                 }
             }
-    
+
             // Convert the map to an array of values
             const updatedAlarmsData = Object.values(idDosageMedicineFrequencyMap);
-    
+
             // If existing alarms exist, concatenate with the new alarms
             const finalAlarmsArray = existingAlarms.length > 0 ? existingAlarms.concat(updatedAlarmsData) : updatedAlarmsData;
-    
+
             // Store updated alarms in AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(finalAlarmsArray));
             console.log('Added alarms:', finalAlarmsArray);
-    
+
         } catch (error) {
             console.error('Error rendering alarm components:', error);
         }
     };
-    
-
-
-
-
-
-
-
 
 
     const handleCounter = () => {
         setModalVisible(true);
     }
+
+    const renderImage = () => {
+        switch (selectedImage) {
+            case 1:
+                return <Image source={blackMed} style={styles.Profilelogo} />;
+            case 2:
+                return <Image source={blackCapsule} style={styles.capsulelogo} />;
+            case 3:
+                return <Image source={blackDrop} style={styles.Profilelogo} />;
+            case 4:
+                return <Image source={blackDrink} style={styles.Profilelogo} />;
+            case 5:
+                return <Image source={blueMed} style={styles.Profilelogo} />;
+            case 6:
+                return <Image source={blueCapsule} style={styles.capsulelogo} />;
+            case 7:
+                return <Image source={blueDrop} style={styles.Profilelogo} />;
+            case 8:
+                return <Image source={blueDrink} style={styles.Profilelogo} />;
+            case 9:
+                return <Image source={yellowMed} style={styles.Profilelogo} />;
+            case 10:
+                return <Image source={yellowCapsule} style={styles.capsulelogo} />;
+            case 11:
+                return <Image source={yellowDrop} style={styles.Profilelogo} />;
+            case 12:
+                return <Image source={yellowDrink} style={styles.Profilelogo} />;
+            case 13:
+                return <Image source={redMed} style={styles.Profilelogo} />;
+            case 14:
+                return <Image source={redCapsule} style={styles.capsulelogo} />;
+            case 15:
+                return <Image source={redDrop} style={styles.Profilelogo} />;
+            case 16:
+                return <Image source={redDrink} style={styles.Profilelogo} />;
+            case 17:
+                return <Image source={{ uri: image }} style={styles.ProfileImage} />;
+            case 18:
+                return <Image source={{ uri: image }} style={styles.ProfileImage} />;
+            default:
+                return <Image source={blackMed} style={styles.Profilelogo} />;
+        }
+    };
+
 
     return (
         <>
@@ -287,11 +343,11 @@ const AddReminder = () => {
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Add Reminder"} />
-                <View style={styles.medicineContiner}>
-                    <Image source={medicine} style={styles.ProfileLogo} />
-                </View>
-                <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
 
+                <TouchableOpacity onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })} style={styles.medicineContiner}>
+                    {renderImage()}
+                </TouchableOpacity>
+                <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
                         <View
                             ref={(ref) => (errorRefs.current[0] = ref)}
@@ -752,7 +808,21 @@ const styles = StyleSheet.create({
     FocusStyling: {
         color: config.primaryColor,
     },
-
+    ProfileImage: {
+        height: 75,
+        width: 75,
+        borderRadius: 37.5,
+    },
+    Profilelogo: {
+        height: 36,
+        width: 24,
+        borderColor: config.secondaryColor,
+    },
+    capsulelogo: {
+        height: 30,
+        width: 28,
+        borderColor: config.secondaryColor,
+    },
     backLink: {
         fontSize: PixelRatio.getFontScale() * 17,
         color: config.secondaryColor,

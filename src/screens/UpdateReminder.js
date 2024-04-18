@@ -20,20 +20,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import medicine from '../assets/medicine.png';
 const UpdateReminder = () => {
-    const route = useRoute();
+    const routeInfo = useRoute();
+    const medicineId = routeInfo.params.medicineId;
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [placeholderLabelAnim] = useState(new Animated.Value(selectedDays ? 1 : 0));
-    const [termsAccepted, setTermsAccepted] = useState(false)
     const [isOpen, setIsOpen] = useState(false);
-    const [placeholderVisible, setPlaceholderVisible] = useState(true);
-    const [showForm, setShowForm] = useState(false)
     const [errorMessage, setErrorMessage] = useState('');
     const [showLoader, setShowLoader] = useState(false);
-    const [otp, setOtp] = useState('');
-    const [isEmailFocused, setIsEmailFocused] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarKey, setSnackbarKey] = useState(0);
     const [MedicineName, setMedicineName] = useState('');
     const [days, setDays] = useState('');
     const [frequency, setFrequency] = useState('');
@@ -46,24 +40,15 @@ const UpdateReminder = () => {
     const [medicineError, setMedicineError] = useState(false);
     const [doseError, setDoseError] = useState(false);
     const [dateError, setDateError] = useState(false);
-    const [genderError, setGenderError] = useState(false);
-
+    const [fetchDateFormat, setFetchedDateFormat] = useState('');
     const [daysError, setDaysError] = useState('');
-    const [frequencyError, setFrequencyError] = useState('');
-    const [PasswordMatch, setPasswordMatch] = useState(false);
-    const [invalidEmail, setInvalidEmail] = useState(false);
-    const [verifyOTP, setVerifyOTP] = useState(false);
-    const [pLengthError, setPLengthError] = useState(false);
-    const [cpLengthError, setCPLengthError] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
-    const [selectedDaysError, setSelectedDaysError] = useState(false);
     const [isNotify, setIsNotify] = useState(false);
     const [priority, setPriority] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [freNumber, setFreNumber] = useState('');
     const [duration, setDuration] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
     const [freNumberError, setFreNumberError] = useState('');
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
@@ -101,7 +86,6 @@ const UpdateReminder = () => {
         const monthAbbreviation = monthNames[parseInt(month) - 1];
         formattedDate = `${day} ${monthAbbreviation}.${year} as ${hours}h ${minutes}min`;
     }
-
     const DaysArray = [
         { label: 'Days', value: '1' },
         { label: 'Weeks', value: '2' },
@@ -113,9 +97,62 @@ const UpdateReminder = () => {
         setShowTimePicker(false);
         const currentTime = selectedTime || time;
         setTime(currentTime);
-
     };
 
+    useEffect(() => {
+        getMedicineDetails();
+    }, [])
+
+
+    const getMedicineDetails = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/medicines',
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                for (let i = 0; i < response.data.length; i++) {
+                    if (response.data[i].id === medicineId) {
+                        console.log(response.data[i]);
+                        setMedicineName(response.data[i].name);
+                        setDose(response.data[i].dosage);
+                        const days = response.data[i].number_of_days;
+                        setDays(days.toString());
+
+                        const fetchedDate = new Date(response.data[i].start_time);
+                        const monthNames = [
+                            "January", "February", "March", "April", "May", "June", "July",
+                            "August", "September", "October", "November", "December"
+                        ];
+                        setDate(fetchedDate);
+                        const year = fetchedDate.getFullYear();
+                        const monthIndex = fetchedDate.getMonth(); 
+                        const monthName = monthNames[monthIndex]; 
+                        const day = fetchedDate.getDate();
+                        const hours = fetchedDate.getHours();
+                        const minutes = fetchedDate.getMinutes();
+
+                        const formattedDate = `${day} ${monthName} ${year} as ${hours}h ${minutes}min`;
+                        setFetchedDateFormat(formattedDate);
+                        setFreNumber(response.data[i].frequency);
+                        setDuration("hour");
+                    }
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+    }
 
     const handleConfirm = async () => {
         setMedicineError(false);
@@ -199,24 +236,24 @@ const UpdateReminder = () => {
         try {
             // Ensure medicines is an array
             medicines = Array.isArray(medicines) ? medicines : [medicines];
-    
+
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
             const existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
-    
+
             // Initialize variables
             const idDosageMedicineFrequencyMap = {};
-    
+
             // Process each medicine
             for (const medicine of medicines) {
                 const { start_time, frequency, name, id, dosage } = medicine;
                 const startTimeDate = moment(start_time).format('YYYY-MM-DD');
                 const currentTime = moment();
                 const nextAlarmTime = moment(start_time);
-    
+
                 if (moment(start_time).isSame(moment(), 'day')) {
                     let timeId = 1; // Initialize timeId
-    
+
                     while (nextAlarmTime.isBefore(moment().endOf('day'))) {
                         const newAlarm = {
                             time: nextAlarmTime.format('HH:mm'),
@@ -225,10 +262,10 @@ const UpdateReminder = () => {
                             id,
                             frequency
                         };
-    
+
                         // Create a key based on id, dosage, medicine, and frequency
                         const key = `${id}_${dosage}_${name}_${frequency}`;
-    
+
                         // Initialize times array if it doesn't exist
                         if (!idDosageMedicineFrequencyMap[key]) {
                             idDosageMedicineFrequencyMap[key] = {
@@ -240,40 +277,33 @@ const UpdateReminder = () => {
                                 days: []
                             };
                         }
-    
+
                         // Push the time to the times array with taken: false and timeId
                         idDosageMedicineFrequencyMap[key].times.push({ time: newAlarm.time, id: timeId, taken: false });
                         if (!idDosageMedicineFrequencyMap[key].days.includes(startTimeDate)) {
                             idDosageMedicineFrequencyMap[key].days.push(startTimeDate);
                         }
-    
+
                         nextAlarmTime.add(frequency, 'hours');
                         timeId++; // Increment timeId for the next time
                     }
                 }
             }
-    
+
             // Convert the map to an array of values
             const updatedAlarmsData = Object.values(idDosageMedicineFrequencyMap);
-    
+
             // If existing alarms exist, concatenate with the new alarms
             const finalAlarmsArray = existingAlarms.length > 0 ? existingAlarms.concat(updatedAlarmsData) : updatedAlarmsData;
-    
+
             // Store updated alarms in AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(finalAlarmsArray));
             console.log('Added alarms:', finalAlarmsArray);
-    
+
         } catch (error) {
             console.error('Error rendering alarm components:', error);
         }
     };
-    
-
-
-
-
-
-
 
 
 
@@ -286,7 +316,7 @@ const UpdateReminder = () => {
             <View style={styles.container}>
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
-                <BackHeader name={"Add Reminder"} />
+                <BackHeader name={"Update Reminder"} />
                 <View style={styles.medicineContiner}>
                     <Image source={medicine} style={styles.ProfileLogo} />
                 </View>
@@ -346,7 +376,7 @@ const UpdateReminder = () => {
                                         />
                                     )}
                                     {date && (
-                                        <Text style={{ ...styles.inputStyles, marginTop: -32 }}>{formattedDate}</Text>
+                                        <Text style={{ ...styles.inputStyles, marginTop: -32 }}>{formattedDate? formattedDate : fetchDateFormat}</Text>
                                     )}
 
                                 </View>
@@ -359,14 +389,12 @@ const UpdateReminder = () => {
                         </View>
                         {showDatePicker && (
                             <>
-
                                 <DateTimePicker
                                     testID="datePicker"
                                     value={date || new Date()}
                                     mode="date"
                                     display="default"
                                     onChange={onChange}
-
                                 />
                             </>
                         )}
@@ -376,7 +404,6 @@ const UpdateReminder = () => {
                                 value={time}
                                 mode="time"
                                 onChange={onChangeTime}
-
                             />
                         )}
                         <View style={{ flexDirection: 'row', width: '90%', }}>

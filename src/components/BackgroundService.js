@@ -1,14 +1,15 @@
 import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment';
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import notifee, { AndroidImportance,AndroidBadgeIconType  } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import medicine from '../assets/medicine.png';
 const BackgroundService = () => {
   BackgroundTimer.start();
   BackgroundTimer.runBackgroundTimer(async () => {
     try {
-      // Your background task logic here
       const currentTime = moment().format('HH:mm');
+      // console.log(currentTime);
+      // console.log("here");
+      // displayNotification("this", "that");
       const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
       if (AlarmsArray) {
         AlarmsArray.forEach(alarm => {
@@ -21,27 +22,27 @@ const BackgroundService = () => {
 
             const alarmTime = moment(`${days[0]} ${time}`).startOf('minute');
             if (alarmTime.isSame(currentTime)) {
-              displayNotification(dosage, medicine);
-            }
+              displayNotifications(dosage, medicine);
+            } 
           });
         });
       }
-
     } catch (error) {
       console.error('Background task error:', error);
     }
-  }, 60000); // Run every 1 second
+  }, 60000); 
 };
 
-const displayNotification = async (dosage, medicine) => {
+
+const displayNotifications = async (dosage, medicine) => {
   if (Platform.OS === 'ios') {
     await notifee.requestPermission();
   }
 
   const channelId = await notifee.createChannel({
-    id: 'default 1',
-    name: 'Default Channel 1',
-    sound: 'default',
+    id: 'default 2',
+    name: 'Default Channel 2',
+    sound: 'hollow',
     importance: AndroidImportance.HIGH,
   });
 
@@ -50,14 +51,14 @@ const displayNotification = async (dosage, medicine) => {
     body: `To take ${dosage}`,
     android: {
       channelId,
-      smallIcon: 'ic_launcher',
+      smallIcon: 'ic_launcher_foreground',
+      largeIcon: require('../assets/medicine_small.jpeg'),
+      showTimestamp: true,
       pressAction: {
         id: 'default',
       },
     },
   });
 };
-
-
 
 export default BackgroundService;

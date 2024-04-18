@@ -1,21 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text,Image, ActivityIndicator, StyleSheet, TouchableOpacity,PixelRatio } from 'react-native';
+import { View, Text, Image, ActivityIndicator, StyleSheet, TouchableOpacity, PixelRatio } from 'react-native';
 import Modal from "react-native-modal";
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
-const ImgaeLogo = ({imageURI}) => {
+import { CircularProgressBase } from 'react-native-circular-progress-indicator';
+
+const ImgaeLogo = ({ imageURI,name,healthInfo }) => {
     const navigation = useNavigation();
-    const [image , setImage] = useState(imageURI);
-    
-    useEffect(()=>{
+    const [image, setImage] = useState(imageURI);
+    // const [healthInfo , setHealthInfo ] = useState(false);
+    useEffect(() => {
         setImage(imageURI);
-    },[imageURI])
-    
+    }, [imageURI])
+
+    const props = {
+        activeStrokeWidth: 10,
+        inActiveStrokeWidth: 10,
+        inActiveStrokeOpacity: 0.2
+    };
+
     return (
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profileButton}>
-            <Image source={image ? { uri: image } : profileIcon} style={styles.profilelogo} />
-        </TouchableOpacity>
+        <>
+            <TouchableOpacity onPress={() => navigation.navigate('ProfileAndHealth',{imageURI: image,name:name, healthInfo: healthInfo})} style={styles.profileButton}>
+                <Image source={image ? { uri: image } : profileIcon} style={styles.profilelogo} />
+                <View style={{ position: 'absolute' }}>
+                    <CircularProgressBase
+                        {...props}
+                        value={healthInfo === false ? 30 : 100}
+                        radius={26}
+                        activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                        inActiveStrokeColor={healthInfo === false ? '#fd5c63' : '#54B435'}
+                    />
+                </View>
+            </TouchableOpacity>
+        </>
     );
 };
 
@@ -27,9 +46,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     profilelogo: {
-        width: '70%',
-        height: '70%',
-        borderRadius: 20,
+        width: '73%',
+        height: '74%',
+        borderRadius: 29,
     },
 });
 

@@ -36,9 +36,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 
 const MedicineImage = ({route}) => {
-    const { selectedImageD, imageD } = route.params || {};
+    const { selectedImageD, imageD , isUpdate } = route.params || {};
     const navigation = useNavigation();
-    const scrollViewRef = useRef();
     const [image, setImage] = useState(imageD? imageD : '');
     const [selectedImage, setSelectedImage] = useState(selectedImageD ? selectedImageD : '');
     const openGallery = () => {
@@ -74,7 +73,7 @@ const MedicineImage = ({route}) => {
             setImage(response.assets[0].originalPath);
             setSelectedImage(17);
         } catch (error) {
-            console.error('Error:', error);
+            console.log('Error:', error);
         }
     };
 
@@ -84,7 +83,13 @@ const MedicineImage = ({route}) => {
     }
 
     const handleConfirm = () => {
-        navigation.navigate('AddReminder', { selectedImage,image });
+        console.log(isUpdate);
+        if(isUpdate){
+
+            navigation.navigate('UpdateReminder', { selectedImage,image });
+        }else{
+            navigation.navigate('AddReminder', { selectedImage,image });
+        }
     }
 
     const renderImage = () => {

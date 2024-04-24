@@ -81,9 +81,20 @@ const ProfileAndHealth = ({ route }) => {
                                 <Text style={styles.FHeading}>Health Information</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
-                                <View style={styles.redCircle}></View>
-                                <Text style={styles.SHeading}>Incomplate stage</Text>
+                                {
+                                    healthInfo === false ?
+                                        <>
+                                            <View style={styles.redCircle}></View>
+                                            <Text style={styles.SHeading}>Incomplate stage</Text>
+                                        </>
+                                        :
+                                        <>
+                                            <View style={styles.greenCircle}></View>
+                                            <Text style={styles.SHeading}>Complete Stage</Text>
+                                        </>
+                                }
                             </View>
+
                             <Text style={styles.TLHeading}>Descrbe your health status and sync your data with health apps you already use.</Text>
                         </View>
                     </TouchableOpacity>
@@ -184,8 +195,8 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         borderColor: config.secondaryColor,
         borderWidth: 1,
-        left:-4,
-        top:5,
+        left: -4,
+        top: 5,
     },
     userIcon: {
         height: 20.6,

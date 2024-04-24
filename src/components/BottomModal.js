@@ -6,16 +6,6 @@ import SnoozeNotify from './SnoozeNotify';
 import CancelledAlarm from './CancelledAlarm';
 // Did you take you Medicine
 const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfor, reloadFunction }) => {
-    const [timeBoxes, setTimeBoxes] = useState(false);
-   
-    // console.warn(AlarmId);
-    useEffect(() => {
-        setTimeBoxes(false);
-    }, [onClose])
-
-    const EditTime = () => {
-        setTimeBoxes(true);
-    }
     const handleCloseModal = () => {
         onClose();
     };

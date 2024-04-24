@@ -11,7 +11,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import camera from '../assets/camera.png';
 import profileIcon from '../assets/profile.png';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera,launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const EditImage = ({ route }) => {
     const { imageURI } = route.params;

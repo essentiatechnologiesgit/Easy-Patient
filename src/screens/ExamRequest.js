@@ -22,9 +22,6 @@ const ExamRequest = () => {
     const navigation = useNavigation();
     const scrollViewRef = useRef();
 
-
-  
-
     return (
         <>
             <View style={styles.container}>

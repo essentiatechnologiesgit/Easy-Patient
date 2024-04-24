@@ -17,21 +17,21 @@ import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import PrescriptionContainer from '../components/PrescriptionContainer';
-import archive from '../assets/archive.png';
-const Prescriptions = () => {
+
+const PrescriptionsArchive = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const scrollViewRef = useRef();
 
+
+
+
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Prescriptions"} />
-                <TouchableOpacity onPress={() => navigation.navigate("PrescriptionsArchive")} style={styles.touch}>
-                    <Image source={archive} style={styles.archiveIcon} />
-                </TouchableOpacity>
+                <BackHeader name={"Prescriptions Archive"} />
                 <ScrollView>
-                    <PrescriptionContainer />
+                    <PrescriptionContainer />    
                 </ScrollView>
             </View>
         </>
@@ -42,17 +42,8 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         flex: 1,
-    },
-    archiveIcon: {
-        height: 25,
-        width: 25,
-        margin: 20,
-    },
-    touch: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
+        // justifyContent:'center',
     },
 });
 
-export default Prescriptions;
+export default PrescriptionsArchive;

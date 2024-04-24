@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelRatio, StyleSheet, Text, Image, View,TouchableOpacity } from 'react-native';
+import { PixelRatio, StyleSheet, Text, Image, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
 
@@ -27,9 +27,9 @@ const BackHeader = ({ name }) => {
                 <TouchableOpacity onPress={handleBackPress} style={styles.back}>
                     <Image source={leftArrow} style={styles.arrow}></Image>
                 </TouchableOpacity>
-                 <Text style={name === "Reminders" ? styles.headRem : styles.head}>{name}</Text>
-               {/* <Text style={styles.head}>df</Text> */}
-               {
+                <Text style={name === "Reminders" ? styles.headRem : styles.head}>{name}</Text>
+                {/* <Text style={styles.head}>df</Text> */}
+                {
                     name === "Reminders" ?
                         <View style={styles.button}>
                             <CircleButton />
@@ -37,7 +37,7 @@ const BackHeader = ({ name }) => {
                         : null
                 }
 
-             </View>
+            </View>
         </>
     );
 };

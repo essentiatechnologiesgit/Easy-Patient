@@ -5,10 +5,15 @@ import BackHeader from '../components/backHeader';
 import medicine from '../assets/medicine.png';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
-
+import Footer from '../components/Footer';
+import { useNavigation } from "@react-navigation/native";
+import { useIsFocused } from '@react-navigation/native';
+import CircleButton from '../components/CircleButton';
+import medicineWhite from '../assets/medicineWhite.jpg';
 const Reminders = () => {
     const [medicineData, setMedicineData] = useState([]);
-
+    const navigation = useNavigation();
+    const isFocused = useIsFocused();
     useEffect(() => {
         async function fetchData() {
             const { accessToken, userId } = await getUsersData();
@@ -16,6 +21,16 @@ const Reminders = () => {
         }
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (isFocused) {
+            async function fetchData() {
+                const { accessToken, userId } = await getUsersData();
+                getMedicineData(accessToken, userId);
+            }
+            fetchData();
+        }
+    }, [isFocused]);
 
     const getUsersData = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -29,24 +44,25 @@ const Reminders = () => {
         const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
         if (AlarmsArray) {
             const filteredAlarms = AlarmsArray.filter(alarm => alarm.user_id === userId);
+            console.log("Here", filteredAlarms);
             setMedicineData(filteredAlarms);
         }
     }
 
     const calculateNextDosageTime = (times) => {
         const currentTime = new Date(); // Get the current time
-    
+
         for (const time of times) {
             const [hours, minutes] = time.time.split(':').map(Number); // Parse the time string
             const dosageTime = new Date(); // Create a Date object for the dosage time
             dosageTime.setHours(hours);
             dosageTime.setMinutes(minutes);
-    
+
             if (dosageTime > currentTime) {
                 return dosageTime.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
             }
         }
-    
+
         const firstDosageTime = new Date();
         firstDosageTime.setDate(firstDosageTime.getDate() + 1);
         const [hours, minutes] = times[0].time.split(':').map(Number);
@@ -59,25 +75,44 @@ const Reminders = () => {
         <>
             <View style={styles.container}>
                 <BackHeader name={"Reminders"} />
-                <View style={styles.scrollViewContainer}>
-                    {medicineData.map((item, index) => (
-                        <TouchableWithoutFeedback key={index}>
-                            <View style={styles.medicineContainer}>
-                                <View style={styles.imageContainer}>
-                                    <Image source={medicine} style={styles.profileLogo} />
+                {
+                    medicineData && medicineData.length > 0 ?
+
+                        <View style={styles.scrollViewContainer}>
+                            {
+
+                                medicineData.map((item, index) => (
+                                    <TouchableWithoutFeedback onPress={() => navigation.navigate("UpdateReminder", { medicineId: item.id })} key={index}>
+                                        <View style={styles.medicineContainer}>
+                                            <View style={styles.imageContainer}>
+                                                <Image source={medicine} style={styles.profileLogo} />
+                                            </View>
+                                            <View style={styles.textContainer}>
+                                                <Text style={styles.medicineTextHeading}>{item.medicine}</Text>
+                                                <Text style={styles.medicineTextSide}>{`Next dose: ${calculateNextDosageTime(item.times)}`}</Text>
+                                                <Text style={styles.medicineTextGrey}>After every {item.frequency} hour</Text>
+                                                <Text style={styles.medicineTextGrey}>{item.dosage}</Text>
+                                            </View>
+                                            <Image source={arrow} style={styles.arrowLogo} />
+                                        </View>
+                                    </TouchableWithoutFeedback>
+                                ))
+                            }
+                        </View>
+                        :
+                        <>
+                            <View style={styles.Empty}>
+                                <Image source={medicineWhite} style={styles.medicineWhite} />
+                                <Text style={styles.emptyText}>You do not have any medications or Supplement reminder</Text>
+                                <Text style={styles.emptyText}>Add now</Text>
+                                <View style={styles.button}>
+                                    <CircleButton />
                                 </View>
-                                <View style={styles.textContainer}>
-                                    <Text style={styles.medicineTextHeading}>{item.medicine}</Text>
-                                    <Text style={styles.medicineTextSide}>{`Next dose: ${calculateNextDosageTime(item.times)}`}</Text>
-                                    <Text style={styles.medicineTextGrey}>After every {item.frequency} hour</Text>
-                                    <Text style={styles.medicineTextGrey}>{item.dosage}</Text>
-                                </View>
-                                <Image source={arrow} style={styles.arrowLogo} />
                             </View>
-                        </TouchableWithoutFeedback>
-                    ))}
-                </View>
+                        </>
+                }
             </View>
+            <Footer prop={1} />
         </>
     );
 };
@@ -89,6 +124,22 @@ const styles = StyleSheet.create({
     },
     scrollViewContainer: {
         paddingBottom: 100, // Adjust as needed
+    },
+    medicineWhite: {
+        height: 80,
+        width: 75,
+    },
+    Empty: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 5,
+        width: '70%',
+        alignSelf: 'center'
+    },
+    emptyText: {
+        color: config.primaryColor,
+        textAlign: 'center',
     },
     medicineContainer: {
         flexDirection: 'row',

@@ -263,12 +263,9 @@ const Profile = () => {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'multipart/form-data',
             };
-            console.log(formData);
-
             const response = await axios.post('https://api-patient-dev.easy-health.app/patient/upload', formData, {
                 headers: headers,
             });
-            console.log(response);
             updateProfilePicture(response.data.location);
             // console.log('Image uploaded successfully:', response.data.location);
 

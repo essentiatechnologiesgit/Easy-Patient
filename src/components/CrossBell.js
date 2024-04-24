@@ -8,11 +8,7 @@ import Svg, { Path } from 'react-native-svg';
 const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
-    const handleBackPress = () => {
-        navigation.goBack();
-    }
-
-
+    
 
 
     return (

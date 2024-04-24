@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, Switch, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, StyleSheet, Switch, Alert, Image, PixelRatio, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -7,10 +7,26 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
 import CustomizedButton from '../components/CustomizedButton';
+import deleteIcon from '../assets/delete.png';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ValidationError from '../components/ValidationError';
 import moment from "moment";
 import axios from 'axios';
+import redDrop from '../assets/redDrop.png';
+import blackDrop from '../assets/blackDrop.png';
+import blueDrop from '../assets/blueDrop.png';
+import { readFile } from 'react-native-fs';
+import yellowDrink from '../assets/yellowDrink.png';
+import blackCapsule from '../assets/blackCapsule.png';
+import yellowDrop from '../assets/yellowDrop.png';
+import redDrink from '../assets/redDrink.png';
+import blueDrink from '../assets/blueDrink.png';
+import blackDrink from '../assets/blackDrink.png';
+import yellowMed from '../assets/yellowMed.png';
+import blueMed from '../assets/blueMed.png';
+import redMed from '../assets/redMed.png';
+import blackMed from '../assets/blackMed.png';
+import yellowCapsule from '../assets/yellowCapsule.png';
 import BottomModalPopup from '../components/BottomModalPopup';
 import Snackbar from '../components/Snackbar';
 import ModalLoader from '../components/ModalLoader';
@@ -19,9 +35,12 @@ import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import medicine from '../assets/medicine.png';
-const UpdateReminder = () => {
-    const routeInfo = useRoute();
-    const medicineId = routeInfo.params.medicineId;
+import MedicineImage from './MedicineImage';
+const UpdateReminder = ({ route }) => {
+    // const routeInfo = useRoute();
+    // const medicineId = routeInfo.params.medicineId;
+
+    const { selectedImage, image, medicineId } = route.params || { selectedImage: 1, medicineId: 227 };
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [placeholderLabelAnim] = useState(new Animated.Value(selectedDays ? 1 : 0));
@@ -49,7 +68,9 @@ const UpdateReminder = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [freNumber, setFreNumber] = useState('');
     const [duration, setDuration] = useState('');
+    const [MedicineId, setMedicineId] = useState('');
     const [freNumberError, setFreNumberError] = useState('');
+    const [accessToken, setAccessToken] = useState('');
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
     };
@@ -75,17 +96,7 @@ const UpdateReminder = () => {
             useNativeDriver: false,
         }).start();
     };
-    let formattedDate = '';
-    if (date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(time.getHours()).padStart(2, '0');
-        const minutes = String(time.getMinutes()).padStart(2, '0');
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const monthAbbreviation = monthNames[parseInt(month) - 1];
-        formattedDate = `${day} ${monthAbbreviation}.${year} as ${hours}h ${minutes}min`;
-    }
+
     const DaysArray = [
         { label: 'Days', value: '1' },
         { label: 'Weeks', value: '2' },
@@ -103,12 +114,12 @@ const UpdateReminder = () => {
         getMedicineDetails();
     }, [])
 
-
     const getMedicineDetails = async () => {
+        setMedicineId(medicineId);
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
-
+        setAccessToken(access_token);
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
@@ -122,7 +133,8 @@ const UpdateReminder = () => {
             .then((response) => {
                 for (let i = 0; i < response.data.length; i++) {
                     if (response.data[i].id === medicineId) {
-                        console.log(response.data[i]);
+
+                        // console.log(response.data[i]);
                         setMedicineName(response.data[i].name);
                         setDose(response.data[i].dosage);
                         const days = response.data[i].number_of_days;
@@ -133,28 +145,116 @@ const UpdateReminder = () => {
                             "January", "February", "March", "April", "May", "June", "July",
                             "August", "September", "October", "November", "December"
                         ];
-                        setDate(fetchedDate);
+
                         const year = fetchedDate.getFullYear();
-                        const monthIndex = fetchedDate.getMonth(); 
-                        const monthName = monthNames[monthIndex]; 
+                        const monthIndex = fetchedDate.getMonth();
+                        const monthName = monthNames[monthIndex];
                         const day = fetchedDate.getDate();
                         const hours = fetchedDate.getHours();
                         const minutes = fetchedDate.getMinutes();
-
                         const formattedDate = `${day} ${monthName} ${year} as ${hours}h ${minutes}min`;
                         setFetchedDateFormat(formattedDate);
                         setFreNumber(response.data[i].frequency);
                         setDuration("hour");
+                        if (response.data[i].st_notification == '1') {
+                            setIsNotify(true);
+                        }
+                        if (response.data[i].st_critical == '1') {
+                            setPriority(true);
+                        }
                     }
                 }
             })
             .catch((error) => {
                 console.log(error);
             });
+    }
 
+    const getFileExtension = (fileUri) => {
+        if (!fileUri) {
+            return null;
+        }
+        const parts = fileUri.split('.');
+        return parts.length > 1 ? parts.pop() : null;
+    }
+
+    const handleDelete = () => {
+
+        Alert.alert(
+            'Alert',
+            `Do you want to delete ${MedicineName}?`,
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Deletion cancelled'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'Ok',
+                    onPress: () => deleteItem(),
+                    style: 'destructive',
+                },
+            ],
+            { cancelable: false }
+        );
+    }
+
+    const deleteItem = () => {
+        setShowLoader(true);
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/medicines/${medicineId}`,
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                removeMedicineById(medicineId);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+                setShowLoader(false);
+                navigation.navigate('Reminders', {
+                    isChanged: true,
+                });
+            });
+    }
+
+    const removeMedicineById = async (medicineId) => {
+        try {
+            const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
+            let existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
+
+            existingAlarms = existingAlarms.filter(alarm => alarm.id !== medicineId);
+
+            await AsyncStorage.setItem('Alarms', JSON.stringify(existingAlarms));
+
+            console.log(`Medicine with ID ${medicineId} removed successfully.`);
+        } catch (error) {
+            console.error('Error removing medicine:', error);
+        }
+    };
+
+    let formattedDate = '';
+    if (date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(time.getHours()).padStart(2, '0');
+        const minutes = String(time.getMinutes()).padStart(2, '0');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthAbbreviation = monthNames[parseInt(month) - 1];
+        formattedDate = `${day} ${monthAbbreviation}.${year} as ${hours}h ${minutes}min`;
     }
 
     const handleConfirm = async () => {
+
         setMedicineError(false);
         setErrorMessage('');
         setDateError(false);
@@ -168,7 +268,7 @@ const UpdateReminder = () => {
             setDoseError(true);
             setErrorMessage('Enter dosage');
         }
-        else if (!date) {
+        else if (!date && !fetchDateFormat) {
             setDateError(true);
             setErrorMessage('Enter start date and time');
         }
@@ -180,131 +280,167 @@ const UpdateReminder = () => {
             setErrorMessage('Please enter the frequency');
         } else {
             setShowLoader(true);
-
-            const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
-            const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
-
-
-
+            
+  
             const loginResponse = await AsyncStorage.getItem('loginResponse');
             const responseObject = JSON.parse(loginResponse);
             const access_token = responseObject.access_token;
+            try {
+                let data = new FormData();
+                const fileExtension = getFileExtension(image) || 'jpg'; // Default extension 'jpg'
+                const fileName = `image.${fileExtension}`;
 
-            let data = new FormData();
-            data.append('name', MedicineName);
-            data.append('dosage', dose);
-            data.append('start_time', `${Newdate} ${Newtime}`);
-            data.append('number_of_days', days);
-            data.append('frequency', freNumber);
-            data.append('days_of_the_week', '1,2,3');
-            data.append('st_notification', !isNotify ? 0 : 1);
-            data.append('st_critical', !priority ? 0 : 1);
-            data.append('file', '');
-            data.append('default_icon', '0');
-            data.append('medicine_schedules', 'test_string');
+                // data.append('file', {
+                //     uri: image,
+                //     name: fileName,
+                //     type: `image/${fileExtension}`,
+                // });
+                data.append('name', MedicineName);
+                data.append('dosage', dose);
+                if(date){
+                    const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
+                    const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;    
+                    data.append('start_time', `${Newdate} ${Newtime}`);
 
-            let config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: 'https://api-patient-dev.easy-health.app/medicines',
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${access_token}`,
-                },
-                data: data
-            };
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                    renderAlarmComponents(response.data);
+                }
+                data.append('number_of_days', days);
+                data.append('frequency', freNumber);
+                data.append('days_of_the_week', '4,7,5');
+                data.append('st_notification', !isNotify ? 0 : 1);
+                data.append('st_critical', !priority ? 0 : 1);
+                data.append('default_icon', selectedImage);
+                // data.append('name', MedicineName);
+                // data.append('dosage', dose);
+                // data.append('start_time', `${Newdate} ${Newtime}`);
+                // data.append('number_of_days', days);
+                // data.append('frequency', freNumber);
+                // data.append('days_of_the_week', '1,2,3');
+                // data.append('st_notification', !isNotify ? 0 : 1);
+                // data.append('st_critical', !priority ? 0 : 1);
+                // // data.append('file', image ? image : selectedImage);
+                // data.append('default_icon', selectedImage);
+                // data.append('current_picture_path', 'easypatient/medicine/ep-1593093084739-89yyvpszwh.jpeg');
+                // data.append('current_picture_link', 'https://s3.sa-east-1.amazonaws.com/easy-rx.com/easypatient/medicine/ep-1593093084739-89yyvpszwh.jpeg');
 
-
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    setShowLoader(false);
-                    navigation.navigate('Dashboard', {
-                        isChanged: true,
-                    });
-                });
+                const config = {
+                    method: 'put',
+                    maxBodyLength: Infinity,
+                    url: `https://api-patient-dev.easy-health.app/medicines/${medicineId}`,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${access_token}`,
+                    },
+                    data: data
+                };
+                console.log(config);
+                const response = await axios.request(config);
+                console.log(JSON.stringify(response.data));
+                updateMedicineById();
+            } catch (error) {
+                console.log("", error);
+            } finally {
+                setShowLoader(false);
+                // navigation.navigate('Dashboard', {
+                //     isChanged: true,
+                // });
+            }
         }
     }
 
-    const renderAlarmComponents = async (medicines) => {
+    const updateMedicineById = async (Newdate, Newtime) => {
+        console.log(MedicineName);
         try {
-            // Ensure medicines is an array
-            medicines = Array.isArray(medicines) ? medicines : [medicines];
-
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
-            const existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
+            let existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
 
-            // Initialize variables
-            const idDosageMedicineFrequencyMap = {};
+            // Iterate through each alarm
+            existingAlarms = existingAlarms.map(alarm => {
+                // If the alarm matches the provided medicineId, update it
+                if (alarm.id === medicineId) {
+                    const updatedTimes = [];
+                    const nextAlarmTime = moment(time);
+                    let timeId = 1;
 
-            // Process each medicine
-            for (const medicine of medicines) {
-                const { start_time, frequency, name, id, dosage } = medicine;
-                const startTimeDate = moment(start_time).format('YYYY-MM-DD');
-                const currentTime = moment();
-                const nextAlarmTime = moment(start_time);
-
-                if (moment(start_time).isSame(moment(), 'day')) {
-                    let timeId = 1; // Initialize timeId
-
+                    // Update times based on the new start time
                     while (nextAlarmTime.isBefore(moment().endOf('day'))) {
-                        const newAlarm = {
+                        updatedTimes.push({
                             time: nextAlarmTime.format('HH:mm'),
-                            medicine: name,
-                            dosage,
-                            id,
-                            frequency
-                        };
-
-                        // Create a key based on id, dosage, medicine, and frequency
-                        const key = `${id}_${dosage}_${name}_${frequency}`;
-
-                        // Initialize times array if it doesn't exist
-                        if (!idDosageMedicineFrequencyMap[key]) {
-                            idDosageMedicineFrequencyMap[key] = {
-                                id,
-                                dosage,
-                                medicine: name,
-                                frequency,
-                                times: [],
-                                days: []
-                            };
-                        }
-
-                        // Push the time to the times array with taken: false and timeId
-                        idDosageMedicineFrequencyMap[key].times.push({ time: newAlarm.time, id: timeId, taken: false });
-                        if (!idDosageMedicineFrequencyMap[key].days.includes(startTimeDate)) {
-                            idDosageMedicineFrequencyMap[key].days.push(startTimeDate);
-                        }
-
-                        nextAlarmTime.add(frequency, 'hours');
-                        timeId++; // Increment timeId for the next time
+                            id: timeId,
+                            taken: false
+                        });
+                        nextAlarmTime.add(freNumber, 'hours');
+                        timeId++;
                     }
+
+                    return {
+                        ...alarm,
+                        medicine: MedicineName,
+                        dosage: dose,
+                        start_time: `${Newdate} ${Newtime}`,
+                        number_of_days: days,
+                        frequency: freNumber,
+                        st_notification: isNotify ? 1 : 0,
+                        st_critical: priority ? 1 : 0,
+                        default_icon: selectedImage,
+                        times: updatedTimes
+                    };
                 }
-            }
-
-            // Convert the map to an array of values
-            const updatedAlarmsData = Object.values(idDosageMedicineFrequencyMap);
-
-            // If existing alarms exist, concatenate with the new alarms
-            const finalAlarmsArray = existingAlarms.length > 0 ? existingAlarms.concat(updatedAlarmsData) : updatedAlarmsData;
+                return alarm;
+            });
 
             // Store updated alarms in AsyncStorage
-            await AsyncStorage.setItem('Alarms', JSON.stringify(finalAlarmsArray));
-            console.log('Added alarms:', finalAlarmsArray);
+            await AsyncStorage.setItem('Alarms', JSON.stringify(existingAlarms));
+            console.log('Updated alarms:', existingAlarms);
 
         } catch (error) {
-            console.error('Error rendering alarm components:', error);
+            console.error('Error updating medicine by id:', error);
         }
     };
 
+
+    const renderImage = () => {
+        switch (selectedImage) {
+            case 1:
+                return <Image source={blackMed} style={styles.Profilelogo} />;
+            case 2:
+                return <Image source={blackCapsule} style={styles.capsulelogo} />;
+            case 3:
+                return <Image source={blackDrop} style={styles.Profilelogo} />;
+            case 4:
+                return <Image source={blackDrink} style={styles.Profilelogo} />;
+            case 5:
+                return <Image source={blueMed} style={styles.Profilelogo} />;
+            case 6:
+                return <Image source={blueCapsule} style={styles.capsulelogo} />;
+            case 7:
+                return <Image source={blueDrop} style={styles.Profilelogo} />;
+            case 8:
+                return <Image source={blueDrink} style={styles.Profilelogo} />;
+            case 9:
+                return <Image source={yellowMed} style={styles.Profilelogo} />;
+            case 10:
+                return <Image source={yellowCapsule} style={styles.capsulelogo} />;
+            case 11:
+                return <Image source={yellowDrop} style={styles.Profilelogo} />;
+            case 12:
+                return <Image source={yellowDrink} style={styles.Profilelogo} />;
+            case 13:
+                return <Image source={redMed} style={styles.Profilelogo} />;
+            case 14:
+                return <Image source={redCapsule} style={styles.capsulelogo} />;
+            case 15:
+                return <Image source={redDrop} style={styles.Profilelogo} />;
+            case 16:
+                return <Image source={redDrink} style={styles.Profilelogo} />;
+            case 17:
+                return <Image source={{ uri: image }} style={styles.ProfileImage} />;
+            case 18:
+                return <Image source={{ uri: image }} style={styles.ProfileImage} />;
+            default:
+                return <Image source={blackMed} style={styles.Profilelogo} />;
+        }
+    };
 
 
     const handleCounter = () => {
@@ -317,11 +453,11 @@ const UpdateReminder = () => {
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Update Reminder"} />
-                <View style={styles.medicineContiner}>
-                    <Image source={medicine} style={styles.ProfileLogo} />
-                </View>
+                <TouchableOpacity onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true })} style={styles.medicineContiner}>
+                    {renderImage()}
+                </TouchableOpacity>
+                <Text style={styles.EditImage}>Edit Image</Text>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
-
                     <View style={styles.signupFormContainer}>
                         <View
                             ref={(ref) => (errorRefs.current[0] = ref)}
@@ -341,7 +477,6 @@ const UpdateReminder = () => {
                                 </>
                             )}
                         </View>
-
                         <View
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
@@ -364,19 +499,22 @@ const UpdateReminder = () => {
                             style={styles.floatingLabel}>
                             <TouchableOpacity onPress={handlePressDatePicker}>
                                 <View style={!dateError ? styles.containerStyles : styles.containerStylesEmpty}>
+                                    {fetchDateFormat && !formattedDate && (
+                                        <Text style={{ marginBottom: -10, color: config.secondaryColor }}>Start Date and Time</Text>
+                                    )}
                                     {date ? (
-                                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Date Of Birth</Text>
+                                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Start Date and Time</Text>
                                     ) : (
                                         <TextInput
                                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
                                             placeholder="Start Date and Time"
                                             placeholderTextColor={!dateError ? config.primaryColor : 'red'}
                                             editable={false}
-                                            value={date ? formattedDate : ""}
+                                            value={date ? formattedDate : fetchDateFormat}
                                         />
                                     )}
                                     {date && (
-                                        <Text style={{ ...styles.inputStyles, marginTop: -32 }}>{formattedDate? formattedDate : fetchDateFormat}</Text>
+                                        <Text style={{ ...styles.inputStyles, marginTop: -32 }}>{formattedDate && formattedDate.length > 0 ? formattedDate : fetchDateFormat}</Text>
                                     )}
 
                                 </View>
@@ -579,7 +717,11 @@ const UpdateReminder = () => {
                             <Text style={styles.NotifyMsg}>Allow Easy Patient to make sound notifications even when you cell phone is in silent mode.</Text>
                         </View>
                         <View style={{ width: '95%', marginTop: 35 }}>
-                            <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                            <CustomizedButton onPress={() => handleConfirm()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                        </View>
+                        <View style={{ width: '95%', marginTop: 25, marginBottom: 50, }}>
+                            <Image source={deleteIcon} style={styles.deleteIcon} />
+                            <CustomizedButton onPress={() => handleDelete()} buttonColor={"white"} borderColor={"#a70000"} textColor={"#a70000"} text={"Switch off"} />
                         </View>
                     </View>
                 </ScrollView>
@@ -594,6 +736,23 @@ const styles = StyleSheet.create({
         flex: 1,
         // justifyContent:'center',
     },
+    ProfileImage: {
+        height: 75,
+        width: 75,
+        borderRadius: 37.5,
+    },
+    deleteIcon: {
+        height: 28,
+        width: 24,
+        marginLeft: 35,
+        marginTop: 6,
+        zIndex: 999,
+        position: 'absolute',
+    },
+    ProfileLogo: {
+        height: 52,
+        width: 35,
+    },
     medicineContiner: {
         borderRadius: 40,
         width: 80,
@@ -601,7 +760,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: config.secondaryColor,
         marginTop: 40,
-        marginBottom: 25,
+        marginBottom: 10,
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
@@ -641,7 +800,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
         alignItems: 'center',
     },
-    ProfileLogo: {
+    Profilelogo: {
         height: 52,
         width: 35,
     },
@@ -653,6 +812,11 @@ const styles = StyleSheet.create({
         borderBottomColor: config.secondaryColor,
         borderBottomWidth: 2,
         width: '90%',
+    },
+    capsulelogo: {
+        height: 30,
+        width: 28,
+        borderColor: config.secondaryColor,
     },
     NotifyMsg: {
         color: config.secondaryColor,
@@ -697,6 +861,11 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 17,
         textAlign: 'center',
         color: 'gray',
+    },
+    EditImage: {
+        color: config.secondaryColor,
+        textAlign: 'center',
+        marginBottom: 20,
     },
     label: {
         position: 'absolute',

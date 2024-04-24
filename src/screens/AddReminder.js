@@ -149,10 +149,8 @@ const AddReminder = ({ route }) => {
             setFreNumberError(true);
             setErrorMessage('Please enter the frequency');
         } else {
-            // setShowLoader(true);
-            const uriParts = image.split('.');
-            const fileType = uriParts[uriParts.length - 1];
-
+            setShowLoader(true);
+            
             const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
             const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
 
@@ -161,12 +159,21 @@ const AddReminder = ({ route }) => {
             const access_token = responseObject.access_token;
             const userId = responseObject.user.user_id;
 
-
-
-
             const data = new FormData();
-
-
+            // const fileUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
+            const fileExtension = getFileExtension(image) || 'jpg'; // Default extension 'jpg'
+            const fileName = `image.${fileExtension}`;
+            // data.append('file', {
+            //     uri: image,
+            //     name: fileName,
+            //     type: `image/${fileExtension}`,
+            // });
+            // const fileObject = {
+            //     uri: image,
+            //     name: fileName,
+            //     type: `image/${fileExtension}`,
+            // };
+            // console.log('File Object:', fileObject);
             data.append('name', MedicineName);
             data.append('dosage', dose);
             data.append('start_time', `${Newdate} ${Newtime}`);
@@ -175,14 +182,8 @@ const AddReminder = ({ route }) => {
             data.append('days_of_the_week', '1,2,3');
             data.append('st_notification', !isNotify ? 0 : 1);
             data.append('st_critical', !priority ? 0 : 1);
-            // data.append('file', image ? image : selectedImage);
             data.append('default_icon', selectedImage);
             data.append('medicine_schedules', 'test_string');
-            data.append('file', {
-                uri: image, 
-                name: 'medicine_image.jpg',
-                type: 'image/jpeg', 
-            });
 
             let config = {
                 method: 'post',
@@ -194,11 +195,11 @@ const AddReminder = ({ route }) => {
                 },
                 data: data
             };
-            console.log(data);
+
             axios.request(config)
                 .then((response) => {
                     console.log(JSON.stringify(response.data));
-                    // renderAlarmComponents(response.data, userId);
+                    renderAlarmComponents(response.data, userId);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -391,7 +392,7 @@ const AddReminder = ({ route }) => {
                             <TouchableOpacity onPress={handlePressDatePicker}>
                                 <View style={!dateError ? styles.containerStyles : styles.containerStylesEmpty}>
                                     {date ? (
-                                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Date Of Birth</Text>
+                                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Start Date and Time</Text>
                                     ) : (
                                         <TextInput
                                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}

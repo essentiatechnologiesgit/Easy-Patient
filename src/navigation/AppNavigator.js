@@ -13,24 +13,31 @@ import EditImage from '../components/EditImage';
 import Practice from '../components/Practice';
 import MealPlans from '../screens/MealPlans';
 import Guidelines from '../screens/Guidelines';
+import PrescriptionsArchive from '../screens/PrescriptionsArchive';
 import Attestations from '../screens/Attestations';
 import HealthRecommendation from '../screens/HealthRecommendation';
 import Prescriptions from '../screens/Prescriptions';
 import Reminders from '../screens/Reminders';
 import Appointments from '../screens/Appointments';
+import AppointmentsDetails from '../screens/AppointmentsDetails';
 import Configure from '../screens/Configure';
 import AddReminder from '../screens/AddReminder';
 import ChangePassword from '../screens/ChangePassword';
 import TermsAndConditions from '../screens/TermsAndConditions';
 import DeleteAccount from '../screens/DeleteAccount';
 import UpdateReminder from '../screens/UpdateReminder';
+import MealPlansArchive from '../screens/MealPlansArchive';
 import ProfileAndHealth from '../screens/ProfileAndHealth';
 import HealthInformation from '../screens/HealthInformation';
 import BackgroundServices from '../screens/BackGroundServices';
 import ExamRequest from '../screens/ExamRequest';
+import GuidelinesView from '../screens/GuidelinesView';
+import MealPlansView from '../screens/MealPlansView';
 import Reports from '../screens/Reports';
+import GuidelinesArchive from '../screens/GuidelinesArchive';
 import BodyAssessments from '../screens/BodyAssessments';
 import MedicineImage from '../screens/MedicineImage';
+import PrescriptionsView from '../screens/PrescriptionsView';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -68,10 +75,16 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="BodyAssessments" component={BodyAssessments} />
         <Stack.Screen style={styles.container} name="ExamRequest" component={ExamRequest} />
         <Stack.Screen style={styles.container} name="MedicineImage" component={MedicineImage} />
-        
+        <Stack.Screen style={styles.container} name="AppointmentsDetails" component={AppointmentsDetails} />
+        <Stack.Screen style={styles.container} name="PrescriptionsView" component={PrescriptionsView} />
         <Stack.Screen style={styles.container} name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen style={styles.container} name="DeleteAccount" component={DeleteAccount} />
-
+        <Stack.Screen style={styles.container} name="MealPlansArchive" component={MealPlansArchive} />
+        <Stack.Screen style={styles.container} name="PrescriptionsArchive" component={PrescriptionsArchive} />
+        <Stack.Screen style={styles.container} name="MealPlansView" component={MealPlansView} />
+        <Stack.Screen style={styles.container} name="GuidelinesArchive" component={GuidelinesArchive} />
+        <Stack.Screen style={styles.container} name="GuidelinesView" component={GuidelinesView} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

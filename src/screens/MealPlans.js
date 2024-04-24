@@ -1,34 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
-import config from '../../config';
-import profileIcon from '../assets/profile.png';
-import { useNavigation,useRoute  } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { FloatingLabelInput } from 'react-native-floating-label-input';
-import DropDownPicker from 'react-native-dropdown-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import CustomizedButton from '../components/CustomizedButton';
-import ValidationError from '../components/ValidationError';
-import axios from 'axios';
-import Snackbar from '../components/Snackbar';
-import ModalLoader from '../components/ModalLoader';
-import qs from 'qs';
-import AlertIcon from '../components/AlertIcon';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import archive from '../assets/archive.png';
 import BackHeader from '../components/backHeader';
+import MealContainer from '../components/MealContainer';
+import { touch } from 'react-native-fs';
 
-const MeatPlans = () => {
+const MealPlans = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const scrollViewRef = useRef();
 
-
-  
-
     return (
         <>
             <View style={styles.container}>
-            <BackHeader name={"Meal Plans"} />
+                <BackHeader name={"Diet Plans"} />
+                <TouchableOpacity onPress={()=>navigation.navigate("MealPlansArchive")} style={styles.touch}>
+                    <Image source={archive} style={styles.archiveIcon} />
+                </TouchableOpacity>
+                <ScrollView>
+                    <MealContainer />
+                </ScrollView>
             </View>
         </>
     );
@@ -40,6 +33,16 @@ const styles = StyleSheet.create({
         flex: 1,
         // justifyContent:'center',
     },
+    archiveIcon: {
+        height: 25,
+        width: 25,
+        margin: 20,
+    },
+    touch:{
+        position:'absolute',
+        top:0,
+        right:0,
+    },
 });
 
-export default MeatPlans;
+export default MealPlans;

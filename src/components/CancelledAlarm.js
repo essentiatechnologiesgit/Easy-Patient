@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
 
-   
+
     const EditTime = () => {
         setTimeBoxes(true);
     }
@@ -20,10 +20,8 @@ const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, 
             const alarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
             const updatedAlarmsArray = alarmsArray.map(alarm => {
                 if (alarm.id === medicineId) {
-
                     const updatedMedicine = alarm.times.map(timeObj => {
-                        if (timeObj.id === AlarmId) {
-
+                        if (timeObj.time === timeUpdate) {
                             const [hours, minutes] = timeObj.time.split(':').map(Number);
                             const totalMinutes = hours * 60 + minutes;
                             const updatedTotalMinutes = totalMinutes + minutesToAdd;
@@ -63,10 +61,11 @@ const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, 
             const updatedAlarmsArray = alarmsArray.map(alarm => {
                 if (alarm.id === medicineId) {
                     const updatedMedicine = alarm.times.map(timeObj => {
-                        if (timeObj.id === AlarmId) {
+
+                        if (timeObj.time === timeUpdate) {
                             return {
                                 ...timeObj,
-                                taken: true 
+                                taken: true
                             };
                         } else {
                             return timeObj;
@@ -80,8 +79,7 @@ const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, 
                     return alarm;
                 }
             });
-            // console.log(JSON.stringify(updatedAlarmsArray, null, 2));
-           
+
             await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsArray));
             reloadFunction();
             handleCloseModal()

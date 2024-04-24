@@ -152,7 +152,7 @@ const HealthInformation = () => {
             "id": dataId,
             "height": height,
             "weight": weight,
-            "heat_rate": heartRate,
+            "heart_rate": heartRate,
             "daily_steps": steps,
             "exercise_time_in_minutes": exercise,
             "move_time_in_minutes": MovementTime,

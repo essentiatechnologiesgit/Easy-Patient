@@ -5,7 +5,7 @@ import config from '../../config';
 import SnoozeNotify from './SnoozeNotify';
 import CancelledAlarm from './CancelledAlarm';
 // Did you take you Medicine
-const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfor, reloadFunction }) => {
+const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfor, reloadFunction, Medicine }) => {
     const handleCloseModal = () => {
         onClose();
     };
@@ -26,9 +26,9 @@ const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfo
                 <View style={{ backgroundColor: '#edf1f7', padding: 20 }}>
                     {
                         modalfor === "CrossAlarm" ?
-                            <CancelledAlarm AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction} />
+                            <CancelledAlarm AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction} Medicine={Medicine}/>
                             :
-                            <SnoozeNotify  AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction}  />
+                            <SnoozeNotify  AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction}  Medicine={Medicine}/>
                     }
                 </View>
             </View>

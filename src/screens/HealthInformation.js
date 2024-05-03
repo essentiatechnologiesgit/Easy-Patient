@@ -137,6 +137,7 @@ const HealthInformation = () => {
                     setExercise(response.data[0].exercise_time_in_minutes);
                     setSteps(response.data[0].daily_steps);
                     setDataId(response.data[0].id);
+                    setBloodPressure(response.data[0].blood_pressure);
                 } else {
                     console.log(`No data found for userId ${userId}`);
                 }
@@ -159,6 +160,7 @@ const HealthInformation = () => {
             "stand_hours": waiting,
             "active_energy": energy,
             "resting_energy": resting,
+            "blood_pressure": bloodPressure,
             "is_smoker": 1
         });
 
@@ -352,13 +354,14 @@ const HealthInformation = () => {
         let data = JSON.stringify({
             "height": height,
             "weight": weight,
-            "heat_rate": heartRate,
+            "heart_rate": heartRate,
             "daily_steps": steps,
             "exercise_time_in_minutes": exercise,
             "move_time_in_minutes": MovementTime,
             "stand_hours": waiting,
             "active_energy": energy,
             "resting_energy": resting,
+            "blood_pressure" : bloodPressure,
             "is_smoker": 1
         });
 

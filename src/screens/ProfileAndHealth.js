@@ -27,7 +27,7 @@ const ProfileAndHealth = ({ route }) => {
                         <CircularProgressBase
                             {...props}
                             value={healthInfo === false ? 30 : 100}
-                            radius={52}
+                            radius={53}
                             activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
                             inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
                         />

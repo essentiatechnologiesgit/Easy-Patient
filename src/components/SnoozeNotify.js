@@ -4,7 +4,7 @@ import CustomButton from './CustomizedButton';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction  }) => {
+const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction,Medicine  }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
     
     // useEffect(() => {
@@ -102,7 +102,7 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
             {
                 !timeBoxes &&
                 <>
-                    <Text style={styles.textHead}>7:00 Omerprazole</Text>
+                    <Text style={styles.textHead}>{timeUpdate} {Medicine}</Text>
                     <Text style={styles.textMed}>You didnt take your medicine</Text>
                     <Text style={[styles.textMed, { marginBottom: 20 }]}>Mark as taken?</Text>
                     <View style={styles.buttonContainer}>

@@ -40,14 +40,14 @@ const ImgaeLogo = ({ imageURI,name,healthInfo }) => {
 
 const styles = StyleSheet.create({
     profileButton: {
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
     },
     profilelogo: {
-        width: '73%',
-        height: '74%',
+        width: 40,
+        height: 40,
         borderRadius: 29,
     },
 });

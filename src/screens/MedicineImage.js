@@ -35,10 +35,10 @@ import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 
-const MedicineImage = ({route}) => {
-    const { selectedImageD, imageD , isUpdate } = route.params || {};
+const MedicineImage = ({ route }) => {
+    const { selectedImageD, imageD, isUpdate,MedicineId } = route.params || {};
     const navigation = useNavigation();
-    const [image, setImage] = useState(imageD? imageD : '');
+    const [image, setImage] = useState(imageD ? imageD : '');
     const [selectedImage, setSelectedImage] = useState(selectedImageD ? selectedImageD : '');
     const openGallery = () => {
         ImagePicker.openPicker({
@@ -63,18 +63,18 @@ const MedicineImage = ({route}) => {
             }
         });
     };
-    const handleCameraLaunch = async () => {
-        const options = {
-            mediaType: 'photo',
-        };
-        try {
-            const response = await launchCamera(options);
-            console.log('pickedFile', response.assets[0].originalPath);
-            setImage(response.assets[0].originalPath);
-            setSelectedImage(17);
-        } catch (error) {
-            console.log('Error:', error);
-        }
+    const handleCameraLaunch = () => {
+        ImagePicker.openCamera({
+            cropping: true,
+            mediaType: 'photo'
+        })
+            .then((image) => {
+                setImage(image.path);
+                setSelectedImage(17);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     };
 
     const handleImageSelect = (selected) => {
@@ -84,20 +84,21 @@ const MedicineImage = ({route}) => {
 
     const handleConfirm = () => {
         console.log(isUpdate);
-        if(isUpdate){
+        if (isUpdate) {
 
-            navigation.navigate('UpdateReminder', { selectedImage,image });
-        }else{
-            navigation.navigate('AddReminder', { selectedImage,image });
+            navigation.navigate('UpdateReminder', { selectedImage, image, MedicineId });
+        } else {
+            navigation.navigate('AddReminder', { selectedImage, image });
         }
     }
 
     const renderImage = () => {
+
         switch (selectedImage) {
             case 1:
                 return <Image source={blackMed} style={styles.Profilelogo} />;
             case 2:
-                return <Image source={blackCapsule} style={styles.capsulelogo} />;
+                return <Image source={require('../assets/blackCapsule.png')} style={styles.capsulelogo} />;
             case 3:
                 return <Image source={blackDrop} style={styles.Profilelogo} />;
             case 4:
@@ -134,6 +135,7 @@ const MedicineImage = ({route}) => {
                 return <Image source={blackMed} style={styles.Profilelogo} />; // Return null if selectedImage is not set
         }
     };
+    
 
 
 
@@ -276,10 +278,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: '#cfc9c8',
     },
-    ProfileImage:{
-        height:75,
-        width:75,
-        borderRadius:37.5,
+    ProfileImage: {
+        height: 75,
+        width: 75,
+        borderRadius: 37.5,
     },
     Profilelogo: {
         height: 36,

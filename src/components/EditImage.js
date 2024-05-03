@@ -43,48 +43,19 @@ const EditImage = ({ route }) => {
             }
         });
     };
-    const handleCameraLaunch = async () => {
-        const options = {
-          mediaType:'photo',
-        };
-    
-        try {
-          const response = await launchCamera(options);
-            console.log('pickedFile',response.assets[0].originalPath);
-            setImage(response.assets[0].originalPath);
-        } catch (error) {
-          console.error('Error:', error);
-        }
+    const handleCameraLaunch = () => {
+        ImagePicker.openCamera({
+          cropping: true,
+        })
+        .then((image) => {
+          setImage(image.path);
+        })
+        .catch((error) => {
+        console.log(error);
+        });
       };
-    //   const handleCameraLaunch = async () => {
-    
+
       
-    //     const options = {
-    //       title: 'Select Image',
-    //       mediaType: 'photo',
-    //       cropping: true, // Enable cropping similar to gallery
-    //       cropperCircleOverlay: true, // Optional: Enable circular cropping
-    //       freeStyleCropEnabled: true, // Optional: Allow free-style cropping
-    //       cropperToolbarTitle: 'Edit Photo',
-    //       cropperToolbarColor: 'white',
-    //       cropperToolbarWidgetColor: 'black',
-    //       cropperActiveWidgetColor: 'black',
-    //       cropperStatusBarColor: 'white',
-    //       cropperStatusBarContentDark: false,
-    //       includeBase64: false, // Avoid including base64 data (not needed usually)
-    //       showCropFrame: true,
-    //       showCropGuidelines: true,
-    //     };
-      
-    //     try {
-    //       const image = await launchCamera(options);
-    //       if (!image.didCancel) {
-    //         setImage(image.path); // Set the image path in your state
-    //       }
-    //     } catch (error) {
-    //       console.error('Camera Error:', error);
-    //     }
-    //   };
 
     const updateProfilePicture = async (newProfilePic) => {
         let loginResponse = await AsyncStorage.getItem('loginResponse');

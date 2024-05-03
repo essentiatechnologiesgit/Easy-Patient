@@ -71,8 +71,7 @@ const SideBar = () => {
                     <Image source={HomeWhite} style={styles.home} />
                 </TouchableOpacity>
             </View>
-            <ScrollView>
-                <View style={{ marginBottom: 15, marginTop: 5, }}>
+                 <View style={{ marginBottom: 15, marginTop: 5, }}>
                     <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -85,6 +84,9 @@ const SideBar = () => {
                     <Text style={styles.emailHeading}>{email}</Text>
                 </View>
                 <View style={styles.horizontalLine}></View>
+                <ScrollView
+                 showsVerticalScrollIndicator={false}
+                >
                 <View style={styles.containerList}>
                     <TouchableOpacity onPress={() => navigation.navigate("Prescriptions")} style={styles.appointments}>
                         <View style={styles.navigate}>
@@ -152,6 +154,7 @@ const SideBar = () => {
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
                 </View>
+                </ScrollView>
                 <View style={[styles.horizontalLine, { marginTop: 35 }]}></View>
                 <View style={styles.containerList}>
                     <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
@@ -168,7 +171,7 @@ const SideBar = () => {
                     </TouchableOpacity>
                 </View>
                 <ConfirmationModal isVisible={isModalVisible} toggleModal={toggleModal} Modalfor={"logout"} />
-            </ScrollView>
+           
         </View>
     );
 };

@@ -10,7 +10,6 @@ import Profile from '../screens/Profile';
 import Dashboard from '../screens/Dashboard';
 import SideBar from '../screens/SideBar';
 import EditImage from '../components/EditImage';
-import Practice from '../components/Practice';
 import MealPlans from '../screens/MealPlans';
 import Guidelines from '../screens/Guidelines';
 import PrescriptionsArchive from '../screens/PrescriptionsArchive';
@@ -29,7 +28,6 @@ import UpdateReminder from '../screens/UpdateReminder';
 import MealPlansArchive from '../screens/MealPlansArchive';
 import ProfileAndHealth from '../screens/ProfileAndHealth';
 import HealthInformation from '../screens/HealthInformation';
-import BackgroundServices from '../screens/BackGroundServices';
 import ExamRequest from '../screens/ExamRequest';
 import GuidelinesView from '../screens/GuidelinesView';
 import MealPlansView from '../screens/MealPlansView';
@@ -37,7 +35,14 @@ import Reports from '../screens/Reports';
 import GuidelinesArchive from '../screens/GuidelinesArchive';
 import BodyAssessments from '../screens/BodyAssessments';
 import MedicineImage from '../screens/MedicineImage';
+import AttestationsArchive from '../screens/AttestationsArchive';
 import PrescriptionsView from '../screens/PrescriptionsView';
+import AttestationsView from '../screens/AttestationsView';
+import ReportsView from '../screens/ReportsView';
+import ReportsArchive from '../screens/ReportsArchive';
+import BodyAssessmentsView  from '../screens/BodyAssessmentsView';
+import BodyAssessmentsArchive from '../screens/BodyAssessmentsArchive';
+import ExamRequestsArchive from '../screens/ExamRequestsArchive.js';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -67,7 +72,6 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="Configure" component={Configure} />
         <Stack.Screen style={styles.container} name="AddReminder" component={AddReminder} />
         <Stack.Screen style={styles.container} name="ChangePassword" component={ChangePassword} />
-        {/* <Stack.Screen style={styles.container} name="NotificationBackground" component={NotificationBackground} />   */}
         <Stack.Screen style={styles.container} name="UpdateReminder" component={UpdateReminder} />
         <Stack.Screen style={styles.container} name="HealthInformation" component={HealthInformation} />
         <Stack.Screen style={styles.container} name="Attestations" component={Attestations} />
@@ -84,6 +88,14 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="MealPlansView" component={MealPlansView} />
         <Stack.Screen style={styles.container} name="GuidelinesArchive" component={GuidelinesArchive} />
         <Stack.Screen style={styles.container} name="GuidelinesView" component={GuidelinesView} />
+        <Stack.Screen style={styles.container} name="AttestationsArchive" component={AttestationsArchive} />
+        <Stack.Screen style={styles.container} name="AttestationsView" component={AttestationsView} />
+        <Stack.Screen style={styles.container} name="ReportsView" component={ReportsView} />
+        <Stack.Screen style={styles.container} name="ReportsArchive" component={ReportsArchive} />
+        <Stack.Screen style={styles.container} name="BodyAssessmentsArchive" component={BodyAssessmentsArchive} />
+        <Stack.Screen style={styles.container} name="BodyAssessmentsView" component={BodyAssessmentsView} />
+        <Stack.Screen style={styles.container} name="ExamRequestsArchive" component={ExamRequestsArchive} />
+        
         
       </Stack.Navigator>
     </NavigationContainer>

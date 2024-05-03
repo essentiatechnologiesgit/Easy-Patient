@@ -28,7 +28,7 @@ import blackCapsule from '../assets/blackCapsule.png';
 import moment from "moment";
 import axios from 'axios';
 import BottomModalPopup from '../components/BottomModalPopup';
-
+import RNFetchBlob from 'rn-fetch-blob';
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
@@ -112,7 +112,6 @@ const AddReminder = ({ route }) => {
         setShowTimePicker(false);
         const currentTime = selectedTime || time;
         setTime(currentTime);
-
     };
 
     const getFileExtension = (fileUri) => {
@@ -149,69 +148,153 @@ const AddReminder = ({ route }) => {
             setFreNumberError(true);
             setErrorMessage('Please enter the frequency');
         } else {
-            setShowLoader(true);
-            
-            const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
-            const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
+            // setShowLoader(true);
 
-            const loginResponse = await AsyncStorage.getItem('loginResponse');
-            const responseObject = JSON.parse(loginResponse);
-            const access_token = responseObject.access_token;
-            const userId = responseObject.user.user_id;
-
-            const data = new FormData();
-            // const fileUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
+            let loginResponse = await AsyncStorage.getItem('loginResponse');
+            let responseObject = JSON.parse(loginResponse);
+            let access_token = responseObject.access_token;
+            let userId = responseObject.user.user_id;
             const fileExtension = getFileExtension(image) || 'jpg'; // Default extension 'jpg'
-            const fileName = `image.${fileExtension}`;
-            // data.append('file', {
-            //     uri: image,
-            //     name: fileName,
-            //     type: `image/${fileExtension}`,
-            // });
-            // const fileObject = {
-            //     uri: image,
-            //     name: fileName,
-            //     type: `image/${fileExtension}`,
-            // };
-            // console.log('File Object:', fileObject);
-            data.append('name', MedicineName);
-            data.append('dosage', dose);
-            data.append('start_time', `${Newdate} ${Newtime}`);
-            data.append('number_of_days', days);
-            data.append('frequency', freNumber);
-            data.append('days_of_the_week', '1,2,3');
-            data.append('st_notification', !isNotify ? 0 : 1);
-            data.append('st_critical', !priority ? 0 : 1);
-            data.append('default_icon', selectedImage);
-            data.append('medicine_schedules', 'test_string');
+            const fileName = `imageMed.${fileExtension}`;
 
-            let config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: 'https://api-patient-dev.easy-health.app/medicines',
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${access_token}`,
-                },
-                data: data
-            };
-
-            axios.request(config)
-                .then((response) => {
-                    console.log(JSON.stringify(response.data));
-                    renderAlarmComponents(response.data, userId);
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    setShowLoader(false);
-                    // navigation.navigate('Dashboard', {
-                    //     isChanged: true,
-                    // });
+            // Prepare image data (adjust based on your image source):
+            let imageData;
+            if (Platform.OS === 'ios') {
+                imageData = image.replace('file://', ''); // Remove 'file://' for iOS
+            } else {
+                imageData = image;
+            }
+            const formData = new FormData();
+            if (image) {
+                console.warn("imageCase");
+                formData.append('file', {
+                    uri: Platform.OS !== 'ios' ? image : image.replace('file://', ''),
+                    type: `image/${fileExtension}`,
+                    name: fileName,
                 });
+                try {
+                    const response = await fetch('https://api-patient-dev.easy-health.app/medicines', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${access_token}`,
+                            'Content-Type': formData instanceof FormData ? 'multipart/form-data' : 'application/json', // Set based on data type
+                        },
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+
+                        const apiData = await response.json();
+                        console.log(apiData);
+                        updateMedicine(apiData.id, access_token, userId);
+                        // renderAlarmComponents(apiData, userId, apiData.picture_link);
+                    } else {
+                        console.error('Error sending medicine data:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error sending medicine data:', error);
+                } finally {
+
+                    setShowLoader(false);
+                    // navigation.navigate('Dashboard', { /* isChanged: true, */ }); // Remove the commented line if needed
+                }
+            } else {
+                console.warn("iconCase");
+                const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
+                const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
+
+                const data = new FormData();
+                data.append('name', MedicineName);
+                data.append('dosage', dose);
+                data.append('number_of_days', days);
+                data.append('frequency', freNumber);
+                data.append('days_of_the_week', '4,7,5');
+                data.append('st_notification', !isNotify ? 0 : 1);
+                data.append('st_critical', !priority ? 0 : 1);
+                data.append('default_icon', selectedImage)
+                data.append('start_time', `${Newdate} ${Newtime}`);
+                const config = {
+                    method: 'POST',
+                    maxBodyLength: Infinity,
+                    url: `https://api-patient-dev.easy-health.app/medicines`,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${access_token}`,
+                    },
+                    data: data
+                };
+
+                axios.request(config)
+                    .then((response) => {
+                        console.log(JSON.stringify(response.data.id));
+                        getMedicine(response.data.id,access_token,userId);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    }).finally(() => {
+                        // updateMedicineById();
+                    });
+            }
+
+
+
         }
     }
+
+    const updateMedicine = async (medicineId, access_token, userId) => {
+        const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
+        const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
+        const data = new FormData();
+        data.append('name', MedicineName);
+        data.append('dosage', dose);
+        data.append('number_of_days', days);
+        data.append('frequency', freNumber);
+        data.append('days_of_the_week', '4,7,5');
+        data.append('st_notification', !isNotify ? 0 : 1);
+        data.append('st_critical', !priority ? 0 : 1);
+        data.append('start_time', `${Newdate} ${Newtime}`);
+
+        const config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/medicines/${medicineId}`,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${access_token}`,
+            },
+            data: data
+        };
+        const response = await axios.request(config);
+        // console.log("Credentails",medicineId, access_token, userId)
+        getMedicine(medicineId, access_token, userId);
+    }
+
+    const getMedicine = (medicineId, access_token, userId) => {
+        console.log("inside get");
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/medicines',
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                for (let i = 0; i < response.data.length; i++) {
+                    if (response.data[i].id === medicineId) {
+                        // console.log(JSON.stringify(response.data[i]));
+                        
+                        renderAlarmComponents(response.data[i], userId);
+                    }
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
 
     const renderAlarmComponents = async (medicines, userId) => {
         try {
@@ -226,7 +309,7 @@ const AddReminder = ({ route }) => {
 
             // Process each medicine
             for (const medicine of medicines) {
-                const { start_time, frequency, name, id, dosage, picture_path } = medicine;
+                const { start_time, frequency, name, id, dosage, picture_link } = medicine;
 
                 const startTimeDate = moment(start_time).format('YYYY-MM-DD');
                 const currentTime = moment();
@@ -242,7 +325,8 @@ const AddReminder = ({ route }) => {
                             dosage,
                             id,
                             frequency,
-                            picture_path // Include picture_path in the alarm object
+                            picture_link:picture_link? picture_link: null,
+                            selectedImage: selectedImage // Include picture_path in the alarm object
                         };
 
                         // Create a key based on id, dosage, medicine, and frequency
@@ -258,7 +342,8 @@ const AddReminder = ({ route }) => {
                                 frequency,
                                 times: [],
                                 days: [],
-                                picture_path // Include picture_path in the medicine entry
+                                picture_link:picture_link? picture_link: null,
+                                selectedImage: selectedImage // Include picture_path in the medicine entry
                             };
                         }
 
@@ -294,7 +379,9 @@ const AddReminder = ({ route }) => {
         setModalVisible(true);
     }
 
+
     const renderImage = () => {
+
         switch (selectedImage) {
             case 1:
                 return <Image source={blackMed} style={styles.Profilelogo} />;
@@ -336,6 +423,7 @@ const AddReminder = ({ route }) => {
                 return <Image source={blackMed} style={styles.Profilelogo} />;
         }
     };
+    // console.log(image);
 
 
     return (

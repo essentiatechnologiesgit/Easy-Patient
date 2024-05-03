@@ -2,26 +2,23 @@ import React from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
+import showIcon from '../assets/showIcon.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import archiveGold from '../assets/archiveGold.png';
 import { TouchableOpacity } from 'react-native';
-const PrescriptionContainer = () => {
+
+const ReportsArchiveContainer = () => {
     const navigation = useNavigation();
     return (
         <>
-            <TouchableWithoutFeedback onPress={() => navigation.navigate("PrescriptionsView")}>
+            <TouchableWithoutFeedback onPress={()=>navigation.navigate('ReportsView')}>
                 <View style={styles.container}>
-                    <Text style={styles.headings}>Medicines / Manipulated</Text>
-                    <Text style={styles.subHeadings}>Recieved 05/06/21</Text>
+                    <Text style={styles.headings}>Recieved 05/06/21</Text>
                     <Text style={styles.text}>Florianopolis Clinic</Text>
                     <Text style={styles.text}>Dr Jose Paulo Fontes</Text>
-                    <View style={styles.hideContainer}>
-                        <Image source={archiveGold} style={styles.archiveIcon} />
-                        <Text style={styles.hide}>hide</Text>
-                    </View>
-                    <View style={styles.NewContainer}>
-                        <Text style={styles.New}>New</Text>
-                    </View>
+                    <TouchableOpacity style={styles.hideContainer}>
+                        <Image source={showIcon} style={styles.showIcon} />
+                        <Text style={styles.hide}>Show</Text>
+                    </TouchableOpacity>
                     <Image source={arrow} style={styles.arrowLogo} />
                 </View>
             </TouchableWithoutFeedback>
@@ -36,6 +33,10 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         width: '90%',
         alignSelf: 'center',
+    },
+    showIcon: {
+        height: 16,
+        width: 14,
     },
     NewContainer: {
         height: 25,
@@ -56,12 +57,8 @@ const styles = StyleSheet.create({
         position: 'absolute', // Position the arrow absolutely
         height: 20,
         width: 13,
-        top: 55, // Adjust this value as needed
+        top: 40, // Adjust this value as needed
         right: 0, // Position the arrow to the right
-    },
-    archiveIcon: {
-        height: 15,
-        width: 15,
     },
     headings: {
         color: config.textColorHeadings,
@@ -69,16 +66,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     hideContainer: {
-        flexDirection:'row',
+        flexDirection: 'row',
         borderWidth: 1,
         borderColor: config.secondaryColor,
         height: 25,
-        gap:3,
-        width: 60,
+        width: 62,
+        gap: 3,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,
-        marginTop:3,
+        marginTop: 5,
     },
     hide: {
         color: config.secondaryColor,
@@ -95,4 +92,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default PrescriptionContainer;
+export default ReportsArchiveContainer;

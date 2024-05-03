@@ -16,6 +16,8 @@ import redDrop from '../assets/redDrop.png';
 import blackDrop from '../assets/blackDrop.png';
 import blueDrop from '../assets/blueDrop.png';
 import { readFile } from 'react-native-fs';
+import blueCapsule from '../assets/blueCapsule.png';
+import redCapsule from '../assets/redCapsule.png';
 import yellowDrink from '../assets/yellowDrink.png';
 import blackCapsule from '../assets/blackCapsule.png';
 import yellowDrop from '../assets/yellowDrop.png';
@@ -40,9 +42,10 @@ const UpdateReminder = ({ route }) => {
     // const routeInfo = useRoute();
     // const medicineId = routeInfo.params.medicineId;
 
-    const { selectedImage, image, medicineId } = route.params || { selectedImage: 1, medicineId: 227 };
+    const { selectedImage, image, medicineId } = route.params || { selectedImage: 1 };
     const navigation = useNavigation();
     const scrollViewRef = useRef();
+    const [medId, setMedId] = useState(medicineId);
     const [placeholderLabelAnim] = useState(new Animated.Value(selectedDays ? 1 : 0));
     const [isOpen, setIsOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -71,6 +74,10 @@ const UpdateReminder = ({ route }) => {
     const [MedicineId, setMedicineId] = useState('');
     const [freNumberError, setFreNumberError] = useState('');
     const [accessToken, setAccessToken] = useState('');
+    const [MedImage, setMedImage] = useState('');
+    const [default_icon, setDefaultIcon] = useState('');
+
+
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
     };
@@ -114,7 +121,8 @@ const UpdateReminder = ({ route }) => {
         getMedicineDetails();
     }, [])
 
-    const getMedicineDetails = async () => {
+    const getMedicineDetails = async (imageUpdate) => {
+
         setMedicineId(medicineId);
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
@@ -132,8 +140,11 @@ const UpdateReminder = ({ route }) => {
         axios.request(config)
             .then((response) => {
                 for (let i = 0; i < response.data.length; i++) {
-                    if (response.data[i].id === medicineId) {
-
+                    if (response.data[i].id === medId) {
+                        if (imageUpdate == "true") {
+                            console.log("Inside Updated Imge");
+                            updateMedicineById(response.data[i].picture_link);
+                        }
                         // console.log(response.data[i]);
                         setMedicineName(response.data[i].name);
                         setDose(response.data[i].dosage);
@@ -155,6 +166,9 @@ const UpdateReminder = ({ route }) => {
                         const formattedDate = `${day} ${monthName} ${year} as ${hours}h ${minutes}min`;
                         setFetchedDateFormat(formattedDate);
                         setFreNumber(response.data[i].frequency);
+                        setMedImage(response.data[i].picture_link);
+                        setDefaultIcon(response.data[i].default_icon);
+                        // console.log(response.data[i]);
                         setDuration("hour");
                         if (response.data[i].st_notification == '1') {
                             setIsNotify(true);
@@ -254,7 +268,8 @@ const UpdateReminder = ({ route }) => {
     }
 
     const handleConfirm = async () => {
-
+        // console.warn(medicineId);
+        // console.log("SelectedImage",typeof(selectedImage));
         setMedicineError(false);
         setErrorMessage('');
         setDateError(false);
@@ -279,76 +294,111 @@ const UpdateReminder = ({ route }) => {
             setFreNumberError(true);
             setErrorMessage('Please enter the frequency');
         } else {
-            setShowLoader(true);
-            
-  
+            // setShowLoader(true);
             const loginResponse = await AsyncStorage.getItem('loginResponse');
             const responseObject = JSON.parse(loginResponse);
             const access_token = responseObject.access_token;
-            try {
-                let data = new FormData();
-                const fileExtension = getFileExtension(image) || 'jpg'; // Default extension 'jpg'
-                const fileName = `image.${fileExtension}`;
 
-                // data.append('file', {
-                //     uri: image,
-                //     name: fileName,
-                //     type: `image/${fileExtension}`,
-                // });
-                data.append('name', MedicineName);
-                data.append('dosage', dose);
-                if(date){
-                    const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
-                    const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;    
-                    data.append('start_time', `${Newdate} ${Newtime}`);
+            // if (image === '' || image === undefined) {
+            //     //condition for not to send image
+            //     console.warn("This is ");
 
+
+            //     // updateData(access_token);
+            // } else {
+            let IMG = false;
+            if (image) {
+                IMG = true;
+                try {
+                    console.warn("In image");
+                    let data = new FormData();
+                    const fileExtension = getFileExtension(image) || 'jpg'; // Default extension 'jpg'
+                    const fileName = `image.${fileExtension}`;
+
+                    data.append('file', {
+                        uri: image,
+                        name: fileName,
+                        type: `image/${fileExtension}`,
+                    });
+
+                    const config = {
+                        method: 'put',
+                        maxBodyLength: Infinity,
+                        url: `https://api-patient-dev.easy-health.app/medicines/${medId}`,
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': `Bearer ${access_token}`,
+                        },
+                        data: data
+                    };
+
+                    const response = await axios.request(config);
+                    console.log(JSON.stringify(response.data));
+                    // updateMedicineById();
+                    // updateData(access_token);
+                } catch (error) {
+                    console.log("", error);
+                } finally {
+                    setShowLoader(false);
+                    // navigation.navigate('Dashboard', {
+                    //     isChanged: true,
+                    // });
                 }
-                data.append('number_of_days', days);
-                data.append('frequency', freNumber);
-                data.append('days_of_the_week', '4,7,5');
-                data.append('st_notification', !isNotify ? 0 : 1);
-                data.append('st_critical', !priority ? 0 : 1);
-                data.append('default_icon', selectedImage);
-                // data.append('name', MedicineName);
-                // data.append('dosage', dose);
-                // data.append('start_time', `${Newdate} ${Newtime}`);
-                // data.append('number_of_days', days);
-                // data.append('frequency', freNumber);
-                // data.append('days_of_the_week', '1,2,3');
-                // data.append('st_notification', !isNotify ? 0 : 1);
-                // data.append('st_critical', !priority ? 0 : 1);
-                // // data.append('file', image ? image : selectedImage);
-                // data.append('default_icon', selectedImage);
-                // data.append('current_picture_path', 'easypatient/medicine/ep-1593093084739-89yyvpszwh.jpeg');
-                // data.append('current_picture_link', 'https://s3.sa-east-1.amazonaws.com/easy-rx.com/easypatient/medicine/ep-1593093084739-89yyvpszwh.jpeg');
-
-                const config = {
-                    method: 'put',
-                    maxBodyLength: Infinity,
-                    url: `https://api-patient-dev.easy-health.app/medicines/${medicineId}`,
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Authorization': `Bearer ${access_token}`,
-                    },
-                    data: data
-                };
-                console.log(config);
-                const response = await axios.request(config);
-                console.log(JSON.stringify(response.data));
-                updateMedicineById();
-            } catch (error) {
-                console.log("", error);
-            } finally {
-                setShowLoader(false);
-                // navigation.navigate('Dashboard', {
-                //     isChanged: true,
-                // });
             }
+            updateData(access_token, IMG);
         }
     }
 
-    const updateMedicineById = async (Newdate, Newtime) => {
-        console.log(MedicineName);
+    const updateData = async (access_token, IMG) => {
+        // console.log(selectedImage);
+        let data = new FormData();
+
+        if (date) {
+            const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
+            const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
+            data.append('start_time', `${Newdate} ${Newtime}`);
+        }
+
+        data.append('days_of_the_week', '4,7,5');
+        data.append('st_notification', !isNotify ? 0 : 1);
+        data.append('st_critical', !priority ? 0 : 1);
+        data.append('name', MedicineName);
+        data.append('dosage', dose);
+        data.append('number_of_days', days);
+        data.append('frequency', freNumber);
+        if (!IMG)
+            data.append('default_icon', selectedImage ? selectedImage : default_icon);
+
+        const config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/medicines/${medId}`,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${access_token}`,
+            },
+            data: data
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error);
+            }).finally(async () => {
+                if (IMG){
+                    await getMedicineDetails("true");
+                }else{
+                    updateMedicineById();
+                }
+                    
+                
+            });
+    }
+
+    const updateMedicineById = async (imageUpdate) => {
+
         try {
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
@@ -357,34 +407,86 @@ const UpdateReminder = ({ route }) => {
             // Iterate through each alarm
             existingAlarms = existingAlarms.map(alarm => {
                 // If the alarm matches the provided medicineId, update it
-                if (alarm.id === medicineId) {
-                    const updatedTimes = [];
-                    const nextAlarmTime = moment(time);
+
+                if (alarm.id === medId) {
+
                     let timeId = 1;
+                    if (date) {
 
-                    // Update times based on the new start time
-                    while (nextAlarmTime.isBefore(moment().endOf('day'))) {
-                        updatedTimes.push({
-                            time: nextAlarmTime.format('HH:mm'),
-                            id: timeId,
-                            taken: false
-                        });
-                        nextAlarmTime.add(freNumber, 'hours');
-                        timeId++;
+                        let Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
+                        let Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
+                        const updatedTimes = [];
+                        const nextAlarmTime = moment(time);
+                        // Update times based on the new start time
+                        while (nextAlarmTime.isBefore(moment().endOf('day'))) {
+                            updatedTimes.push({
+                                time: nextAlarmTime.format('HH:mm'),
+                                id: timeId,
+                                taken: false
+                            });
+                            nextAlarmTime.add(freNumber, 'hours');
+                            timeId++;
+                        }
+                        if (imageUpdate) {
+                            return {
+                                ...alarm,
+                                medicine: MedicineName,
+                                dosage: dose,
+                                start_time: `${Newdate} ${Newtime}`,
+                                number_of_days: days,
+                                frequency: freNumber,
+                                st_notification: isNotify ? 1 : 0,
+                                st_critical: priority ? 1 : 0,
+                                selectedImage: selectedImage ? selectedImage : default_icon,
+                                times: updatedTimes,
+                                picture_link: imageUpdate,
+                            };
+                        } else {
+                            return {
+                                ...alarm,
+                                medicine: MedicineName,
+                                dosage: dose,
+                                start_time: `${Newdate} ${Newtime}`,
+                                number_of_days: days,
+                                frequency: freNumber,
+                                st_notification: isNotify ? 1 : 0,
+                                st_critical: priority ? 1 : 0,
+                                selectedImage: selectedImage ? selectedImage : default_icon,
+                                times: updatedTimes,
+                                picture_link:null
+                            };
+                        }
+
+                    } else {
+                       
+                        if (imageUpdate) {
+                            console.log("in Image Update");
+                            return {
+                                ...alarm,
+                                medicine: MedicineName,
+                                dosage: dose,
+                                number_of_days: days,
+                                frequency: freNumber,
+                                st_notification: isNotify ? 1 : 0,
+                                st_critical: priority ? 1 : 0,
+                                selectedImage: selectedImage ? selectedImage : default_icon,
+                                picture_link: imageUpdate,
+                            };
+                        } else {
+                            return {
+                                ...alarm,
+                                medicine: MedicineName,
+                                dosage: dose,
+                                number_of_days: days,
+                                frequency: freNumber,
+                                st_notification: isNotify ? 1 : 0,
+                                st_critical: priority ? 1 : 0,
+                                selectedImage: selectedImage ? selectedImage : default_icon,
+                                picture_link:null
+                            };
+                        }
+
                     }
-
-                    return {
-                        ...alarm,
-                        medicine: MedicineName,
-                        dosage: dose,
-                        start_time: `${Newdate} ${Newtime}`,
-                        number_of_days: days,
-                        frequency: freNumber,
-                        st_notification: isNotify ? 1 : 0,
-                        st_critical: priority ? 1 : 0,
-                        default_icon: selectedImage,
-                        times: updatedTimes
-                    };
                 }
                 return alarm;
             });
@@ -400,7 +502,7 @@ const UpdateReminder = ({ route }) => {
 
 
     const renderImage = () => {
-        switch (selectedImage) {
+        switch (selectedImage ? selectedImage : default_icon) {
             case 1:
                 return <Image source={blackMed} style={styles.Profilelogo} />;
             case 2:
@@ -453,8 +555,15 @@ const UpdateReminder = ({ route }) => {
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Update Reminder"} />
-                <TouchableOpacity onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true })} style={styles.medicineContiner}>
-                    {renderImage()}
+                <TouchableOpacity onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })} style={styles.medicineContiner}>
+                    {
+                        selectedImage || default_icon ?
+                            renderImage()
+                            :
+                            <Image source={MedImage ? { uri: MedImage } : blackMed} style={MedImage ? styles.ProfileImage : styles.ProfileLogo} />
+
+                    }
+
                 </TouchableOpacity>
                 <Text style={styles.EditImage}>Edit Image</Text>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>

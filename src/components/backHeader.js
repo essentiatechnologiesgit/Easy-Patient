@@ -27,8 +27,7 @@ const BackHeader = ({ name }) => {
                 <TouchableOpacity onPress={handleBackPress} style={styles.back}>
                     <Image source={leftArrow} style={styles.arrow}></Image>
                 </TouchableOpacity>
-                <Text style={name === "Reminders" ? styles.headRem : styles.head}>{name}</Text>
-                {/* <Text style={styles.head}>df</Text> */}
+                <Text style={name === "Reminders" ? styles.headRem : styles.head} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
                 {
                     name === "Reminders" ?
                         <View style={styles.button}>
@@ -64,10 +63,11 @@ const styles = StyleSheet.create({
         shadowColor: 'black',
     },
     head: {
-        textAlign: 'center',
         fontSize: PixelRatio.getFontScale() * 24,
-        left: '70%',
+        left: '60%',
         color: 'black',
+        width:'65%',
+        // backgroundColor:'red',
     },
     headRem: {
         left: -60,

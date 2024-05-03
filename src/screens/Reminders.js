@@ -9,10 +9,28 @@ import Footer from '../components/Footer';
 import { useNavigation } from "@react-navigation/native";
 import { useIsFocused } from '@react-navigation/native';
 import CircleButton from '../components/CircleButton';
+import yellowDrop from '../assets/yellowDrop.png';
+import redDrop from '../assets/redDrop.png';
+import blackDrop from '../assets/blackDrop.png';
+import blueDrop from '../assets/blueDrop.png';
+import yellowDrink from '../assets/yellowDrink.png';
+import redDrink from '../assets/redDrink.png';
+import blueDrink from '../assets/blueDrink.png';
+import blackDrink from '../assets/blackDrink.png';
+import yellowMed from '../assets/yellowMed.png';
+import blueMed from '../assets/blueMed.png';
+import redMed from '../assets/redMed.png';
+import blackMed from '../assets/blackMed.png';
+import yellowCapsule from '../assets/yellowCapsule.png';
+import blueCapsule from '../assets/blueCapsule.png';
+import redCapsule from '../assets/redCapsule.png';
+import blackCapsule from '../assets/blackCapsule.png';
 import medicineWhite from '../assets/medicineWhite.jpg';
+import { ScrollView } from 'react-native-gesture-handler';
 const Reminders = () => {
     const [medicineData, setMedicineData] = useState([]);
     const navigation = useNavigation();
+    const [image, setImage] = useState('');
     const isFocused = useIsFocused();
     useEffect(() => {
         async function fetchData() {
@@ -44,7 +62,6 @@ const Reminders = () => {
         const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
         if (AlarmsArray) {
             const filteredAlarms = AlarmsArray.filter(alarm => alarm.user_id === userId);
-            console.log("Here", filteredAlarms);
             setMedicineData(filteredAlarms);
         }
     }
@@ -71,6 +88,51 @@ const Reminders = () => {
         return firstDosageTime.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
     };
 
+    const renderImage = (selectedImage) => {
+        switch (selectedImage) {
+            case 1:
+                return <Image source={blackMed} style={styles.Profilelogo} />;
+            case 2:
+                return <Image source={require('../assets/blackCapsule.png')} style={styles.capsulelogo} />;
+            case 3:
+                return <Image source={blackDrop} style={styles.Profilelogo} />;
+            case 4:
+                return <Image source={blackDrink} style={styles.Profilelogo} />;
+            case 5:
+                return <Image source={blueMed} style={styles.Profilelogo} />;
+            case 6:
+                return <Image source={blueCapsule} style={styles.capsulelogo} />;
+            case 7:
+                return <Image source={blueDrop} style={styles.Profilelogo} />;
+            case 8:
+                return <Image source={blueDrink} style={styles.Profilelogo} />;
+            case 9:
+                return <Image source={yellowMed} style={styles.Profilelogo} />;
+            case 10:
+                return <Image source={yellowCapsule} style={styles.capsulelogo} />;
+            case 11:
+                return <Image source={yellowDrop} style={styles.Profilelogo} />;
+            case 12:
+                return <Image source={yellowDrink} style={styles.Profilelogo} />;
+            case 13:
+                return <Image source={redMed} style={styles.Profilelogo} />;
+            case 14:
+                return <Image source={redCapsule} style={styles.capsulelogo} />;
+            case 15:
+                return <Image source={redDrop} style={styles.Profilelogo} />;
+            case 16:
+                return <Image source={redDrink} style={styles.Profilelogo} />;
+            case 17:
+                return <Image source={{ uri: image }} style={styles.ProfileImage} />;
+            case 18:
+                return <Image source={{ uri: image }} style={styles.ProfileImage} />;
+            default:
+                return <Image source={blackMed} style={styles.Profilelogo} />; // Return null if selectedImage is not set
+        }
+    };
+
+
+
     return (
         <>
             <View style={styles.container}>
@@ -78,15 +140,19 @@ const Reminders = () => {
                 {
                     medicineData && medicineData.length > 0 ?
 
-                        <View style={styles.scrollViewContainer}>
+                        <ScrollView style={styles.scrollViewContainer}>
                             {
-
                                 medicineData.map((item, index) => (
                                     <TouchableWithoutFeedback onPress={() => navigation.navigate("UpdateReminder", { medicineId: item.id })} key={index}>
                                         <View style={styles.medicineContainer}>
                                             <View style={styles.imageContainer}>
-                                                <Image source={medicine} style={styles.profileLogo} />
-                                            </View>
+                                            {
+                                                item.picture_link ? 
+                                                <Image source={item.picture_link ? { uri: item.picture_link } : {renderImage}} style={styles.profileLogo} />
+                                                :
+                                                renderImage(item.selectedImage)
+                                            }
+                                          </View>
                                             <View style={styles.textContainer}>
                                                 <Text style={styles.medicineTextHeading}>{item.medicine}</Text>
                                                 <Text style={styles.medicineTextSide}>{`Next dose: ${calculateNextDosageTime(item.times)}`}</Text>
@@ -98,7 +164,7 @@ const Reminders = () => {
                                     </TouchableWithoutFeedback>
                                 ))
                             }
-                        </View>
+                        </ScrollView>
                         :
                         <>
                             <View style={styles.Empty}>
@@ -141,6 +207,10 @@ const styles = StyleSheet.create({
         color: config.primaryColor,
         textAlign: 'center',
     },
+    capsulelogo:{
+        height:30,
+        width:30,
+    },
     medicineContainer: {
         flexDirection: 'row',
         padding: 12,
@@ -169,6 +239,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: config.textColorHeadings,
     },
+    Profilelogo: {
+        height: 36,
+        width: 24,
+        borderColor: config.secondaryColor,
+    },
     medicineTextGrey: {
         fontSize: PixelRatio.getFontScale() * 16,
         color: config.primaryColor,
@@ -184,8 +259,9 @@ const styles = StyleSheet.create({
         alignContent: 'center',
     },
     profileLogo: {
-        height: 52,
-        width: 35,
+        height: 75,
+        width: 75,
+        borderRadius:37.5,
     },
 });
 

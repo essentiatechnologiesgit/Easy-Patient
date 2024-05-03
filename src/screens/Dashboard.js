@@ -82,11 +82,8 @@ const Dashboard = () => {
         await axios.request(config)
             .then((response) => {
                 if (response.data.length > 0) {
-
                     setHealthInfo(true);
-                    console.log("data found");
                 } else {
-                    console.log(`No data found for userId`);
                     setHealthInfo(false);
                 }
             })
@@ -125,22 +122,28 @@ const Dashboard = () => {
             const allAlarmComponents = [];
             const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
             if (AlarmsArray) {
+                // Filter alarms for the current day
+                const currentDayAlarms = AlarmsArray.filter(alarm => {
+                    const firstAlarmDay = moment(alarm.days[0], 'YYYY-MM-DD');
+                    return moment().isSame(firstAlarmDay, 'day');
+                });
+    
                 // Flatten all times for sorting
-                const allTimes = AlarmsArray.reduce((acc, alarm) => {
+                const allTimes = currentDayAlarms.reduce((acc, alarm) => {
                     return acc.concat(alarm.times.map((timeObj) => ({ ...timeObj, ...alarm })));
                 }, []);
-
+    
                 // Sort all times
                 allTimes.sort((a, b) => {
                     return moment(`${a.days[0]} ${a.time}`, 'YYYY-MM-DD HH:mm').diff(moment(`${b.days[0]} ${b.time}`, 'YYYY-MM-DD HH:mm'));
                 });
-
+    
                 // Generate alarm components for sorted times
                 allTimes.forEach((timeObj, index) => {
                     const { time, id: timeId, taken, medicine, id, dosage } = timeObj;
                     const alarmTime = moment(`${timeObj.days[0]} ${time}`, 'YYYY-MM-DD HH:mm');
                     const remainingTime = alarmTime.diff(moment(), 'minutes');
-
+    
                     let alarmComponent;
                     // Check if this is the next upcoming alarm
                     if (remainingTime > 0 && !allTimes.some((otherTime) => moment(`${otherTime.days[0]} ${otherTime.time}`).isBetween(moment(), alarmTime))) {
@@ -156,7 +159,22 @@ const Dashboard = () => {
                                 reloadFunction={renderTimeComponents}
                             />
                         );
-                    } else {
+                    }
+                    else if (alarmTime.isSame(moment())) {
+                        alarmComponent = (
+                            <CrossBell
+                                remainingTime={remainingTime}
+                                time={alarmTime.format('HH:mm')}
+                                id={timeId}
+                                dosage={dosage}
+                                Medicine={medicine}
+                                medicineId={id}
+                                taken={taken}
+                                reloadFunction={renderTimeComponents}
+                            />
+                        );
+                    }
+                    else {
                         // Check if the alarm is in the past
                         if (alarmTime.isBefore(moment())) {
                             alarmComponent = (
@@ -179,23 +197,23 @@ const Dashboard = () => {
                                     medicineId={id}
                                     taken={taken}
                                     reloadFunction={renderTimeComponents}
-
+    
                                 />
                             );
                         }
                     }
-
+    
                     // Add the generated alarm component to the list
                     allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
                 });
-
+    
                 // Render components
                 const components = allAlarmComponents.map((item, index) => (
                     <View style={styles.component} key={index}>
                         {item.component}
                     </View>
                 ));
-
+    
                 // Update state with rendered components
                 setAlarmComponents(components);
             }
@@ -203,6 +221,7 @@ const Dashboard = () => {
             console.error('Error rendering alarm components:', error);
         }
     };
+    
 
 
     // const renderTimeComponents = async () => {
@@ -479,8 +498,8 @@ const styles = StyleSheet.create({
         height: 90,
         width: '90%',
         alignSelf: 'center',
-        padding:25,
-        gap:15,
+        padding: 25,
+        gap: 15,
         backgroundColor: 'white',
         borderRadius: 8,
         marginBottom: 20,

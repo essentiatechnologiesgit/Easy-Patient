@@ -17,10 +17,9 @@ import qs from 'qs';
 import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
-import AttestationsContainer from '../components/AttestationContainer';
-import ReportsContainer from '../components/ReportsConatiner';
+import AttestaionsArchiveContainer from '../components/AttestationsArchiveConatiner';
 
-const Reports = () => {
+const AttestationsArchive = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const scrollViewRef = useRef();
@@ -28,15 +27,12 @@ const Reports = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Reports"} />
-                <TouchableOpacity onPress={() => navigation.navigate("ReportsArchive")} style={styles.touch}>
-                    <Image source={archive} style={styles.archiveIcon} />
-                </TouchableOpacity>
+                <BackHeader name={"Attestations/Declarations Archive"} />
                 <ScrollView>
-                <ReportsContainer />
+                    <AttestaionsArchiveContainer />
                 </ScrollView>
                 {/* <View style={styles.Empty}>
-                    <Text style={styles.emptyText}>You do not have any Attestations/Declarations</Text>
+                    <Text style={styles.emptyText}>You do not have any Attestations/Declarations Archive</Text>
                 </View> */}
             </View>
         </>
@@ -73,4 +69,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Reports;
+export default AttestationsArchive;

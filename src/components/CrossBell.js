@@ -10,7 +10,7 @@ const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, take
     const navigation = useNavigation();
     
 
-
+  
     return (
         <>
             {
@@ -35,7 +35,7 @@ const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, take
                 </View>
             }
             {/* <Button title="Display Notification" onPress={onDisplayNotification} /> */}
-            <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} />
+            <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} Medicine={Medicine} time={time}/>
         </>
     );
 };

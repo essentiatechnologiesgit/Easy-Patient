@@ -9,7 +9,7 @@ const ExamRequestsContainer = () => {
     const navigation = useNavigation();
     return (
         <>
-            <TouchableWithoutFeedback onPress={()=>navigation.navigate('BodyAssessmentsView')}>
+            <TouchableWithoutFeedback onPress={()=>navigation.navigate('ExamRequestView')}>
                 <View style={styles.container}>
                     <Text style={styles.headings}>Recieved 05/06/21</Text>
                     <Text style={styles.text}>Florianopolis Clinic</Text>

@@ -9,26 +9,21 @@ const BackgroundService = () => {
   
   BackgroundTimer.start();
   BackgroundTimer.runBackgroundTimer(async () => {
+    console.log("The time when function called",moment());
     try {
       const currentTime = moment().format('HH:mm');
-      // console.log("here");
       // displayNotification("this", "that");
       const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
       if (AlarmsArray) {
-        // this "alarm" varibale is consoling and iteration for every medicine
         AlarmsArray.forEach(alarm => {
-          // console.log(alarm);
           const { days, times, dosage, medicine, picture_link,selectedImage } = alarm;
-          // console.log(alarm);
           const currentTime = moment().startOf('minute');
-          // const newTime = moment("2024-04-08T05:37:00.000Z");
-
+      
           times.forEach(timeObj => {
             const { time } = timeObj;
-            // console.log("Alarm and Times Object",AlarmsArray);
             const alarmTime = moment(`${days[0]} ${time}`).startOf('minute');
             if (alarmTime.isSame(currentTime)) {
-              // console.log("Alarm Time and Curr Time", alarmTime, currentTime,picture_link,selectedImage);
+              console.log("Alarm Time and Curr Time", alarmTime, currentTime);
               // console.log("Times ", times);
               displayNotifications(dosage, medicine,picture_link,selectedImage,selectedImage);
             }
@@ -45,7 +40,7 @@ const BackgroundService = () => {
 
 
 const displayNotifications = async (dosage, medicine,picture_link,selectedImage) => {
-
+  console.log("Inside for Displaying notification alarm");
   const renderImage = (selectedImage) => {
   
     switch (selectedImage) {
@@ -97,7 +92,7 @@ const displayNotifications = async (dosage, medicine,picture_link,selectedImage)
   const channelId = await notifee.createChannel({
     id: 'default 2',
     name: 'Default Channel 2',
-    sound: 'hollow',
+    sound: 'notification',
     importance: AndroidImportance.HIGH,
   });
 

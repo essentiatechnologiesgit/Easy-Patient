@@ -2,10 +2,10 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Text } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
-const CircleButton = () => {
+const CircleButton = ({title}) => {
   const navigation=useNavigation();
   const hadnleOnPress = () =>{
-    navigation.navigate("AddReminder");
+    navigation.navigate(title);
   }
 
   return (

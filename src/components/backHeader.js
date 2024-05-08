@@ -31,7 +31,7 @@ const BackHeader = ({ name }) => {
                 {
                     name === "Reminders" ?
                         <View style={styles.button}>
-                            <CircleButton />
+                            <CircleButton title={"AddReminder"}/>
                         </View>
                         : null
                 }

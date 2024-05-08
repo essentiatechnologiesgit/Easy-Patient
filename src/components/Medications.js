@@ -9,7 +9,7 @@ const Medications = () => {
         <>
             <View style={styles.container}>
                 <Text style={styles.emptyText}>You don't have any medication or supplement reminders</Text>
-                <CircleButton />
+                <CircleButton title={"AddReminder"}/>
             </View>
         </>
     );

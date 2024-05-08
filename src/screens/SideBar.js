@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
 import leftArrow from '../assets/leftArrow.png';
 import fork from '../assets/forkWhite.png';
-import { Email,openComposer } from 'react-native-email-link';
+import { Email, openComposer } from 'react-native-email-link';
 import heartBeat from '../assets/heartWhite.png';
 import fileAdd from '../assets/fileAddWhite.png';
 import fileCapsule from '../assets/fileCapsuleWhite.png';
@@ -36,10 +36,10 @@ const SideBar = () => {
     const [isModalVisible, setModalVisible] = useState(false);
 
     const toggleModal = () => {
-      setModalVisible(!isModalVisible);
+        setModalVisible(!isModalVisible);
     };
 
-    
+
 
     const getUserDetails = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -55,10 +55,10 @@ const SideBar = () => {
         // navigation.navigate("Login");
     }
 
-    const handleEmailPress = () =>{
+    const handleEmailPress = () => {
         openComposer({
             to: "support@easy-health.app",
-          });
+        });
     }
 
     return (
@@ -71,22 +71,22 @@ const SideBar = () => {
                     <Image source={HomeWhite} style={styles.home} />
                 </TouchableOpacity>
             </View>
-                 <View style={{ marginBottom: 15, marginTop: 5, }}>
-                    <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <Text style={styles.nameHeading}>{name}</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                        <Image source={pen} style={styles.pen} />
-                    </TouchableOpacity>
-                </View>
-                <View style={{ marginBottom: 20 }}>
-                    <Text style={styles.emailHeading}>{email}</Text>
-                </View>
-                <View style={styles.horizontalLine}></View>
-                <ScrollView
-                 showsVerticalScrollIndicator={false}
-                >
+            <View style={{ marginBottom: 15, marginTop: 5, }}>
+                <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <Text style={styles.nameHeading}>{name}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+                    <Image source={pen} style={styles.pen} />
+                </TouchableOpacity>
+            </View>
+            <View style={{ marginBottom: 20 }}>
+                <Text style={styles.emailHeading}>{email}</Text>
+            </View>
+            <View style={styles.horizontalLine}></View>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+            >
                 <View style={styles.containerList}>
                     <TouchableOpacity onPress={() => navigation.navigate("Prescriptions")} style={styles.appointments}>
                         <View style={styles.navigate}>
@@ -153,25 +153,39 @@ const SideBar = () => {
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                </View>
-                </ScrollView>
-                <View style={[styles.horizontalLine, { marginTop: 35 }]}></View>
-                <View style={styles.containerList}>
-                    <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
-                        <Image source={EmailIcon} style={styles.mail}></Image>
-                        <Text style={styles.sideText}>Support App</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("FoodDiary")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={fileEditWhite} style={styles.fileEdit}></Image>
+                            <Text style={styles.sideText}>Food Diary</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
-                        <Image source={configure} style={styles.configure}></Image>
-                        <Text style={styles.sideText}>Configure</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => Logout()} style={styles.navigate}>
-                        <Image source={exit} style={styles.exit}></Image>
-                        <Text style={styles.sideText}>Exit</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("Anamnesis")} style={styles.appointments}>
+                        <View style={styles.navigate}>
+                            <Image source={fileAdd} style={styles.file}></Image>
+                            <Text style={styles.sideText}>Anamnesis</Text>
+                        </View>
+                        <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
                 </View>
-                <ConfirmationModal isVisible={isModalVisible} toggleModal={toggleModal} Modalfor={"logout"} />
-           
+            </ScrollView>
+            <View style={[styles.horizontalLine, { marginTop: 35 }]}></View>
+            <View style={styles.containerList}>
+                <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
+                    <Image source={EmailIcon} style={styles.mail}></Image>
+                    <Text style={styles.sideText}>Support App</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
+                    <Image source={configure} style={styles.configure}></Image>
+                    <Text style={styles.sideText}>Configure</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => Logout()} style={styles.navigate}>
+                    <Image source={exit} style={styles.exit}></Image>
+                    <Text style={styles.sideText}>Exit</Text>
+                </TouchableOpacity>
+            </View>
+            <ConfirmationModal isVisible={isModalVisible} toggleModal={toggleModal} Modalfor={"logout"} />
+
         </View>
     );
 };
@@ -186,7 +200,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 15,
         alignItems: 'center',
-        
+
     },
     fork: {
         height: 21,
@@ -241,8 +255,8 @@ const styles = StyleSheet.create({
     appointments: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width:'99%',
-        alignSelf:'center',
+        width: '99%',
+        alignSelf: 'center',
     },
     horizontalLine: {
         borderBottomColor: 'white',

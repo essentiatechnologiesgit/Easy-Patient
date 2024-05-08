@@ -32,6 +32,7 @@ import ExamRequest from '../screens/ExamRequest';
 import GuidelinesView from '../screens/GuidelinesView';
 import MealPlansView from '../screens/MealPlansView';
 import Reports from '../screens/Reports';
+import ExamRequestView from '../screens/ExamRequestView.js';
 import GuidelinesArchive from '../screens/GuidelinesArchive';
 import BodyAssessments from '../screens/BodyAssessments';
 import MedicineImage from '../screens/MedicineImage';
@@ -43,6 +44,12 @@ import ReportsArchive from '../screens/ReportsArchive';
 import BodyAssessmentsView  from '../screens/BodyAssessmentsView';
 import BodyAssessmentsArchive from '../screens/BodyAssessmentsArchive';
 import ExamRequestsArchive from '../screens/ExamRequestsArchive.js';
+import FoodDiary from '../screens/FoodDiary.js';
+import AddFoodDiary from '../screens/AddFoodDiary.js';
+import AddFoodImage from '../screens/AddFoodImage.js';
+import Anamnesis from '../screens/Anamnesis.js';
+import AnamnesisView from '../screens/AnamnesisView.js';
+import AnamnesisArchive from '../screens/AnamnesisArchive.js';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -95,7 +102,13 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="BodyAssessmentsArchive" component={BodyAssessmentsArchive} />
         <Stack.Screen style={styles.container} name="BodyAssessmentsView" component={BodyAssessmentsView} />
         <Stack.Screen style={styles.container} name="ExamRequestsArchive" component={ExamRequestsArchive} />
-        
+        <Stack.Screen style={styles.container} name="ExamRequestView" component={ExamRequestView} />
+        <Stack.Screen style={styles.container} name="FoodDiary" component={FoodDiary} />
+        <Stack.Screen style={styles.container} name="AddFoodDiary" component={AddFoodDiary} />
+        <Stack.Screen style={styles.container} name="AddFoodImage" component={AddFoodImage} />
+        <Stack.Screen style={styles.container} name="Anamnesis" component={Anamnesis} />
+        <Stack.Screen style={styles.container} name="AnamnesisView" component={AnamnesisView} />
+        <Stack.Screen style={styles.container} name="AnamnesisArchive" component={AnamnesisArchive} />
         
       </Stack.Navigator>
     </NavigationContainer>

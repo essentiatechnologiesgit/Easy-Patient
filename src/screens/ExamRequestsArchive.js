@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import AttestaionsArchiveContainer from '../components/AttestationsArchiveConatiner';
 import AssessmentsArchiveContainer from '../components/AssessmentsArchiveContainer';
+import ExamRequestArchiveContainer from '../components/ExamRequestArchiveConatiner';
 
 const ExamRequestsArchive = () => {
     const route = useRoute();
@@ -30,7 +31,7 @@ const ExamRequestsArchive = () => {
             <View style={styles.container}>
                 <BackHeader name={"Exam Requests Archive"} />
                 <ScrollView>
-                    <AssessmentsArchiveContainer />
+                    <ExamRequestArchiveContainer />
                 </ScrollView>
                 {/* <View style={styles.Empty}>
                     <Text style={styles.emptyText}>You do not have any Attestations/Declarations Archive</Text>

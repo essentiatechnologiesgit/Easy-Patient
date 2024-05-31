@@ -7,13 +7,43 @@ import { useNavigation } from '@react-navigation/native';
 
 function ConfirmationModal({ isVisible, toggleModal, Modalfor }) {
   const navigation = useNavigation();
-  const ModalFunction = async () =>{
-    if(Modalfor){
+  const ModalFunction = async () => {
+    if (Modalfor) {
       toggleModal();
-        await AsyncStorage.setItem('loginResponse', '');
-        navigation.navigate("Login");
+      emptyLoginResponse();
+      navigation.navigate("Login");
     }
-    
+  }
+
+
+  const emptyLoginResponse = async () => {
+    try {
+      // Get the current login response from AsyncStorage
+      const loginResponseJSON = await AsyncStorage.getItem('loginResponse');
+      if (loginResponseJSON) {
+        const loginResponse = JSON.parse(loginResponseJSON);
+        // Retrieve the refresh_token from the login response
+        const { refresh_token } = loginResponse;
+        // Create a new object with only the refresh_token
+        const newLoginResponse = { refresh_token };
+        // Store the new login response back in AsyncStorage
+        await AsyncStorage.setItem('loginResponse', JSON.stringify(newLoginResponse));
+        console.log('Login response emptied successfully.');
+      } else {
+        console.log('No login response found in AsyncStorage.');
+      }
+    } catch (error) {
+      console.error('Error emptying login response:', error);
+    }
+  };
+
+  getLoginResponse = async () => {
+    try {
+      const storedPassword = await AsyncStorage.getItem('loginResponse');
+      console.log(storedPassword);
+    } catch (error) {
+      console.error('Error getting password from AsyncStorage:', error);
+    }
   }
 
   return (

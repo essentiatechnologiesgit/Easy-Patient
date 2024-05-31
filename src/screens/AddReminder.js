@@ -28,7 +28,6 @@ import blackCapsule from '../assets/blackCapsule.png';
 import moment from "moment";
 import axios from 'axios';
 import BottomModalPopup from '../components/BottomModalPopup';
-import RNFetchBlob from 'rn-fetch-blob';
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
@@ -148,7 +147,7 @@ const AddReminder = ({ route }) => {
             setFreNumberError(true);
             setErrorMessage('Please enter the frequency');
         } else {
-            // setShowLoader(true);
+            setShowLoader(true);
 
             let loginResponse = await AsyncStorage.getItem('loginResponse');
             let responseObject = JSON.parse(loginResponse);
@@ -160,13 +159,12 @@ const AddReminder = ({ route }) => {
             // Prepare image data (adjust based on your image source):
             let imageData;
             if (Platform.OS === 'ios') {
-                imageData = image.replace('file://', ''); // Remove 'file://' for iOS
+                imageData = image.replace('file://', ''); 
             } else {
                 imageData = image;
             }
             const formData = new FormData();
             if (image) {
-                console.warn("imageCase");
                 formData.append('file', {
                     uri: Platform.OS !== 'ios' ? image : image.replace('file://', ''),
                     type: `image/${fileExtension}`,
@@ -181,11 +179,8 @@ const AddReminder = ({ route }) => {
                         },
                         body: formData,
                     });
-
                     if (response.ok) {
-
                         const apiData = await response.json();
-                        console.log(apiData);
                         updateMedicine(apiData.id, access_token, userId);
                         // renderAlarmComponents(apiData, userId, apiData.picture_link);
                     } else {
@@ -196,19 +191,17 @@ const AddReminder = ({ route }) => {
                 } finally {
 
                     setShowLoader(false);
-                    // navigation.navigate('Dashboard', { /* isChanged: true, */ }); // Remove the commented line if needed
+                    navigation.navigate('Dashboard', { /* isChanged: true, */ }); // Remove the commented line if needed
                 }
             } else {
-                console.warn("iconCase");
                 const Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
                 const Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
-
                 const data = new FormData();
                 data.append('name', MedicineName);
                 data.append('dosage', dose);
                 data.append('number_of_days', days);
                 data.append('frequency', freNumber);
-                data.append('days_of_the_week', '4,7,5');
+                data.append('days_of_the_week', `${freNumber},${duration}`);
                 data.append('st_notification', !isNotify ? 0 : 1);
                 data.append('st_critical', !priority ? 0 : 1);
                 data.append('default_icon', selectedImage)
@@ -226,13 +219,14 @@ const AddReminder = ({ route }) => {
 
                 axios.request(config)
                     .then((response) => {
-                        console.log(JSON.stringify(response.data.id));
                         getMedicine(response.data.id,access_token,userId);
                     })
                     .catch((error) => {
                         console.log(error);
                     }).finally(() => {
-                        // updateMedicineById();
+                        setShowLoader(false);
+                        navigation.navigate('Dashboard', { /* isChanged: true, */ }); // Remove the commented line if needed
+          
                     });
             }
 
@@ -270,7 +264,6 @@ const AddReminder = ({ route }) => {
     }
 
     const getMedicine = (medicineId, access_token, userId) => {
-        console.log("inside get");
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
@@ -297,82 +290,120 @@ const AddReminder = ({ route }) => {
 
 
     const renderAlarmComponents = async (medicines, userId) => {
+        let durationInt;
+        if (duration === "Hour") {
+            durationInt = 0;
+        } else if (duration === "Day") {
+            durationInt = 1;
+        } else {
+            durationInt = 2;
+        }
+    
         try {
             medicines = Array.isArray(medicines) ? medicines : [medicines];
-
+    
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
             const existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
-
+    
             // Initialize variables
             const idDosageMedicineFrequencyMap = {};
-
+    
             // Process each medicine
             for (const medicine of medicines) {
-                const { start_time, frequency, name, id, dosage, picture_link } = medicine;
-
-                const startTimeDate = moment(start_time).format('YYYY-MM-DD');
-                const currentTime = moment();
+                const { start_time, frequency, name, id, dosage, picture_link, st_critical, st_notification, number_of_days = 1 } = medicine; // Default to 1 if not provided
                 const nextAlarmTime = moment(start_time);
-
-                if (moment(start_time).isSame(moment(), 'day')) {
-                    let timeId = 1; // Initialize timeId
-
-                    while (nextAlarmTime.isBefore(moment().endOf('day'))) {
-                        const newAlarm = {
-                            time: nextAlarmTime.format('HH:mm'),
-                            medicine: name,
-                            dosage,
-                            id,
-                            frequency,
-                            picture_link:picture_link? picture_link: null,
-                            selectedImage: selectedImage // Include picture_path in the alarm object
-                        };
-
-                        // Create a key based on id, dosage, medicine, and frequency
-                        const key = `${id}_${dosage}_${name}_${frequency}`;
-
-                        // Initialize times array if it doesn't exist
-                        if (!idDosageMedicineFrequencyMap[key]) {
-                            idDosageMedicineFrequencyMap[key] = {
-                                id,
-                                dosage,
-                                medicine: name,
-                                user_id: userId,
-                                frequency,
-                                times: [],
-                                days: [],
-                                picture_link:picture_link? picture_link: null,
-                                selectedImage: selectedImage // Include picture_path in the medicine entry
-                            };
-                        }
-
-                        // Push the time to the times array with taken: false and timeId
-                        idDosageMedicineFrequencyMap[key].times.push({ time: newAlarm.time, id: timeId, taken: false });
-                        if (!idDosageMedicineFrequencyMap[key].days.includes(startTimeDate)) {
-                            idDosageMedicineFrequencyMap[key].days.push(startTimeDate);
-                        }
-
+    
+                let timeId = 1; // Initialize timeId
+    
+                if (durationInt === 0) {
+                    // Hourly case
+                    while (nextAlarmTime.isBefore(moment(start_time).add(number_of_days, 'days').endOf('day'))) {
+                        const currentDay = nextAlarmTime.format('YYYY-MM-DD');
+                        addAlarm(nextAlarmTime, id, dosage, name, frequency, timeId, currentDay, st_critical, st_notification, picture_link, userId, idDosageMedicineFrequencyMap, durationInt, number_of_days);
                         nextAlarmTime.add(frequency, 'hours');
-                        timeId++; // Increment timeId for the next time
+                        timeId++;
+                    }
+                } else if (durationInt === 1) {
+                    // Daily case
+                    for (let i = 0; i < number_of_days; i++) {
+                        const currentDay = nextAlarmTime.format('YYYY-MM-DD');
+                        addAlarm(nextAlarmTime, id, dosage, name, frequency, timeId, currentDay, st_critical, st_notification, picture_link, userId, idDosageMedicineFrequencyMap, durationInt, number_of_days);
+                        nextAlarmTime.add(1, 'day');
+                        timeId++;
+                    }
+                } else {
+                    // Monthly case
+                    for (let i = 0; i < number_of_days; i += 30) {
+                        const currentDay = nextAlarmTime.format('YYYY-MM-DD');
+                        addAlarm(nextAlarmTime, id, dosage, name, frequency, timeId, currentDay, st_critical, st_notification, picture_link, userId, idDosageMedicineFrequencyMap, durationInt, number_of_days);
+                        nextAlarmTime.add(1, 'month');
+                        timeId++;
                     }
                 }
             }
-
-            // Convert the map to an array of values
+    
             const updatedAlarmsData = Object.values(idDosageMedicineFrequencyMap);
-
-            // If existing alarms exist, concatenate with the new alarms
+    
             const finalAlarmsArray = existingAlarms.length > 0 ? existingAlarms.concat(updatedAlarmsData) : updatedAlarmsData;
-
-            // Store updated alarms in AsyncStorage
+    
             await AsyncStorage.setItem('Alarms', JSON.stringify(finalAlarmsArray));
-            console.log('Added alarms:', finalAlarmsArray);
-
+            console.log('Added alarms:', JSON.stringify(finalAlarmsArray, null, 2));
+    
         } catch (error) {
             console.error('Error rendering alarm components:', error);
         }
     };
+    
+    // Helper function to add alarms
+    const addAlarm = (nextAlarmTime, id, dosage, name, frequency, timeId, currentDay, st_critical, st_notification, picture_link, userId, idDosageMedicineFrequencyMap, durationInt, number_of_days) => {
+        const key = `${id}_${dosage}_${name}_${frequency}`;
+        console.log(`Processing alarm for key: ${key}`); // Debug log
+    
+        // Initialize times array if it doesn't exist
+        if (!idDosageMedicineFrequencyMap[key]) {
+            idDosageMedicineFrequencyMap[key] = {
+                id,
+                dosage,
+                medicine: name,
+                user_id: userId,
+                frequency,
+                duration: durationInt,
+                times: [],
+                days: [],
+                notification: st_critical,
+                priority: st_notification,
+                picture_link: picture_link ? picture_link : null,
+                selectedImage: selectedImage, // Ensure this is defined
+            };
+            console.log(`Initialized entry for key: ${key}`); // Debug log
+        }
+    
+        const newAlarm = {
+            time: nextAlarmTime.format('YYYY-MM-DD HH:mm'), // Include date and time
+            medicine: name,
+            dosage,
+            id,
+            duration: durationInt,
+            frequency,
+            number_of_days, // Ensure number_of_days is included
+            notification: st_critical,
+            priority: st_notification,
+            picture_link: picture_link ? picture_link : null,
+            selectedImage: selectedImage // Ensure this is defined
+        };
+    
+        // Push the time to the times array with taken: false and timeId
+        idDosageMedicineFrequencyMap[key].times.push({ time: newAlarm.time, id: timeId, taken: false });
+        if (!idDosageMedicineFrequencyMap[key].days.includes(currentDay)) {
+            idDosageMedicineFrequencyMap[key].days.push(currentDay);
+        }
+        console.log(`Added alarm: ${JSON.stringify(newAlarm)} to key: ${key}`); // Debug log
+    };
+    
+    
+    
+    
 
 
     const handleCounter = () => {
@@ -425,7 +456,7 @@ const AddReminder = ({ route }) => {
     };
     // console.log(image);
 
-
+   
     return (
         <>
             <View style={styles.container}>

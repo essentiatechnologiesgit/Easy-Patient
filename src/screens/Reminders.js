@@ -25,8 +25,9 @@ import yellowCapsule from '../assets/yellowCapsule.png';
 import blueCapsule from '../assets/blueCapsule.png';
 import redCapsule from '../assets/redCapsule.png';
 import blackCapsule from '../assets/blackCapsule.png';
-import medicineWhite from '../assets/medicineWhite.jpg';
+import medicineWhite from '../assets/medicineLarge.jpg';
 import { ScrollView } from 'react-native-gesture-handler';
+import moment from "moment";
 const Reminders = () => {
     const [medicineData, setMedicineData] = useState([]);
     const navigation = useNavigation();
@@ -67,26 +68,31 @@ const Reminders = () => {
     }
 
     const calculateNextDosageTime = (times) => {
-        const currentTime = new Date(); // Get the current time
-
-        for (const time of times) {
-            const [hours, minutes] = time.time.split(':').map(Number); // Parse the time string
-            const dosageTime = new Date(); // Create a Date object for the dosage time
-            dosageTime.setHours(hours);
-            dosageTime.setMinutes(minutes);
-
-            if (dosageTime > currentTime) {
-                return dosageTime.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
+        if (!times || !Array.isArray(times) || times.length === 0) {
+            console.error("Invalid times array:", times);
+            return "Invalid times data";
+        }
+    
+        const currentTime = moment();
+    
+        for (const timeObj of times) {
+            if (timeObj && timeObj.time) {
+                const dosageTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
+    
+                if (dosageTime.isAfter(currentTime)) {
+                    return dosageTime.format('MMMM D, YYYY h:mm A');
+                }
+            } else {
+                console.error("Invalid time object:", timeObj);
             }
         }
-
-        const firstDosageTime = new Date();
-        firstDosageTime.setDate(firstDosageTime.getDate() + 1);
-        const [hours, minutes] = times[0].time.split(':').map(Number);
-        firstDosageTime.setHours(hours);
-        firstDosageTime.setMinutes(minutes);
-        return firstDosageTime.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true });
+    
+        const firstDosageTime = moment(times[0].time, 'YYYY-MM-DD HH:mm').add(1, 'day');
+        return firstDosageTime.format('MMMM D, YYYY h:mm A');
     };
+    
+    
+    
 
     const renderImage = (selectedImage) => {
         switch (selectedImage) {

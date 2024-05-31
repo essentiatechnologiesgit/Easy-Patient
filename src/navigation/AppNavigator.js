@@ -41,7 +41,7 @@ import PrescriptionsView from '../screens/PrescriptionsView';
 import AttestationsView from '../screens/AttestationsView';
 import ReportsView from '../screens/ReportsView';
 import ReportsArchive from '../screens/ReportsArchive';
-import BodyAssessmentsView  from '../screens/BodyAssessmentsView';
+import BodyAssessmentsView from '../screens/BodyAssessmentsView';
 import BodyAssessmentsArchive from '../screens/BodyAssessmentsArchive';
 import ExamRequestsArchive from '../screens/ExamRequestsArchive.js';
 import FoodDiary from '../screens/FoodDiary.js';
@@ -50,6 +50,8 @@ import AddFoodImage from '../screens/AddFoodImage.js';
 import Anamnesis from '../screens/Anamnesis.js';
 import AnamnesisView from '../screens/AnamnesisView.js';
 import AnamnesisArchive from '../screens/AnamnesisArchive.js';
+import Biometric from '../screens/Biometric.js';
+import PatternAuth from '../screens/PatternAuth.js';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -60,11 +62,13 @@ const AppNavigator = () => {
           headerShown: false,
           // cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // Set sliding animation
         }}>
+        {/* <Stack.Screen style={styles.container} name="Biometric" component={Biometric} /> */}
         {/* <Stack.Screen style={styles.container} name="BackgroundServices" component={BackgroundServices} />   */}
-        {/* <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
+        <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
         <Stack.Screen style={styles.container} name="Login" component={Login} />
+        <Stack.Screen style={styles.container} name="PatternAuth" component={PatternAuth} />
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
-        <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} /> */}
+        <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} />
         <Stack.Screen style={styles.container} name="ProfileAndHealth" component={ProfileAndHealth} />
         <Stack.Screen style={styles.container} name="Profile" component={Profile} />
@@ -109,7 +113,7 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="Anamnesis" component={Anamnesis} />
         <Stack.Screen style={styles.container} name="AnamnesisView" component={AnamnesisView} />
         <Stack.Screen style={styles.container} name="AnamnesisArchive" component={AnamnesisArchive} />
-        
+
       </Stack.Navigator>
     </NavigationContainer>
   );

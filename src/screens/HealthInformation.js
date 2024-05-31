@@ -148,7 +148,6 @@ const HealthInformation = () => {
     };
 
     const UpdateData = () => {
-        console.log("In update");
         let data = JSON.stringify({
             "id": dataId,
             "height": height,
@@ -181,6 +180,8 @@ const HealthInformation = () => {
             })
             .catch((error) => {
                 console.log(error);
+            }).finally(()=>{
+                navigation.goBack();
             });
     }
 
@@ -382,6 +383,8 @@ const HealthInformation = () => {
             })
             .catch((error) => {
                 console.log(error);
+            }).finally(()=>{
+                navigation.goBack();
             });
     }
 

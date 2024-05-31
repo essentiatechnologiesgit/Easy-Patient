@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
@@ -9,8 +9,11 @@ import EmailIcon from '../assets/email.svg';
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import Svg, { Path } from 'react-native-svg';
+import CustomButton from '../components/CustomizedButton';
+import FingerPrint from '../components/FingerAuth';
 import qs from 'qs';
+import PatternAuth from '../components/PatternAuth';
+import { stat } from 'react-native-fs';
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState('');
@@ -25,10 +28,11 @@ const LoginScreen = () => {
   const [showLoader, setShowLoader] = useState(false);
   const [emailExist, setEmailExist] = useState(true);
   const [ButtonText, setButtonText] = useState('Next');
-  const emailInputRef = useRef(null);
-  const passwordInputRef = useRef(null);
+  const [showFingerAuth, setShowFingerAuth] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [showPattern, setShowPattern] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
   const handleLogin = () => {
     setUsernameError(false);
     setPasswordError(false);
@@ -47,7 +51,6 @@ const LoginScreen = () => {
       checkEmailExist();
     }
     else if (!password) {
-
       setPasswordError(true);
       setErrorMessage("provide password");
     }
@@ -56,6 +59,9 @@ const LoginScreen = () => {
     }
   };
 
+  const handleAuth = () => {
+    setShowFingerAuth((prevShowFingerAuth) => !prevShowFingerAuth);
+  }
   const Login = async () => {
     setShowLoader(true);
     let data = qs.stringify({
@@ -76,7 +82,7 @@ const LoginScreen = () => {
     try {
       const response = await axios.request(config);
       await AsyncStorage.setItem('loginResponse', JSON.stringify(response.data));
-     
+      await saveLoginDetails();
       setShowLoader(false);
       navigation.navigate("Dashboard");
       setUsername('');
@@ -87,10 +93,62 @@ const LoginScreen = () => {
       console.log(error);
     }
   }
+
+  const saveLoginDetails = async () => {
+    try {
+      // Construct an object containing login details
+      const loginDetails = {
+        email: username,
+        password: password
+      };
+
+      const jsonLoginDetails = JSON.stringify(loginDetails);
+
+      await AsyncStorage.setItem('loginDetails', jsonLoginDetails);
+
+      console.log('Login details saved successfully.');
+    } catch (error) {
+      console.error('Error saving login details:', error);
+    }
+  };
+
+  const getSwitch5Status = async () => {
+    try {
+      const data = await AsyncStorage.getItem('Configurations');
+
+      if (data) {
+        const parsedData = JSON.parse(data);
+        if (parsedData) {
+          for (const key in parsedData) {
+            if (parsedData.hasOwnProperty(key) && parsedData[key].switch5 === true) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Error getting Configurations from AsyncStorage:', error);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    getFunction = async () => {
+      const status = await getSwitch5Status();
+      if (status) {
+        setShowAuth(true);
+      }
+    }
+
+    getFunction()
+  }, [])
+
+
+
   const handleEmailFocus = () => {
     setIsEmailFocused(true);
   };
-
   const handleEmailBlur = () => {
     setIsEmailFocused(false);
   };
@@ -143,9 +201,11 @@ const LoginScreen = () => {
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword')
   }
+
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
       {showLoader && <ModalLoader />}
+      {showFingerAuth && <FingerPrint setShowFingerAuth={setShowFingerAuth} />}
       <View style={styles.container}>
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
@@ -161,6 +221,7 @@ const LoginScreen = () => {
               onBlur={handleEmailBlur}
               placeholderTextColor="gray"
               color="black"
+              autoCapitalize="none"
             />
           </View>
         </View>
@@ -211,14 +272,16 @@ const LoginScreen = () => {
         }
 
         {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
-        <TouchableOpacity
-          style={
-            styles.loginButton
-          }
-          onPress={handleLogin}
-        >
-          <Text style={{ color: config.tertiaryColor, textAlign: 'center', fontSize: PixelRatio.getFontScale() * 17 }}>{ButtonText}</Text>
+        <TouchableOpacity style={{ width: '100%', marginTop: 50 }}>
+          <CustomButton onPress={() => handleLogin()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Next"}  />
         </TouchableOpacity>
+        {
+          showAuth &&
+          <View style={{ width: '100%', marginTop: 15 }}>
+            <CustomButton onPress={() => handleAuth()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Authenticate Connect"} title={"authorization"} />
+          </View>
+        }
+
         <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
           <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
         </TouchableOpacity>
@@ -318,6 +381,7 @@ const styles = StyleSheet.create({
     fontSize: PixelRatio.getFontScale() * 17,
     backgroundColor: config.secondaryColor, // Set background color directly
   },
+
   forgotPassword: {
     justifyContent: 'flex-end',
     width: '90%',

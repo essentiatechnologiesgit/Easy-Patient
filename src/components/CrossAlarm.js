@@ -4,7 +4,7 @@ import BottomModal from './BottomModal';
 import Svg, { Path } from 'react-native-svg';
 const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) => {
     const [modalVisible, setModalVisible] = useState(false);
-
+    
     return (
         <>
             {
@@ -15,7 +15,6 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
                     </Svg>
                     <Text style={styles.text}>{time} - {Medicine} </Text>
                 </View>
-
             }
             {
                 !taken &&

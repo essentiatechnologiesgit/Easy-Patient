@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
-import { useNavigation,useRoute  } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -23,12 +23,12 @@ const HealthRecommendation = () => {
     const scrollViewRef = useRef();
 
 
-  
+
 
     return (
         <>
             <View style={styles.container}>
-            <BackHeader name={"Health Recommendation"} />
+                <BackHeader name={"Health Recommendation"} />
             </View>
         </>
     );

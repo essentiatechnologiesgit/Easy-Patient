@@ -120,33 +120,51 @@ const Dashboard = () => {
     const renderTimeComponents = async () => {
         try {
             const allAlarmComponents = [];
-            const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
-            if (AlarmsArray) {
-                // Filter alarms for the current day
+            const AlarmsArrayJSON = await AsyncStorage.getItem('Alarms');
+            const AlarmsArray = AlarmsArrayJSON ? JSON.parse(AlarmsArrayJSON) : [];
+    
+            if (AlarmsArray && AlarmsArray.length > 0) {
+                // Get today's date in 'YYYY-MM-DD' format
+                const today = moment().format('YYYY-MM-DD');
+    
+                // Filter alarms for the current day and their times
                 const currentDayAlarms = AlarmsArray.filter(alarm => {
-                    const firstAlarmDay = moment(alarm.days[0], 'YYYY-MM-DD');
-                    return moment().isSame(firstAlarmDay, 'day');
+                    return alarm.times && alarm.times.some(timeObj => {
+                        const alarmDateTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
+                        return alarmDateTime.isSame(today, 'day');
+                    });
+                }).map(alarm => {
+                    return {
+                        ...alarm,
+                        times: alarm.times.filter(timeObj => {
+                            const alarmDateTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
+                            return alarmDateTime.isSame(today, 'day');
+                        })
+                    };
                 });
     
                 // Flatten all times for sorting
                 const allTimes = currentDayAlarms.reduce((acc, alarm) => {
-                    return acc.concat(alarm.times.map((timeObj) => ({ ...timeObj, ...alarm })));
+                    if (alarm.times) {
+                        return acc.concat(alarm.times.map(timeObj => ({ ...timeObj, ...alarm })));
+                    }
+                    return acc;
                 }, []);
     
                 // Sort all times
                 allTimes.sort((a, b) => {
-                    return moment(`${a.days[0]} ${a.time}`, 'YYYY-MM-DD HH:mm').diff(moment(`${b.days[0]} ${b.time}`, 'YYYY-MM-DD HH:mm'));
+                    return moment(a.time, 'YYYY-MM-DD HH:mm').diff(moment(b.time, 'YYYY-MM-DD HH:mm'));
                 });
     
                 // Generate alarm components for sorted times
                 allTimes.forEach((timeObj, index) => {
                     const { time, id: timeId, taken, medicine, id, dosage } = timeObj;
-                    const alarmTime = moment(`${timeObj.days[0]} ${time}`, 'YYYY-MM-DD HH:mm');
+                    const alarmTime = moment(time, 'YYYY-MM-DD HH:mm');
                     const remainingTime = alarmTime.diff(moment(), 'minutes');
     
                     let alarmComponent;
                     // Check if this is the next upcoming alarm
-                    if (remainingTime > 0 && !allTimes.some((otherTime) => moment(`${otherTime.days[0]} ${otherTime.time}`).isBetween(moment(), alarmTime))) {
+                    if (remainingTime > 0 && !allTimes.some((otherTime) => moment(otherTime.time, 'YYYY-MM-DD HH:mm').isBetween(moment(), alarmTime))) {
                         alarmComponent = (
                             <CrossBell
                                 remainingTime={remainingTime}
@@ -159,8 +177,7 @@ const Dashboard = () => {
                                 reloadFunction={renderTimeComponents}
                             />
                         );
-                    }
-                    else if (alarmTime.isSame(moment())) {
+                    } else if (alarmTime.isSame(moment(), 'minute')) {
                         alarmComponent = (
                             <CrossBell
                                 remainingTime={remainingTime}
@@ -173,8 +190,7 @@ const Dashboard = () => {
                                 reloadFunction={renderTimeComponents}
                             />
                         );
-                    }
-                    else {
+                    } else {
                         // Check if the alarm is in the past
                         if (alarmTime.isBefore(moment())) {
                             alarmComponent = (
@@ -197,7 +213,6 @@ const Dashboard = () => {
                                     medicineId={id}
                                     taken={taken}
                                     reloadFunction={renderTimeComponents}
-    
                                 />
                             );
                         }
@@ -222,159 +237,10 @@ const Dashboard = () => {
         }
     };
     
-
-
-    // const renderTimeComponents = async () => {
-    //     try {
-
-    //         const allAlarmComponents = [];
-    //         const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
-    //         console.log(AlarmsArray);
-    //         if (AlarmsArray) {
-    //             AlarmsArray.forEach((alarm) => {
-    //                 const { days, times, medicine, id, dosage, frequency } = alarm;
-    //                 const currentTime = moment();
-
-    //                 days.forEach((day) => {
-    //                     times.forEach((timeObj) => {
-    //                         const { time, id: timeId, taken } = timeObj;
-    //                         const alarmTime = moment(`${day} ${time}`, 'YYYY-MM-DD HH:mm');
-    //                         let alarmComponent;
-    //                         // Check if this is the next upcoming alarm
-    //                         if (alarmTime.isAfter(moment()) &&
-    //                             !times.some((otherTime) => moment(`${day} ${otherTime.time}`).isBetween(moment(), alarmTime))) {
-    //                             alarmComponent = (
-    //                                 // <></>
-    //                                 <CrossBell
-    //                                     remainingTime={alarmTime.diff(moment(), 'minutes')} // Calculate remaining time
-    //                                     time={alarmTime.format('HH:mm')}
-    //                                     id={timeId}
-    //                                     dosage={dosage}
-    //                                     Medicine={medicine}
-    //                                     medicineId={id}
-    //                                     taken={taken}
-    //                                     reloadFunction={renderTimeComponents} // Optional: for manual refresh
-    //                                 />
-    //                             );
-    //                         } else {
-    //                             if (alarmTime.isBefore(moment())) {
-    //                                 alarmComponent = (
-    //                                     <CrossAlarm
-    //                                         time={alarmTime.format('HH:mm')}
-    //                                         medicineId={id}
-    //                                         id={timeId}
-    //                                         Medicine={medicine}
-    //                                         taken={taken}
-    //                                         reloadFunction={renderTimeComponents}
-    //                                     />
-    //                                 );
-    //                             } else {
-    //                                 alarmComponent = (
-    //                                     <BellAlarm
-    //                                         time={alarmTime.format('HH:mm')}
-    //                                         id={timeId}
-    //                                         Medicine={medicine}
-    //                                         medicineId={id}
-    //                                         taken={taken}
-    //                                         reloadFunction={renderTimeComponents}
-    //                                     />
-    //                                 );
-    //                             }
-    //                         }
-    //                         if (alarmComponent) { // Only add if a component is defined
-    //                             allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
-    //                         }
-    //                     });
-    //                 });
-    //             });
-    //         }
-
-    //         allAlarmComponents.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
-    //         const components = allAlarmComponents.map((item, index) => (
-    //             <View style={styles.component} key={index}>
-    //                 {item.component}
-    //             </View>
-    //         ));
-    //         setAlarmComponents(components);
-    //     } catch (error) {
-    //         console.error('Error rendering alarm components:', error);
-    //     }
-    // }
-
-
-
-    // const renderTimeComponents = async () => {
-    //     try {
-    //         const allAlarmComponents = [];
-    //         const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
-    //         if (AlarmsArray) {
-    //             AlarmsArray?.forEach((alarm) => {
-    //                 const { days, times, medicine, id, dosage, frequency } = alarm;
-    //                 const currentTime = moment();
-
-    //                 days.forEach((day) => {
-    //                     times.forEach((timeObj) => {
-    //                         const { time, id: timeId, taken } = timeObj;
-    //                         const alarmTime = moment(`${day} ${time}`, 'YYYY-MM-DD HH:mm');
-    //                         let remainingTime = alarmTime.diff(currentTime, 'minutes');
-    //                         if (remainingTime < 0) {
-    //                             remainingTime = 0;
-    //                         }
-    //                         let alarmComponent;
-    //                         if (alarmTime.isBefore(currentTime)) {
-    //                             alarmComponent = (
-    //                                 <CrossAlarm
-    //                                     time={alarmTime.format('HH:mm')}
-    //                                     medicineId={id}
-    //                                     id={timeId}
-    //                                     Medicine={medicine}
-    //                                     taken={taken}
-    //                                     reloadFunction={renderTimeComponents}
-    //                                 />
-    //                             );
-    //                         }
-    //                         else if (alarmTime.isBetween(currentTime, moment(currentTime).add(frequency, 'hour'))) {
-    //                             alarmComponent = (
-    //                                 <CrossBell
-    //                                     remainingTime={remainingTime}
-    //                                     time={alarmTime.format('HH:mm')}
-    //                                     id={timeId}
-    //                                     dosage={dosage}
-    //                                     Medicine={medicine}
-    //                                     medicineId={id}
-    //                                     taken={taken}
-    //                                     reloadFunction={renderTimeComponents}
-    //                                 />
-    //                             );
-    //                         } else {
-    //                             alarmComponent = (
-    //                                 <BellAlarm
-    //                                     time={alarmTime.format('HH:mm')}
-    //                                     id={timeId}
-    //                                     Medicine={medicine}
-    //                                     medicineId={id}
-    //                                     taken={taken}
-    //                                     reloadFunction={renderTimeComponents}
-    //                                 />
-    //                             );
-    //                         }
-    //                         allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
-    //                     });
-    //                 });
-    //             });
-    //         }
-
-    //         allAlarmComponents.sort((a, b) => moment(a.time, 'HH:mm').diff(moment(b.time, 'HH:mm')));
-    //         const components = allAlarmComponents.map((item, index) => (
-    //             <View style={styles.component} key={index}>
-    //                 {item.component}
-    //             </View>
-    //         ));
-    //         setAlarmComponents(components);
-    //     } catch (error) {
-    //         console.error('Error rendering alarm components:', error);
-    //     }
-    // };
+    
+    
+    
+    
 
     const handleRefresh = async () => {
         setRefreshing(true);

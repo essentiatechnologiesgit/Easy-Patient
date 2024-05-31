@@ -76,7 +76,7 @@ const UpdateReminder = ({ route }) => {
     const [accessToken, setAccessToken] = useState('');
     const [MedImage, setMedImage] = useState('');
     const [default_icon, setDefaultIcon] = useState('');
-
+    const [newIcon, setNewIcon] = useState(false);
 
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
@@ -142,7 +142,6 @@ const UpdateReminder = ({ route }) => {
                 for (let i = 0; i < response.data.length; i++) {
                     if (response.data[i].id === medId) {
                         if (imageUpdate == "true") {
-                            console.log("Inside Updated Imge");
                             updateMedicineById(response.data[i].picture_link);
                         }
                         // console.log(response.data[i]);
@@ -226,7 +225,6 @@ const UpdateReminder = ({ route }) => {
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
                 removeMedicineById(medicineId);
             })
             .catch((error) => {
@@ -249,7 +247,6 @@ const UpdateReminder = ({ route }) => {
 
             await AsyncStorage.setItem('Alarms', JSON.stringify(existingAlarms));
 
-            console.log(`Medicine with ID ${medicineId} removed successfully.`);
         } catch (error) {
             console.error('Error removing medicine:', error);
         }
@@ -294,23 +291,26 @@ const UpdateReminder = ({ route }) => {
             setFreNumberError(true);
             setErrorMessage('Please enter the frequency');
         } else {
-            // setShowLoader(true);
+            setShowLoader(true);
             const loginResponse = await AsyncStorage.getItem('loginResponse');
             const responseObject = JSON.parse(loginResponse);
             const access_token = responseObject.access_token;
 
-            // if (image === '' || image === undefined) {
-            //     //condition for not to send image
-            //     console.warn("This is ");
+            // if (image)
+            //     console.warn("image")
+            // else {
+            //     if (selectedImage) {
+            //         console.warn("selected Image", selectedImage)
+            //     } else {
+            //         console.warn("No image Case");
+            //     }
+            // }
 
 
-            //     // updateData(access_token);
-            // } else {
             let IMG = false;
             if (image) {
                 IMG = true;
                 try {
-                    console.warn("In image");
                     let data = new FormData();
                     const fileExtension = getFileExtension(image) || 'jpg'; // Default extension 'jpg'
                     const fileName = `image.${fileExtension}`;
@@ -333,13 +333,10 @@ const UpdateReminder = ({ route }) => {
                     };
 
                     const response = await axios.request(config);
-                    console.log(JSON.stringify(response.data));
-                    // updateMedicineById();
-                    // updateData(access_token);
                 } catch (error) {
                     console.log("", error);
                 } finally {
-                    setShowLoader(false);
+                    // setShowLoader(false);
                     // navigation.navigate('Dashboard', {
                     //     isChanged: true,
                     // });
@@ -369,6 +366,7 @@ const UpdateReminder = ({ route }) => {
         if (!IMG)
             data.append('default_icon', selectedImage ? selectedImage : default_icon);
 
+
         const config = {
             method: 'put',
             maxBodyLength: Infinity,
@@ -382,23 +380,34 @@ const UpdateReminder = ({ route }) => {
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
             })
             .catch((error) => {
                 console.log(error);
             }).finally(async () => {
-                if (IMG){
+                if (IMG) {
                     await getMedicineDetails("true");
-                }else{
-                    updateMedicineById();
+                } else {
+
+                    if (selectedImage) {
+                        updateMedicineById();
+                    } else {
+                        updateMedicineById(MedImage);
+                    }
                 }
-                    
-                
+
+
             });
     }
 
     const updateMedicineById = async (imageUpdate) => {
-
+        let durationInt;
+        if (duration === "Hour") {
+            durationInt = 0;
+        } else if (duration === "Day") {
+            durationInt = 1;
+        } else {
+            durationInt = 2;
+        }
         try {
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
@@ -407,85 +416,82 @@ const UpdateReminder = ({ route }) => {
             // Iterate through each alarm
             existingAlarms = existingAlarms.map(alarm => {
                 // If the alarm matches the provided medicineId, update it
-
                 if (alarm.id === medId) {
-
                     let timeId = 1;
-                    if (date) {
+                    const updatedTimes = [];
+                    const startTimeMoment = moment(time);
+                    const daysArray = [];
 
+                    if (date) {
                         let Newdate = `${date?.getFullYear()}-${String(date?.getMonth() + 1).padStart(2, '0')}-${String(date?.getDate()).padStart(2, '0')}`;
                         let Newtime = `${String(time?.getHours()).padStart(2, '0')}:${String(time?.getMinutes()).padStart(2, '0')}:${String(time?.getSeconds()).padStart(2, '0')}`;
-                        const updatedTimes = [];
-                        const nextAlarmTime = moment(time);
+                        const nextAlarmTime = moment(`${Newdate} ${Newtime}`);
+
                         // Update times based on the new start time
-                        while (nextAlarmTime.isBefore(moment().endOf('day'))) {
-                            updatedTimes.push({
-                                time: nextAlarmTime.format('HH:mm'),
-                                id: timeId,
-                                taken: false
-                            });
-                            nextAlarmTime.add(freNumber, 'hours');
-                            timeId++;
-                        }
-                        if (imageUpdate) {
-                            return {
-                                ...alarm,
-                                medicine: MedicineName,
-                                dosage: dose,
-                                start_time: `${Newdate} ${Newtime}`,
-                                number_of_days: days,
-                                frequency: freNumber,
-                                st_notification: isNotify ? 1 : 0,
-                                st_critical: priority ? 1 : 0,
-                                selectedImage: selectedImage ? selectedImage : default_icon,
-                                times: updatedTimes,
-                                picture_link: imageUpdate,
-                            };
-                        } else {
-                            return {
-                                ...alarm,
-                                medicine: MedicineName,
-                                dosage: dose,
-                                start_time: `${Newdate} ${Newtime}`,
-                                number_of_days: days,
-                                frequency: freNumber,
-                                st_notification: isNotify ? 1 : 0,
-                                st_critical: priority ? 1 : 0,
-                                selectedImage: selectedImage ? selectedImage : default_icon,
-                                times: updatedTimes,
-                                picture_link:null
-                            };
+                        if (durationInt === 0) { // Hourly
+                            while (nextAlarmTime.isBefore(moment().endOf('day'))) {
+                                updatedTimes.push({
+                                    time: nextAlarmTime.format('YYYY-MM-DD HH:mm'),
+                                    id: timeId,
+                                    taken: false
+                                });
+                                nextAlarmTime.add(freNumber, 'hours');
+                                timeId++;
+                            }
+                        } else if (durationInt === 1) { // Daily
+                            for (let day = 0; day < days; day++) {
+                                updatedTimes.push({
+                                    time: nextAlarmTime.clone().add(day, 'days').format('YYYY-MM-DD HH:mm'),
+                                    id: timeId,
+                                    taken: false
+                                });
+                                daysArray.push(nextAlarmTime.clone().add(day, 'days').format('YYYY-MM-DD'));
+                                timeId++;
+                            }
+                        } else { // Monthly
+                            for (let month = 0; month < days / 30; month++) {
+                                updatedTimes.push({
+                                    time: nextAlarmTime.clone().add(month, 'months').format('YYYY-MM-DD HH:mm'),
+                                    id: timeId,
+                                    taken: false
+                                });
+                                daysArray.push(nextAlarmTime.clone().add(month, 'months').format('YYYY-MM-DD'));
+                                timeId++;
+                            }
                         }
 
+                        const updatedAlarm = {
+                            ...alarm,
+                            medicine: MedicineName,
+                            dosage: dose,
+                            start_time: `${Newdate} ${Newtime}`,
+                            number_of_days: days,
+                            frequency: freNumber,
+                            duration: durationInt,
+                            st_notification: isNotify ? 1 : 0,
+                            st_critical: priority ? 1 : 0,
+                            selectedImage: selectedImage ? selectedImage : default_icon,
+                            times: updatedTimes,
+                            days: daysArray,
+                            picture_link: imageUpdate ? imageUpdate : null,
+                        };
+
+                        return updatedAlarm;
                     } else {
-                       
-                        if (imageUpdate) {
-                            console.log("in Image Update");
-                            return {
-                                ...alarm,
-                                medicine: MedicineName,
-                                dosage: dose,
-                                number_of_days: days,
-                                frequency: freNumber,
-                                st_notification: isNotify ? 1 : 0,
-                                st_critical: priority ? 1 : 0,
-                                selectedImage: selectedImage ? selectedImage : default_icon,
-                                picture_link: imageUpdate,
-                            };
-                        } else {
-                            return {
-                                ...alarm,
-                                medicine: MedicineName,
-                                dosage: dose,
-                                number_of_days: days,
-                                frequency: freNumber,
-                                st_notification: isNotify ? 1 : 0,
-                                st_critical: priority ? 1 : 0,
-                                selectedImage: selectedImage ? selectedImage : default_icon,
-                                picture_link:null
-                            };
-                        }
+                        const updatedAlarm = {
+                            ...alarm,
+                            medicine: MedicineName,
+                            dosage: dose,
+                            number_of_days: days,
+                            duration: durationInt,
+                            frequency: freNumber,
+                            st_notification: isNotify ? 1 : 0,
+                            st_critical: priority ? 1 : 0,
+                            selectedImage: selectedImage ? selectedImage : default_icon,
+                            picture_link: imageUpdate ? imageUpdate : null
+                        };
 
+                        return updatedAlarm;
                     }
                 }
                 return alarm;
@@ -493,8 +499,8 @@ const UpdateReminder = ({ route }) => {
 
             // Store updated alarms in AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(existingAlarms));
-            console.log('Updated alarms:', existingAlarms);
-
+            setShowLoader(false);
+            navigation.goBack();
         } catch (error) {
             console.error('Error updating medicine by id:', error);
         }

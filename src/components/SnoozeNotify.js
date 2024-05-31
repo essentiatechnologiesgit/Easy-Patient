@@ -3,7 +3,7 @@ import { View, Modal, TouchableOpacity, Text, StyleSheet, TouchableWithoutFeedba
 import CustomButton from './CustomizedButton';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import moment from 'moment';
 const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction,Medicine  }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
     
@@ -19,82 +19,119 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
         onCloseModal();
     };
 
-    const setTime = async (minutesToAdd) => {
+    const setTime = async ( minutesToAdd) => {
         try {
-            const alarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
+            // Retrieve the alarms array from AsyncStorage
+            const alarmsArrayJSON = await AsyncStorage.getItem('Alarms');
+            if (!alarmsArrayJSON) {
+                throw new Error('No alarms found in AsyncStorage');
+            }
+    
+            const alarmsArray = JSON.parse(alarmsArrayJSON);
+            const today = moment().format('YYYY-MM-DD');
+    
+            // Map through the alarms array and update the specific medicine time object
             const updatedAlarmsArray = alarmsArray.map(alarm => {
                 if (alarm.id === medicineId) {
-                    
-                    const updatedMedicine = alarm.times.map(timeObj => {
-                        console.log(timeObj.id,AlarmId);
-                        if (timeObj.id === AlarmId) {
-                            
-                            const [hours, minutes] = timeObj.time.split(':').map(Number);
-                            const totalMinutes = hours * 60 + minutes;
-                            const updatedTotalMinutes = totalMinutes + minutesToAdd;
-                            const updatedHours = Math.floor(updatedTotalMinutes / 60);
-                            const updatedMinutes = updatedTotalMinutes % 60;
+                    const updatedTimes = alarm.times.map(timeObj => {
+                        // Extract time part (HH:mm) and date part (YYYY-MM-DD) from the time object
+                        const alarmDateTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
+                        const timePart = alarmDateTime.format('HH:mm');
+                        const datePart = alarmDateTime.format('YYYY-MM-DD');
+    
+                        // Check if the time part matches and it belongs to today
+                        if (timePart === timeUpdate && datePart === today) {
+                            const updatedTime = alarmDateTime.add(minutesToAdd, 'minutes');
                             return {
                                 ...timeObj,
-                                time: `${updatedHours.toString().padStart(2, '0')}:${updatedMinutes.toString().padStart(2, '0')}`
+                                time: updatedTime.format('YYYY-MM-DD HH:mm')
                             };
-                        } else {
-                            return timeObj;
                         }
+                        return timeObj;
                     });
                     return {
                         ...alarm,
-                        times: updatedMedicine
+                        times: updatedTimes
                     };
-                } else {
-                    return alarm;
                 }
+                return alarm;
             });
-
-            // console.log(JSON.stringify(updatedAlarmsArray, null, 2));
+    
+            // Save the updated alarms array back to AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsArray));
-            reloadFunction();
-            handleCloseModal()
-            // console.log('Alarm updated successfully.');
+            
+            // Call the reload function to refresh the UI
+            if (typeof reloadFunction === 'function') {
+                reloadFunction();
+            }
+    
+            // Call the handleCloseModal function to close the modal
+            if (typeof handleCloseModal === 'function') {
+                handleCloseModal();
+            }
+    
+            console.log('Alarm updated successfully.');
         } catch (error) {
             console.error('Error updating alarm:', error);
         }
-    }
+    };
+    
 
 
     const setTakenTrue = async () => {
         try {
-            const alarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
+            // Retrieve the alarms array from AsyncStorage
+            const alarmsArrayJSON = await AsyncStorage.getItem('Alarms');
+            if (!alarmsArrayJSON) {
+                throw new Error('No alarms found in AsyncStorage');
+            }
+    
+            const alarmsArray = JSON.parse(alarmsArrayJSON);
+            const today = moment().format('YYYY-MM-DD');
+    
+            // Map through the alarms array and update the specific medicine time object
             const updatedAlarmsArray = alarmsArray.map(alarm => {
                 if (alarm.id === medicineId) {
-                    const updatedMedicine = alarm.times.map(timeObj => {
-                        if (timeObj.id === AlarmId) {
+                    const updatedTimes = alarm.times.map(timeObj => {
+                        // Extract time part (HH:mm) and date part (YYYY-MM-DD) from the time object
+                        const timePart = moment(timeObj.time, 'YYYY-MM-DD HH:mm').format('HH:mm');
+                        const datePart = moment(timeObj.time, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD');
+    
+                        // Check if the time part matches and it belongs to today
+                        if (timePart === timeUpdate && datePart === today) {
                             return {
                                 ...timeObj,
-                                taken: true 
+                                taken: true
                             };
-                        } else {
-                            return timeObj;
                         }
+                        return timeObj;
                     });
                     return {
                         ...alarm,
-                        times: updatedMedicine
+                        times: updatedTimes
                     };
-                } else {
-                    return alarm;
                 }
+                return alarm;
             });
-            // console.log(JSON.stringify(updatedAlarmsArray, null, 2));
-           
+    
+            // Save the updated alarms array back to AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsArray));
-            reloadFunction();
-            handleCloseModal()
+            
+            // Call the reload function to refresh the UI
+            if (typeof reloadFunction === 'function') {
+                reloadFunction();
+            }
+    
+            // Call the handleCloseModal function to close the modal
+            if (typeof handleCloseModal === 'function') {
+                handleCloseModal();
+            }
+    
             console.log('Taken updated successfully.');
         } catch (error) {
             console.error('Error updating taken:', error);
         }
-    }
+    };
 
 
     return (

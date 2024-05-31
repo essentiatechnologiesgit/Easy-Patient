@@ -64,7 +64,6 @@ const Configure = () => {
             } else {
                 console.error('Settings URL not supported on this platform');
             }
-        
     }
     const toggleSwitch = async (number) => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');

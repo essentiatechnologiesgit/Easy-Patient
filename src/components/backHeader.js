@@ -23,19 +23,11 @@ const BackHeader = ({ name }) => {
 
     return (
         <>
-            <View style={name === "Reminders" ? styles.containerRem : styles.container}>
+            <View style={styles.container}>
                 <TouchableOpacity onPress={handleBackPress} style={styles.back}>
                     <Image source={leftArrow} style={styles.arrow}></Image>
                 </TouchableOpacity>
-                <Text style={name === "Reminders" ? styles.headRem : styles.head} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
-                {
-                    name === "Reminders" ?
-                        <View style={styles.button}>
-                            <CircleButton title={"AddReminder"}/>
-                        </View>
-                        : null
-                }
-
+                <Text style={styles.head} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
             </View>
         </>
     );
@@ -59,28 +51,27 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         justifyContent: 'space-between',
-        // paddingHorizontal: 18,
         shadowColor: 'black',
     },
     head: {
         fontSize: PixelRatio.getFontScale() * 24,
-        left: '60%',
+        marginLeft: '10%',
         color: 'black',
         width:'65%',
-        // backgroundColor:'red',
     },
     headRem: {
         left: -60,
         textAlign: 'center',
         fontSize: PixelRatio.getFontScale() * 24,
         color: 'black',
+        width:'65%',
     },
     arrow: {
-        height: 20,
-        width: 20,
+        height: 14,
+        width: 14,
     },
     back: {
-        left: 18,
+        left: 12,
         backgroundColor: '#EAECEF',
         padding: 7,
         borderRadius: 20,

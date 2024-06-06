@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, Switch, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, StyleSheet, Switch, Image, PixelRatio, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -159,7 +159,7 @@ const AddReminder = ({ route }) => {
             // Prepare image data (adjust based on your image source):
             let imageData;
             if (Platform.OS === 'ios') {
-                imageData = image.replace('file://', ''); 
+                imageData = image.replace('file://', '');
             } else {
                 imageData = image;
             }
@@ -219,14 +219,14 @@ const AddReminder = ({ route }) => {
 
                 axios.request(config)
                     .then((response) => {
-                        getMedicine(response.data.id,access_token,userId);
+                        getMedicine(response.data.id, access_token, userId);
                     })
                     .catch((error) => {
                         console.log(error);
                     }).finally(() => {
                         setShowLoader(false);
                         navigation.navigate('Dashboard', { /* isChanged: true, */ }); // Remove the commented line if needed
-          
+
                     });
             }
 
@@ -278,7 +278,7 @@ const AddReminder = ({ route }) => {
                 for (let i = 0; i < response.data.length; i++) {
                     if (response.data[i].id === medicineId) {
                         // console.log(JSON.stringify(response.data[i]));
-                        
+
                         renderAlarmComponents(response.data[i], userId);
                     }
                 }
@@ -298,24 +298,24 @@ const AddReminder = ({ route }) => {
         } else {
             durationInt = 2;
         }
-    
+
         try {
             medicines = Array.isArray(medicines) ? medicines : [medicines];
-    
+
             // Fetch existing alarms from AsyncStorage
             const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
             const existingAlarms = existingAlarmsJSON ? JSON.parse(existingAlarmsJSON) : [];
-    
+
             // Initialize variables
             const idDosageMedicineFrequencyMap = {};
-    
+
             // Process each medicine
             for (const medicine of medicines) {
                 const { start_time, frequency, name, id, dosage, picture_link, st_critical, st_notification, number_of_days = 1 } = medicine; // Default to 1 if not provided
                 const nextAlarmTime = moment(start_time);
-    
+
                 let timeId = 1; // Initialize timeId
-    
+
                 if (durationInt === 0) {
                     // Hourly case
                     while (nextAlarmTime.isBefore(moment(start_time).add(number_of_days, 'days').endOf('day'))) {
@@ -334,32 +334,32 @@ const AddReminder = ({ route }) => {
                     }
                 } else {
                     // Monthly case
-                    for (let i = 0; i < number_of_days; i += 30) {
+                    for (let i = 0; i < number_of_days; i += 7) {
                         const currentDay = nextAlarmTime.format('YYYY-MM-DD');
                         addAlarm(nextAlarmTime, id, dosage, name, frequency, timeId, currentDay, st_critical, st_notification, picture_link, userId, idDosageMedicineFrequencyMap, durationInt, number_of_days);
-                        nextAlarmTime.add(1, 'month');
+                        nextAlarmTime.add(1, 'week');
                         timeId++;
                     }
                 }
             }
-    
+
             const updatedAlarmsData = Object.values(idDosageMedicineFrequencyMap);
-    
+
             const finalAlarmsArray = existingAlarms.length > 0 ? existingAlarms.concat(updatedAlarmsData) : updatedAlarmsData;
-    
+
             await AsyncStorage.setItem('Alarms', JSON.stringify(finalAlarmsArray));
             console.log('Added alarms:', JSON.stringify(finalAlarmsArray, null, 2));
-    
+
         } catch (error) {
             console.error('Error rendering alarm components:', error);
         }
     };
-    
+
     // Helper function to add alarms
     const addAlarm = (nextAlarmTime, id, dosage, name, frequency, timeId, currentDay, st_critical, st_notification, picture_link, userId, idDosageMedicineFrequencyMap, durationInt, number_of_days) => {
         const key = `${id}_${dosage}_${name}_${frequency}`;
         console.log(`Processing alarm for key: ${key}`); // Debug log
-    
+
         // Initialize times array if it doesn't exist
         if (!idDosageMedicineFrequencyMap[key]) {
             idDosageMedicineFrequencyMap[key] = {
@@ -378,7 +378,7 @@ const AddReminder = ({ route }) => {
             };
             console.log(`Initialized entry for key: ${key}`); // Debug log
         }
-    
+
         const newAlarm = {
             time: nextAlarmTime.format('YYYY-MM-DD HH:mm'), // Include date and time
             medicine: name,
@@ -392,7 +392,7 @@ const AddReminder = ({ route }) => {
             picture_link: picture_link ? picture_link : null,
             selectedImage: selectedImage // Ensure this is defined
         };
-    
+
         // Push the time to the times array with taken: false and timeId
         idDosageMedicineFrequencyMap[key].times.push({ time: newAlarm.time, id: timeId, taken: false });
         if (!idDosageMedicineFrequencyMap[key].days.includes(currentDay)) {
@@ -400,10 +400,10 @@ const AddReminder = ({ route }) => {
         }
         console.log(`Added alarm: ${JSON.stringify(newAlarm)} to key: ${key}`); // Debug log
     };
-    
-    
-    
-    
+
+
+
+
 
 
     const handleCounter = () => {
@@ -456,17 +456,19 @@ const AddReminder = ({ route }) => {
     };
     // console.log(image);
 
-   
+
     return (
         <>
             <View style={styles.container}>
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
-                <BackHeader name={"Add Reminder"} />
-
-                <TouchableOpacity onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })} style={styles.medicineContiner}>
+                <BackHeader name={"Add Reminder"}/>
+                <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })} style={styles.medicineContiner}>
                     {renderImage()}
                 </TouchableOpacity>
+                <TouchableWithoutFeedback onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })}>
+                    <Text style={styles.addImage}>Add Image</Text>
+                </TouchableWithoutFeedback>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
                         <View
@@ -742,6 +744,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         flex: 1,
         // justifyContent:'center',
+    },
+    addImage: {
+        color: config.secondaryColor,
+        alignSelf: 'center',
+        top: -15,
     },
     medicineContiner: {
         borderRadius: 40,

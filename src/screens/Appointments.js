@@ -18,8 +18,7 @@ const Appointments = () => {
             <View style={styles.container}>
                 <BackHeader name={"Appointments"} />
                 <ScrollView>
-                <AppointmentContainer />
-                    
+                    <AppointmentContainer />
                 </ScrollView>
             </View>
             <Footer prop={2} />
@@ -31,7 +30,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         flex: 1,
-        // justifyContent:'center',
     },
 });
 

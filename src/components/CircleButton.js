@@ -19,14 +19,14 @@ const styles = StyleSheet.create({
     button: {
         width: 35, 
         height: 35, 
-        borderRadius: 20, 
+        borderRadius: 17.5, 
         backgroundColor: config.secondaryColor,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 4,
       },
       text: {
-        top:-2,
+        top:-1,
         fontSize: 26,
         color: 'white',
       },

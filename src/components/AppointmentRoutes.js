@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
         padding: 10,
         justifyContent: 'space-between',
     },
-    
+    clinicText:{
+        color:config.secondaryColor,
+    },
     carIcon: {
         height: 23,
         width: 26,

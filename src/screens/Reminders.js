@@ -72,13 +72,13 @@ const Reminders = () => {
             console.error("Invalid times array:", times);
             return "Invalid times data";
         }
-    
+
         const currentTime = moment();
-    
+
         for (const timeObj of times) {
             if (timeObj && timeObj.time) {
                 const dosageTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
-    
+
                 if (dosageTime.isAfter(currentTime)) {
                     return dosageTime.format('MMMM D, YYYY h:mm A');
                 }
@@ -86,13 +86,13 @@ const Reminders = () => {
                 console.error("Invalid time object:", timeObj);
             }
         }
-    
+
         const firstDosageTime = moment(times[0].time, 'YYYY-MM-DD HH:mm').add(1, 'day');
         return firstDosageTime.format('MMMM D, YYYY h:mm A');
     };
-    
-    
-    
+
+
+
 
     const renderImage = (selectedImage) => {
         switch (selectedImage) {
@@ -143,6 +143,9 @@ const Reminders = () => {
         <>
             <View style={styles.container}>
                 <BackHeader name={"Reminders"} />
+                <View style={styles.touch}>
+                    <CircleButton title={"AddReminder"} />
+                </View>
                 {
                     medicineData && medicineData.length > 0 ?
 
@@ -152,13 +155,13 @@ const Reminders = () => {
                                     <TouchableWithoutFeedback onPress={() => navigation.navigate("UpdateReminder", { medicineId: item.id })} key={index}>
                                         <View style={styles.medicineContainer}>
                                             <View style={styles.imageContainer}>
-                                            {
-                                                item.picture_link ? 
-                                                <Image source={item.picture_link ? { uri: item.picture_link } : {renderImage}} style={styles.profileLogo} />
-                                                :
-                                                renderImage(item.selectedImage)
-                                            }
-                                          </View>
+                                                {
+                                                    item.picture_link ?
+                                                        <Image source={item.picture_link ? { uri: item.picture_link } : { renderImage }} style={styles.profileLogo} />
+                                                        :
+                                                        renderImage(item.selectedImage)
+                                                }
+                                            </View>
                                             <View style={styles.textContainer}>
                                                 <Text style={styles.medicineTextHeading}>{item.medicine}</Text>
                                                 <Text style={styles.medicineTextSide}>{`Next dose: ${calculateNextDosageTime(item.times)}`}</Text>
@@ -178,7 +181,7 @@ const Reminders = () => {
                                 <Text style={styles.emptyText}>You do not have any medications or Supplement reminder</Text>
                                 <Text style={styles.emptyText}>Add now</Text>
                                 <View style={styles.button}>
-                                    <CircleButton title={"AddReminder"}/>
+                                    <CircleButton title={"AddReminder"} />
                                 </View>
                             </View>
                         </>
@@ -209,13 +212,18 @@ const styles = StyleSheet.create({
         width: '70%',
         alignSelf: 'center'
     },
+    touch: {
+        position: 'absolute',
+        top: 15,
+        right: 15,
+    },
     emptyText: {
         color: config.primaryColor,
         textAlign: 'center',
     },
-    capsulelogo:{
-        height:30,
-        width:30,
+    capsulelogo: {
+        height: 30,
+        width: 30,
     },
     medicineContainer: {
         flexDirection: 'row',
@@ -267,7 +275,7 @@ const styles = StyleSheet.create({
     profileLogo: {
         height: 75,
         width: 75,
-        borderRadius:37.5,
+        borderRadius: 37.5,
     },
 });
 

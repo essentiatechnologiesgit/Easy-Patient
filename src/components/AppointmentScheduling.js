@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     bodyHead: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontWeight: 'bold',
     },
 
     line: {

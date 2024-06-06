@@ -1,61 +1,39 @@
 import React from 'react';
-import { View, Image, ActivityIndicator, StyleSheet, PixelRatio,TouchableWithoutFeedback,Text } from 'react-native';
+import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
-import callIcon from '../assets/callIcon.png';
-import watsappIcon from '../assets/watsappIcon.png';
+import EmailComponent from './EmailComponent';
 import GoldEmailIcon from '../assets/goldEmailIcon.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import CallComponent from './CallComponent';
+import WhatsappComponent from './WatsappComponent';
 const AppointmentContact = () => {
     const navigation = useNavigation();
     return (
         <>
-                <View style={styles.firstContainer}>
-                    <View style={styles.head}>
-                        <Text style={styles.status}>Contacts</Text>
-                    </View>
-                    <View style={styles.line}></View>
-                    <View style={styles.carContainer}>
-                        <Image source={callIcon} style={styles.callIcon} />
-                        <Text style={styles.clinicText}>0321546351564</Text>
-                        <Text></Text>
-                    </View>
-                    <View style={styles.carContainer}>
-                        <Image source={watsappIcon} style={styles.watsappIcon} />
-                        <Text style={styles.clinicText}>0321546351564</Text>
-                        <Text></Text>
-                    </View>
-                    <View style={styles.carContainer}>
-                        <Image source={GoldEmailIcon} style={styles.emailIcon} />
-                        <Text style={styles.clinicText}>syedmisbahali1111@gmail.com</Text>
-                        <Text></Text>
-                    </View>
+            <View style={styles.firstContainer}>
+                <View style={styles.head}>
+                    <Text style={styles.status}>Contacts</Text>
                 </View>
+                <View style={styles.line}></View>
+                <CallComponent />
+                <WhatsappComponent />
+                <EmailComponent />
+            </View>
         </>
     );
 };
 
 const styles = StyleSheet.create({
-    Appointments: {
-        flexDirection: 'column',
-        padding: 12,
-        width: '90%',
-        alignSelf: 'center',
-        borderBottomWidth: 0.2,
-        borderBottomColor: config.primaryColor,
-    },
     firstContainer: {
         padding: 20,
-        // backgroundColor: 'grey',
     },
-    callIcon:{
-        height:28,
-        width:26,
+    status: {
+        color: config.secondaryColor,
     },
-
-    watsappIcon:{
-        height:25,
-        width:25,
+    watsappIcon: {
+        height: 25,
+        width: 25,
     },
     clinicText: {
         color: config.secondaryColor,
@@ -63,9 +41,9 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
     },
-    emailIcon:{
-        width:28,
-        height:20,
+    emailIcon: {
+        width: 28,
+        height: 20,
     },
     carContainer: {
         marginTop: 10,

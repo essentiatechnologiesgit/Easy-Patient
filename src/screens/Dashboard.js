@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
     },
     nameHeading: {
-        fontWeight: '500',
+        fontWeight: '600',
         fontSize: PixelRatio.getFontScale() * 24,
         color: config.textColorHeadings,
     },
@@ -390,9 +390,9 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         marginBottom: 15,
         marginTop: -5,
-        fontWeight: '400',
+        fontWeight: '600',  // semi-bold
         marginLeft: 16,
-    },
+    },    
     ProfileLogo: {
         width: '100%',
         height: '70%',

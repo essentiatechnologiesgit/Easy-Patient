@@ -169,7 +169,7 @@ const SideBar = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-            <View style={[styles.horizontalLine, { marginTop: 35 }]}></View>
+            <View style={[styles.horizontalLine, { marginBottom: 5, marginTop: 10, }]}></View>
             <View style={styles.containerList}>
                 <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
                     <Image source={EmailIcon} style={styles.mail}></Image>

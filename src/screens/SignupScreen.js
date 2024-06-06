@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, findNodeHandle, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TextInput, TouchableWithoutFeedback, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox'
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
@@ -17,11 +17,13 @@ import Svg, { Path } from 'react-native-svg';
 import AlertIcon from '../components/AlertIcon';
 import OtpInput from '../components/OTPInput';
 const SignupScreen = () => {
+  const route = useRoute();
+  const { params } = route.params || {};
   const scrollViewRef = useRef();
   const navigation = useNavigation();
   const [placeholderLabelAnim] = useState(new Animated.Value(selectedGender ? 1 : 0));
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(route.params ? true : false);
   const [isOpen, setIsOpen] = useState(false);
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const [showForm, setShowForm] = useState(false)
@@ -69,7 +71,11 @@ const SignupScreen = () => {
     setOtp(otpValue);
   };
 
-
+  useEffect(() => {
+      if(route.params){
+        setTermsAccepted(true);
+      }
+  },[route.params])
   const handleScrollToError = (index) => {
     const errorRef = errorRefs.current[index];
     if (errorRef) {
@@ -360,7 +366,8 @@ const SignupScreen = () => {
               onValueChange={() => { setTermsAccepted(!termsAccepted) }}
               tintColors={{ true: config.secondaryColor }}
             />
-            <Text style={styles.textt}>I accept the </Text><Text style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
+
+            <Text style={styles.textt}>I accept the </Text><Text onPress={() => { navigation.navigate("TermsAndConditions") }} style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
           </View>
           <TouchableOpacity
             style={[termsAccepted ? { backgroundColor: config.secondaryColor } : { backgroundColor: 'rgba(0,0,0,0)' },
@@ -376,7 +383,7 @@ const SignupScreen = () => {
 
             <Text style={styles.login}>I already have an account</Text>
           </TouchableOpacity>
-         
+
         </View>
         }
         {
@@ -385,8 +392,8 @@ const SignupScreen = () => {
             <ScrollView ref={scrollViewRef} style={{ width: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
               <View style={styles.signupFormContainer}>
                 <View
-                ref={(ref) => (errorRefs.current[0] = ref)}
-                style={styles.floatingLabel}>
+                  ref={(ref) => (errorRefs.current[0] = ref)}
+                  style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'E-mail'}
                     inputStyles={styles.inputStyles}
@@ -395,7 +402,7 @@ const SignupScreen = () => {
                     value={email}
                     onChangeText={value => setEmail(value)}
                     containerStyles={styles.containerStyles}
-                    
+
                   />
                   {emailError && !email && (
                     <>
@@ -412,8 +419,8 @@ const SignupScreen = () => {
                 </View>
 
                 <View
-                ref={(ref) => (errorRefs.current[1] = ref)}
-                style={styles.floatingLabel}>
+                  ref={(ref) => (errorRefs.current[1] = ref)}
+                  style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Full Name'}
                     inputStyles={styles.inputStyles}
@@ -431,8 +438,8 @@ const SignupScreen = () => {
                   )}
                 </View>
                 <View
-                ref={(ref) => (errorRefs.current[2] = ref)}
-                style={styles.floatingLabel}>
+                  ref={(ref) => (errorRefs.current[2] = ref)}
+                  style={styles.floatingLabel}>
                   <TouchableOpacity onPress={handlePressDatePicker}>
                     <View style={{ ...styles.containerStyles }}>
                       {date ? (
@@ -470,8 +477,8 @@ const SignupScreen = () => {
                   />
                 )}
                 <View
-                ref={(ref) => (errorRefs.current[3] = ref)}
-                style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
+                  ref={(ref) => (errorRefs.current[3] = ref)}
+                  style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
                   <Animated.Text
                     style={[
                       styles.placeholderLabel,
@@ -539,8 +546,8 @@ const SignupScreen = () => {
                   )}
                 </View>
                 <View
-                ref={(ref) => (errorRefs.current[5] = ref)}
-                style={styles.floatingLabel}>
+                  ref={(ref) => (errorRefs.current[5] = ref)}
+                  style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Password'}
                     inputStyles={styles.inputStyles}
@@ -568,8 +575,8 @@ const SignupScreen = () => {
                   )}
                 </View>
                 <View
-                ref={(ref) => (errorRefs.current[5] = ref)}
-                style={styles.floatingLabel}>
+                  ref={(ref) => (errorRefs.current[5] = ref)}
+                  style={styles.floatingLabel}>
                   <FloatingLabelInput
                     label={'Confirm Password'}
                     inputStyles={styles.inputStyles}
@@ -587,7 +594,7 @@ const SignupScreen = () => {
                       <ValidationError errorMessage={errorMessage} />
                     </>
                   )}
-                  {cpLengthError  && (
+                  {cpLengthError && (
                     <>
                       <AlertIcon />
                       <ValidationError errorMessage={errorMessage} />
@@ -603,7 +610,7 @@ const SignupScreen = () => {
                 <View style={{ width: '100%', marginTop: 40 }}>
                   <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
                 </View>
-                <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>  
+                <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>
               </View>
             </ScrollView>
 
@@ -676,6 +683,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'gray'
   },
+
   inputEmail: {
     marginBottom: -8,
     flex: 1,
@@ -780,7 +788,7 @@ const styles = StyleSheet.create({
     color: config.secondaryColor,
     textDecorationLine: 'underline',
     marginTop: 30,
-    marginBottom:30,
+    marginBottom: 30,
   },
   inputPassword: {
     marginTop: 10,
@@ -842,19 +850,20 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     color: config.secondaryColor,
     fontSize: PixelRatio.getFontScale() * 15,
-    
+
   },
   checkbox: {
     marginTop: '4%',
     width: '90%',
     justifyContent: 'left',
     textAlign: 'left',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     fontSize: PixelRatio.getFontScale() * 17,
     padding: 2,
-    color: config.secondaryColor,
+    color: config.primaryColor,
     flexDirection: 'row',
     textAlign: 'center',
     alignItems: 'center',

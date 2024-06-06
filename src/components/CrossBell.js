@@ -1,69 +1,123 @@
 import React, { useState } from 'react';
-import { TouchableWithoutFeedback, Button, StyleSheet, Text, Image, View, Platform } from 'react-native';
+import { TouchableWithoutFeedback, StyleSheet, Text, Image, View, TouchableOpacity, } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import CrossBellIcon from '../assets/crossBell.png';
 import BottomModal from './BottomModal';
 import Svg, { Path } from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
-    
 
-  
+    const renderRightActions = (progress, dragX, swipeableRef) => (
+        <TouchableOpacity onPress={(e) => handleDeletePress(e, swipeableRef)}>
+            <View style={taken ? styles.deleteButtontaken : styles.deleteButton}>
+                <Image
+                    source={require('../assets/deleteWhite.png')}
+                    style={styles.image}
+                />
+            </View>
+        </TouchableOpacity>
+    );
+
+    const handleDeletePress = (e, swipeableRef) => {
+        e.stopPropagation();
+        deleteAlarm(medicineId, time);
+        swipeableRef.close();
+    };
+
+    const deleteAlarm = async (medicineId, targetTime) => {
+        try {
+            const existingAlarmsJSON = await AsyncStorage.getItem('Alarms');
+            if (!existingAlarmsJSON) {
+                console.warn('No alarms found in storage.');
+                return;
+            }
+
+            const existingAlarms = JSON.parse(existingAlarmsJSON);
+            console.log('Existing alarms:', existingAlarms);
+
+            const todayDate = moment().format('YYYY-MM-DD');
+            const targetDateTime = `${todayDate} ${targetTime}`;
+
+            const updatedAlarms = existingAlarms.map(alarm => {
+                if (alarm.id === medicineId) {
+                    const updatedTimes = alarm.times.filter(timeObj => {
+                        const alarmTime = moment(timeObj.time);
+                        const isSameTime = alarmTime.isSame(moment(targetDateTime));
+                        console.log(`Checking time - ID: ${timeObj.id}, Time: ${timeObj.time}, Matches: ${isSameTime}`);
+
+                        return !isSameTime;
+                    });
+                    return { ...alarm, times: updatedTimes };
+                }
+                return alarm;
+            });
+
+            await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarms));
+            reloadFunction();
+        } catch (error) {
+            console.error('Error deleting alarm:', error);
+        }
+    };
+
     return (
         <>
             {
                 !taken &&
                 <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
                     <View style={styles.container}>
-                        <View style={styles.child}>
-                            <Image source={CrossBellIcon} style={styles.bell}></Image>
-                            <Text style={styles.text}>{time} - {Medicine} </Text>
-                        </View>
-                        <View style={styles.reminder}><Text style={styles.prescriptionText}>Take {dosage} {Medicine} in {remainingTime}m</Text></View>
+                        <Swipeable renderRightActions={renderRightActions}>
+                            <View style={styles.child}>
+                                <Image source={CrossBellIcon} style={styles.bell}></Image>
+                                <Text style={styles.text}>{time} - {Medicine} </Text>
+                            </View>
+                            <View style={styles.reminder}><Text style={styles.prescriptionText}>Take {dosage} {Medicine} in {remainingTime}m</Text></View>
+                        </Swipeable>
                     </View>
                 </TouchableWithoutFeedback>
             }
             {
                 taken &&
                 <View style={styles.containerSuccess}>
-                    <Svg width="23" height="22" viewBox="0 0 24 24">
-                        <Path fill="#50B76C" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" />
-                    </Svg>
-                    <Text style={styles.text}>{time} - Alarm </Text>
+                    <Swipeable renderRightActions={renderRightActions}>
+                        <View style={styles.cont}>
+                            <Svg width="23" height="22" viewBox="0 0 24 24">
+                                <Path fill="#50B76C" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" />
+                            </Svg>
+                            <Text style={styles.text}>{time} - Alarm </Text>
+                        </View>
+                    </Swipeable>
                 </View>
             }
-            {/* <Button title="Display Notification" onPress={onDisplayNotification} /> */}
-            <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} Medicine={Medicine} time={time}/>
+            <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} Medicine={Medicine} time={time} />
         </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
-        justifyContent: 'space-evenly',
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        height: 80,
-        padding: 10,
+        paddingVertical: 1,
         alignSelf: 'center',
+    },
+    cont: {
+        flexDirection: 'row',
     },
     containerSuccess: {
-        flexDirection: 'row',
+        justifyContent: 'center',
+        // justifyContent: 'space-evenly',
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        height: 40,
         padding: 10,
         alignSelf: 'center',
     },
-    // text: {
-    //     color: 'gray',
-    //     textAlign: 'center',
-    // },
     reminder: {
         alignSelf: 'center',
         justifyContent: 'center',
@@ -72,9 +126,12 @@ const styles = StyleSheet.create({
         width: '96%',
         borderRadius: 3,
         backgroundColor: '#e8e8e8',
+        marginBottom: 10,
     },
     child: {
         flexDirection: 'row',
+        marginBottom: 8,
+        margin: 12,
     },
     text: {
         marginLeft: 8,
@@ -88,7 +145,29 @@ const styles = StyleSheet.create({
     bell: {
         height: 20,
         width: 20,
-    }
+    },
+    deleteButton: {
+        backgroundColor: '#AA0000',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: 70,
+    },
+    deleteButtontaken: {
+        backgroundColor: '#AA0000',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: 22,
+    },
+    image: {
+        height: 20,
+        width: 20,
+    },
+    deleteButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
 });
 
 export default CrossBell;

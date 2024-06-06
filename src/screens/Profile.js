@@ -290,7 +290,7 @@ const Profile = () => {
 
     return (
         <>
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <ProfileImagePopup visible={modalVisible} onClose={() => setModalVisible(false)} setImage={setImage} />
                 <BackHeader name={"Profile"} />
                 <View style={styles.formContainer}>
@@ -471,7 +471,7 @@ const Profile = () => {
                 </View>
                 {showLoader && <ModalLoader />}
 
-            </View>
+            </ScrollView>
         </>
     );
 };
@@ -480,7 +480,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         flex: 1,
-        // justifyContent:'center',
     },
     Profilelogo: {
         height: 90,

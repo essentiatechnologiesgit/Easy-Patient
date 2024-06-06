@@ -19,7 +19,6 @@ const CustomButton = ({ buttonColor, borderColor, textColor, text, onPress, titl
             </View>
           </>
         }
-
         <Text style={[styles.text, { color: textColor }]}>{text}</Text>
       </TouchableOpacity>
     </View>

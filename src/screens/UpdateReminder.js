@@ -295,18 +295,6 @@ const UpdateReminder = ({ route }) => {
             const loginResponse = await AsyncStorage.getItem('loginResponse');
             const responseObject = JSON.parse(loginResponse);
             const access_token = responseObject.access_token;
-
-            // if (image)
-            //     console.warn("image")
-            // else {
-            //     if (selectedImage) {
-            //         console.warn("selected Image", selectedImage)
-            //     } else {
-            //         console.warn("No image Case");
-            //     }
-            // }
-
-
             let IMG = false;
             if (image) {
                 IMG = true;
@@ -449,13 +437,13 @@ const UpdateReminder = ({ route }) => {
                                 timeId++;
                             }
                         } else { // Monthly
-                            for (let month = 0; month < days / 30; month++) {
+                            for (let week = 0; week < days / 7; week++) {
                                 updatedTimes.push({
-                                    time: nextAlarmTime.clone().add(month, 'months').format('YYYY-MM-DD HH:mm'),
+                                    time: nextAlarmTime.clone().add(week, 'weeks').format('YYYY-MM-DD HH:mm'),
                                     id: timeId,
                                     taken: false
                                 });
-                                daysArray.push(nextAlarmTime.clone().add(month, 'months').format('YYYY-MM-DD'));
+                                daysArray.push(nextAlarmTime.clone().add(week, 'weeks').format('YYYY-MM-DD'));
                                 timeId++;
                             }
                         }

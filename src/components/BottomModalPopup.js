@@ -29,7 +29,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                 setSelectedDuration("Day");
                 break;
             case 2:
-                setSelectedDuration("Month");
+                setSelectedDuration("Week");
                 break;
             default:
                 setSelectedDuration("Day");
@@ -82,7 +82,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                             <WheelPicker
                                 style={styles.picker}
                                 selectedItem={selectedItem}
-                                data={["Hour","Day","Month"]}
+                                data={["Hour","Day","Week"]}
                                 onItemSelected={handleItemSelected}
                                 selectedItemTextSize={28}
                                 itemTextColor={config.primaryColor}

@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 22,
         color: config.textColorHeadings,
         marginBottom: -10,
-        fontWeight: '400',
+        fontWeight: '600',
     },
     scrollViewContent: {
         alignItems: "center",

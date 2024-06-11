@@ -6,11 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ModalLoader from '../components/ModalLoader';
 import config from '../../config';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import CustomButton from '../components/CustomizedButton';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 const TermsAndConditions = () => {
     const navigation = useNavigation();
+    const route = useRoute();
+    const { setTermsAccepted = null, isConfigure } = route.params || {};
     const [htmlContent, setHtmlContent] = useState('');
     const [showLoader, setShowLoader] = useState(true);
 
@@ -43,27 +45,39 @@ const TermsAndConditions = () => {
             });
     };
 
+
     return (
         <>
             <View style={styles.container}>
-                <View style={styles.heading}>
-                    <Text style={styles.termsHeading}>Terms and Conditions</Text>
-
-                    <Text style={styles.subHeading}>By clicking Agree, you are accepting the terms below</Text>
-
-                </View>
+               
+                {
+                    !isConfigure ? 
+                    <View style={styles.heading}>
+                        <Text style={styles.termsHeading}>Terms and Conditions</Text>
+                        <Text style={styles.subHeading}>By clicking Agree, you are accepting the terms below</Text>
+                    </View>
+                    :
+                    <>
+                    <BackHeader name={"Terms and Conditions"} />
+                    <View style={{marginTop:20}}></View>
+                    </>
+                }
                 <WebView
                     originWhitelist={['*']}
                     source={{ html: `<html><head><style>body { font-size: 35px; }</style></head><body>${htmlContent}</body></html>` }}
                 />
-                <View style={styles.footerContainer}>
-                    <TouchableOpacity style={styles.btn} onPress={() => { navigation.navigate('Signup', accepted="true") }} >
-                        <Text style={styles.btnText}>Agree</Text>
-                    </TouchableOpacity>
-                    <TouchableWithoutFeedback onPress={() => { navigation.navigate('Signup') }} >
-                        <Text style={styles.btnCancel}>Cancel</Text>
-                    </TouchableWithoutFeedback>
-                </View>
+                {
+                    !isConfigure &&
+                    <View style={styles.footerContainer}>
+                        <TouchableOpacity style={styles.btn} onPress={() => { setTermsAccepted(true), navigation.navigate('Signup') }} >
+                            <Text style={styles.btnText}>Agree</Text>
+                        </TouchableOpacity>
+                        <TouchableWithoutFeedback onPress={() => { navigation.navigate('Signup') }} >
+                            <Text style={styles.btnCancel}>Cancel</Text>
+                        </TouchableWithoutFeedback>
+                    </View>
+                }
+
                 {showLoader && <ModalLoader />}
             </View>
         </>

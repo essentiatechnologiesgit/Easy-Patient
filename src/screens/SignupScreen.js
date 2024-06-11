@@ -23,7 +23,7 @@ const SignupScreen = () => {
   const navigation = useNavigation();
   const [placeholderLabelAnim] = useState(new Animated.Value(selectedGender ? 1 : 0));
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(route.params ? true : false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const [showForm, setShowForm] = useState(false)
@@ -72,10 +72,10 @@ const SignupScreen = () => {
   };
 
   useEffect(() => {
-      if(route.params){
-        setTermsAccepted(true);
-      }
-  },[route.params])
+    if (route.params) {
+      setTermsAccepted(true);
+    }
+  }, [route.params])
   const handleScrollToError = (index) => {
     const errorRef = errorRefs.current[index];
     if (errorRef) {
@@ -367,7 +367,11 @@ const SignupScreen = () => {
               tintColors={{ true: config.secondaryColor }}
             />
 
-            <Text style={styles.textt}>I accept the </Text><Text onPress={() => { navigation.navigate("TermsAndConditions") }} style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
+            <Text style={styles.textt}>I accept the </Text><Text onPress={() => {
+              navigation.navigate('TermsAndConditions', {
+                setTermsAccepted: setTermsAccepted,
+              });
+            }} style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
           </View>
           <TouchableOpacity
             style={[termsAccepted ? { backgroundColor: config.secondaryColor } : { backgroundColor: 'rgba(0,0,0,0)' },

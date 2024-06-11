@@ -27,7 +27,7 @@ const ProfileAndHealth = ({ route }) => {
                         <CircularProgressBase
                             {...props}
                             value={healthInfo === false ? 30 : 100}
-                            radius={53}
+                            radius={52}
                             activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
                             inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
                         />
@@ -55,7 +55,6 @@ const ProfileAndHealth = ({ route }) => {
                                         <Text style={styles.complete}>Profile Complete 100%</Text>
                                     </>
                             }
-
                         </View>
                     </View>
                 </View>
@@ -94,7 +93,6 @@ const ProfileAndHealth = ({ route }) => {
                                         </>
                                 }
                             </View>
-
                             <Text style={styles.TLHeading}>Descrbe your health status and sync your data with health apps you already use.</Text>
                         </View>
                     </TouchableOpacity>
@@ -108,7 +106,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         flex: 1,
-        // justifyContent:'center',
     },
     ProfilesContainer: {
         gap: 20,

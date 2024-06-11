@@ -10,6 +10,7 @@ import ValidationError from '../components/ValidationError';
 import OtpInput from '../components/OTPInput';
 import Snackbar from '../components/Snackbar';
 import Svg, { Path } from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import qs from 'qs';
 const ForgotPassword = () => {
   const navigation = useNavigation();
@@ -140,8 +141,9 @@ const ForgotPassword = () => {
     axios.request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
-        setShowLoader(false);
-        navigation.navigate("Dashboard");
+        getDetails();
+        // setShowLoader(false);
+        // navigation.navigate("Dashboard");
       })
       .catch((error) => {
         setShowLoader(false);
@@ -149,25 +151,53 @@ const ForgotPassword = () => {
         navigation.goBack();
         console.log(error);
       });
-
   }
-  function validatePassword(password) {
-    const letterRegex = /[a-zA-Z]/;
-    const digitRegex = /\d/;
+  const getDetails = async () => {
+    let data = qs.stringify({
+      'grant_type': 'password',
+      'username': username,
+      'password': password
+    });
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://api-patient-dev.easy-health.app/o/token/',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
+      },
+      data: data
+    };
+    try {
+      const response = await axios.request(config);
+      await AsyncStorage.setItem('loginResponse', JSON.stringify(response.data));
+      await saveLoginDetails();
+      setShowLoader(false);
+      navigation.navigate("Dashboard");
 
-    if (password.length < 5) {
-      console.log("count error");
-      return false;
+    } catch (error) {
+      setShowLoader(false);
+      handleShowSnackbar("Invalid username or password");
+      console.log(error);
     }
-    const containsLetter = letterRegex.test(password);
-    const containsDigit = digitRegex.test(password);
-    if (!containsLetter || !containsDigit) {
-      console.log("letter d error");
-      return false;
-    }
-    return true;
   }
 
+  const saveLoginDetails = async () => {
+    try {
+      // Construct an object containing login details
+      const loginDetails = {
+        email: username,
+        password: password
+      };
+
+      const jsonLoginDetails = JSON.stringify(loginDetails);
+
+      await AsyncStorage.setItem('loginDetails', jsonLoginDetails);
+
+    } catch (error) {
+      console.error('Error saving login details:', error);
+    }
+  };
   const VerifyOTP = () => {
     let data = qs.stringify({
       'email': username,

@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         padding: 12,
         width: '90%',
         alignSelf: 'center',
-        borderBottomWidth: 0.2,
+        borderBottomWidth: 1,
         borderBottomColor: config.primaryColor,
     },
     head: {

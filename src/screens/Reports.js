@@ -24,7 +24,7 @@ const Reports = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const scrollViewRef = useRef();
-
+    
     return (
         <>
             <View style={styles.container}>

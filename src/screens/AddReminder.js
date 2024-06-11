@@ -56,7 +56,7 @@ const AddReminder = ({ route }) => {
     const [frequencyError, setFrequencyError] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
-    const [isNotify, setIsNotify] = useState(false);
+    const [isNotify, setIsNotify] = useState(true);
     const [priority, setPriority] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [freNumber, setFreNumber] = useState('');
@@ -88,6 +88,7 @@ const AddReminder = ({ route }) => {
             useNativeDriver: false,
         }).start();
     };
+
     let formattedDate = '';
     if (date) {
         const year = date.getFullYear();
@@ -201,7 +202,7 @@ const AddReminder = ({ route }) => {
                 data.append('dosage', dose);
                 data.append('number_of_days', days);
                 data.append('frequency', freNumber);
-                data.append('days_of_the_week', `${freNumber},${duration}`);
+                data.append('days_of_the_week', `${selectedDays},${duration}`);
                 data.append('st_notification', !isNotify ? 0 : 1);
                 data.append('st_critical', !priority ? 0 : 1);
                 data.append('default_icon', selectedImage)
@@ -243,7 +244,7 @@ const AddReminder = ({ route }) => {
         data.append('dosage', dose);
         data.append('number_of_days', days);
         data.append('frequency', freNumber);
-        data.append('days_of_the_week', '4,7,5');
+        data.append('days_of_the_week', `${selectedDays},${duration}`);
         data.append('st_notification', !isNotify ? 0 : 1);
         data.append('st_critical', !priority ? 0 : 1);
         data.append('start_time', `${Newdate} ${Newtime}`);

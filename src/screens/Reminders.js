@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         padding: 12,
         width: '90%',
         alignSelf: 'center',
-        borderBottomWidth: 0.2,
+        borderBottomWidth: 0.40,
         borderBottomColor: config.primaryColor,
     },
     textContainer: {

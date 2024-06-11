@@ -96,7 +96,7 @@ const UpdateReminder = ({ route }) => {
     const handleSelect = (item) => {
         setSelectedDays(item.value);
         setIsOpen(false);
-        setPlaceholderVisible(false);
+        // setPlaceholderVisible(false);
         Animated.timing(placeholderLabelAnim, {
             toValue: 1,
             duration: 400,
@@ -144,7 +144,7 @@ const UpdateReminder = ({ route }) => {
                         if (imageUpdate == "true") {
                             updateMedicineById(response.data[i].picture_link);
                         }
-                        // console.log(response.data[i]);
+                        console.log(response.data[i]);
                         setMedicineName(response.data[i].name);
                         setDose(response.data[i].dosage);
                         const days = response.data[i].number_of_days;
@@ -167,8 +167,21 @@ const UpdateReminder = ({ route }) => {
                         setFreNumber(response.data[i].frequency);
                         setMedImage(response.data[i].picture_link);
                         setDefaultIcon(response.data[i].default_icon);
-                        // console.log(response.data[i]);
-                        setDuration("hour");
+                        const data = response.data[i].days_of_the_week;
+
+                        const [theDay, duration] = data.split(',');
+                        setSelectedDays(theDay)
+                        setDuration(duration);
+                        
+                        console.log(response.data[i]);
+                        setIsOpen(false);
+                        // setPlaceholderVisible(false);
+                        Animated.timing(placeholderLabelAnim, {
+                            toValue: 1,
+                            duration: 400,
+                            useNativeDriver: false,
+                        }).start();
+                        // setDuration("hour");
                         if (response.data[i].st_notification == '1') {
                             setIsNotify(true);
                         }
@@ -344,7 +357,7 @@ const UpdateReminder = ({ route }) => {
             data.append('start_time', `${Newdate} ${Newtime}`);
         }
 
-        data.append('days_of_the_week', '4,7,5');
+        data.append('days_of_the_week', `${selectedDays},${duration}`);
         data.append('st_notification', !isNotify ? 0 : 1);
         data.append('st_critical', !priority ? 0 : 1);
         data.append('name', MedicineName);
@@ -549,7 +562,7 @@ const UpdateReminder = ({ route }) => {
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Update Reminder"} />
-                <TouchableOpacity onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })} style={styles.medicineContiner}>
+                <TouchableOpacity activeOpacity={1}  onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })} style={styles.medicineContiner}>
                     {
                         selectedImage || default_icon ?
                             renderImage()
@@ -559,7 +572,9 @@ const UpdateReminder = ({ route }) => {
                     }
 
                 </TouchableOpacity>
+                <TouchableWithoutFeedback onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })}>
                 <Text style={styles.EditImage}>Edit Image</Text>
+                </TouchableWithoutFeedback>    
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
                         <View
@@ -824,7 +839,7 @@ const UpdateReminder = ({ route }) => {
                         </View>
                         <View style={{ width: '95%', marginTop: 25, marginBottom: 50, }}>
                             <Image source={deleteIcon} style={styles.deleteIcon} />
-                            <CustomizedButton onPress={() => handleDelete()} buttonColor={"white"} borderColor={"#a70000"} textColor={"#a70000"} text={"Switch off"} />
+                            <CustomizedButton onPress={() => handleDelete()} buttonColor={"white"} borderColor={"#a70000"} textColor={"#a70000"} text={"Delete"} />
                         </View>
                     </View>
                 </ScrollView>

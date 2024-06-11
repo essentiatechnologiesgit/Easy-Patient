@@ -32,7 +32,7 @@ const MealPlansView = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"View Diet Plans"} />
+                <BackHeader name={"View Meal Plans"} />
                 <TouchableOpacity onPress={() => ToggleDropDown()} style={styles.dotsContainer}>
                     <View style={styles.dot}></View>
                     <View style={styles.dot}></View>

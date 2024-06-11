@@ -15,7 +15,7 @@ const MealPlansArchive = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Diet Plans Archive"} />
+                <BackHeader name={"Meal Plans Archive"} />
                 <ScrollView>
                     <MealArchiveContainer />
                 </ScrollView>

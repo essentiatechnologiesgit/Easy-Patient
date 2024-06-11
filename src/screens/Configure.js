@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated,Alert, StyleSheet, Switch, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, Alert, StyleSheet, Switch, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import { Linking, Platform } from 'react-native';
-import notifee, { AndroidImportance,AndroidBadgeIconType  } from '@notifee/react-native';
+import notifee, { AndroidImportance, AndroidBadgeIconType } from '@notifee/react-native';
 
 const Configure = () => {
     const route = useRoute();
@@ -36,34 +36,34 @@ const Configure = () => {
             'Restrictions Detected',
             'To ensure notifications are delivered, please disable battery optimization for the app.',
             [
-              // 3. launch intent to navigate the user to the appropriate screen
-              {
-                text: 'OK, open settings',
-                onPress: async () => await notifee.openBatteryOptimizationSettings(),
-              },
-              {
-                text: "Cancel",
-                onPress: () => console.log("Cancel Pressed"),
-                style: "cancel"
-              },
+                // 3. launch intent to navigate the user to the appropriate screen
+                {
+                    text: 'OK, open settings',
+                    onPress: async () => await notifee.openBatteryOptimizationSettings(),
+                },
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
             ],
             { cancelable: false }
-          );
+        );
     };
     const AppearOnTop = () => {
-            let settingsURL;
+        let settingsURL;
 
-            if (Platform.OS === 'android') {
-                settingsURL = 'package:' + 'your.package.name' + '/notification';
-            } else if (Platform.OS === 'ios') {
-                settingsURL = 'app-settings:';
-            }
+        if (Platform.OS === 'android') {
+            settingsURL = 'package:' + 'your.package.name' + '/notification';
+        } else if (Platform.OS === 'ios') {
+            settingsURL = 'app-settings:';
+        }
 
-            if (settingsURL) {
-                Linking.openSettings();
-            } else {
-                console.error('Settings URL not supported on this platform');
-            }
+        if (settingsURL) {
+            Linking.openSettings();
+        } else {
+            console.error('Settings URL not supported on this platform');
+        }
     }
     const toggleSwitch = async (number) => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -191,7 +191,7 @@ const Configure = () => {
                     <Text style={styles.mainText}>Allow the app to run in the background</Text>
                 </View>
                 <View style={styles.configureSideContainer}>
-                    <Text style={styles.sideText}>To recieve notification on time , enable the permisison</Text>
+                    <Text style={styles.sideText}>To receive notification on time , enable the permission</Text>
                 </View>
                 <View style={styles.configureContainer}>
                     <Switch
@@ -203,7 +203,7 @@ const Configure = () => {
                     />
                     <Text style={styles.mainText}>Allow the app to enable FaceID/Fingerprint Authentication</Text>
                 </View>
-                <TouchableOpacity onPress={() => { navigation.navigate("TermsAndConditions") }} style={styles.terms}><Text style={styles.termsText}>Terms & Conditions</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => { navigation.navigate("TermsAndConditions", { isConfigure: true }) }} style={styles.terms}><Text style={styles.termsText}>Terms & Conditions</Text></TouchableOpacity>
                 <TouchableOpacity onPress={() => { deletAccount() }} style={styles.delete}><Text style={styles.deleteText}>Delete Account</Text></TouchableOpacity>
             </View>
         </>

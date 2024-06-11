@@ -15,7 +15,7 @@ const MealPlans = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Diet Plans"} />
+                <BackHeader name={"Meal Plans"} />
                 <TouchableOpacity onPress={()=>navigation.navigate("MealPlansArchive")} style={styles.touch}>
                     <Image source={archive} style={styles.archiveIcon} />
                 </TouchableOpacity>

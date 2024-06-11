@@ -15,7 +15,7 @@ const BackgroundService = () => {
 
   BackgroundTimer.start();
   BackgroundTimer.runBackgroundTimer(async () => {
-    console.log("The time when function called", moment());
+    // console.log("The time when function called", moment());
     try {
       const currentTime = moment().format('YYYY-MM-DD HH:mm');
       const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
@@ -25,7 +25,7 @@ const BackgroundService = () => {
           times.forEach(timeObj => {
             const { time } = timeObj;
             if (time === currentTime) {
-              console.log("Alarm Time and Curr Time", time, currentTime);
+              // console.log("Alarm Time and Curr Time", time, currentTime);
               displayNotifications(dosage, medicine, picture_link, selectedImage);
             }
           });

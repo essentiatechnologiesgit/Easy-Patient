@@ -153,7 +153,7 @@ const SideBar = () => {
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("FoodDiary")} style={styles.appointments}>
+                    {/* <TouchableOpacity onPress={() => navigation.navigate("FoodDiary")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={fileEditWhite} style={styles.fileEdit}></Image>
                             <Text style={styles.sideText}>Food Diary</Text>
@@ -166,7 +166,7 @@ const SideBar = () => {
                             <Text style={styles.sideText}>Anamnesis</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </ScrollView>
             <View style={[styles.horizontalLine, { marginBottom: 5, marginTop: 10, }]}></View>

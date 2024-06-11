@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     container: {
         padding: 10,
         borderBottomColor: 'grey',
-        borderBottomWidth: 0.5,
+        borderBottomWidth: 1,
         width: '90%',
         alignSelf: 'center',
     },

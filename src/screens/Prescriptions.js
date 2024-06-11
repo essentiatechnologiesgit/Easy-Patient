@@ -31,7 +31,7 @@ const Prescriptions = () => {
                     <Image source={archive} style={styles.archiveIcon} />
                 </TouchableOpacity>
                 <ScrollView>
-                    <PrescriptionContainer />
+                    {/* <PrescriptionContainer /> */}
                 </ScrollView>
             </View>
         </>

@@ -45,18 +45,60 @@ const HealthInformation = () => {
     const [dataId, setDataId] = useState('');
     const [bloodPressure, setBloodPressure] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [newHeight , setNewHeight] = useState('');
+
+
     useEffect(() => {
+
         configureGoogleSignIn();
         googleLogin();
+        saveData();
+        getWeights();
 
-        const fetchData = async () => {
-            const access_token = await getAccessToken();
-            await getData(access_token);
-        };
+        // const fetchData = async () => {
+        //     const access_token = await getAccessToken();
+        //     await getData(access_token);
+        // };
 
-        fetchData();
+        // if(!heartRate.length>0 || !height.length>0 || !weight.length>0 || !steps.length>0 || !heartRate.length>0|| !bloodPressure.length>0){
+        //    fetchData();
+        // }
 
     }, []);
+
+    const saveData = async () => {
+        // const opt = {
+        //     value: 200,
+        //     date: new Date().toISOString(),
+        //     unit: "pound"
+        //   };
+
+        //   GoogleFit.saveWeight(opt, (err, res) => {
+        //     if (err) throw "Cant save data to the Google Fit";
+        //     console.log("result",res);
+        //   });
+        //   const weightSamples = await GoogleFit.getWeightSamples(opt);
+        //   console.log(weightSamples);
+
+        // const heightInMeters = 1.80; // Replace with your user's height in meters
+
+        // const opt = {
+        //   value: heightInMeters,
+        //   date: new Date().toISOString(),// Start time of the height measurement (optional)
+        // };
+
+        // GoogleFit.saveHeight(opt, (err, res) => {
+        //   if (err) {
+        //     console.error("Error saving height data:", err);
+        //   } else {
+        //     console.log("Height data saved successfully:", res);
+        //   }
+        //   console.log(res);
+        // });
+   
+    
+
+    }
 
 
     const configureGoogleSignIn = async () => {
@@ -114,7 +156,7 @@ const HealthInformation = () => {
             }
         }
     }
-
+  
     const getData = async (access_token) => {
         let config = {
             method: 'get',
@@ -180,47 +222,47 @@ const HealthInformation = () => {
             })
             .catch((error) => {
                 console.log(error);
-            }).finally(()=>{
+            }).finally(() => {
                 navigation.goBack();
             });
     }
 
-    // const getAuthorization = () => {
-    //     const options = {
-    //         scopes: [
-    //             Scopes.FITNESS_ACTIVITY_READ,
-    //             Scopes.FITNESS_ACTIVITY_WRITE,
-    //             Scopes.FITNESS_BODY_READ,
-    //             Scopes.FITNESS_BODY_WRITE,
-    //             Scopes.FITNESS_BLOOD_PRESSURE_READ,
-    //             Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
-    //             Scopes.FITNESS_BLOOD_GLUCOSE_READ,
-    //             Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
-    //             Scopes.FITNESS_NUTRITION_WRITE,
-    //             Scopes.FITNESS_SLEEP_READ,
-    //         ],
-    //     };
-    //     GoogleFit.checkIsAuthorized().then(() => {
-    //         var authorized = GoogleFit.isAuthorized;
-    //         // console.log(authorized);
-    //         if (authorized) {
-    //             // console.log("get Authorized")
-    //         } else {
-    //             GoogleFit.authorize(options)
-    //                 .then(authResult => {
-    //                     if (authResult.success) {
-    //                         console.log('AUTH_SUCCESS');
-    //                     } else {
-    //                         console.log('AUTH_DENIED ' + authResult.message);
-    //                     }
-    //                 })
-    //                 .catch(() => {
-    //                     dispatch('AUTH_ERROR');
-    //                 });
-    //         }
-    //     });
+    const getAuthorization = () => {
+        const options = {
+            scopes: [
+                Scopes.FITNESS_ACTIVITY_READ,
+                Scopes.FITNESS_ACTIVITY_WRITE,
+                Scopes.FITNESS_BODY_READ,
+                Scopes.FITNESS_BODY_WRITE,
+                Scopes.FITNESS_BLOOD_PRESSURE_READ,
+                Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
+                Scopes.FITNESS_BLOOD_GLUCOSE_READ,
+                Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
+                Scopes.FITNESS_NUTRITION_WRITE,
+                Scopes.FITNESS_SLEEP_READ,
+            ],
+        };
+        GoogleFit.checkIsAuthorized().then(() => {
+            var authorized = GoogleFit.isAuthorized;
+            // console.log(authorized);
+            if (authorized) {
+                // console.log("get Authorized")
+            } else {
+                GoogleFit.authorize(options)
+                    .then(authResult => {
+                        if (authResult.success) {
+                            console.log('AUTH_SUCCESS');
+                        } else {
+                            console.log('AUTH_DENIED ' + authResult.message);
+                        }
+                    })
+                    .catch(() => {
+                        dispatch('AUTH_ERROR');
+                    });
+            }
+        });
 
-    // }
+    }
 
     async function handleGoogleFitAuthorization(selectedAccount) {
         if (!selectedAccount) {
@@ -237,33 +279,14 @@ const HealthInformation = () => {
                 scopes: [/* Your Scopes here */],
             });
             if (authResult.success) {
-                // getFitData();
-                getSteps();
+                   await getWeights();
+                // getSteps();
             } else {
                 console.log("Authorization failed:", authResult.message);
             }
         }
     }
 
-    const getFitData = async () => {
-        const opt = {
-            unit: "pound", // required; default 'kg'
-            startDate: new Date().toString(), // required
-            endDate: new Date().toISOString(), // required
-            // bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
-            bucketInterval: 1, // optional - default 1. 
-            ascending: false // optional; default false
-        };
-
-        GoogleFit.getActivitySamples(opt).then((res) => {
-            console.log(res)
-        });
-        // or with async/await syntax
-        async function fetchData() {
-            const res = await GoogleFit.getActivitySamples(opt);
-            console.log(res);
-        }
-    };
 
     const handleSync = async () => {
         await GoogleSignin.signOut();
@@ -274,84 +297,59 @@ const HealthInformation = () => {
             const access_token = await getAccessToken();
 
             await getData(access_token);
-
         };
 
         fetchData();
     }
 
-    const getSteps = () => {
-        const opt = {
-            startDate: new Date().toString(), // required ISO8601Timestamp
-            endDate: new Date().toISOString(), // required ISO8601Timestamp
-            // bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
-            bucketInterval: 1, // optional - default 1. 
-        };
-
-        GoogleFit.getDailyStepCountSamples(opt)
-            .then((res) => {
-                console.log('Daily steps >>> ', GoogleFit.openFit)
-            })
-            .catch((err) => { console.warn(err) });
-
-        // or with async/await syntax
-        async function fetchData() {
-            const res = await GoogleFit.getDailyStepCountSamples(opt);
-        }
-
-        // shortcut functions, 
-        // return weekly or daily steps of given date
-        // all params are optional, using new Date() without given date, 
-        // adjustment is 0 by default, determine the first day of week, 0 == Sunday, 1==Monday, etc.
-        //   GoogleFit.getDailySteps(date).then().catch()
-        //   GoogleFit.getWeeklySteps(date, adjustment).then().catch()
-    }
-
     const getWeights = async () => {
         const opt = {
-            unit: "pound", // required; default 'kg'
-            startDate: new Date().toString(), // required
-            endDate: new Date().toISOString(), // required
-            // bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
-            bucketInterval: 1, // optional - default 1. 
-            ascending: false // optional; default false
+
+            date: new Date().toISOString(),
+            unit: "pound"
         };
 
-        // GoogleFit.getWeightSamples(opt).then((res) => {
-        //     console.log("Weights", res)
-        // });
+        try {
+            const weightSamples = await GoogleFit.getWeightSamples(opt);
+            // console.log("Weights", weightSamples[0].value);
+            if (weightSamples.length > 0) {
+                setWeight(String(weightSamples[0].value));
+            }
 
-        // GoogleFit.getDailyStepCountSamples(opt)
-        //     .then((res) => {
-        //         console.log('Daily steps >>> ', res)
-        //     })
-        //     .catch((err) => { console.warn(err) });
+            
 
-        // GoogleFit.getHeightSamples(opt).then((res) => {
-        //     console.log("Heights", res);
-        // });
+            const heightSamples = await GoogleFit.getHeightSamples(opt);
+            // console.log("Heights", heightSamples);
+            if (heightSamples.length > 0)
+                setHeight(String(heightSamples[0].value));
 
-        // const heartrate = await GoogleFit.getHeartRateSamples(opt);
-        //     console.log("Heart rate",heartrate);
-        // // or with async/await syntax
-        // async function fetchData() {
-        //     const res = await GoogleFit.getWeightSamples(opt);
-        //     console.log(res);
-        // }
+            const activeMinutes = await GoogleFit.getMoveMinutes(opt);
+            // console.log("Active Minutes ",activeMinutes);
+            if (activeMinutes.length > 0)
+                setMovementTime(String(activeMinutes[0].duration));
 
-        GoogleFit.getActivitySamples(opt).then((res) => {
-            console.log(res)
-        });
-        // or with async/await syntax
-        async function fetchData() {
-            const res = await GoogleFit.getActivitySamples(opt);
-            console.log(res);
+            const stepCountSamples = await GoogleFit.getDailyStepCountSamples(opt);
+            // console.log('Daily steps >>> ', stepCountSamples[0].steps);
+            if (stepCountSamples[0].steps.length > 0)
+                setSteps(String(stepCountSamples[0].steps));
+            // console.log("stepCountSamples",stepCountSamples[0].steps.length)
+
+            const heartRateSamples = await GoogleFit.getHeartRateSamples(opt);
+            // console.log("Heart rate", heartRateSamples);
+            if (heartRateSamples.length > 0)
+                setHeartRate(String(heartRateSamples[0].value));
+
+
+
+        } catch (err) {
+            console.warn(err);
         }
     }
+
+
 
 
     const SaveData = () => {
-        console.log("In save");
         let data = JSON.stringify({
             "height": height,
             "weight": weight,
@@ -362,7 +360,7 @@ const HealthInformation = () => {
             "stand_hours": waiting,
             "active_energy": energy,
             "resting_energy": resting,
-            "blood_pressure" : bloodPressure,
+            "blood_pressure": bloodPressure,
             "is_smoker": 1
         });
 
@@ -383,7 +381,7 @@ const HealthInformation = () => {
             })
             .catch((error) => {
                 console.log(error);
-            }).finally(()=>{
+            }).finally(() => {
                 navigation.goBack();
             });
     }

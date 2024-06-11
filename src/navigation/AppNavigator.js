@@ -64,11 +64,11 @@ const AppNavigator = () => {
         }}>
         {/* <Stack.Screen style={styles.container} name="Biometric" component={Biometric} /> */}
         {/* <Stack.Screen style={styles.container} name="BackgroundServices" component={BackgroundServices} />   */}
-        {/* <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
+        <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
         <Stack.Screen style={styles.container} name="Login" component={Login} />
         <Stack.Screen style={styles.container} name="PatternAuth" component={PatternAuth} />
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
-        <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} /> */}
+        <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen style={styles.container} name="Dashboard" component={Dashboard} />
         <Stack.Screen style={styles.container} name="ProfileAndHealth" component={ProfileAndHealth} />
         <Stack.Screen style={styles.container} name="Profile" component={Profile} />

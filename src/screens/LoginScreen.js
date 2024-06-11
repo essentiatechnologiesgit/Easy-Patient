@@ -1,19 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity,BackHandler,Alert } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import AlertIcon from '../components/AlertIcon';
 import ValidationError from '../components/ValidationError';
 import Snackbar from '../components/Snackbar';
-import EmailIcon from '../assets/email.svg';
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import CustomButton from '../components/CustomizedButton';
 import FingerPrint from '../components/FingerAuth';
 import qs from 'qs';
-import PatternAuth from '../components/PatternAuth';
-import { stat } from 'react-native-fs';
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState('');
@@ -31,7 +28,6 @@ const LoginScreen = () => {
   const [showFingerAuth, setShowFingerAuth] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [showPattern, setShowPattern] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const handleLogin = () => {
     setUsernameError(false);
@@ -106,7 +102,6 @@ const LoginScreen = () => {
 
       await AsyncStorage.setItem('loginDetails', jsonLoginDetails);
 
-      console.log('Login details saved successfully.');
     } catch (error) {
       console.error('Error saving login details:', error);
     }
@@ -144,6 +139,35 @@ const LoginScreen = () => {
     getFunction()
   }, [])
 
+  const [backPressedOnce, setBackPressedOnce] = useState(false);
+  const backPressedOnceRef = useRef(backPressedOnce);
+
+  useEffect(() => {
+      backPressedOnceRef.current = backPressedOnce;
+  }, [backPressedOnce]);
+
+  useEffect(() => {
+    const backAction = () => {
+        if (backPressedOnceRef.current) {
+            BackHandler.exitApp();
+        } else {
+            setBackPressedOnce(true);
+            handleShowSnackbar("Press Back again to exit");
+
+            setTimeout(() => {
+                setBackPressedOnce(false);
+            }, 2000); // Reset after 2 seconds
+        }
+        return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+    );
+
+    return () => backHandler.remove();
+}, []);
 
 
   const handleEmailFocus = () => {

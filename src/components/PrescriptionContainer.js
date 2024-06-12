@@ -1,27 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
 import { TouchableOpacity } from 'react-native';
-const PrescriptionContainer = () => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import showIcon from '../assets/showIcon.png';
+const PrescriptionContainer = ({ record, isArchived ,isHide,isShow}) => {
     const navigation = useNavigation();
+
+    useEffect(()=>{
+        if(isHide)
+           handleHide();
+    },[isHide])
+
+    useEffect(()=>{
+        
+        if(isShow)
+           handleShow();
+    },[isShow])
+
+    const handleShow = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/prescriptions/available/${record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate('Prescriptions');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const handleHide = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/prescriptions/archive/${record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate('PrescriptionsArchive');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+    }
+
     return (
         <>
-            <TouchableWithoutFeedback onPress={() => navigation.navigate("PrescriptionsView")}>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('PrescriptionsView', { record: record, isArchived,isArchived })}>
                 <View style={styles.container}>
-                    <Text style={styles.headings}>Medicines / Manipulated</Text>
-                    <Text style={styles.subHeadings}>Recieved 05/06/21</Text>
-                    <Text style={styles.text}>Florianopolis Clinic</Text>
-                    <Text style={styles.text}>Dr Jose Paulo Fontes</Text>
-                    <View style={styles.hideContainer}>
-                        <Image source={archiveGold} style={styles.archiveIcon} />
-                        <Text style={styles.hide}>hide</Text>
-                    </View>
-                    <View style={styles.NewContainer}>
-                        <Text style={styles.New}>New</Text>
-                    </View>
+                    <Text style={styles.headings}>{record.type}</Text>
+                    <Text style={styles.subHeadings}>Recieved {record.title}</Text>
+                    <Text style={styles.text}>{record.specialist}</Text>
+                    <Text style={styles.text}>{record.clinic_name}</Text>
+                    {
+                        !isArchived ?
+                            <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
+                                <Image source={archiveGold} style={styles.archiveIcon} />
+                                <Text style={styles.hide}>hide</Text>
+                            </TouchableOpacity> :
+
+                            <TouchableOpacity style={styles.hideContainer} onPress={() => handleShow()}>
+                                <Image source={showIcon} style={styles.showIcon} />
+                                <Text style={styles.hide}>Show</Text>
+                            </TouchableOpacity>
+                    }
+                    {
+                        record.is_new &&
+                        <View style={styles.NewContainer}>
+                            <Text style={styles.New}>New</Text>
+                        </View>
+                    }
                     <Image source={arrow} style={styles.arrowLogo} />
                 </View>
             </TouchableWithoutFeedback>
@@ -34,8 +107,12 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomColor: 'grey',
         borderBottomWidth: 1,
-        width: '90%',
+        width: '93%',
         alignSelf: 'center',
+    },
+    showIcon: {
+        height: 16,
+        width: 14,
     },
     NewContainer: {
         height: 25,
@@ -47,6 +124,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#B8E0C3',
+    },
+    hideContainer: {
+        flexDirection: 'row',
+        borderWidth: 1,
+        borderColor: config.secondaryColor,
+        height: 25,
+        width: 62,
+        gap: 3,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 14,
+        marginTop: 5,
+    },
+    hide: {
+        color: config.secondaryColor,
+        fontSize: PixelRatio.getFontScale() * 12,
     },
     New: {
         color: '#146229',
@@ -60,8 +153,8 @@ const styles = StyleSheet.create({
         right: 0, // Position the arrow to the right
     },
     archiveIcon: {
-        height: 15,
-        width: 15,
+        height: 15.5,
+        width: 13,
     },
     headings: {
         color: config.textColorHeadings,
@@ -69,16 +162,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     hideContainer: {
-        flexDirection:'row',
+        flexDirection: 'row',
         borderWidth: 1,
         borderColor: config.secondaryColor,
         height: 25,
-        gap:3,
-        width: 60,
+        gap: 3,
+        width: 55,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,
-        marginTop:3,
+        marginTop: 3,
     },
     hide: {
         color: config.secondaryColor,
@@ -90,7 +183,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     text: {
-        color: config.textColorHeadings,
+        color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 16,
     },
 });

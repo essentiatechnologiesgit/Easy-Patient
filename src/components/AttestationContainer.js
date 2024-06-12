@@ -45,8 +45,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#B8E0C3',
     },
     archiveIcon: {
-        height: 15,
-        width: 15,
+        height: 15.5,
+        width: 13,
     },
     New: {
         color: '#146229',

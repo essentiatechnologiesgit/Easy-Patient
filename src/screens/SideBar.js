@@ -15,7 +15,8 @@ import HomeWhite from '../assets/homeWhite.png';
 import pen from '../assets/pen.png';
 import EmailIcon from '../assets/EmailIcon.png';
 import fileEditWhite from '../assets/fileEditWhite.png';
-
+import Exam from '../assets/exam.png';
+import Attestations from '../assets/attestations.png';
 import fileWhite from '../assets/fileWhite.png';
 import ConfirmationModal from '../components/ConfirmationModal';
 import configure from '../assets/configureWhite.png';
@@ -104,7 +105,7 @@ const SideBar = () => {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("ExamRequest")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={fileWhite} style={styles.file}></Image>
+                            <Image source={Exam} style={styles.file}></Image>
                             <Text style={styles.sideText}>Exam Request</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
@@ -119,7 +120,7 @@ const SideBar = () => {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Appointments")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={calendar} style={styles.calendar}></Image>
+                            <Image source={calendar} style={styles.calendar2}></Image>
                             <Text style={styles.sideText}>Appointments</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
@@ -141,14 +142,14 @@ const SideBar = () => {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Reports")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={calendar} style={styles.calendar}></Image>
+                            <Image source={Exam} style={styles.calendar}></Image>
                             <Text style={styles.sideText}>Reports</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Attestations")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={fileEditWhite} style={styles.fileEdit}></Image>
+                            <Image source={Attestations} style={styles.fileEdit}></Image>
                             <Text style={styles.sideText}>Attestations/Declarations</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
@@ -228,8 +229,8 @@ const styles = StyleSheet.create({
         width: 20,
     },
     fileEdit: {
-        height: 27,
-        width: 24,
+        height: 23,
+        width: 18,
     },
     jar: {
         height: 25,
@@ -240,8 +241,12 @@ const styles = StyleSheet.create({
         width: 24,
     },
     calendar: {
-        height: 22,
-        width: 20,
+        height: 23,
+        width: 18,
+    },
+    calendar2: {
+        height: 23,
+        width: 21,
     },
     sideText: {
         fontSize: PixelRatio.getFontScale() * 18,

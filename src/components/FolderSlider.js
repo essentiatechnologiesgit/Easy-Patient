@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Dimensions, Image, StyleSheet, PixelRatio, ScrollView } from 'react-native';
 import Modal from "react-native-modal";
 import fork from '../assets/fork.png';
@@ -11,9 +11,49 @@ import { useNavigation } from "@react-navigation/native";
 import fileCapsule from '../assets/fileCapsule.png';
 import config from "../../config";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const FolderSlider = () => {
     const scrollViewRef = useRef(null);
     const navigation = useNavigation();
+    const [totalPrescriptions , setTotalPrescriptions ] = useState(0);
+    useEffect(() => {
+        getPrescriptionsCount();
+    }, [])
+
+    const getPrescriptionsCount = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+        let data = new FormData();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/prescriptions',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+            data: data
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                // Log the response data to the console
+                console.log(JSON.stringify(response.data));
+
+                // Calculate the total number of objects in the array
+                let totalNumberOfObjects = response.data.length;
+                // console.warn(totalNumberOfObjects);
+                setTotalPrescriptions(totalNumberOfObjects)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
     return (
         <>
             <Text style={styles.heading}>My Files</Text>
@@ -26,14 +66,14 @@ const FolderSlider = () => {
                 showsHorizontalScrollIndicator={false}
             >
                 <View style={styles.container}>
-                    
+
                     <TouchableOpacity onPress={() => navigation.navigate("Prescriptions")} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={fileCapsule} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{totalPrescriptions}  files</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.FolderContainer}>
@@ -51,7 +91,7 @@ const FolderSlider = () => {
                         <Image source={heartBeat} style={styles.heartlogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                            Exam Requests
+                                Exam Requests
                             </Text>
                             <Text style={styles.files}>0  files</Text>
                         </View>
@@ -84,7 +124,7 @@ const FolderSlider = () => {
                         <Image source={Scale} style={styles.Scale}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                            Body Assessments
+                                Body Assessments
                             </Text>
                             <Text style={styles.files}>0  files</Text>
                         </View>
@@ -95,7 +135,7 @@ const FolderSlider = () => {
                         <Image source={fileLife} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                            Reports
+                                Reports
                             </Text>
                             <Text style={styles.files}>0  files</Text>
                         </View>
@@ -106,7 +146,7 @@ const FolderSlider = () => {
                         <Image source={fileEdit} style={styles.fileEdit}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                            Attestations/Declarations
+                                Attestations/Declarations
                             </Text>
                             <Text style={styles.files}>0  files</Text>
                         </View>
@@ -160,15 +200,15 @@ const styles = StyleSheet.create({
         height: 25,
         width: 20,
         marginLeft: 10,
-      },
-      
+    },
+
     Scale: {
         top: -10,
         height: 26,
         width: 25,
         marginLeft: 10,
         transform: [{ rotate: '120deg' }],
-      
+
     },
     heartlogo: {
         top: -10,

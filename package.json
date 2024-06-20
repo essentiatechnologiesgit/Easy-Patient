@@ -34,6 +34,7 @@
     "react-native-background-timer": "^2.4.1",
     "react-native-battery-optimization-check": "^1.0.8",
     "react-native-biometrics": "^3.0.1",
+    "react-native-blob-util": "^0.19.9",
     "react-native-calendar-picker": "^8.0.1",
     "react-native-calendars": "^1.1304.1",
     "react-native-circular-progress-indicator": "^4.4.2",

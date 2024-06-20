@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity,Dimensions } from 'react-native';
+import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Dimensions } from 'react-native';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import greenProfile from '../assets/greenProfile.png';
@@ -9,6 +9,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import axios from 'axios';
 import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
+import Pdf from 'react-native-pdf';
 import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
@@ -35,10 +36,11 @@ const MealPlansView = () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
+
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
-            url: `https://api-patient-dev.easy-health.app/prescriptions/view/${record.id}`,
+            url: `https://api-patient-dev.easy-health.app/meal-plan/view/${record.doc_id}`,
             headers: {
                 'Authorization': `Bearer ${access_token}`
             }
@@ -51,6 +53,7 @@ const MealPlansView = () => {
             .catch((error) => {
                 console.log(error);
             });
+
     }
 
     const pdfUrl = record.file;
@@ -73,35 +76,37 @@ const MealPlansView = () => {
                 </TouchableOpacity>
                 <ScrollView style={styles.mailContainer}>
                     <Text style={styles.heading}>{record.title}</Text>
-                    <View style={styles.recievedCont}>
-                        <Image source={downArrow} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Received on: {record.title}</Text>
-                    </View>
-                    <View style={styles.specialistCont}>
-                        <Image source={greenProfile} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Specialist: {record.specialist}</Text>
+                    <View>
+                        <Text style={styles.doctor}>Dr.{record.specialist} at {record.date}</Text>
                     </View>
                     <View style={styles.pdfContainer}>
-                        {
+                        {/* {
                             googleDocsUrl && injectedJavaScript &&
                             <WebView
                                 source={{ uri: googleDocsUrl }}
-                                startInLoadingState={true}
+                                // startInLoadingState={true}
                                 style={styles.webview}
                                 scalesPageToFit={true}
-                                injectedJavaScript={injectedJavaScript}
+                                // injectedJavaScript={injectedJavaScript}
+                                cacheEnabled={true}
+                                cacheMode={'LOAD_CACHE_ELSE_NETWORK'} 
                             />
-                        }
+                        } */}
+                        <Pdf
+                            trustAllCerts={false}
+                            source={{ uri: record.file }}
+                            style={{ flex: 1, width: Dimensions.get('window').width }}
+                        />
                     </View>
                 </ScrollView>
                 {
                     isArchived ?
                         <>
-                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} title={"PrescriptionsArchive"} />}
+                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} record_id={record.doc_id} title={"MealPlansArchive"} />}
                         </>
                         :
                         <>
-                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} title={"Prescriptions"} />}
+                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} record_id={record.doc_id} title={"MealPlans"} />}
                         </>
                 }
             </View>
@@ -126,6 +131,10 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         fontWeight: 'bold',
     },
+    doctor:{
+        fontSize: PixelRatio.getFontScale() * 18,
+        color: config.primaryColor,
+   },
     subHeadings: {
         fontSize: PixelRatio.getFontScale() * 16,
         color: config.primaryColor,

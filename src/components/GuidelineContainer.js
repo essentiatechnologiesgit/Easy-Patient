@@ -1,23 +1,102 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
+import showIcon from '../assets/showIcon.png';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native';
-const GuidelineContainer = () => {
+const GuidelineContainer = ({ record, isArchived, isHide, isShow, record_id }) => {
     const navigation = useNavigation();
+
+    useEffect(() => {
+        if (isHide)
+            handleHide();
+    }, [isHide])
+
+    useEffect(() => {
+        if (isShow)
+            handleShow();
+    }, [isShow])
+
+
+    const handleShow = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/orientations/available/${record_id !== 0 ? record_id : record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate('Guidelines')
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const handleHide = async () => {
+
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+
+
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/orientations/archive/${record_id !== 0 ? record_id : record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate("GuidelinesArchive");
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+    }
     return (
         <>
-            <TouchableWithoutFeedback onPress={()=>navigation.navigate('GuidelinesView')}>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('GuidelinesView', { record: record, isArchived, isArchived })}>
                 <View style={styles.container}>
-                    <Text style={styles.headings}>Recieved 05/06/21</Text>
-                    <Text style={styles.text}>Florianopolis Clinic</Text>
-                    <Text style={styles.text}>Dr Jose Paulo Fontes</Text>
-                    <TouchableOpacity style={styles.hideContainer} onPress={() => navigation.navigate("GuidelinesArchive")}>
-                        <Image source={archiveGold} style={styles.archiveIcon} />
-                        <Text style={styles.hide}>hide</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.subHeadings}>Recieved {record.title}</Text>
+                    <Text style={styles.text}>{record.clinic_name}</Text>
+                    <Text style={styles.text2}>Dr. {record.specialist}</Text>
+                    {
+                        !isArchived ?
+                            <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
+                                <Image source={archiveGold} style={styles.archiveIcon} />
+                                <Text style={styles.hide}>hide</Text>
+                            </TouchableOpacity> :
+
+                            <TouchableOpacity style={styles.hideContainer} onPress={() => handleShow()}>
+                                <Image source={showIcon} style={styles.showIcon} />
+                                <Text style={styles.hide}>Show</Text>
+                            </TouchableOpacity>
+                    }
+                    {
+                        record.is_new &&
+                        <View style={styles.NewContainer}>
+                            <Text style={styles.New}>New</Text>
+                        </View>
+                    }
                     <Image source={arrow} style={styles.arrowLogo} />
                 </View>
             </TouchableWithoutFeedback>
@@ -32,6 +111,10 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         width: '90%',
         alignSelf: 'center',
+    },
+    showIcon: {
+        height: 16,
+        width: 14,
     },
     NewContainer: {
         height: 25,
@@ -56,7 +139,7 @@ const styles = StyleSheet.create({
         position: 'absolute', // Position the arrow absolutely
         height: 20,
         width: 13,
-        top: 40, // Adjust this value as needed
+        top: 50, // Adjust this value as needed
         right: 0, // Position the arrow to the right
     },
     headings: {
@@ -66,12 +149,11 @@ const styles = StyleSheet.create({
     },
     hideContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        gap: 3,
         borderWidth: 1,
         borderColor: config.secondaryColor,
         height: 25,
-        width: 60,
+        width: 62,
+        gap: 3,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,
@@ -88,6 +170,10 @@ const styles = StyleSheet.create({
     },
     text: {
         color: config.textColorHeadings,
+        fontSize: PixelRatio.getFontScale() * 16,
+    },
+    text2: {
+        color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 16,
     },
 });

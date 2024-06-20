@@ -5,18 +5,21 @@ import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
 import { TouchableOpacity } from 'react-native';
-const MealContainer = ({ record, isArchived ,isHide,isShow}) => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import showIcon from '../assets/showIcon.png';
+const MealContainer = ({ record, isArchived, isHide, isShow ,record_id}) => {
     const navigation = useNavigation();
 
-    useEffect(()=>{
-        if(isHide)
-           handleHide();
-    },[isHide])
+    useEffect(() => {
+        if (isHide)
+            handleHide();
+    }, [isHide])
 
-    useEffect(()=>{        
-        if(isShow)
-           handleShow();
-    },[isShow])
+    useEffect(() => {
+        if (isShow)
+            handleShow();
+    }, [isShow])
 
 
     const handleShow = async () => {
@@ -26,20 +29,22 @@ const MealContainer = ({ record, isArchived ,isHide,isShow}) => {
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
-            url: `https://api-patient-dev.easy-health.app/prescriptions/available/${record.id}`,
-            headers: {
-                'Authorization': `Bearer ${access_token}`
+            url: `https://api-patient-dev.easy-health.app/meal-plan/available/${record_id !== 0 ? record_id : record.doc_id}`,
+            headers: { 
+               'Authorization': `Bearer ${access_token}`
             }
-        };
+          };
+          
+          axios.request(config)
+          .then((response) => {
+            console.log(JSON.stringify(response.data));
+            navigation.navigate('MealPlans')
+          })
+          .catch((error) => {
+            console.log(error);
+          });
 
-        axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('Prescriptions');
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+
     }
 
     const handleHide = async () => {
@@ -49,7 +54,7 @@ const MealContainer = ({ record, isArchived ,isHide,isShow}) => {
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
-            url: `https://api-patient-dev.easy-health.app/prescriptions/archive/${record.id}`,
+            url: `https://api-patient-dev.easy-health.app/meal-plan/archive/${record_id !== 0 ? record_id : record.doc_id}`,
             headers: {
                 'Authorization': `Bearer ${access_token}`
             }
@@ -58,18 +63,17 @@ const MealContainer = ({ record, isArchived ,isHide,isShow}) => {
         axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
-                navigation.navigate('PrescriptionsArchive');
+                navigation.navigate('MealPlansArchive')
             })
             .catch((error) => {
                 console.log(error);
             });
-
     }
 
 
     return (
         <>
-            <TouchableWithoutFeedback onPress={() => navigation.navigate('MealPlansView', { record: record, isArchived,isArchived })}>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('MealPlansView', { record: record, isArchived, isArchived })}>
                 <View style={styles.container}>
                     <Text style={styles.subHeadings}>Recieved {record.title}</Text>
                     <Text style={styles.text}>{record.specialist}</Text>

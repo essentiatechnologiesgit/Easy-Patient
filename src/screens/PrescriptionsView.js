@@ -8,7 +8,8 @@ import PrescriptionDropDown from '../components/PrescriptionDropDown';
 import downArrow from '../assets/downArrow.png';
 import greenProfile from '../assets/greenProfile.png';
 import axios from 'axios';
-import { Pdf, PdfUtil } from 'react-native-pdf-light';
+import Pdf from 'react-native-pdf';
+
 const PrescriptionsView = () => {
     const route = useRoute();
     const { record, isArchived } = route.params;
@@ -64,16 +65,11 @@ const PrescriptionsView = () => {
                 </TouchableOpacity>
                 <ScrollView style={styles.mailContainer}>
                     <Text style={styles.heading}>{record.type}</Text>
-                    <View style={styles.recievedCont}>
-                        <Image source={downArrow} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Received on: {record.title}</Text>
-                    </View>
-                    <View style={styles.specialistCont}>
-                        <Image source={greenProfile} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Specialist: {record.specialist}</Text>
+                    <View>
+                        <Text style={styles.doctor}>Dr.{record.specialist} at {record.date}</Text>
                     </View>
                     <View style={styles.pdfContainer}>
-                        {
+                        {/* {
                             googleDocsUrl && injectedJavaScript &&
                             <WebView
                                 source={{ uri: googleDocsUrl }}
@@ -82,7 +78,12 @@ const PrescriptionsView = () => {
                                 scalesPageToFit={true}
                                 injectedJavaScript={injectedJavaScript}
                             />
-                        }
+                        } */}
+                        <Pdf
+                            trustAllCerts={false}
+                            source={{ uri: record.file }}
+                            style={{ flex: 1, width: Dimensions.get('window').width }}
+                        />
                     </View>
                 </ScrollView>
                 {
@@ -119,9 +120,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
+    doctor:{
+         fontSize: PixelRatio.getFontScale() * 18,
+         color: config.primaryColor,
+    },
     heading: {
         fontSize: PixelRatio.getFontScale() * 18,
-        color: config.textColorHeadings,
+        color: config.primaryColor,
         fontWeight: 'bold',
     },
     subHeadings: {

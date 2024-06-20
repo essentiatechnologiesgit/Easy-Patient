@@ -1,49 +1,128 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, StyleSheet, PermissionsAndroid, Image, PixelRatio, TouchableOpacity, Dimensions } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import greenProfile from '../assets/greenProfile.png';
 import downArrow from '../assets/downArrow.png';
+import { WebView } from 'react-native-webview';
 import { ScrollView } from 'react-native-gesture-handler';
+import Pdf from 'react-native-pdf';
 import BackHeader from '../components/backHeader';
 import PrescriptionDropDown from '../components/PrescriptionDropDown';
-
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const GuidelinesView = () => {
     const route = useRoute();
     const navigation = useNavigation();
+    const { record, isArchived } = route.params;
     const scrollViewRef = useRef();
     const [showDropDown, setShowDropDown] = useState(false);
 
     const ToggleDropDown = () => {
         setShowDropDown(!showDropDown);
     }
+
+    useEffect(() => {
+        if (record.is_new) {
+            updateRecord()
+        }
+    }, [])
+
+    const updateRecord = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/orientations/view/${record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const pdfUrl = record.file;
+    const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`;
+    const injectedJavaScript = `
+        const meta = document.createElement('meta');
+        meta.setAttribute('name', 'viewport');
+        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        document.getElementsByTagName('head')[0].appendChild(meta);
+    `;
+
+
+    const source = {
+        uri: 'https://s3.sa-east-1.amazonaws.com/easy-rx.com/uploads/161/plano_alimentar_simplificado/plano_alimentar_simplificado_1718107003153.7644_607_116.pdf',
+        cache: true,
+        type: 'application/pdf',
+    };
+
+    const requestPermissions = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.requestMultiple([
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                ]);
+
+                if (
+                    granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] !== PermissionsAndroid.RESULTS.GRANTED ||
+                    granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] !== PermissionsAndroid.RESULTS.GRANTED
+                ) {
+                    console.log('Permissions not granted');
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    };
+
+    React.useEffect(() => {
+        requestPermissions();
+    }, []);
+
     return (
         <>
             <View style={styles.container}>
                 <BackHeader name={"View Guidelines"} />
-                <TouchableOpacity onPress={() => ToggleDropDown()} style={styles.dotsContainer}>
+                <TouchableOpacity onPress={ToggleDropDown} style={styles.dotsContainer}>
                     <View style={styles.dot}></View>
                     <View style={styles.dot}></View>
                     <View style={styles.dot}></View>
                 </TouchableOpacity>
                 <ScrollView style={styles.mailContainer}>
-                    <Text style={styles.heading}>Medicine / Custom</Text>
-                    <View style={styles.recievedCont}>
-                        <Image source={downArrow} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Recieved on: 13/8/19</Text>
+                    <View>
+                        <Text style={styles.doctor}>Dr.{record.specialist} at {record.date}</Text>
                     </View>
-                    <View style={styles.specialistCont}>
-                        <Image source={greenProfile} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Specialist: Dr Ahmed</Text>
-                    </View>
-                    <View style={styles.paragraph}>
-                        <Text style={styles.para}>
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Why do we use it? It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose injected humour and the like.Where does it come from?Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" The Extremes of Good and Evil by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                        </Text>
+                    <View style={styles.pdfContainer}>
+                        <Pdf
+                            trustAllCerts={false}
+                            source={{ uri: record.file }}
+                            style={{ flex: 1, width: Dimensions.get('window').width }}
+                        />
                     </View>
                 </ScrollView>
-                {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown}/>}
+                {
+                    isArchived ?
+                        <>
+                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} record_id={record.id} title={"GuidelinesArchive"} />}
+                        </>
+                        :
+                        <>
+                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} record_id={record.id} title={"Guidelines"} />}
+                        </>
+                }
             </View>
         </>
     );
@@ -70,6 +149,15 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 16,
         color: config.primaryColor,
     },
+    pdfContainer: {
+        flex: 1,
+        height: Dimensions.get('window').height - 200, // Adjust to fit the height of your screen
+        marginTop: 20,
+    },
+    doctor:{
+        fontSize: PixelRatio.getFontScale() * 18,
+        color: config.primaryColor,
+   },
     dotsContainer: {
         flexDirection: 'column', // Align dots vertically
         justifyContent: 'space-between', // Distribute dots evenly
@@ -93,7 +181,7 @@ const styles = StyleSheet.create({
         color: config.primaryColor,
     },
     recievedCont: {
-        marginTop: 20,
+        marginTop: 10,
         gap: 6,
         flexDirection: 'row',
         alignItems: 'center',

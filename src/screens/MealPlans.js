@@ -9,10 +9,12 @@ import { touch } from 'react-native-fs';
 import ModalLoader from '../components/ModalLoader';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import GoldenCapsule from '../assets/goldenCapsule.png';
+import mealGolden from '../assets/mealGolden.png';
+import config from '../../config';
 const MealPlans = () => {
     const route = useRoute();
     const isHide = route?.params?.isHide ?? false;
+    const record_id = route?.params?.record_id ?? 0;
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [mealData, setMealData] = useState([]);
@@ -67,15 +69,15 @@ const MealPlans = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 mealData.map((record, index) => (
-                                    <MealContainer key={index} record={record} isHide={isHide} />
+                                    <MealContainer key={index} record={record} isHide={isHide} record_id={record_id} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>
                         </ScrollView>
                         :
                         <View style={styles.Empty}>
-                            <Image source={GoldenCapsule} style={styles.fileIcon} />
-                            <Text style={styles.emptyText}>You do not have any prescriptions data</Text>
+                            <Image source={mealGolden} style={styles.fileIcon} />
+                            <Text style={styles.emptyText}>You do not have any Meal Plans data</Text>
                         </View>
                 }
                 {showLoader && <ModalLoader />}
@@ -99,6 +101,22 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         right: 0,
+    },
+    emptyText: {
+        color: config.primaryColor,
+        textAlign: 'center',
+    },
+    Empty: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '70%',
+        alignSelf: 'center',
+        gap: 30,
+    },
+    fileIcon: {
+        height: 90,
+        width: 90,
     },
 });
 

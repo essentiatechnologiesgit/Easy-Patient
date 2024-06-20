@@ -8,7 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Share from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
 import { PermissionsAndroid } from 'react-native';
-const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, title, }) => {
+const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, title, record_id }) => {
     const navigation = useNavigation();
     const handleClick = () => {
         setShowDropDown(!showDropDown)
@@ -19,7 +19,7 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
     }
 
     const handleHide = () => {
-        navigation.navigate(title, { isHide: "true" });
+        navigation.navigate(title, { isHide: "true", record_id: record_id });
     }
 
 
@@ -81,8 +81,8 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
         }
     };
 
-    const handleShow = ( ) =>{
-        navigation.navigate(title, { isShow :"true" });
+    const handleShow = () => {
+        navigation.navigate(title, { isShow: "true",record_id:record_id });
     }
 
     return (

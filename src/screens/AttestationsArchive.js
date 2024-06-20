@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute ,useIsFocused} from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -18,22 +18,73 @@ import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import AttestaionsArchiveContainer from '../components/AttestationsArchiveConatiner';
-
+import AttestationContainer from '../components/AttestationContainer';
+import heartBeatGolden from '../assets/heartBeatGolden.png';
+import AttestationsGold from '../assets/AttestationsGold.png';
 const AttestationsArchive = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const scrollViewRef = useRef();
+    const isFocused = useIsFocused();
+    const [attestationsData, setAttestationsData] = useState([]);
+    const [showLoader, setShowLoader] = useState(true);
+    const isShow = route?.params?.isShow ?? false;
+    const record_id = route?.params?.record_id ?? 0;
+    useEffect(() => {
+        getData();
+    }, [])
+
+    useEffect(() => {
+        getData();
+    }, [isFocused])
+
+    const getData = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/attestation/archive',
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                setAttestationsData(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            }).finally(() => {
+                setShowLoader(false);
+            });
+    }
+
 
     return (
         <>
             <View style={styles.container}>
                 <BackHeader name={"Attestations/Declarations Archive"} />
-                <ScrollView>
-                    <AttestaionsArchiveContainer />
-                </ScrollView>
-                {/* <View style={styles.Empty}>
-                    <Text style={styles.emptyText}>You do not have any Attestations/Declarations Archive</Text>
-                </View> */}
+                {
+                    attestationsData && attestationsData.length > 0 ?
+                        <ScrollView style={styles.scroll}>
+                            {
+                                attestationsData.map((record, index) => (
+                                    <AttestationContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} />
+                                ))
+                            }
+                            <View style={{ marginTop: 20, }}></View>
+                        </ScrollView>
+                        :
+                        <View style={styles.Empty}>
+                            <Image source={AttestationsGold} style={styles.fileIcon} />
+                            <Text style={styles.emptyText}>You do not have any Attestations/Declarations data</Text>
+                        </View>
+                }
+                {showLoader && <ModalLoader />}
             </View>
         </>
     );
@@ -62,10 +113,14 @@ const styles = StyleSheet.create({
         width: 25,
         margin: 20,
     },
-    touch:{
-        position:'absolute',
-        top:0,
-        right:0,
+    touch: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+    },
+    fileIcon: {
+        height: 80,
+        width: 65,
     },
 });
 

@@ -13,46 +13,61 @@ import config from "../../config";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Guidelines from "../screens/Guidelines";
 
 const FolderSlider = () => {
     const scrollViewRef = useRef(null);
     const navigation = useNavigation();
-    const [totalPrescriptions , setTotalPrescriptions ] = useState(0);
+    const [anamnesis , setAnnemnesis] = useState(0);
+    const [reports , setReports ] = useState(0);
+    const [ exam , setExam ] = useState(0);
+    const [attestations , setAttestations] = useState(0);
+    const [assessment , setAssessment] = useState(0);
+    const [ orientations , setOrientations] = useState(0);
+    const [prescriptions , setPrescriptions] = useState(0);
+    const [meal, setMeal ] = useState(0);
+    const [recommentations , setRecommentations] = useState(0);
+
     useEffect(() => {
-        getPrescriptionsCount();
+        getAccessToken();
     }, [])
 
-    const getPrescriptionsCount = async () => {
+
+    const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
-        let data = new FormData();
+
 
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://api-patient-dev.easy-health.app/prescriptions',
+            url: 'https://api-patient-dev.easy-health.app/views/',
             headers: {
                 'Authorization': `Bearer ${access_token}`,
-            },
-            data: data
+            }
         };
 
         axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
-                // Log the response data to the console
-                console.log(JSON.stringify(response.data));
 
-                // Calculate the total number of objects in the array
-                let totalNumberOfObjects = response.data.length;
-                // console.warn(totalNumberOfObjects);
-                setTotalPrescriptions(totalNumberOfObjects)
+                setAnnemnesis(response.data.anamnesis.new);
+                setReports(response.data.medicalReport.new);
+                setExam(response.data.examGuide.new);
+                setAttestations(response.data.attestation.new);
+                setAssessment(response.data.bodyAssessment.new);
+                setOrientations(response.data.orientation.new);
+                setPrescriptions(response.data.prescriptions.new);
+                setMeal(response.data.mealPlan.new);
+                setRecommentations(response.data.recommentations.new);
+
             })
             .catch((error) => {
                 console.log(error);
             });
     }
+
 
     return (
         <>
@@ -73,7 +88,7 @@ const FolderSlider = () => {
                         <Image source={fileCapsule} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
-                            <Text style={styles.files}>{totalPrescriptions}  files</Text>
+                            <Text style={styles.files}>{anamnesis}  files</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.FolderContainer}>
@@ -82,7 +97,7 @@ const FolderSlider = () => {
                         <Image source={fork} style={styles.logo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -3 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Meal Plans</Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{meal}  files</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("ExamRequest")} style={styles.FolderContainer}>
@@ -93,7 +108,7 @@ const FolderSlider = () => {
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Exam Requests
                             </Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{exam}  files</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Guidelines")} style={styles.FolderContainer}>
@@ -102,7 +117,7 @@ const FolderSlider = () => {
                         <Image source={fileAdd} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Guidelines</Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{orientations}  files</Text>
                         </View>
                     </TouchableOpacity>
 
@@ -126,7 +141,7 @@ const FolderSlider = () => {
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Body Assessments
                             </Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{assessment}  files</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Reports")} style={styles.FolderContainer}>
@@ -137,7 +152,7 @@ const FolderSlider = () => {
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Reports
                             </Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{reports}  files</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Attestations")} style={styles.FolderContainer}>
@@ -148,7 +163,7 @@ const FolderSlider = () => {
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Attestations/Declarations
                             </Text>
-                            <Text style={styles.files}>0  files</Text>
+                            <Text style={styles.files}>{attestations} files</Text>
                         </View>
                     </TouchableOpacity>
                 </View>

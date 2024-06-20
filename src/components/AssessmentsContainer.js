@@ -1,23 +1,102 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import showIcon from '../assets/showIcon.png';
 import { TouchableOpacity } from 'react-native';
-const AssessmentsConatiner = () => {
+const AssessmentsConatiner = ({ record, isArchived, isHide, isShow, record_id }) => {
     const navigation = useNavigation();
+
+    useEffect(() => {
+        if (isHide)
+            handleHide();
+    }, [isHide])
+
+    useEffect(() => {
+        if (isShow)
+            handleShow();
+    }, [isShow])
+
+
+    const handleShow = async () => {
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/body-assessment/available/${record_id !== 0 ? record_id : record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate('BodyAssessments')
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const handleHide = async () => {
+
+        const loginResponse = await AsyncStorage.getItem('loginResponse');
+        const responseObject = JSON.parse(loginResponse);
+        const access_token = responseObject.access_token;
+
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `https://api-patient-dev.easy-health.app/body-assessment/archive/${record_id !== 0 ? record_id : record.id}`,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+        console.log(config);
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                navigation.navigate('BodyAssessmentsArchive');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+    }
+
     return (
         <>
-            <TouchableWithoutFeedback onPress={()=>navigation.navigate('BodyAssessmentsView')}>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('BodyAssessmentsView', { record: record, isArchived, isArchived })}>
                 <View style={styles.container}>
-                    <Text style={styles.headings}>Recieved 05/06/21</Text>
-                    <Text style={styles.text}>Florianopolis Clinic</Text>
-                    <Text style={styles.text}>Dr Jose Paulo Fontes</Text>
-                    <TouchableOpacity style={styles.hideContainer} >
-                        <Image source={archiveGold} style={styles.archiveIcon} />
-                        <Text style={styles.hide}>hide</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.subHeadings}>Recieved {record.title}</Text>
+                    <Text style={styles.text}>{record.clinic_name}</Text>
+                    <Text style={styles.text2}>Dr. {record.specialist}</Text>
+
+                    {
+                        !isArchived ?
+                            <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
+                                <Image source={archiveGold} style={styles.archiveIcon} />
+                                <Text style={styles.hide}>hide</Text>
+                            </TouchableOpacity> :
+
+                            <TouchableOpacity style={styles.hideContainer} onPress={() => handleShow()}>
+                                <Image source={showIcon} style={styles.showIcon} />
+                                <Text style={styles.hide}>Show</Text>
+                            </TouchableOpacity>
+                    }
+                    {
+                        record.is_new &&
+                        <View style={styles.NewContainer}>
+                            <Text style={styles.New}>New</Text>
+                        </View>
+                    }
                     <Image source={arrow} style={styles.arrowLogo} />
                 </View>
             </TouchableWithoutFeedback>
@@ -43,6 +122,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#B8E0C3',
+    },
+    showIcon: {
+        height: 16,
+        width: 14,
     },
     archiveIcon: {
         height: 15.5,
@@ -88,6 +171,10 @@ const styles = StyleSheet.create({
     },
     text: {
         color: config.textColorHeadings,
+        fontSize: PixelRatio.getFontScale() * 16,
+    },
+    text2: {
+        color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 16,
     },
 });

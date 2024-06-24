@@ -45,24 +45,38 @@ const HealthInformation = () => {
     const [dataId, setDataId] = useState('');
     const [bloodPressure, setBloodPressure] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [newHeight , setNewHeight] = useState('');
+    const [newHeight, setNewHeight] = useState('');
 
 
     useEffect(() => {
 
-        configureGoogleSignIn();
-        googleLogin();
-        saveData();
-        getWeights();
 
-        // const fetchData = async () => {
-        //     const access_token = await getAccessToken();
-        //     await getData(access_token);
-        // };
+        const getScopes = async () => {
+            GoogleSignin.configure({
+                scopes: [
+                    Scopes.FITNESS_ACTIVITY_READ,
+                    Scopes.FITNESS_ACTIVITY_WRITE,
+                    Scopes.FITNESS_BODY_READ,
+                    Scopes.FITNESS_BODY_WRITE,
+                    Scopes.FITNESS_BLOOD_PRESSURE_READ,
+                    Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
+                    Scopes.FITNESS_BLOOD_GLUCOSE_READ,
+                    Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
+                    Scopes.FITNESS_NUTRITION_WRITE,
+                    Scopes.FITNESS_SLEEP_READ,
+                ],
+                webClientId: WEB_CLIENT_ID,
+                offlineAccess: true,
+            });
+            await googleLogin();
 
-        // if(!heartRate.length>0 || !height.length>0 || !weight.length>0 || !steps.length>0 || !heartRate.length>0|| !bloodPressure.length>0){
-        //    fetchData();
-        // }
+        }
+
+        getScopes();
+        // configureGoogleSignIn();
+        // saveData();
+        // getWeights();
+
 
     }, []);
 
@@ -95,17 +109,13 @@ const HealthInformation = () => {
         //   }
         //   console.log(res);
         // });
-   
-    
+
+
 
     }
 
 
-    const configureGoogleSignIn = async () => {
-        await GoogleSignin.configure({
-            forceCodeForRefreshToken: true,
-        });
-    };
+
 
     const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -119,8 +129,10 @@ const HealthInformation = () => {
     const googleLogin = async () => {
         try {
             await GoogleSignin.hasPlayServices();
+            await GoogleSignin.signOut();
             const userInfo = await GoogleSignin.signIn();
             if (userInfo.user.email) {
+                // console.log(userInfo);
                 handleGoogleFitAuthorization(userInfo.user.email);
             }
         } catch (error) {
@@ -156,7 +168,7 @@ const HealthInformation = () => {
             }
         }
     }
-  
+
     const getData = async (access_token) => {
         let config = {
             method: 'get',
@@ -227,42 +239,9 @@ const HealthInformation = () => {
             });
     }
 
-    const getAuthorization = () => {
-        const options = {
-            scopes: [
-                Scopes.FITNESS_ACTIVITY_READ,
-                Scopes.FITNESS_ACTIVITY_WRITE,
-                Scopes.FITNESS_BODY_READ,
-                Scopes.FITNESS_BODY_WRITE,
-                Scopes.FITNESS_BLOOD_PRESSURE_READ,
-                Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
-                Scopes.FITNESS_BLOOD_GLUCOSE_READ,
-                Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
-                Scopes.FITNESS_NUTRITION_WRITE,
-                Scopes.FITNESS_SLEEP_READ,
-            ],
-        };
-        GoogleFit.checkIsAuthorized().then(() => {
-            var authorized = GoogleFit.isAuthorized;
-            // console.log(authorized);
-            if (authorized) {
-                // console.log("get Authorized")
-            } else {
-                GoogleFit.authorize(options)
-                    .then(authResult => {
-                        if (authResult.success) {
-                            console.log('AUTH_SUCCESS');
-                        } else {
-                            console.log('AUTH_DENIED ' + authResult.message);
-                        }
-                    })
-                    .catch(() => {
-                        dispatch('AUTH_ERROR');
-                    });
-            }
-        });
+    const WEB_CLIENT_ID = '1019255833424-pc4qjroj6ug3ri52h57pmtq735rgbdrp.apps.googleusercontent.com';
 
-    }
+
 
     async function handleGoogleFitAuthorization(selectedAccount) {
         if (!selectedAccount) {
@@ -279,7 +258,7 @@ const HealthInformation = () => {
                 scopes: [/* Your Scopes here */],
             });
             if (authResult.success) {
-                   await getWeights();
+                await getWeights();
                 // getSteps();
             } else {
                 console.log("Authorization failed:", authResult.message);
@@ -316,7 +295,7 @@ const HealthInformation = () => {
                 setWeight(String(weightSamples[0].value));
             }
 
-            
+
 
             const heightSamples = await GoogleFit.getHeightSamples(opt);
             // console.log("Heights", heightSamples);
@@ -339,6 +318,15 @@ const HealthInformation = () => {
             if (heartRateSamples.length > 0)
                 setHeartRate(String(heartRateSamples[0].value));
 
+            if (weightSamples || heightSamples || activeMinutes || stepCountSamples || heartRateSamples) {
+                const fetchData = async () => {
+                    const access_token = await getAccessToken();
+
+                    await getData(access_token);
+                };
+
+                fetchData();
+            } 
 
 
         } catch (err) {

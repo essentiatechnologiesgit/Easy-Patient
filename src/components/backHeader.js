@@ -2,7 +2,7 @@ import React from 'react';
 import { PixelRatio, StyleSheet, Text, Image, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
-
+import config from '../../config';
 import CircleButton from '../components/CircleButton';
 const BackHeader = ({ name }) => {
     const navigation = useNavigation();
@@ -36,21 +36,11 @@ const BackHeader = ({ name }) => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: 'white',
+        backgroundColor: config.headerColor,
         elevation: 4,
         height: 66,
         width: '100%',
         alignItems: 'center',
-        shadowColor: 'black',
-    },
-    containerRem: {
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        elevation: 4,
-        height: 66,
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'space-between',
         shadowColor: 'black',
     },
     head: {

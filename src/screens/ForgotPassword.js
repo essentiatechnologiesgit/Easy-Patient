@@ -301,7 +301,7 @@ const ForgotPassword = () => {
                 onChangeText={(text) => setUsername(text.trim())}
                 onFocus={handleEmailFocus}
                 onBlur={handleEmailBlur}
-                placeholderTextColor="gray"
+                placeholderTextColor={config.primaryColor}
                 color="black"
               />
             </View>
@@ -334,7 +334,7 @@ const ForgotPassword = () => {
               secureTextEntry={true}
               onFocus={handlePasswordFocus}
               onBlur={handlePasswordBlur}
-              placeholderTextColor="gray"
+              placeholderTextColor={config.primaryColor}
               color="black"
             />
             <View style={{ width: '100%', right: 30, bottom: 10 }}>
@@ -361,7 +361,7 @@ const ForgotPassword = () => {
               secureTextEntry={true}
               onFocus={handleConfirmPassFocus}
               onBlur={handleConfirmPassBlur}
-              placeholderTextColor="gray"
+              placeholderTextColor={config.primaryColor}
               color="black"
             />
             <View style={{ width: '100%', right: 30, bottom: 15 }}>
@@ -403,7 +403,7 @@ const ForgotPassword = () => {
 
 
         <View style={{ width: '100%', marginTop: 40 }}>
-          <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+          <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
         </View>
         {!OTPbox && !showPassword &&
           <>
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   TextContainerText: {
     fontSize: PixelRatio.getFontScale() * 17,
     textAlign: 'center',
-    color: 'gray',
+    color: config.primaryColor,
   },
   backgroundImage: {
     flex: 1,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: PixelRatio.getFontScale() * 18,
     textAlign: 'center',
-    color: 'gray'
+    color: config.primaryColor
   },
 
   signup: {

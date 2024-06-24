@@ -87,7 +87,7 @@ const Guidelines = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: config.backgroundColor,
         flex: 1,
     },
     archiveIcon: {

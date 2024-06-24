@@ -3,7 +3,7 @@ import { View, Image, Text, StyleSheet, TouchableOpacity, Linking, Alert,PixelRa
 import callIcon from '../assets/callIcon.png'; // Update the path as necessary
 import config from '../../config'; // Update the path as necessary
 import watsappIcon from '../assets/watsappIcon.png';
-const whatsappNumber = '0321546351564';
+
 
 const openWhatsApp = (number) => {
     const url = `whatsapp://send?phone=${number}`;
@@ -18,11 +18,11 @@ const openWhatsApp = (number) => {
         .catch((err) => console.error('An error occurred', err));
 };
 
-const WhatsappComponent = () => {
+const WhatsappComponent = ({watsappNo}) => {
     return (
-        <TouchableOpacity style={styles.carContainer} onPress={() => openWhatsApp(whatsappNumber)}>
+        <TouchableOpacity style={styles.carContainer} onPress={() => openWhatsApp(watsappNo)}>
             <Image source={watsappIcon} style={styles.watsappIcon} />
-            <Text style={styles.clinicText}>0321546351564</Text>
+            <Text style={styles.clinicText}>{watsappNo}</Text>
         </TouchableOpacity>
     );
 };

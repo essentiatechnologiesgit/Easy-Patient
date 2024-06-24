@@ -9,11 +9,11 @@ const openDialer = (number) => {
     Linking.openURL(`tel:${number}`);
 };
 
-const CallComponent = () => {
+const CallComponent = ({phone}) => {
     return (
-        <TouchableOpacity style={styles.carContainer} onPress={() => openDialer('0321546351564')}>
+        <TouchableOpacity style={styles.carContainer} onPress={() => openDialer(phone)}>
             <Image source={callIcon} style={styles.callIcon} />
-            <Text style={styles.clinicText}>0321546351564</Text>
+            <Text style={styles.clinicText}>{phone}</Text>
             <Text></Text>
         </TouchableOpacity>
     );

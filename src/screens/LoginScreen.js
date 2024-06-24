@@ -169,7 +169,6 @@ const LoginScreen = () => {
     return () => backHandler.remove();
 }, []);
 
-
   const handleEmailFocus = () => {
     setIsEmailFocused(true);
   };
@@ -243,7 +242,7 @@ const LoginScreen = () => {
               onChangeText={(text) => setUsername(text.trim())}
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
-              placeholderTextColor="gray"
+              placeholderTextColor={config.primaryColor}
               color="black"
               autoCapitalize="none"
             />
@@ -279,7 +278,7 @@ const LoginScreen = () => {
                   onChangeText={setPassword}
                   onFocus={handlePasswordFocus}
                   onBlur={handlePasswordBlur}
-                  placeholderTextColor="gray"
+                  placeholderTextColor={config.primaryColor}
                   color="black"
                 />
               </View>
@@ -415,7 +414,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     textAlign: 'right',
     fontSize: PixelRatio.getFontScale() * 15,
-    color: 'grey',
+    color: config.primaryColor,
   },
   register: {
     paddingTop: '15%',

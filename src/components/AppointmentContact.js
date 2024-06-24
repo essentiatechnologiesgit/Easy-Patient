@@ -7,18 +7,33 @@ import GoldEmailIcon from '../assets/goldEmailIcon.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CallComponent from './CallComponent';
 import WhatsappComponent from './WatsappComponent';
-const AppointmentContact = () => {
+const AppointmentContact = ({ watsappNo, phone, email }) => {
     const navigation = useNavigation();
     return (
         <>
             <View style={styles.firstContainer}>
-                <View style={styles.head}>
-                    <Text style={styles.status}>Contacts</Text>
-                </View>
+                {
+                    phone && watsappNo && email &&
+                    <View style={styles.head}>
+                        <Text style={styles.status}>Contacts</Text>
+                    </View>
+                }
+
                 <View style={styles.line}></View>
-                <CallComponent />
-                <WhatsappComponent />
-                <EmailComponent />
+                {
+                    phone &&
+                    <CallComponent phone={phone} />
+                }
+                {
+                    watsappNo &&
+
+                    <WhatsappComponent watsappNo={watsappNo} />
+                }
+                {
+                    email &&
+                    <EmailComponent email={email} />
+                }
+
             </View>
         </>
     );

@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import CarIcon from '../assets/CarIcon.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
-const AppointmentRoutes = () => {
+import Geocoder from 'react-native-geocoding';
+const AppointmentRoutes = ({clinicName,address}) => {
     const navigation = useNavigation();
+
+    // Geocoder.init('YOUR_GOOGLE_MAPS_API_KEY');
+    // useEffect(() => {
+    //     // Example for geocoding
+    //     Geocoder.from('1600 Amphitheatre Parkway, Mountain View, CA')
+    //       .then(json => {
+    //         const location = json.results[0].geometry.location;
+    //         console.log(location);
+    //       })
+    //       .catch(error => console.warn(error));
+    
+    //     // Example for reverse geocoding
+    //     Geocoder.from(37.4219983, -122.084)
+    //       .then(json => {
+    //         const addressComponent = json.results[0].address_components[0];
+    //         console.log(addressComponent);
+    //       })
+    //       .catch(error => console.warn(error));
+    //   }, []);
+    
     return (
         <>
             <View style={styles.firstContainer}>
@@ -13,8 +34,8 @@ const AppointmentRoutes = () => {
                     <Text style={styles.status}>Routes</Text>
                 </View>
                 <View style={styles.line}></View>
-                <Text style={styles.routeHead}>Clinic Florianopolis</Text>
-                <Text style={styles.routeText}>Rua Hercillio Luz, 810 - sala 1102 Centro, Florianopolis/SC</Text>
+                <Text style={styles.routeHead}>{clinicName}</Text>
+                <Text style={styles.routeText}>{address.street}, {address.number} {address.neighborhood} {address.city_name}</Text>
                 <View style={styles.carContainer}>
                     <Image source={CarIcon} style={styles.carIcon} />
                     <Text style={styles.clinicText}>Go to the Clinic</Text>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, RefreshControl, ScrollView, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, RefreshControl, ScrollView, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, BackHandler } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -14,7 +14,6 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '../components/Footer';
 import ImageLogo from '../components/ImageLogo'
-import { BackHandler } from 'react-native';
 import { CircularProgressBase } from 'react-native-circular-progress-indicator';
 import Snackbar from '../components/Snackbar';
 import Medications from '../components/Medications';
@@ -54,6 +53,36 @@ const Dashboard = () => {
         fetchData();
     }, [route]);
 
+
+    const [backPressedOnce, setBackPressedOnce] = useState(false);
+    const backPressedOnceRef = useRef(backPressedOnce);
+
+    useEffect(() => {
+        backPressedOnceRef.current = backPressedOnce;
+    }, [backPressedOnce]);
+
+    useEffect(() => {
+        const backAction = () => {
+            if (backPressedOnceRef.current) {
+                BackHandler.exitApp();
+            } else {
+                setBackPressedOnce(true);
+                handleShowSnackbar("Press Back again to exit");
+
+                setTimeout(() => {
+                    setBackPressedOnce(false);
+                }, 2000); // Reset after 2 seconds
+            }
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
 
 
     const handleShowSnackbar = (message) => {
@@ -122,11 +151,11 @@ const Dashboard = () => {
             const allAlarmComponents = [];
             const AlarmsArrayJSON = await AsyncStorage.getItem('Alarms');
             const AlarmsArray = AlarmsArrayJSON ? JSON.parse(AlarmsArrayJSON) : [];
-    
+
             if (AlarmsArray && AlarmsArray.length > 0) {
                 // Get today's date in 'YYYY-MM-DD' format
                 const today = moment().format('YYYY-MM-DD');
-    
+
                 // Filter alarms for the current day and their times
                 const currentDayAlarms = AlarmsArray.filter(alarm => {
                     return alarm.times && alarm.times.some(timeObj => {
@@ -142,7 +171,7 @@ const Dashboard = () => {
                         })
                     };
                 });
-    
+
                 // Flatten all times for sorting
                 const allTimes = currentDayAlarms.reduce((acc, alarm) => {
                     if (alarm.times) {
@@ -150,18 +179,18 @@ const Dashboard = () => {
                     }
                     return acc;
                 }, []);
-    
+
                 // Sort all times
                 allTimes.sort((a, b) => {
                     return moment(a.time, 'YYYY-MM-DD HH:mm').diff(moment(b.time, 'YYYY-MM-DD HH:mm'));
                 });
-    
+
                 // Generate alarm components for sorted times
                 allTimes.forEach((timeObj, index) => {
                     const { time, id: timeId, taken, medicine, id, dosage } = timeObj;
                     const alarmTime = moment(time, 'YYYY-MM-DD HH:mm');
                     const remainingTime = alarmTime.diff(moment(), 'minutes');
-    
+
                     let alarmComponent;
                     // Check if this is the next upcoming alarm
                     if (remainingTime > 0 && !allTimes.some((otherTime) => moment(otherTime.time, 'YYYY-MM-DD HH:mm').isBetween(moment(), alarmTime))) {
@@ -217,18 +246,18 @@ const Dashboard = () => {
                             );
                         }
                     }
-    
+
                     // Add the generated alarm component to the list
                     allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
                 });
-    
+
                 // Render components
                 const components = allAlarmComponents.map((item, index) => (
                     <View style={styles.component} key={index}>
                         {item.component}
                     </View>
                 ));
-    
+
                 // Update state with rendered components
                 setAlarmComponents(components);
             }
@@ -236,11 +265,11 @@ const Dashboard = () => {
             console.error('Error rendering alarm components:', error);
         }
     };
-    
-    
-    
-    
-    
+
+
+
+
+
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -261,73 +290,81 @@ const Dashboard = () => {
     };
 
     return (
-        <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-            <ScrollView
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-            >
-                <View style={styles.headerContainer}>
-                    <Image source={config.logo} style={styles.logo} />
-                    {
-                        image &&
-                        <>
-                            <ImageLogo imageURI={image} name={name} healthInfo={healthInfo} />
-                        </>
-                    }
-                    {
-                        !image &&
-                        <>
-                            <View style={{ position: 'absolute', right: 0 }}>
-                                <CircularProgressBase
-                                    {...props}
-                                    value={healthInfo === false ? 30 : 100}
-                                    radius={26}
-                                    activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
-                                    inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
-                                />
-                            </View>
-                            <TouchableOpacity onPress={() => navigation.navigate('ProfileAndHealth', { imageURI: image, name: name, healthInfo: healthInfo })} style={styles.profileButton}>
-                                <Image source={profileIcon} style={styles.ProfileLogo} />
-                            </TouchableOpacity>
-                        </>
-                    }
-                </View>
-                <View style={styles.nameContainer}>
-                    <Text style={styles.nameHeading}>Hello {name}!</Text>
-                    <Text style={styles.nameSideHeading}>Welcome to Easy Patient</Text>
-                </View>
+        <>
+            <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+                <ScrollView
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+                >
+                    <View style={styles.headerContainer}>
+
+                        <Image source={config.logo} style={styles.logo} />
+                        {
+                            image &&
+                            <>
+                                <ImageLogo imageURI={image} name={name} healthInfo={healthInfo} />
+                            </>
+                        }
+                        {
+                            !image &&
+                            <>
+                                <View style={{ position: 'absolute', right: 0 }}>
+                                    <CircularProgressBase
+                                        {...props}
+                                        value={healthInfo === false ? 30 : 100}
+                                        radius={26}
+                                        activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                                        inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                                    />
+                                </View>
+                                <TouchableOpacity onPress={() => navigation.navigate('ProfileAndHealth', { imageURI: image, name: name, healthInfo: healthInfo })} style={styles.profileButton}>
+                                    <Image source={profileIcon} style={styles.ProfileLogo} />
+                                </TouchableOpacity>
+                            </>
+                        }
+                         
+                    </View>
+                    <View style={styles.nameContainer}>
+                        <Text style={styles.nameHeading}>Hello {name}!</Text>
+                        <Text style={styles.nameSideHeading}>Welcome to Easy Patient</Text>
+                    </View>
 
 
-                <View style={styles.parentView}>
-                    {/* <Text style={styles.heading}>Notifications</Text>
+                    <View style={styles.parentView}>
+                        {/* <Text style={styles.heading}>Notifications</Text>
                     <View style={styles.NotificationContainer}>
                         <Image source={goodHealth} style={styles.healthIcon} />
                         <Text style={styles.reminder}>Dr Ahmed sent you a package of reminders</Text>
                     </View> */}
-                    <View style={styles.sliderContainer}>
-                        <FolderSlider />
-                    </View>
-                    <Text style={styles.heading}>Todays Medications</Text>
-                    {
-                        !alarmComponents.length > 0 &&
-                        <View style={styles.component}>
-                            <Medications />
+                        <View style={styles.sliderContainer}>
+                            <FolderSlider />
                         </View>
-                    }
-                    {
-                        alarmComponents.map((component, index) => (
-                            <View style={styles.component} key={index}>
-                                {component}
+                        <Text style={styles.heading}>Todays Medications</Text>
+                        {
+                            !alarmComponents.length > 0 &&
+                            <View style={styles.component}>
+                                <Medications />
                             </View>
-                        ))
-                        // {renderTimeComponents}
-                    }
+                        }
+                        {
+                            alarmComponents.map((component, index) => (
+                                <View style={styles.component} key={index}>
+                                    {component}
+                                </View>
+                            ))
+                            // {renderTimeComponents}
+                        }
 
-                </View>
-            </ScrollView>
+                    </View>
+
+                </ScrollView>
+
+                <Footer prop={0} />
+                   
+            </ImageBackground>
+            <View style={{alignItems:'center', bottom:100}}>
             {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
-
-            <Footer prop={0} />
-        </ImageBackground>
+            </View>
+        </>
     );
 };
 
@@ -366,7 +403,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         padding: 25,
         gap: 15,
-        backgroundColor: 'white',
+        backgroundColor: config.modalColor,
         borderRadius: 8,
         marginBottom: 20,
         // justifyContent: 'center',
@@ -392,7 +429,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
         fontWeight: '600',  // semi-bold
         marginLeft: 16,
-    },    
+    },
     ProfileLogo: {
         width: '100%',
         height: '70%',

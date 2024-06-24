@@ -9,6 +9,9 @@ export default {
     backgroundImage: require('./src/assets/background-image.png'),
     backgroundImageType:'png',
     subLogo: require('./src/assets/sub-logo.png'),
-    backgroundColor: '#33F9FF',
+    backgroundColor: '#FFFFFF',
+    modalColor:'#FFFFFF',
+    buttonText:'#FFFFFF',
+    headerColor:'#FFFFFF',
   };
 

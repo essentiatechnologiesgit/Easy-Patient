@@ -3,8 +3,13 @@ import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithou
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
-const AppointmentScheduling = () => {
+import moment from 'moment';
+const AppointmentScheduling = ({date,responsible,local,query}) => {
     const navigation = useNavigation();
+    const dateTime = moment(date);
+    const formattedTime = dateTime.format('HH:mm');
+    const formattedDate = dateTime.format('ddd, MMMM Do');
+   
     return (
         <>
                 <View style={styles.firstContainer}>
@@ -21,11 +26,11 @@ const AppointmentScheduling = () => {
                             <Text style={styles.bodyHead}>Query Type</Text>
                         </View>
                         <View style={styles.list}>
-                            <Text style={styles.bodyText}>9.30</Text>
-                            <Text style={styles.bodyText}>Thu December 5th</Text>
-                            <Text style={styles.bodyText}>Floriapano Clinic</Text>
-                            <Text style={styles.bodyText}>Dr Ahmed</Text>
-                            <Text style={styles.bodyText}>First Consultation</Text>
+                            <Text style={styles.bodyText}>{formattedTime}</Text>
+                            <Text style={styles.bodyText}>{formattedDate}</Text>
+                            <Text style={styles.bodyText}>{local}</Text>
+                            <Text style={styles.bodyText}>{responsible}</Text>
+                            <Text style={styles.bodyText}>{query}</Text>
                         </View>
                     </View>
                 </View>

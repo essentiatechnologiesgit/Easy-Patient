@@ -687,7 +687,7 @@ const AddReminder = ({ route }) => {
                                     }
                                     editable={false}
                                     placeholder="Frequency"
-                                    placeholderTextColor={!freNumberError ? 'gray' : 'red'}
+                                    placeholderTextColor={!freNumberError ? config.primaryColor : 'red'}
                                     onChangeText={value => setFrequency(value)} // You can remove this line
                                 />
                             }
@@ -731,7 +731,7 @@ const AddReminder = ({ route }) => {
                             <Text style={styles.NotifyMsg}>Allow Easy Patient to make sound notifications even when you cell phone is in silent mode.</Text>
                         </View>
                         <View style={{ width: '95%', marginTop: 35 }}>
-                            <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                            <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
                         </View>
                     </View>
                 </ScrollView>
@@ -742,7 +742,7 @@ const AddReminder = ({ route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: config.backgroundColor,
         flex: 1,
         // justifyContent:'center',
     },

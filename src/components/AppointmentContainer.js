@@ -3,20 +3,42 @@ import { View, Image, ActivityIndicator, StyleSheet, PixelRatio,TouchableWithout
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
-const AppointmentContainer = () => {
+import moment from 'moment';
+const AppointmentContainer = ({ record, isArchived, isHide, isShow, record_id }) => {
     const navigation = useNavigation();
+    const statusMapping = {
+        1: 'Waiting',
+        2: 'Confirmed',
+        3: 'Cancelled'
+    };
+    const statusName = statusMapping[record.schedule_status_id] || 'null';
+    const dateTime = moment(record.date);
+    const formattedTime = dateTime.format('HH:mm');
+    const formattedDate = dateTime.format('ddd, MMMM Do');
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case 'Waiting':
+                return styles.waiting;
+            case 'Confirmed':
+                return styles.confirmed;
+            case 'Cancelled':
+                return styles.cancelled;
+            default:
+                return styles.defaultStatus;
+        }
+    };
     return (
         <>
-            <TouchableWithoutFeedback onPress={() => navigation.navigate("AppointmentsDetails")}>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate('AppointmentsDetails', { record: record, isArchived,isArchived })}>
                 <View style={styles.Appointments}>
                     <View style={styles.contentWrapper}>
                         <View style={styles.head}>
-                            <Text style={styles.headings}>09:30</Text>
-                            <Text style={styles.confirmed}>Confirmed</Text>
+                            <Text style={styles.headings}>{formattedTime}</Text>
+                            <Text style={[styles.statusText, getStatusStyle(statusName)]}>{statusName}</Text>
                         </View>
-                        <Text style={styles.headings}>Thu, December 5th</Text>
-                        <Text style={styles.subHeading}>Floriano Polis Clinic</Text>
-                        <Text style={styles.subHeading}>Return</Text>
+                        <Text style={styles.headings}>{formattedDate}</Text>
+                        <Text style={styles.subHeading}>{record.clinic}</Text>
+                        <Text style={styles.subHeading}>{record.type}</Text>
                     </View>
                     <Image source={arrow} style={styles.arrowLogo} />
                 </View>
@@ -50,6 +72,14 @@ const styles = StyleSheet.create({
     confirmed: {
         color: '#50B76C',
         fontSize: PixelRatio.getFontScale() * 17,
+    },
+    waiting:{
+        color: config.secondaryColor,
+        fontSize: PixelRatio.getFontScale() * 17,
+    },
+    cancelled:{
+        color: '#54A5B8',
+        fontSize: PixelRatio.getFontScale() * 17, 
     },
     contentWrapper: {
         flex: 1, // Ensure the content takes all available space

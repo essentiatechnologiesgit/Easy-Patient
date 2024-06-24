@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         width: 200,
-        backgroundColor: 'white',
+        backgroundColor: config.modalColor,
         right: 0,
         margin: 50,
         padding: 15,

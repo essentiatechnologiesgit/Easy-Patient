@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
 import faceID from '../assets/faceID.png';
 import touchId from '../assets/TouchId.png';
+import config from '../../config';
 const CustomButton = ({ buttonColor, borderColor, textColor, text, onPress, title }) => {
   return (
     <View style={styles.container}>
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
 
   line: {
     borderLeftWidth: 2, 
-    borderLeftColor: 'white',
+    borderLeftColor: config.buttonText,
     height: 20, 
     marginHorizontal: 'auto',
   },

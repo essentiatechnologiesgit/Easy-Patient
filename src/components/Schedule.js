@@ -3,6 +3,7 @@ import { PixelRatio, StyleSheet, Text, Image, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Path } from 'react-native-svg'; // Import Path from react-native-svg
 import calendarDark from '../assets/calendarDark.png';
+import config from '../../config';
 const Schedule = ({ time, prescriptionText }) => {
     const navigation = useNavigation();
 
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         borderRadius: 6,
-        backgroundColor: 'white',
+        backgroundColor: config.modalColor,
         width: '92%',
         height: 80,
         padding: 10,

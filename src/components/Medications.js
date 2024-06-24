@@ -20,12 +20,12 @@ const styles = StyleSheet.create({
     emptyText:{
         fontSize: PixelRatio.getFontScale() * 17,
         padding:6,
-        color:'#82848D',
+        color:config.primaryColor,
         textAlign:'center',
         width:'85%',
     },
     container:{
-        backgroundColor:'white',
+        backgroundColor:config.modalColor,
         justifyContent:'center',
         alignItems:'center',
         alignSelf:'center',

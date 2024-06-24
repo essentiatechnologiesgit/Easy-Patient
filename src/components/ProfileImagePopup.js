@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         width: '90%',
         alignSelf: 'center',
-        backgroundColor: 'white',
+        backgroundColor: config.modalColor,
         borderRadius: 10,
         marginBottom: 10,
     },

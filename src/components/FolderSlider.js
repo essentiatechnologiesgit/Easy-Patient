@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         borderRadius: 14,
         marginRight: 20,
         opacity: 1,
-        backgroundColor: 'white',
+        backgroundColor: config.modalColor,
         elevation: 0,
     },
     logo: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     smallContainer: {
-        backgroundColor: 'white',
+        backgroundColor: config.modalColor,
         height: 20,
         width: 50,
         borderTopRightRadius: 12,

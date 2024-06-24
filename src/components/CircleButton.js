@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
       text: {
         top:-1,
         fontSize: 26,
-        color: 'white',
+        color: config.buttonText,
       },
 });
 

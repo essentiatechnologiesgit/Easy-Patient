@@ -31,7 +31,7 @@ const Prescriptions = () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
-
+        console.log(access_token);
         let data = new FormData();
 
         let config = {
@@ -43,7 +43,7 @@ const Prescriptions = () => {
             },
             data: data
         };
-
+        console.log(config);
         axios.request(config)
             .then((response) => {
                 // console.log(JSON.stringify(response.data));
@@ -87,7 +87,7 @@ const Prescriptions = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: config.backgroundColor,
         flex: 1,
     },
     archiveIcon: {

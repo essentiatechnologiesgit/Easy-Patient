@@ -28,19 +28,17 @@ import AppointmentContact from '../components/AppointmentContact';
 const AppointmentsDetails = () => {
     const route = useRoute();
     const navigation = useNavigation();
+    const { record, isArchived } = route.params;
     const scrollViewRef = useRef();
-
+    
     return (
         <>
             <ScrollView style={styles.container}>
                 <BackHeader name={"Appointments"} />
-                <AppointmentStatus />
-
-                <AppointmentScheduling />
-
-                <AppointmentRoutes />
-
-                <AppointmentContact />
+                <AppointmentStatus scheduleStatusId = {record.schedule_status_id} scheduleStatusName = {record.schedule_status_name}/>
+                <AppointmentScheduling  date={record.date} responsible={record.specialist} local={record.clinic} query={record.type} />
+                <AppointmentRoutes clinicName={record.clinic} address={record.address} />
+                <AppointmentContact watsappNo ={record.watsapp_value} phone={record.phone} email={record.email} />
             </ScrollView>
             <Footer prop={2} />
         </>
@@ -49,7 +47,7 @@ const AppointmentsDetails = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: config.backgroundColor,
         flex: 1,
     },
     head: {

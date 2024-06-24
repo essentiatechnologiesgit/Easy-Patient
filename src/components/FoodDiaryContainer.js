@@ -43,7 +43,7 @@ const AppointmentContainer = ({ record }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: 'red',
         flex: 1,
     },
     scrollViewContainer: {

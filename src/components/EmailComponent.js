@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity, Linking, Alert, PixelRatio } from 'react-native';
 import GoldEmailIcon from '../assets/goldEmailIcon.png'; // Update the path as necessary
 import config from '../../config';
-const emailAddress = 'syedmisbahali1111@gmail.com';
+
 
 const openEmailClient = (email) => {
     const url = `mailto:${email}`;
@@ -17,11 +17,11 @@ const openEmailClient = (email) => {
         .catch((err) => console.error('An error occurred', err));
 };
 
-const EmailComponent = () => {
+const EmailComponent = ({email}) => {
     return (
-        <TouchableOpacity style={styles.carContainer} onPress={() => openEmailClient(emailAddress)}>
+        <TouchableOpacity style={styles.carContainer} onPress={() => openEmailClient(email)}>
             <Image source={GoldEmailIcon} style={styles.emailIcon} />
-            <Text style={styles.clinicText}>syedmisbahali1111@gmail.com</Text>
+            <Text style={styles.clinicText}>{email}</Text>
             <Text></Text>
         </TouchableOpacity>
     );

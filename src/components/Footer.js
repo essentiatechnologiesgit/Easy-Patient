@@ -11,6 +11,7 @@ import jar from '../assets/jar.png';
 import jarLight from '../assets/jarLight.png';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+import config from "../../config";
 const Footer = (props) => {
     const navigation = useNavigation();
     const [indicatorPosition, setIndicatorPosition] = useState(0);
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: PixelRatio.getFontScale() * 14,
-        color: '#55565CB3',
+        color: config.primaryColor,
     },
     indicator: {
         position: 'absolute',

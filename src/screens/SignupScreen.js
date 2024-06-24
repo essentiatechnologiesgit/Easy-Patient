@@ -338,7 +338,7 @@ const SignupScreen = () => {
               style={styles.inputEmail}
               placeholder="E-mail"
               value={email}
-              placeholderTextColor="gray"
+              placeholderTextColor={config.primaryColor}
               color="black"
               onChangeText={(text) => setEmail(text.trim())}
               onFocus={handleEmailFocus}
@@ -513,7 +513,7 @@ const SignupScreen = () => {
                         }),
                         color: placeholderLabelAnim.interpolate({
                           inputRange: [0, 1.5],
-                          outputRange: ['gray', config.secondaryColor], // Change font color after animation
+                          outputRange: [config.primaryColor, config.secondaryColor], // Change font color after animation
                         }),
                       },
                     ]}
@@ -612,7 +612,7 @@ const SignupScreen = () => {
                   )}
                 </View>
                 <View style={{ width: '100%', marginTop: 40 }}>
-                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
                 </View>
                 <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>
               </View>
@@ -630,7 +630,7 @@ const SignupScreen = () => {
               <OtpInput onChange={handleOtpChange} />
             </View>
             <View style={{ width: '100%', marginTop: 40 }}>
-              <CustomizedButton onPress={handleVerifyOTP} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+              <CustomizedButton onPress={handleVerifyOTP} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
             </View>
             <View style={{ marginTop: '8%' }}><Text style={styles.codeText}>Didn't receive the code?</Text><Text style={styles.codeText}>Click here:</Text></View>
             <View style={{ marginTop: '7%' }}>
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
   TextContainerText: {
     fontSize: PixelRatio.getFontScale() * 17,
     textAlign: 'center',
-    color: 'gray'
+    color: config.primaryColor
   },
 
   inputEmail: {
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: PixelRatio.getFontScale() * 17,
     textAlign: 'center',
-    color: 'gray',
+    color: config.primaryColor,
   },
   label: {
     position: 'absolute',
@@ -875,7 +875,7 @@ const styles = StyleSheet.create({
   textt: {
     fontSize: PixelRatio.getFontScale() * 17,
     padding: 2,
-    color: 'gray',
+    color: config.primaryColor,
     flexDirection: 'row',
     textAlign: 'center',
     alignItems: 'center',

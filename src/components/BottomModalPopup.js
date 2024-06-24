@@ -119,7 +119,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                             </View>
                             <View style={styles.buttonStyle}>
                                 {/* <CustomButton  buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"OK"} /> */}
-                                <CustomButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"OK"} />
+                                <CustomButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"OK"} />
 
                             </View>
                         </>

@@ -3,7 +3,6 @@ import { View, Text, TextInput, Animated, StyleSheet, PermissionsAndroid, Image,
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import greenProfile from '../assets/greenProfile.png';
 import downArrow from '../assets/downArrow.png';
 import { WebView } from 'react-native-webview';
 import { ScrollView } from 'react-native-gesture-handler';

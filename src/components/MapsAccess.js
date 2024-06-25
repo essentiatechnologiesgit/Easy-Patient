@@ -10,6 +10,7 @@ import CustomButton from './CustomizedButton';
 const MapsAccess = () => {
     const navigation = useNavigation();
 
+    
 
     return (
         <View style={styles.parentContainer}>

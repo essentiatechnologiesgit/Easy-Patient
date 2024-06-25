@@ -30,15 +30,15 @@ const AppointmentsDetails = () => {
     const navigation = useNavigation();
     const { record, isArchived } = route.params;
     const scrollViewRef = useRef();
-    
+    // console.log(record.longitude);
     return (
         <>
             <ScrollView style={styles.container}>
                 <BackHeader name={"Appointments"} />
-                <AppointmentStatus scheduleStatusId = {record.schedule_status_id} scheduleStatusName = {record.schedule_status_name}/>
-                <AppointmentScheduling  date={record.date} responsible={record.specialist} local={record.clinic} query={record.type} />
-                <AppointmentRoutes clinicName={record.clinic} address={record.address} />
-                <AppointmentContact watsappNo ={record.watsapp_value} phone={record.phone} email={record.email} />
+                <AppointmentStatus scheduleStatusId={record.schedule_status_id} scheduleStatusName={record.schedule_status_name} />
+                <AppointmentScheduling date={record.date} responsible={record.specialist} local={record.clinic} query={record.type} />
+                <AppointmentRoutes clinicName={record.clinic} address={record.address} latitude={record.latitude} longitude={record.longitude}  />
+                <AppointmentContact watsappNo={record.watsapp_value} phone={record.phone} email={record.email} />
             </ScrollView>
             <Footer prop={2} />
         </>

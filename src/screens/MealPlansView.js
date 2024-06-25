@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Dimensions } from 'react-native';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import greenProfile from '../assets/greenProfile.png';
 import { WebView } from 'react-native-webview';
 import downArrow from '../assets/downArrow.png';
 import { ScrollView } from 'react-native-gesture-handler';

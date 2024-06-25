@@ -3,7 +3,6 @@ import { View, Text, TextInput, Animated, StyleSheet, Dimensions, Image, PixelRa
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import greenProfile from '../assets/greenProfile.png';
 import downArrow from '../assets/downArrow.png';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';

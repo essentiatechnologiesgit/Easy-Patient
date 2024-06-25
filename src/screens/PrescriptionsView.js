@@ -6,7 +6,6 @@ import config from '../../config';
 import BackHeader from '../components/backHeader';
 import PrescriptionDropDown from '../components/PrescriptionDropDown';
 import downArrow from '../assets/downArrow.png';
-import greenProfile from '../assets/greenProfile.png';
 import axios from 'axios';
 import Pdf from 'react-native-pdf';
 

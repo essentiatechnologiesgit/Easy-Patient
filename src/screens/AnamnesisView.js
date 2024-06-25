@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
 import config from '../../config';
-import greenProfile from '../assets/greenProfile.png';
+
 import downArrow from '../assets/downArrow.png';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
@@ -31,7 +31,6 @@ const AnamnesisView = () => {
                         <Text style={styles.subHeadings}>Recieved on: 13/8/19</Text>
                     </View>
                     <View style={styles.specialistCont}>
-                        <Image source={greenProfile} style={styles.arrowIcon} />
                         <Text style={styles.subHeadings}>Specialist: Dr Ahmed</Text>
                     </View>
                     <View style={styles.paragraph}>

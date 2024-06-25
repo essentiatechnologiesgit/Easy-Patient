@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Image, PixelRatio, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
-import medicine from '../assets/medicine.png';
 import arrow from '../assets/arrow.png';
 import config from '../../config';
 import Footer from '../components/Footer';

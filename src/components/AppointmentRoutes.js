@@ -1,32 +1,44 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
-import arrow from '../assets/arrow.png';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, PixelRatio, PermissionsAndroid, TouchableOpacity, Linking } from 'react-native';
 import config from '../../config';
 import CarIcon from '../assets/CarIcon.png';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import Geocoder from 'react-native-geocoding';
-const AppointmentRoutes = ({clinicName,address}) => {
-    const navigation = useNavigation();
+import MapView, { Marker } from 'react-native-maps';
 
-    // Geocoder.init('YOUR_GOOGLE_MAPS_API_KEY');
-    // useEffect(() => {
-    //     // Example for geocoding
-    //     Geocoder.from('1600 Amphitheatre Parkway, Mountain View, CA')
-    //       .then(json => {
-    //         const location = json.results[0].geometry.location;
-    //         console.log(location);
-    //       })
-    //       .catch(error => console.warn(error));
-    
-    //     // Example for reverse geocoding
-    //     Geocoder.from(37.4219983, -122.084)
-    //       .then(json => {
-    //         const addressComponent = json.results[0].address_components[0];
-    //         console.log(addressComponent);
-    //       })
-    //       .catch(error => console.warn(error));
-    //   }, []);
-    
+const AppointmentRoutes = ({ clinicName, address, longitude, latitude }) => {
+    const [locationPermission, setLocationPermission] = useState(false);
+
+    useEffect(() => {
+        requestLocationPermission();
+    }, []);
+
+    const requestLocationPermission = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    title: "Location Permission",
+                    message: "This app needs access to your location so you can see your location on the map.",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK",
+                }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log("Location permission granted");
+                setLocationPermission(true);
+            } else {
+                console.log("Location permission denied");
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    };
+
+    const openGoogleMaps = () => {
+        const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+        Linking.openURL(url);
+    };
+
     return (
         <>
             <View style={styles.firstContainer}>
@@ -35,21 +47,35 @@ const AppointmentRoutes = ({clinicName,address}) => {
                 </View>
                 <View style={styles.line}></View>
                 <Text style={styles.routeHead}>{clinicName}</Text>
-                <Text style={styles.routeText}>{address.street}, {address.number} {address.neighborhood} {address.city_name}</Text>
-                <View style={styles.carContainer}>
-                    <Image source={CarIcon} style={styles.carIcon} />
-                    <Text style={styles.clinicText}>Go to the Clinic</Text>
-                    <Text></Text>
-                </View>
+                <Text style={styles.routeText}>
+                    {address.street}, {address.number} {address.neighborhood} {address.city_name}
+                </Text>
+                {
+                    longitude && latitude &&
+                    <TouchableOpacity onPress={openGoogleMaps} style={styles.carContainer}>
+                        <Image source={CarIcon} style={styles.carIcon} />
+                        <Text style={styles.clinicText}>Go to the Clinic</Text>
+                    </TouchableOpacity>
+                }
+
             </View>
         </>
     );
 };
 
 const styles = StyleSheet.create({
+    // Your existing styles
     bodyText: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+    },
+    container: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
     },
     status: {
         color: config.secondaryColor,
@@ -63,10 +89,11 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         flexDirection: 'row',
         padding: 10,
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
     },
-    clinicText:{
-        color:config.secondaryColor,
+    clinicText: {
+        color: config.secondaryColor,
+        marginLeft: '30%',
     },
     carIcon: {
         height: 23,

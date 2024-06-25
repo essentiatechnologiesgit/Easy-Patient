@@ -6,7 +6,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import axios from 'axios';
-import medicine from '../assets/medicine2.png';
 import CustomButton from '../components/CustomizedButton';
 import Snackbar from '../components/Snackbar';
 import { launchCamera } from 'react-native-image-picker';

@@ -25,7 +25,7 @@ const SplashScreen = () => {
         navigation.navigate('Dashboard');
         // Perform further actions with the parsedResponse if needed
       } else {
-        navigation.navigate('Login')
+        navigation.navigate('IntroScreens')
         // Data does not exist
         console.log('No login response found');
       }

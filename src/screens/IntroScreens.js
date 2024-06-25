@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ScrollView, View, StyleSheet, Dimensions, Text, PixelRatio } from 'react-native';
+import { ScrollView, View, StyleSheet, Dimensions, Text, PixelRatio,PermissionsAndroid } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Dots from 'react-native-dots-pagination';
 import config from '../../config';
@@ -8,12 +8,13 @@ import CustomButton from '../components/CustomizedButton';
 import CustomizedAppIntro from '../components/CustomizedAppIntro';
 import BellIntro from '../components/BellIntro';
 import MapsAccess from '../components/MapsAccess';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const IntroScreens = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const navigation = useNavigation();
     const scrollViewRef = useRef(null);  // Create a reference to the ScrollView
-
+    const [locationPermission, setLocationPermission] = useState(false);
     const handleScroll = (event) => {
         const { contentOffset, layoutMeasurement } = event.nativeEvent;
         const page = Math.round(contentOffset.x / layoutMeasurement.width);
@@ -24,9 +25,34 @@ const IntroScreens = () => {
         if (currentPage < 3) {
             scrollViewRef.current.scrollTo({ x: (currentPage + 1) * Dimensions.get('window').width, animated: true });
         } else {
-            navigation.navigate('Login');
+            requestLocationPermission();
         }
     };
+
+    const requestLocationPermission = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    title: "Location Permission",
+                    message: "This app needs access to your location so you can see your location on the map.",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK",
+                }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log("Location permission granted");
+                setLocationPermission(true);
+            } else {
+                console.log("Location permission denied");
+            }
+            navigation.navigate('Login');
+        } catch (err) {
+            console.warn(err);
+        }
+    };
+
 
     return (
         <View style={styles.parentContainer}>
@@ -71,7 +97,9 @@ const IntroScreens = () => {
                             marginHorizontal={4}
                         />
                         :
+                        <TouchableWithoutFeedback onPress={()=>navigation.navigate("Login")}>
                         <Text style={styles.missTrade}>Miss trade</Text>
+                        </TouchableWithoutFeedback>
                 }
             </View>
         </View>

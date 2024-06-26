@@ -689,9 +689,12 @@ const styles = StyleSheet.create({
   },
 
   inputEmail: {
-    marginBottom: -8,
     flex: 1,
+    marginBottom: -8,
+    paddingLeft: 8,
+    height: 40,
     fontSize: PixelRatio.getFontScale() * 17,
+    color: 'red',
   },
   icon: {
     marginBottom: -8,

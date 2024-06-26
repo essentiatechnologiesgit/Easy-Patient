@@ -6,7 +6,7 @@ import archiveBlack from '../assets/archiveBlack.png';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Share from 'react-native-share';
-import RNFetchBlob from 'rn-fetch-blob';
+import RNFetchBlob from 'react-native-blob-util';
 import { PermissionsAndroid } from 'react-native';
 const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, title, record_id }) => {
     const navigation = useNavigation();

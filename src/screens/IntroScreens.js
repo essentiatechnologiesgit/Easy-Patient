@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { ScrollView, View, StyleSheet, Dimensions, Text, PixelRatio,PermissionsAndroid } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { ScrollView, View, StyleSheet, Dimensions, Text, PixelRatio, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import Dots from 'react-native-dots-pagination';
 import config from '../../config';
 import HealthIntroScreen from '../components/HealthIntroScreen';
@@ -15,6 +16,11 @@ const IntroScreens = () => {
     const navigation = useNavigation();
     const scrollViewRef = useRef(null);  // Create a reference to the ScrollView
     const [locationPermission, setLocationPermission] = useState(false);
+
+    useEffect(() => {
+        requestLocationPermission();
+    }, []);
+
     const handleScroll = (event) => {
         const { contentOffset, layoutMeasurement } = event.nativeEvent;
         const page = Math.round(contentOffset.x / layoutMeasurement.width);
@@ -30,29 +36,34 @@ const IntroScreens = () => {
     };
 
     const requestLocationPermission = async () => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                {
-                    title: "Location Permission",
-                    message: "This app needs access to your location so you can see your location on the map.",
-                    buttonNeutral: "Ask Me Later",
-                    buttonNegative: "Cancel",
-                    buttonPositive: "OK",
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: "Location Permission",
+                        message: "This app needs access to your location so you can see your location on the map.",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK",
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("Location permission granted (Android)");
+                    setLocationPermission(true);
+                } else {
+                    console.log("Location permission denied (Android)");
                 }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log("Location permission granted");
-                setLocationPermission(true);
-            } else {
-                console.log("Location permission denied");
+            } catch (err) {
+                console.warn(err);
             }
-            navigation.navigate('Login');
-        } catch (err) {
-            console.warn(err);
+        } else if (Platform.OS === 'ios') {
+            console.log("Here");
+            // Implement iOS location permission request here
+            // For iOS, you generally don't need to request until you actually need it
+            // For example, when user agrees to proceed to the next screen.
         }
     };
-
 
     return (
         <View style={styles.parentContainer}>
@@ -98,7 +109,7 @@ const IntroScreens = () => {
                         />
                         :
                         <TouchableWithoutFeedback onPress={()=>navigation.navigate("Login")}>
-                        <Text style={styles.missTrade}>Miss trade</Text>
+                            <Text style={styles.missTrade}>Miss trade</Text>
                         </TouchableWithoutFeedback>
                 }
             </View>

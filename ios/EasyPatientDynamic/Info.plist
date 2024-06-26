@@ -4,6 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to your location so you can see your location on the map.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app needs access to your location to provide better services.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Enabling Face ID allows you quick and secure access to your account.</string>
 	<key>CFBundleDisplayName</key>

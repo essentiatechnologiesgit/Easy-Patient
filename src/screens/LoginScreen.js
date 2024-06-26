@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity,BackHandler,Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, BackHandler, Alert } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import AlertIcon from '../components/AlertIcon';
@@ -143,31 +143,31 @@ const LoginScreen = () => {
   const backPressedOnceRef = useRef(backPressedOnce);
 
   useEffect(() => {
-      backPressedOnceRef.current = backPressedOnce;
+    backPressedOnceRef.current = backPressedOnce;
   }, [backPressedOnce]);
 
   useEffect(() => {
     const backAction = () => {
-        if (backPressedOnceRef.current) {
-            BackHandler.exitApp();
-        } else {
-            setBackPressedOnce(true);
-            handleShowSnackbar("Press Back again to exit");
+      if (backPressedOnceRef.current) {
+        BackHandler.exitApp();
+      } else {
+        setBackPressedOnce(true);
+        handleShowSnackbar("Press Back again to exit");
 
-            setTimeout(() => {
-                setBackPressedOnce(false);
-            }, 2000); // Reset after 2 seconds
-        }
-        return true;
+        setTimeout(() => {
+          setBackPressedOnce(false);
+        }, 2000); // Reset after 2 seconds
+      }
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
+      "hardwareBackPress",
+      backAction
     );
 
     return () => backHandler.remove();
-}, []);
+  }, []);
 
   const handleEmailFocus = () => {
     setIsEmailFocused(true);
@@ -296,7 +296,7 @@ const LoginScreen = () => {
 
         {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
         <TouchableOpacity style={{ width: '100%', marginTop: 50 }}>
-          <CustomButton onPress={() => handleLogin()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Next"}  />
+          <CustomButton onPress={() => handleLogin()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Next"} />
         </TouchableOpacity>
         {
           showAuth &&
@@ -324,10 +324,19 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'top',
     alignItems: 'center',
-    // paddingTop: 20,
-    marginTop: '20%'
+    padding: 20,
+    ...Platform.select({
+      ios: {
+        justifyContent: 'center',
+        gap:5,
+      },
+      android: {
+        paddingTop: 20, 
+        marginTop: '20%',
+        justifyContent: 'top',
+      },
+    })
   },
   title: {
     fontSize: 24,
@@ -356,6 +365,8 @@ const styles = StyleSheet.create({
   inputEmail: {
     flex: 1,
     marginBottom: -8,
+    paddingLeft: 8,
+    height: 40,
     fontSize: PixelRatio.getFontScale() * 17,
     color: 'red',
   },
@@ -420,7 +431,8 @@ const styles = StyleSheet.create({
     paddingTop: '15%',
     textDecorationLine: 'underline',
     color: config.secondaryColor,
-    fontSize: PixelRatio.getFontScale() * 16
+    fontSize: PixelRatio.getFontScale() * 16,
+    marginBottom:10,
   }
 });
 

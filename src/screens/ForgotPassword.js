@@ -455,12 +455,9 @@ const styles = StyleSheet.create({
     width: '90%',
   },
   inputEmail: {
-    flex: 1,
     marginBottom: -8,
-    paddingLeft: 8,
-    height: 40,
+    flex: 1,
     fontSize: PixelRatio.getFontScale() * 17,
-    color: 'red',
   },
   focusedInput: {
     borderBottomWidth: 4, // Increased border bottom width when focused

@@ -52,6 +52,7 @@ import AnamnesisView from '../screens/AnamnesisView.js';
 import AnamnesisArchive from '../screens/AnamnesisArchive.js';
 import Biometric from '../screens/Biometric.js';
 import IntroScreens from '../screens/IntroScreens.js';
+import PasswordError from '../screens/PasswordError.js';
 import PatternAuth from '../screens/PatternAuth.js';
 const Stack = createStackNavigator();
 
@@ -67,7 +68,9 @@ const AppNavigator = () => {
         {/* <Stack.Screen style={styles.container} name="BackgroundServices" component={BackgroundServices} />   */}
         <Stack.Screen style={styles.container} name="SplashScreen" component={SplashScreen} />
         <Stack.Screen style={styles.container} name="IntroScreens" component={IntroScreens} />
-         <Stack.Screen style={styles.container} name="Login" component={Login} />
+        <Stack.Screen style={styles.container} name="Login" component={Login} />
+        <Stack.Screen style={styles.container} name="PasswordError" component={PasswordError} />
+         
         <Stack.Screen style={styles.container} name="PatternAuth" component={PatternAuth} />
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
         <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} />

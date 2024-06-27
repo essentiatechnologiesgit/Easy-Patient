@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableWithoutFeedback, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableWithoutFeedback, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
 import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox'
@@ -149,6 +149,7 @@ const SignupScreen = () => {
   };
 
   const handlePressDatePicker = () => {
+    // console.log("clicked")
     setShowDatePicker(true);
   };
 
@@ -339,10 +340,13 @@ const SignupScreen = () => {
               placeholder="E-mail"
               value={email}
               placeholderTextColor={config.primaryColor}
-              color="black"
+              color={config.primaryColor}
               onChangeText={(text) => setEmail(text.trim())}
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
+              autoCapitalize="none"
+              caretHidden={false} // Ensure caret is not hidden
+              caretColor={config.primaryColor}
             />
 
           </View>
@@ -362,9 +366,16 @@ const SignupScreen = () => {
           </View>
           <View style={styles.checkbox}>
             <CheckBox
+              style={{ height: 20 }}
               value={termsAccepted}
               onValueChange={() => { setTermsAccepted(!termsAccepted) }}
               tintColors={{ true: config.secondaryColor }}
+              boxType="square"
+              onAnimationType="fade"
+              offAnimationType='fade'
+              onCheckColor="white"
+              onFillColor={config.secondaryColor}
+              onTintColor={config.secondaryColor}
             />
 
             <Text style={styles.textt}>I accept the </Text><Text onPress={() => {
@@ -406,7 +417,7 @@ const SignupScreen = () => {
                     value={email}
                     onChangeText={value => setEmail(value)}
                     containerStyles={styles.containerStyles}
-
+                    autoCapitalize='none'
                   />
                   {emailError && !email && (
                     <>
@@ -432,7 +443,7 @@ const SignupScreen = () => {
                     value={fullName}
                     onChangeText={value => setFullName(value)}
                     containerStyles={styles.containerStyles}
-
+                    autoCapitalize='none'
                   />
                   {fullNameError && !fullName && (
                     <>
@@ -449,14 +460,16 @@ const SignupScreen = () => {
                       {date ? (
                         <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Date Of Birth</Text>
                       ) : (
-                        <TextInput
-                          style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
-                          placeholder="Date Of Birth"
-                          placeholderTextColor={config.primaryColor}
-                          editable={false}
-                          value={date ? formattedDate : ""}
-
-                        />
+                        <>
+                          <TextInput
+                            style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
+                            placeholder="Date Of Birth"
+                            placeholderTextColor={config.primaryColor}
+                            editable={false}
+                            value={date ? formattedDate : ""}
+                            autoCapitalize='none'
+                          />
+                        </>
                       )}
                       {date && (
                         <Text style={{ ...styles.inputStyles, marginTop: -32 }}>{formattedDate}</Text>
@@ -471,14 +484,35 @@ const SignupScreen = () => {
                   </TouchableOpacity>
                 </View>
                 {showDatePicker && (
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    value={date || new Date()}
-                    mode="date"
-                    display="default"
-                    onChange={onChange}
-                    textColor="red"
-                  />
+                  <>
+                    {Platform.OS === 'android' ?
+
+                      <DateTimePicker
+                        style={{ position: 'absolute', width: '100%', bottom: 0, backgroundColor: 'white', zIndex: 999, }}
+                        testID="dateTimePicker"
+                        value={date || new Date()}
+                        mode="date"
+                        display="spinner"
+                        onChange={onChange}
+                      />
+                      :
+                      <>
+                        <View style={{ height: 30, width: '100%', justifyContent: 'center', backgroundColor: '#DAE2E4', position: 'absolute', zIndex: 999, bottom: 216 }} >
+                          <TouchableOpacity onPress={()=>{setShowDatePicker(false)}}>
+                          <Text style={{ alignSelf: 'flex-end', right: 10 }}>OK</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <DateTimePicker
+                          style={{ position: 'absolute', width: '100%', bottom: 0, backgroundColor: 'white', zIndex: 999, }}
+                          testID="dateTimePicker"
+                          value={date || new Date()}
+                          mode="date"
+                          display="spinner"
+                          onChange={onChange}
+                        />
+                      </>
+                    }
+                  </>
                 )}
                 <View
                   ref={(ref) => (errorRefs.current[3] = ref)}
@@ -563,6 +597,7 @@ const SignupScreen = () => {
                     isPassword={true}
                     customHidePasswordComponent={<View></View>}
                     customShowPasswordComponent={<View></View>}
+                    autoCapitalize='none'
                   />
 
                   {passwordError && !password && (
@@ -591,6 +626,7 @@ const SignupScreen = () => {
                     isPassword={true}
                     customHidePasswordComponent={<View></View>}
                     customShowPasswordComponent={<View></View>}
+                    autoCapitalize='none'
                   />
                   {confirmPasswordError && !confirmPassword && (
                     <>
@@ -648,17 +684,27 @@ const SignupScreen = () => {
       </View>
 
 
-    </ImageBackground>
+    </ImageBackground >
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'top',
     alignItems: 'center',
-    // paddingTop: 20,
-    marginTop: '20%'
+    padding: 20,
+    ...Platform.select({
+      ios: {
+        marginTop: 40,
+        justifyContent: 'center',
+        gap: 10,
+      },
+      android: {
+        paddingTop: 20,
+        marginTop: '20%',
+        justifyContent: 'top',
+      },
+    })
   },
   inputContainer: {
     marginTop: '4%',
@@ -687,7 +733,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: config.primaryColor
   },
-
   inputEmail: {
     flex: 1,
     marginBottom: -8,
@@ -817,6 +862,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     resizeMode: 'contain',
     zIndex: 999,
+    height: 58,
   },
   subLogo: {
     marginTop: 15,

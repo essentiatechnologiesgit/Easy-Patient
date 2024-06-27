@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, PixelRatio } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, PixelRatio, Platform } from 'react-native';
 import Modal from "react-native-modal";
 
 const ModalLoader = ({ msg }) => {
@@ -7,8 +7,11 @@ const ModalLoader = ({ msg }) => {
         <View>
             <Modal isVisible={true}>
                 <View style={styles.container}>
-                    <ActivityIndicator size="larger"   color="grey" /> 
-                    <Text style={styles.text}>Loading...</Text>
+                    <ActivityIndicator size="small"   color="grey" /> 
+                    {
+                        Platform.OS === 'android' && 
+                        <Text style={styles.text}>Loading...</Text>
+                    }
                 </View>
             </Modal>
         </View>
@@ -17,11 +20,25 @@ const ModalLoader = ({ msg }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        paddingHorizontal: 30,
-        paddingVertical: 20,
-        flexDirection: 'row', 
-        alignItems: 'center', 
+
+        ...Platform.select({
+            ios: {
+                backgroundColor: 'white',
+                paddingVertical: 20,
+                flexDirection: 'row', 
+                alignItems: 'center',
+                justifyContent:'center',
+                width:50,
+                alignSelf:'center'
+            },
+            android: {
+                backgroundColor: 'white',
+                paddingHorizontal: 30,
+                paddingVertical: 20,
+                flexDirection: 'row', 
+                alignItems: 'center',
+            },
+        }),
     },
     text: {
         color:'gray',

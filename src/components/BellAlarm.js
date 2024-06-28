@@ -6,9 +6,11 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import BellIcon from '../assets/bellIcon.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
-const BellAlarm = ({ time, Medicine, medicineId,reloadFunction }) => {
+import DeleteModal from './DeleteModal';
+const BellAlarm = ({ time, Medicine, medicineId, reloadFunction }) => {
     const [deletePressed, setDeletePressed] = useState(false);
     const navigation = useNavigation();
+    const [deleteModal, setShowDeleteModal] = useState(false);
 
     const handleNavigate = () => {
         if (!deletePressed) {
@@ -16,25 +18,29 @@ const BellAlarm = ({ time, Medicine, medicineId,reloadFunction }) => {
         }
     };
 
-    const handleDeletePress = () => {
+    const handleDeletePress = (e, swipeableRef) => {
         setDeletePressed(true);
-        deleteAlarm(medicineId,time);
+        setShowDeleteModal(true);
+        // e.stopPropagation();
+        swipeableRef.close();
     };
+
+    const handleDeleteConfirm = () => {
+        deleteAlarm(medicineId, time);
+    }
 
     const handleDeletePressOut = () => {
         setDeletePressed(false);
     };
 
-    const renderRightActions = () => (
-        <TouchableOpacity 
-            onPress={handleDeletePress}
-            onPressOut={handleDeletePressOut}
-        >
+    const renderRightActions = (progress, dragX, swipeableRef) => (
+        <TouchableOpacity
+            onPress={(e) => handleDeletePress(e, swipeableRef)}>
             <View style={styles.deleteButton}>
-            <Image
-                source={require('../assets/deleteWhite.png')}
-                style={styles.image}
-            />
+                <Image
+                    source={require('../assets/deleteWhite.png')}
+                    style={styles.image}
+                />
             </View>
         </TouchableOpacity>
     );
@@ -47,16 +53,16 @@ const BellAlarm = ({ time, Medicine, medicineId,reloadFunction }) => {
                 console.warn('No alarms found in storage.');
                 return;
             }
-    
+
             const existingAlarms = JSON.parse(existingAlarmsJSON);
             console.log('Existing alarms:', existingAlarms);
-    
+
             // Get today's date in the format 'YYYY-MM-DD'
             const todayDate = moment().format('YYYY-MM-DD');
-    
+
             // Combine today's date with the target time
             const targetDateTime = `${todayDate} ${targetTime}`;
-    
+
             // Find the alarm object with the specified medicineId
             const updatedAlarms = existingAlarms.map(alarm => {
                 if (alarm.id === medicineId) {
@@ -65,32 +71,35 @@ const BellAlarm = ({ time, Medicine, medicineId,reloadFunction }) => {
                         const alarmTime = moment(timeObj.time);
                         const isSameTime = alarmTime.isSame(moment(targetDateTime));
                         console.log(`Checking time - ID: ${timeObj.id}, Time: ${timeObj.time}, Matches: ${isSameTime}`);
-    
+
                         return !isSameTime;
                     });
                     return { ...alarm, times: updatedTimes };
                 }
                 return alarm;
             });
-    
-        
+
+
             await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarms));
-                reloadFunction();
+            reloadFunction();
         } catch (error) {
             console.error('Error deleting alarm:', error);
         }
     };
     return (
-        <TouchableWithoutFeedback onPress={handleNavigate}>
-            <View style={styles.container}>
-                <Swipeable renderRightActions={renderRightActions}>
-                    <View style={styles.child}>
-                        <Image source={BellIcon} style={styles.bell} />
-                        <Text style={styles.text}>{time} - {Medicine}</Text>
-                    </View>
-                </Swipeable>
-            </View>
-        </TouchableWithoutFeedback>
+        <>
+            <TouchableWithoutFeedback onPress={handleNavigate}>
+                <View style={styles.container}>
+                    <Swipeable renderRightActions={renderRightActions}>
+                        <View style={styles.child}>
+                            <Image source={BellIcon} style={styles.bell} />
+                            <Text style={styles.text}>{time} - {Medicine}</Text>
+                        </View>
+                    </Swipeable>
+                </View>
+            </TouchableWithoutFeedback>
+            <DeleteModal visible={deleteModal} modalfor={"CrossBell"} medicineId={medicineId} reloadFunction={reloadFunction} onClose={() => setShowDeleteModal(false)} Medicine={Medicine} time={time} handleDeleteConfirm={handleDeleteConfirm} />
+        </>
     );
 };
 
@@ -110,9 +119,9 @@ const styles = StyleSheet.create({
         height: 20,
         width: 20,
     },
-    image:{
-        height:20,
-        width:20,
+    image: {
+        height: 20,
+        width: 20,
     },
     deleteButton: {
         backgroundColor: '#AA0000',

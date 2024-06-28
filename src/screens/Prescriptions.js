@@ -68,7 +68,7 @@ const Prescriptions = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 prescriptionsData.map((record, index) => (
-                                    <PrescriptionContainer key={index} record={record}  isHide={isHide}/>
+                                    <PrescriptionContainer key={index} record={record}  isHide={isHide} getData={getData}/>
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

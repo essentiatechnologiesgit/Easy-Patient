@@ -8,7 +8,7 @@ import { TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import showIcon from '../assets/showIcon.png';
-const MealContainer = ({ record, isArchived, isHide, isShow ,record_id}) => {
+const MealContainer = ({ record, isArchived, isHide, isShow ,record_id, getData}) => {
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const MealContainer = ({ record, isArchived, isHide, isShow ,record_id}) => {
           axios.request(config)
           .then((response) => {
             console.log(JSON.stringify(response.data));
-            navigation.navigate('MealPlans')
+            getData()
           })
           .catch((error) => {
             console.log(error);
@@ -63,7 +63,7 @@ const MealContainer = ({ record, isArchived, isHide, isShow ,record_id}) => {
         axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
-                navigation.navigate('MealPlansArchive')
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     },
     headings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 17,
+        fontSize: PixelRatio.getFontScale() * 18,
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -180,12 +180,12 @@ const styles = StyleSheet.create({
     },
     subHeadings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
         fontWeight: 'bold',
     },
     text: {
         color: config.primaryColor,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
 });
 

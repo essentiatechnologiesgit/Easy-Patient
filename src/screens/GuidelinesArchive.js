@@ -62,7 +62,7 @@ const GuidelinesArchive = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 orientationsData.map((record, index) => (
-                                    <GuidelineContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} />
+                                    <GuidelineContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

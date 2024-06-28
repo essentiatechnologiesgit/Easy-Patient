@@ -8,7 +8,7 @@ import axios from 'axios';
 import showIcon from '../assets/showIcon.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native';
-const AttestationContainer = ({ record, isArchived, isHide, isShow, record_id }) => {
+const AttestationContainer = ({ record, isArchived, isHide, isShow, record_id ,getData}) => {
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -39,7 +39,7 @@ const AttestationContainer = ({ record, isArchived, isHide, isShow, record_id })
         axios.request(config)
             .then((response) => {
                 // console.log(JSON.stringify(response.data));
-                navigation.navigate('Attestations')
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -82,8 +82,7 @@ const AttestationContainer = ({ record, isArchived, isHide, isShow, record_id })
           
           axios.request(config)
           .then((response) => {
-            console.log(JSON.stringify(response.data));
-            navigation.navigate("AttestationsArchive");
+            getData()
           })
           .catch((error) => {
             console.log(error);
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     },
     headings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 17,
+        fontSize: PixelRatio.getFontScale() * 18,
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -182,16 +181,16 @@ const styles = StyleSheet.create({
     },
     subHeadings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
         fontWeight: 'bold',
     },
     text: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
     text2: {
         color: config.primaryColor,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
 });
 

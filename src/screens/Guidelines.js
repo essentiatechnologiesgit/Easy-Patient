@@ -68,7 +68,7 @@ const Guidelines = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 orientationsData.map((record, index) => (
-                                    <GuidelineContainer key={index} record={record} isHide={isHide} record_id={record_id} />
+                                    <GuidelineContainer key={index} record={record} isHide={isHide} record_id={record_id} getData={getData}/>
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>
@@ -76,7 +76,7 @@ const Guidelines = () => {
                         :
                         <View style={styles.Empty}>
                             <Image source={guideleinsGold} style={styles.fileIcon} />
-                            <Text style={styles.emptyText}>You do not have any Guideleins data</Text>
+                            <Text style={styles.emptyText}>You do not have any Guidelines data</Text>
                         </View>
                 }
                 {showLoader && <ModalLoader />}

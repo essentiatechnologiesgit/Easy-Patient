@@ -77,7 +77,7 @@ const BodyAssessments = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 assessmentData.map((record, index) => (
-                                    <AssessmentsConatiner key={index} record={record} isHide={isHide} record_id={record_id} />
+                                    <AssessmentsConatiner key={index} record={record} isHide={isHide} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

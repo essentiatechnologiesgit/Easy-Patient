@@ -4,10 +4,10 @@ import Modal from "react-native-modal";
 import fork from '../assets/fork.png';
 import heartBeat from '../assets/heartBeat.png';
 import fileAdd from '../assets/fileAdd.png';
+import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import fileLife from '../assets/fileLife.png';
 import Scale from '../assets/Scale.png';
 import fileEdit from '../assets/fileEdit.png';
-import { useNavigation } from "@react-navigation/native";
 import fileCapsule from '../assets/fileCapsule.png';
 import config from "../../config";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -18,49 +18,63 @@ import Guidelines from "../screens/Guidelines";
 const FolderSlider = () => {
     const scrollViewRef = useRef(null);
     const navigation = useNavigation();
-    const [anamnesis , setAnnemnesis] = useState(0);
-    const [reports , setReports ] = useState(0);
-    const [ exam , setExam ] = useState(0);
-    const [attestations , setAttestations] = useState(0);
-    const [assessment , setAssessment] = useState(0);
-    const [ orientations , setOrientations] = useState(0);
-    const [prescriptions , setPrescriptions] = useState(0);
-    const [meal, setMeal ] = useState(0);
-    const [recommentations , setRecommentations] = useState(0);
+    const [recommentations, setRecommentations] = useState(0);
+    const [prescription, setPrescriptions] = useState(0);
+    const [Exam, setExam] = useState(0);
+    const [Guidelines, setGuidelines] = useState(0);
+    const [assessment, setAssessment] = useState(0);
+    const [anamnesis, setAnnemnesis] = useState(0);
+    const [reports, setReports] = useState(0);
+    const isFocused = useIsFocused();
+    const [attestations, setAttestations] = useState(0);
+    const [orientations, setOrientations] = useState(0);
+    const [meal, setMeal] = useState(0);
+
 
     useEffect(() => {
+        const getAccessToken = async () => {
+            const loginResponse = await AsyncStorage.getItem('loginResponse');
+            const responseObject = JSON.parse(loginResponse);
+            const access_token = responseObject.access_token;
+            getCounts(access_token);
+        }
         getAccessToken();
     }, [])
 
+    useEffect(() => {
+        const getAccessToken = async () => {
+            const loginResponse = await AsyncStorage.getItem('loginResponse');
+            const responseObject = JSON.parse(loginResponse);
+            const access_token = responseObject.access_token;
+            getCounts(access_token);
+        }
+        getAccessToken();
+    }, [isFocused])
 
-    const getAccessToken = async () => {
-        const loginResponse = await AsyncStorage.getItem('loginResponse');
-        const responseObject = JSON.parse(loginResponse);
-        const access_token = responseObject.access_token;
+    const getCounts = (access_token) => {
+        getPrescriptions(access_token);
+        getPlans(access_token);
+        getExams(access_token);
+        getGuidelines(access_token);
+        getReports(access_token);
+        getAttestations(access_token);
+        getAssessments(access_token);
+    }
 
-
+    const getPrescriptions = async (access_token) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://api-patient-dev.easy-health.app/views/',
+            url: 'https://api-patient-dev.easy-health.app/prescriptions',
             headers: {
                 'Authorization': `Bearer ${access_token}`,
-            }
+            },
         };
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-
-                setAnnemnesis(response.data.anamnesis.new);
-                setReports(response.data.medicalReport.new);
-                setExam(response.data.examGuide.new);
-                setAttestations(response.data.attestation.new);
-                setAssessment(response.data.bodyAssessment.new);
-                setOrientations(response.data.orientation.new);
-                setPrescriptions(response.data.prescriptions.new);
-                setMeal(response.data.mealPlan.new);
-                setRecommentations(response.data.recommentations.new);
+                // console.log(JSON.stringify(response.data));
+                setPrescriptions(response.data.length)
 
             })
             .catch((error) => {
@@ -68,6 +82,125 @@ const FolderSlider = () => {
             });
     }
 
+    const getPlans = (access_token) => {
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/meal-plan',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                setMeal(response.data.length)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const getExams = (access_token) => {
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/exam-guide',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                setExam(response.data.length)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const getGuidelines = (access_token) =>{
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/orientations',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                setGuidelines(response.data.length)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const getAssessments = (access_token) =>{
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/body-assessment',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                setAssessment(response.data.length)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    const getReports = (access_token) =>{
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/medical-report/',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                setReports(response.data.length)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    } 
+
+    const getAttestations = (access_token) =>{
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://api-patient-dev.easy-health.app/attestation/',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                setAttestations(response.data.length)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 
     return (
         <>
@@ -78,20 +211,18 @@ const FolderSlider = () => {
                 contentContainerStyle={styles.scrollViewContent}
                 snapToInterval={100}
                 decelerationRate="fast"
-                showsHorizontalScrollIndicator={false}
-            >
+                showsHorizontalScrollIndicator={false}>
                 <View style={styles.container}>
-
                     <TouchableOpacity onPress={() => navigation.navigate("Prescriptions")} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={fileCapsule} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
-                            <Text style={styles.files}>{anamnesis}  files</Text>
+                            <Text style={styles.files}>{prescription}  files</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("MealPlans")} style={styles.FolderContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("MealPlans", { setMeal })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={fork} style={styles.logo}></Image>
@@ -100,7 +231,7 @@ const FolderSlider = () => {
                             <Text style={styles.files}>{meal}  files</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("ExamRequest")} style={styles.FolderContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ExamRequest", { setExam })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={heartBeat} style={styles.heartlogo}></Image>
@@ -108,16 +239,16 @@ const FolderSlider = () => {
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Exam Requests
                             </Text>
-                            <Text style={styles.files}>{exam}  files</Text>
+                            <Text style={styles.files}>{Exam}  files</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Guidelines")} style={styles.FolderContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Guidelines", { setGuidelines })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={fileAdd} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Guidelines</Text>
-                            <Text style={styles.files}>{orientations}  files</Text>
+                            <Text style={styles.files}>{Guidelines}  files</Text>
                         </View>
                     </TouchableOpacity>
 
@@ -133,7 +264,7 @@ const FolderSlider = () => {
                             <Text style={styles.files}>0  files</Text>
                         </View>
                     </TouchableOpacity> */}
-                    <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments")} style={styles.FolderContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments", { setAssessment })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={Scale} style={styles.Scale}></Image>
@@ -144,7 +275,7 @@ const FolderSlider = () => {
                             <Text style={styles.files}>{assessment}  files</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Reports")} style={styles.FolderContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Reports", { setReports })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={fileLife} style={styles.filelogo}></Image>
@@ -155,7 +286,7 @@ const FolderSlider = () => {
                             <Text style={styles.files}>{reports}  files</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate("Attestations")} style={styles.FolderContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Attestations", { setAttestations })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={fileEdit} style={styles.fileEdit}></Image>

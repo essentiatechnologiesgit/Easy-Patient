@@ -8,7 +8,7 @@ import { TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import showIcon from '../assets/showIcon.png';
-const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id }) => {
+const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id ,getData }) => {
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -37,8 +37,7 @@ const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id }) => 
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('Reports')
+               getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -62,8 +61,7 @@ const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id }) => 
         console.log(config);
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('ReportsArchive')
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -158,7 +156,7 @@ const styles = StyleSheet.create({
     },
     headings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 17,
+        fontSize: PixelRatio.getFontScale() * 18,
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -179,12 +177,12 @@ const styles = StyleSheet.create({
     },
     subHeadings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
         fontWeight: 'bold',
     },
     text: {
         color: config.primaryColor,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
 });
 

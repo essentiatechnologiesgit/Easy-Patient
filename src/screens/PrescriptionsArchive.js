@@ -69,7 +69,7 @@ const PrescriptionsArchive = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 prescriptionsData.map((record, index) => (
-                                    <PrescriptionContainer key={index} record={record} isArchived={true} isShow={isShow} />
+                                    <PrescriptionContainer key={index} record={record} isArchived={true} isShow={isShow} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

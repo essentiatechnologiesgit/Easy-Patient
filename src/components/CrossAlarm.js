@@ -5,10 +5,11 @@ import { Swipeable } from 'react-native-gesture-handler';
 import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
-
+import DeleteModal from './DeleteModal';
 const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) => {
     const [modalVisible, setModalVisible] = useState(false);
-
+    const [deleteModal , setShowDeleteModal] = useState(false);
+   
     const renderRightActions = (progress, dragX, swipeableRef) => (
         <TouchableOpacity onPress={(e) => handleDeletePress(e, swipeableRef)}>
             <View style={styles.deleteButton}>
@@ -21,10 +22,14 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
     );
 
     const handleDeletePress = (e, swipeableRef) => {
+        setShowDeleteModal(true)
         e.stopPropagation();
-        deleteAlarm(medicineId, time);
         swipeableRef.close();
     };
+
+    const handleDeleteConfirm = () =>{
+        deleteAlarm(medicineId, time);
+    }
 
     const deleteAlarm = async (medicineId, targetTime) => {
         try {
@@ -100,6 +105,8 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
                 reloadFunction={reloadFunction}
                 onClose={() => setModalVisible(false)}
             />
+               <DeleteModal visible={deleteModal} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setShowDeleteModal(false)} Medicine={Medicine} time={time} handleDeleteConfirm={handleDeleteConfirm} />
+      
         </>
     );
 };

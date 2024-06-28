@@ -71,7 +71,7 @@ const ExamRequestsArchive = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 mealPlansData.map((record, index) => (
-                                    <ExamRequestsContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id}/>
+                                    <ExamRequestsContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

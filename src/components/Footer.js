@@ -1,4 +1,4 @@
-import React, { useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, PixelRatio, Animated } from 'react-native';
 import more from '../assets/more.png';
 
@@ -17,10 +17,10 @@ const Footer = (props) => {
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const indicatorX = useRef(new Animated.Value(0)).current;
     const [activeTab, setActiveTab] = useState(0);
-   
+
     useEffect(() => {
         setActiveTab(props.prop);
-      }, [props.prop]);
+    }, [props.prop]);
 
     const navigateSidebar = () => {
         navigation.navigate("SideBar");
@@ -37,53 +37,55 @@ const Footer = (props) => {
                         navigation.navigate("Dashboard");
                     }}>
                     <Image source={activeTab === 0 ? homeDark : home} style={
-                    [styles.icon,
-                    activeTab === 1 && styles.activeTabIcon
-                    ]}>
-                </Image>
-                {activeTab === 0 && <View style={styles.borderHome} />}
+                        [styles.icon,
+                        activeTab === 1 && styles.activeTabIcon
+                        ]}>
+                    </Image>
+                    {activeTab === 0 && <View style={styles.borderHome} />}
 
-                <Text style={activeTab === 0 ? styles.textDark : styles.text}>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.touchable}
-                onPress={() => {
-                    // moveIndicator(1),
-                    navigation.navigate("Reminders");}}
-            >
-                {activeTab === 1 && <View style={styles.borderReminder} />}
-                <Image
-                    source={activeTab === 1 ? jar : jarLight}
-                    style={styles.iconR}
-                />
-                <Text
-                    style={activeTab === 1 ? styles.textDark : styles.text}
+                    <Text style={activeTab === 0 ? styles.textDark : styles.text}>Home</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.touchable}
+                    onPress={() => {
+                        // moveIndicator(1),
+                        navigation.navigate("Reminders");
+                    }}
                 >
-                    Reminders
-                </Text>
-            </TouchableOpacity>
+                    {activeTab === 1 && <View style={styles.borderReminder} />}
+                    <Image
+                        source={activeTab === 1 ? jar : jarLight}
+                        style={styles.iconR}
+                    />
+                    <Text
+                        style={activeTab === 1 ? styles.textDark : styles.text}
+                    >
+                        Reminders
+                    </Text>
+                </TouchableOpacity>
 
 
-            <TouchableOpacity
-                style={styles.touchable}
-                onPress={() => {
-                    // moveIndicator(2),
-                    navigation.navigate("Appointments");}}
-            >
-                {activeTab === 2 && <View style={styles.border} />}
+                <TouchableOpacity
+                    style={styles.touchable}
+                    onPress={() => {
+                        // moveIndicator(2),
+                        navigation.navigate("Appointments");
+                    }}
+                >
+                    {activeTab === 2 && <View style={styles.border} />}
 
-                <Image source={activeTab === 2 ? calendarDark : calendar} style={styles.iconA}></Image>
-                <Text style={activeTab === 2 ? styles.textDark : styles.text}>Appointments</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.touchable}
-                onPress={() => navigateSidebar()}
-            >
-                <Image source={more} style={styles.iconM}></Image>
-                <Text style={styles.text}>Mails</Text>
-            </TouchableOpacity>
+                    <Image source={activeTab === 2 ? calendarDark : calendar} style={styles.iconA}></Image>
+                    <Text style={activeTab === 2 ? styles.textDark : styles.text}>Appointments</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.touchable}
+                    onPress={() => navigateSidebar()}
+                >
+                    <Image source={more} style={styles.iconM}></Image>
+                    <Text style={styles.text}>More</Text>
+                </TouchableOpacity>
 
-        </View >
+            </View >
         </>
     );
 };

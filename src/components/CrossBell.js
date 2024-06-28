@@ -8,10 +8,11 @@ import BottomModal from './BottomModal';
 import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import DeleteModal from './DeleteModal';
 const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, taken, reloadFunction, prescriptionText }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
-
+    const [deleteModal , setShowDeleteModal] = useState(false);
     const renderRightActions = (progress, dragX, swipeableRef) => (
         <TouchableOpacity onPress={(e) => handleDeletePress(e, swipeableRef)}>
             <View style={taken ? styles.deleteButtontaken : styles.deleteButton}>
@@ -24,10 +25,14 @@ const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, take
     );
 
     const handleDeletePress = (e, swipeableRef) => {
+        setShowDeleteModal(true)
         e.stopPropagation();
-        deleteAlarm(medicineId, time);
         swipeableRef.close();
     };
+
+    const handleDeleteConfirm = () =>{
+        deleteAlarm(medicineId, time);
+    }
 
     const deleteAlarm = async (medicineId, targetTime) => {
         try {
@@ -94,6 +99,8 @@ const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, take
                 </View>
             }
             <BottomModal visible={modalVisible} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setModalVisible(false)} Medicine={Medicine} time={time} />
+            <DeleteModal visible={deleteModal} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setShowDeleteModal(false)} Medicine={Medicine} time={time} handleDeleteConfirm={handleDeleteConfirm} />
+            
         </>
     );
 };

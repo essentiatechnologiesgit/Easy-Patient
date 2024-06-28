@@ -8,7 +8,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import showIcon from '../assets/showIcon.png';
 import { TouchableOpacity } from 'react-native';
-const AssessmentsConatiner = ({ record, isArchived, isHide, isShow, record_id }) => {
+const AssessmentsConatiner = ({ record, isArchived, isHide, isShow, record_id , getData }) => {
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -37,8 +37,8 @@ const AssessmentsConatiner = ({ record, isArchived, isHide, isShow, record_id })
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('BodyAssessments')
+                // console.log(JSON.stringify(response.data));
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -62,8 +62,8 @@ const AssessmentsConatiner = ({ record, isArchived, isHide, isShow, record_id })
         console.log(config);
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('BodyAssessmentsArchive');
+                // console.log(JSON.stringify(response.data));
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     },
     headings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 17,
+        fontSize: PixelRatio.getFontScale() * 18,
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -166,16 +166,16 @@ const styles = StyleSheet.create({
     },
     subHeadings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
         fontWeight: 'bold',
     },
     text: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
     text2: {
         color: config.primaryColor,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
 });
 

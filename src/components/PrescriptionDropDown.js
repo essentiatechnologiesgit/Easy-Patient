@@ -114,7 +114,7 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
                 <TouchableWithoutFeedback onPress={() => handleDownload()}>
                     <View style={styles.lineContainer}>
                         <Image source={downArrow} style={styles.arrow}></Image>
-                        <Text style={styles.text}> Dowload</Text>
+                        <Text style={styles.text}>Download</Text>
                     </View>
                 </TouchableWithoutFeedback>
             </View>

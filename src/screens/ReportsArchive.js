@@ -68,7 +68,7 @@ const ReportsArchive = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 reportsData.map((record, index) => (
-                                    <ReportsContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} />
+                                    <ReportsContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>
@@ -76,7 +76,7 @@ const ReportsArchive = () => {
                         :
                         <View style={styles.Empty}>
                             <Image source={fileGold} style={styles.fileIcon} />
-                            <Text style={styles.emptyText}>You do not have any Medical Reports data</Text>
+                            <Text style={styles.emptyText}>You do not have any Reports data</Text>
                         </View>
                 }
                 {showLoader && <ModalLoader />}

@@ -147,7 +147,7 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
                             style={styles.buttonA}
                             onPress={EditTime}
                         >
-                            <Text style={styles.textA}>Edit</Text>
+                            <Text style={styles.textA}>Snooze</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}

@@ -8,7 +8,7 @@ import { TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import showIcon from '../assets/showIcon.png';
-const PrescriptionContainer = ({ record, isArchived ,isHide,isShow}) => {
+const PrescriptionContainer = ({ record, isArchived ,isHide,isShow,getData}) => {
     const navigation = useNavigation();
 
     useEffect(()=>{
@@ -37,8 +37,8 @@ const PrescriptionContainer = ({ record, isArchived ,isHide,isShow}) => {
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('Prescriptions');
+                // console.log(JSON.stringify(response.data));
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -60,8 +60,8 @@ const PrescriptionContainer = ({ record, isArchived ,isHide,isShow}) => {
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                navigation.navigate('PrescriptionsArchive');
+                // console.log(JSON.stringify(response.data));
+                getData()
             })
             .catch((error) => {
                 console.log(error);
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     },
     headings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 17,
+        fontSize: PixelRatio.getFontScale() * 18,
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -179,12 +179,12 @@ const styles = StyleSheet.create({
     },
     subHeadings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
         fontWeight: 'bold',
     },
     text: {
         color: config.primaryColor,
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 17,
     },
 });
 

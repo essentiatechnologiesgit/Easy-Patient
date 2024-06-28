@@ -10,7 +10,6 @@ const AppointmentRoutes = ({ clinicName, address, longitude, latitude }) => {
     useEffect(() => {
         requestLocationPermission();
     }, []);
-
     const requestLocationPermission = async () => {
         try {
             const granted = await PermissionsAndroid.request(
@@ -34,6 +33,7 @@ const AppointmentRoutes = ({ clinicName, address, longitude, latitude }) => {
         }
     };
 
+   
     const openGoogleMaps = () => {
         const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
         Linking.openURL(url);

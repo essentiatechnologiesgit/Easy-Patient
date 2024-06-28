@@ -8,7 +8,7 @@ import PrescriptionDropDown from '../components/PrescriptionDropDown';
 import downArrow from '../assets/downArrow.png';
 import axios from 'axios';
 import Pdf from 'react-native-pdf';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const PrescriptionsView = () => {
     const route = useRoute();
     const { record, isArchived } = route.params;

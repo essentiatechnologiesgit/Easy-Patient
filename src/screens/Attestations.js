@@ -76,7 +76,7 @@ const Attestations = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 assessmentData.map((record, index) => (
-                                    <AttestationsContainer key={index} record={record} isHide={isHide} record_id={record_id} />
+                                    <AttestationsContainer key={index} record={record} isHide={isHide} record_id={record_id} getData={getData}/>
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

@@ -72,7 +72,7 @@ const Reports = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Medical Reports"} />
+                <BackHeader name={"Reports"} />
                 <TouchableOpacity onPress={() => navigation.navigate("ReportsArchive")} style={styles.touch}>
                     <Image source={archive} style={styles.archiveIcon} />
                 </TouchableOpacity>
@@ -81,7 +81,7 @@ const Reports = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 reportsData.map((record, index) => (
-                                    <ReportsContainer key={index} record={record} isHide={isHide} record_id={record_id} />
+                                    <ReportsContainer key={index} record={record} isHide={isHide} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>
@@ -89,7 +89,7 @@ const Reports = () => {
                         :
                         <View style={styles.Empty}>
                             <Image source={fileGold} style={styles.fileIcon} />
-                            <Text style={styles.emptyText}>You do not have any Medical Reports</Text>
+                            <Text style={styles.emptyText}>You do not have any Reports</Text>
                         </View>
                 }
                 {showLoader && <ModalLoader />}

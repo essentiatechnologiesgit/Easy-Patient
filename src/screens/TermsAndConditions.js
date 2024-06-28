@@ -21,16 +21,13 @@ const TermsAndConditions = () => {
     }, []);
 
     const getTerms = async () => {
-        const loginResponse = await AsyncStorage.getItem('loginResponse');
-        const responseObject = JSON.parse(loginResponse);
-        const access_token = responseObject.access_token;
 
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
             url: 'https://api-patient-dev.easy-health.app/terms',
             headers: {
-                'Authorization': `Bearer ${access_token}`
+                'Authorization': `Bearer 23359af9135bd2a98358a31eaa161255b4f42bf7`
             }
         };
 

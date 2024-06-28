@@ -21,6 +21,7 @@ import AttestaionsArchiveContainer from '../components/AttestationsArchiveConati
 import AttestationContainer from '../components/AttestationContainer';
 import heartBeatGolden from '../assets/heartBeatGolden.png';
 import AttestationsGold from '../assets/AttestationsGold.png';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 const AttestationsArchive = () => {
     const route = useRoute();
     const navigation = useNavigation();
@@ -73,7 +74,7 @@ const AttestationsArchive = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 attestationsData.map((record, index) => (
-                                    <AttestationContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} />
+                                    <AttestationContainer key={index} record={record} isArchived={true} isShow={isShow} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

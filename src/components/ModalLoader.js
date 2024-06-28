@@ -7,7 +7,7 @@ const ModalLoader = ({ msg }) => {
         <View>
             <Modal isVisible={true}>
                 <View style={styles.container}>
-                    <ActivityIndicator size="small"   color="grey" /> 
+                    <ActivityIndicator  size={ Platform.OS === 'android' ? 'large' : 'small' }   color="grey" /> 
                     {
                         Platform.OS === 'android' && 
                         <Text style={styles.text}>Loading...</Text>

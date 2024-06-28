@@ -69,7 +69,7 @@ const MealPlans = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 mealData.map((record, index) => (
-                                    <MealContainer key={index} record={record} isHide={isHide} record_id={record_id} />
+                                    <MealContainer key={index} record={record} isHide={isHide} record_id={record_id} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

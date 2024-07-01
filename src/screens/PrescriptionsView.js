@@ -68,16 +68,6 @@ const PrescriptionsView = () => {
                         <Text style={styles.doctor}>Dr.{record.specialist} at {record.date}</Text>
                     </View>
                     <View style={styles.pdfContainer}>
-                        {/* {
-                            googleDocsUrl && injectedJavaScript &&
-                            <WebView
-                                source={{ uri: googleDocsUrl }}
-                                startInLoadingState={true}
-                                style={styles.webview}
-                                scalesPageToFit={true}
-                                injectedJavaScript={injectedJavaScript}
-                            />
-                        } */}
                         <Pdf
                             trustAllCerts={false}
                             source={{ uri: record.file }}
@@ -106,8 +96,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mailContainer: {
-        padding: 20,
         flex: 1,
+        ...Platform.select({
+            android: {
+                padding: 20,
+            },
+        })
     },
     pdfContainer: {
         flex: 1,
@@ -122,15 +116,27 @@ const styles = StyleSheet.create({
     doctor:{
          fontSize: PixelRatio.getFontScale() * 18,
          color: config.primaryColor,
+         ...Platform.select({
+            ios: {
+                marginLeft: 30,
+            },
+        })
     },
     heading: {
         fontSize: PixelRatio.getFontScale() * 18,
         color: config.primaryColor,
         fontWeight: 'bold',
+        ...Platform.select({
+            ios: {
+                marginLeft: 30,
+                marginTop:20,
+            },
+        })
     },
     subHeadings: {
         fontSize: PixelRatio.getFontScale() * 16,
         color: config.primaryColor,
+        
     },
     dotsContainer: {
         flexDirection: 'column',
@@ -142,6 +148,11 @@ const styles = StyleSheet.create({
         right: 0,
         marginTop: 20,
         marginRight: 24,
+        ...Platform.select({
+            ios: {
+                marginTop: 60,
+            },
+        })
     },
     dot: {
         width: 6,

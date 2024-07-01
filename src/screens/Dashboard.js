@@ -321,7 +321,7 @@ const Dashboard = () => {
                                 </TouchableOpacity>
                             </>
                         }
-                         
+
                     </View>
                     <View style={styles.nameContainer}>
                         <Text style={styles.nameHeading}>Hello {name}!</Text>
@@ -359,10 +359,10 @@ const Dashboard = () => {
                 </ScrollView>
 
                 <Footer prop={0} />
-                   
+
             </ImageBackground>
-            <View style={{alignItems:'center', bottom:100}}>
-            {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
+            <View style={{ alignItems: 'center', bottom: 100 }}>
+                {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
             </View>
         </>
     );
@@ -441,6 +441,11 @@ const styles = StyleSheet.create({
         marginLeft: 16,
         flexDirection: 'row',
         alignItems: 'center',
+        ...Platform.select({
+            ios: {
+                marginTop: 40,
+            },
+        }),
     },
     nameSideHeading: {
         fontSize: PixelRatio.getFontScale() * 20,

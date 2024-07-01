@@ -312,7 +312,6 @@ const Profile = () => {
                                     value={fullName}
                                     onChangeText={value => setFullName(value)}
                                     containerStyles={styles.containerStyles}
-
                                 />
                                 {fullNameError && !fullName && (
                                     <>

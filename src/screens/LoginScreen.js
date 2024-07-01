@@ -11,6 +11,7 @@ import axios from 'axios';
 import ValidationMessageError from '../components/ValidationMessageError';
 import CustomButton from '../components/CustomizedButton';
 import FingerPrint from '../components/FingerAuth';
+import Dialog from "react-native-dialog";
 import qs from 'qs';
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +32,7 @@ const LoginScreen = () => {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [IOSError, setIOSError] = useState(false);
+  const [ noEmail, setNoEmail  ] = useState(false);
   const handleLogin = () => {
     setUsernameError(false);
     setPasswordError(false);
@@ -60,13 +62,13 @@ const LoginScreen = () => {
       checkEmailExist();
     }
     else if (!password) {
-      if(Platform.OS === 'ios'){
+      if (Platform.OS === 'ios') {
         navigation.navigate('PasswordError')
-      }else{
+      } else {
         setPasswordError(true);
         setErrorMessage("provide password");
       }
-      
+
     }
     else {
       Login();
@@ -103,7 +105,11 @@ const LoginScreen = () => {
       setPassword('');
     } catch (error) {
       setShowLoader(false);
-      handleShowSnackbar("Invalid username or password");
+      if(Platform.OS === 'android'){
+        handleShowSnackbar("Invalid username or password");
+      }else{
+        navigation.navigate('PasswordError')
+      }
       console.log(error);
     }
   }
@@ -215,21 +221,16 @@ const LoginScreen = () => {
   const checkEmail = async () => {
     try {
       setShowLoader(true);
+      console.log('Checking email for:', username);
       const response = await axios.get(`https://api-patient-dev.easy-health.app/patient/${username}`);
+      console.log('Response data:', response.data);
+
       if (response.data.registered === true) {
         setEmailExist(false);
-        setButtonText("Login");
+        setButtonText('Login');
         setShowPasswordInput(true);
       } else {
-        if(Platform.OS === 'android')
-        handleShowSnackbar("Incorrect Username/E-mail");
-      else
-      {
-        console.log("Here")
-        setIOSError(true);
-        
-      }
-        
+          handleShowSnackbar('Incorrect Username/E-mail');
       }
       setShowLoader(false);
     } catch (error) {
@@ -350,8 +351,9 @@ const LoginScreen = () => {
         {/* {
         IOSError && 
          */}
-
         {/* } */}
+ 
+        
       </ImageBackground>
 
 

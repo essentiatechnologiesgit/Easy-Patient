@@ -117,56 +117,74 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: config.backgroundColor,
         flex: 1,
-        // justifyContent:'center',
     },
     mailContainer: {
-        padding: 30,
-    },
-    paragraph: {
-        width: '90%',
-    },
-    heading: {
-        fontSize: PixelRatio.getFontScale() * 18,
-        color: config.textColorHeadings,
-        fontWeight: 'bold',
-    },
-    doctor:{
-        fontSize: PixelRatio.getFontScale() * 18,
-        color: config.primaryColor,
-   },
-    subHeadings: {
-        fontSize: PixelRatio.getFontScale() * 16,
-        color: config.primaryColor,
+        flex: 1,
+        ...Platform.select({
+            android: {
+                padding: 20,
+            },
+        })
     },
     pdfContainer: {
         flex: 1,
         height: Dimensions.get('window').height - 200, // Adjust to fit the height of your screen
         marginTop: 20,
     },
+    webview: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+    },
+    doctor:{
+         fontSize: PixelRatio.getFontScale() * 18,
+         color: config.primaryColor,
+         ...Platform.select({
+            ios: {
+                marginLeft: 30,
+            },
+        })
+    },
+    heading: {
+        fontSize: PixelRatio.getFontScale() * 18,
+        color: config.primaryColor,
+        fontWeight: 'bold',
+        ...Platform.select({
+            ios: {
+                marginLeft: 30,
+                marginTop:20,
+            },
+        })
+    },
+    subHeadings: {
+        fontSize: PixelRatio.getFontScale() * 16,
+        color: config.primaryColor,
+        
+    },
     dotsContainer: {
-        flexDirection: 'column', // Align dots vertically
-        justifyContent: 'space-between', // Distribute dots evenly
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         height: 25,
         width: 30,
-        alignItems: 'center', // Set height of the container
-        gap: 4,
+        alignItems: 'center',
         position: 'absolute',
         right: 0,
         marginTop: 20,
         marginRight: 24,
+        ...Platform.select({
+            ios: {
+                marginTop: 60,
+            },
+        })
     },
     dot: {
-        width: 6, // Diameter of the dot
+        width: 6,
         height: 6,
-        borderRadius: 3, // Make it circular
-        backgroundColor: 'black', // Color of the dot
-    },
-    para: {
-        marginTop: 20,
-        color: config.primaryColor,
+        borderRadius: 3,
+        backgroundColor: 'black',
     },
     recievedCont: {
-        marginTop: 10,
+        marginTop: 20,
         gap: 6,
         flexDirection: 'row',
         alignItems: 'center',

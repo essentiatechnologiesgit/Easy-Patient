@@ -10,6 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
 import ValidationError from '../components/ValidationError';
 import axios from 'axios';
+import ValidationMessageError from '../components/ValidationMessageError';
 import Snackbar from '../components/Snackbar';
 import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
@@ -53,15 +54,27 @@ const SignupScreen = () => {
   const [verifyOTP, setVerifyOTP] = useState(false);
   const [pLengthError, setPLengthError] = useState(false);
   const [cpLengthError, setCPLengthError] = useState(false);
+  const [IOSError, setIOSError] = useState(false);
   const handleRegister = () => {
     setEmailError(false);
     setInvalidEmail(false);
     if (!email) {
-      setEmailError(true);
-      setErrorMessage("Incorrect E-mail/Username")
+      if (Platform.OS === 'android') {
+        setEmailError(true);
+        setErrorMessage("Incorrect E-mail/Username")
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please enter correct email");
+
+      }
     } else if (!validateEmail(email)) {
-      setInvalidEmail(true);
-      setErrorMessage("Invalid email");
+      if (Platform.OS === 'android') {
+        setEmailError(true);
+        setErrorMessage("Invalid Email")
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please enter a valid email");
+      }
     }
     else {
       setShowForm(true);
@@ -171,23 +184,44 @@ const SignupScreen = () => {
     setErrorMessage("");
     setInvalidEmail(false);
     if (!email) {
-      setEmailError(true);
-      setErrorMessage("Please provide email");
+      if (Platform.OS === 'android') {
+        setEmailError(true);
+        setErrorMessage("Please provide email");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide email");
+      }
       handleScrollToError(0);
     }
     else if (!validateEmail(email)) {
-      setInvalidEmail(true);
+      if (Platform.OS === 'android') {
+        setInvalidEmail(true);
+        setErrorMessage("Please provide email");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide a valid email");
+      }
       setErrorMessage("Invalid email");
       handleScrollToError(0);
     }
     else if (!fullName) {
-      setFullNameError(true);
-      setErrorMessage("Please provide Full Name");
+      if (Platform.OS === 'android') {
+        setFullNameError(true);
+        setErrorMessage("Please provide Full Name");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide a full Name");
+      }
       handleScrollToError(0);
     }
     else if (!date) {
-      setDateError(true);
-      setErrorMessage("Please select date of Birth");
+      if (Platform.OS === 'android') {
+        setDateError(true);
+        setErrorMessage("Please select date of Birth");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide a date of Birth");
+      }
       handleScrollToError(1);
     }
     else if (!selectedGender) {
@@ -196,28 +230,54 @@ const SignupScreen = () => {
       handleScrollToError(2);
     }
     else if (!password) {
-      setPasswordError(true);
-      setErrorMessage("Please provide Password");
+      if (Platform.OS === 'android') {
+        setPasswordError(true);
+        setErrorMessage("Please provide Password");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide password");
+      }
+
       handleScrollToError(5);
     }
     else if (password.length < 5) {
-      setPLengthError(true);
-      setErrorMessage("Please provide 5 digits password");
+      if (Platform.OS === 'android') {
+        setPLengthError(true);
+        setErrorMessage("Please provide 5 digits password");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide 5 digits password");
+      }
       handleScrollToError(5);
     }
     else if (!confirmPassword) {
-      setConfirmPasswordError(true);
-      setErrorMessage("Please provide Confirm Password");
+      if (Platform.OS === 'android') {
+        setConfirmPasswordError(true);
+        setErrorMessage("Please provide Confirm Password");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide Confirm Password");
+      }
       handleScrollToError(5);
     }
     else if (confirmPassword.length < 5) {
-      setCPLengthError(true);
-      setErrorMessage("Please provide 5 digits password");
+      if (Platform.OS === 'android') {
+        setCPLengthError(true);
+        setErrorMessage("Please provide 5 digits password");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Please provide 5 digits password");
+      }
       handleScrollToError(5);
     }
     else if (confirmPassword != password) {
-      setPasswordMatch(true);
-      setErrorMessage("Passwords dosent match");
+      if (Platform.OS === 'android') {
+        setPasswordMatch(true);
+        setErrorMessage("Passwords dosent match");
+      } else {
+        setIOSError(true);
+        setErrorMessage("Passwords dosent match");
+      }
       handleScrollToError(5);
     }
     else {
@@ -227,11 +287,19 @@ const SignupScreen = () => {
 
   const checkEmailRegistration = async () => {
     try {
-      setShowLoader(true);
+      if (Platform.OS === 'android')
+        setShowLoader(true);
       const response = await axios.get(`https://api-patient-dev.easy-health.app/patient/${email}`);
       if (response.data.registered === true) {
-        setShowLoader(false);
-        handleShowSnackbar("The informed email is already in use. Please try using another one.");
+        if (Platform.OS === 'android')
+          setShowLoader(false);
+        if (Platform.OS === 'ios') {
+          setErrorMessage("The informed email is already in use. Please try using another one.");
+          setIOSError(true);
+        } else {
+          handleShowSnackbar("The informed email is already in use. Please try using another one.");
+        }
+
       } else {
         console.log("email checked");
         RegisterAccount();
@@ -247,9 +315,61 @@ const SignupScreen = () => {
     setSnackbarKey((prevKey) => prevKey + 1);
   };
 
+  const getDetails = async () => {
+    let data = qs.stringify({
+      'grant_type': 'password',
+      'username': username,
+      'password': password
+    });
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://api-patient-dev.easy-health.app/o/token/',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic ZWZmZWN0aXZlc2FsZXNfd2ViX2NsaWVudDo4dz9keF5wVUVxYiZtSnk/IWpBZiNDJWtOOSFSMkJaVQ=='
+      },
+      data: data
+    };
+    try {
+      const response = await axios.request(config);
+      await AsyncStorage.setItem('loginResponse', JSON.stringify(response.data));
+      await saveLoginDetails();
+      setShowLoader(false);
+      navigation.navigate("Dashboard");
+
+    } catch (error) {
+      setShowLoader(false);
+      handleShowSnackbar("Invalid username or password");
+      console.log(error);
+    }
+  }
+
+  const saveLoginDetails = async () => {
+    try {
+      // Construct an object containing login details
+      const loginDetails = {
+        email: username,
+        password: password
+      };
+
+      const jsonLoginDetails = JSON.stringify(loginDetails);
+
+      await AsyncStorage.setItem('loginDetails', jsonLoginDetails);
+
+    } catch (error) {
+      console.error('Error saving login details:', error);
+    }
+  };
+
   const handleVerifyOTP = () => {
     if (!otp) {
+      if(Platform.OS === 'android')
       handleShowSnackbar("Invalid OTP");
+      else{
+        setIOSError(true);
+        setErrorMessage("Invalid OTP provided");
+      }
     } else {
       let data = qs.stringify({
         'email': email,
@@ -270,9 +390,15 @@ const SignupScreen = () => {
           console.log(JSON.stringify(response.data));
           if (response.data.valid === true) {
             // navigate to Dashboard
+            getDetails()
             navigation.navigate("Dashboard");
           } else {
+            if(Platform.OS === 'android')
             handleShowSnackbar("Invalid OTP");
+            else{
+              setIOSError(true);
+              setErrorMessage("Invalid OTP");
+            }
           }
         })
         .catch((error) => {
@@ -329,7 +455,7 @@ const SignupScreen = () => {
 
       <View style={styles.container}>
         {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
-
+        <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
         <Text style={styles.signup}>Signup</Text>
@@ -486,7 +612,6 @@ const SignupScreen = () => {
                 {showDatePicker && (
                   <>
                     {Platform.OS === 'android' ?
-
                       <DateTimePicker
                         style={{ position: 'absolute', width: '100%', bottom: 0, backgroundColor: 'white', zIndex: 999, }}
                         testID="dateTimePicker"
@@ -498,8 +623,8 @@ const SignupScreen = () => {
                       :
                       <>
                         <View style={{ height: 30, width: '100%', justifyContent: 'center', backgroundColor: '#DAE2E4', position: 'absolute', zIndex: 999, bottom: 216 }} >
-                          <TouchableOpacity onPress={()=>{setShowDatePicker(false)}}>
-                          <Text style={{ alignSelf: 'flex-end', right: 10 }}>OK</Text>
+                          <TouchableOpacity onPress={() => { setShowDatePicker(false) }}>
+                            <Text style={{ alignSelf: 'flex-end', right: 10 }}>OK</Text>
                           </TouchableOpacity>
                         </View>
                         <DateTimePicker
@@ -727,6 +852,7 @@ const styles = StyleSheet.create({
   TextContainer: {
     width: '80%',
     marginTop: 40,
+    
   },
   TextContainerText: {
     fontSize: PixelRatio.getFontScale() * 17,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import CustomizedButton from '../components/CustomizedButton';
@@ -11,6 +11,7 @@ import OtpInput from '../components/OTPInput';
 import Snackbar from '../components/Snackbar';
 import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ValidationMessageError from '../components/ValidationMessageError';
 import qs from 'qs';
 const ForgotPassword = () => {
   const navigation = useNavigation();
@@ -38,7 +39,7 @@ const ForgotPassword = () => {
   const [validePassword, setValidPassword] = useState(false);
   const [pLengthError, setPLengthError] = useState(false);
   const [cpLengthError, setCPLengthError] = useState(false);
-
+  const [IOSError, setIOSError] = useState(false);
   const handleOtpChange = (otpValue) => {
     setOtp(otpValue);
     // console.warn(otpValue);
@@ -69,42 +70,86 @@ const ForgotPassword = () => {
     setMatchError(false);
     setCPLengthError(false);
     setPLengthError(false);
+    setPasswordError(false);
     setConfirmPasswordError(false);
     setErrorMessage('');
     if (!username) {
-      setUsernameError(true);
-      setErrorMessage("Incorrect Username/E-mail");
+      if (Platform.OS === 'android') {
+        setUsernameError(true);
+        setErrorMessage("Incorrect Username/E-mail");
+      } else {
+        setErrorMessage("Please enter email-ID");
+        setIOSError(true);
+      }
+
     } else if (!validateEmail(username)) {
-      setInvalidEmail(true);
-      setErrorMessage("Invalid email");
+      if (Platform.OS === 'ios') {
+        setIOSError(true);
+        setErrorMessage("Please enter a valid email");
+      } else {
+        setInvalidEmail(true);
+        setErrorMessage("Invalid email");
+      }
     }
     else if (emailExist) {
+      setIOSError(false);
       checkEmailExist();
     } else if (!otp) {
-      handleShowSnackbar("Invalid OTP");
+      if (Platform.OS === 'android') {
+        handleShowSnackbar("Invalid OTP");
+      } else {
+        setErrorMessage("Invalid OTP");
+        setIOSError(true);
+      }
     } else if (InvalidOTP) {
       VerifyOTP()
     } else if (passwordInput) {
       if (!password) {
-        setPasswordError(true);
-        setErrorMessage("Incorrect Password");
+        if (Platform.OS === 'android') {
+          setPasswordError(true);
+          setErrorMessage("Incorrect Password");
+        } else {
+           setErrorMessage('Please enter email ID')
+           setIOSError(true) 
+        }
+
       }
       else if (password.length < 5) {
-        setPLengthError(true);
-        setErrorMessage("Please provide 5 digits password");
+        if(Platform.OS === 'android'){
+          setPLengthError(true);
+          setErrorMessage("Please provide 5 digits password");  
+        }else{
+          setErrorMessage('Please provide 5 digits password')
+          setIOSError(true) 
+        }
       }
       else if (!ConfirmPass) {
-        setConfirmPasswordError(true);
-        setErrorMessage("Incorrect Confirm Password");
+        if(Platform.OS === 'android' ){
+          setConfirmPasswordError(true);
+          setErrorMessage("Incorrect Confirm Password");
+        }else{
+          setErrorMessage('Please enter Confirm Password')
+          setIOSError(true) 
+        }
       }
       else if (ConfirmPass.length < 5) {
-        setCPLengthError(true);
-        setErrorMessage("Please provide 5 digits password");
+        if(Platform.OS === 'android' ){
+          setCPLengthError(true);
+          setErrorMessage("Please provide 5 digits password");
+        }else{
+          setErrorMessage("Please provide 5 digits password")
+          setIOSError(true) 
+        }
       }
       else {
         if (password != ConfirmPass) {
-          setMatchError(true);
-          setErrorMessage("Passwords does not match");
+          if(Platform.OS === 'android' ){
+            setMatchError(true);
+            setErrorMessage("Passwords does not match");
+          }else{
+            setErrorMessage("Passwords does not match")
+            setIOSError(true) 
+          }
         }
         else {
           changePassword();
@@ -221,7 +266,12 @@ const ForgotPassword = () => {
           setOTPbox(false);
           setInvalidOTP(false);
         } else {
-          handleShowSnackbar("Invalid OTP");
+          if (Platform.OS === 'android') {
+            handleShowSnackbar("Invalid OTP");
+          } else {
+            setErrorMessage("Invalid OTP");
+            setIOSError(true);
+          }
         }
       })
       .catch((error) => {
@@ -231,7 +281,7 @@ const ForgotPassword = () => {
 
   const checkEmailExist = async () => {
     try {
-      setShowLoader(true);
+      // setShowLoader(true);
       const response = await axios.get(`https://api-patient-dev.easy-health.app/patient/${username}`);
       if (response.data.registered === true) {
         setOTPbox(true);
@@ -239,7 +289,12 @@ const ForgotPassword = () => {
         sendOTP();
 
       } else {
-        handleShowSnackbar("Incorrect Username/E-mail");
+        if (Platform.OS === 'android') {
+          handleShowSnackbar("Incorrect Username/E-mail");
+        } else {
+          setErrorMessage("Username not registered");
+          setIOSError(true);
+        }
       }
       setShowLoader(false);
     } catch (error) {
@@ -284,6 +339,8 @@ const ForgotPassword = () => {
 
   return (
     <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+      <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
+
       {showLoader && <ModalLoader />}
       <View style={styles.container}>
         <Image source={config.logo} style={styles.logo}></Image>
@@ -303,6 +360,7 @@ const ForgotPassword = () => {
                 onBlur={handleEmailBlur}
                 placeholderTextColor={config.primaryColor}
                 color="black"
+                autoCapitalize="none"
               />
             </View>
             <View style={{ width: '100%', right: 30, bottom: 0 }}>
@@ -455,9 +513,12 @@ const styles = StyleSheet.create({
     width: '90%',
   },
   inputEmail: {
-    marginBottom: -8,
     flex: 1,
+    marginBottom: -8,
+    paddingLeft: 8,
+    height: 40,
     fontSize: PixelRatio.getFontScale() * 17,
+    color: 'red',
   },
   focusedInput: {
     borderBottomWidth: 4, // Increased border bottom width when focused

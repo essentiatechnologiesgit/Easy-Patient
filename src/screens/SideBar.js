@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, RefreshControl, ScrollView, StyleSheet, TouchableWithoutFeedback, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, RefreshControl, ScrollView, StyleSheet, TouchableWithoutFeedback, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
 import config from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
@@ -172,10 +172,14 @@ const SideBar = () => {
             </ScrollView>
             <View style={[styles.horizontalLine, { marginBottom: 5, marginTop: 10, }]}></View>
             <View style={styles.containerList}>
-                <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
-                    <Image source={EmailIcon} style={styles.mail}></Image>
-                    <Text style={styles.sideText}>Support App</Text>
-                </TouchableOpacity>
+                {
+                    Platform.OS === 'android' &&
+                    <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
+                        <Image source={EmailIcon} style={styles.mail}></Image>
+                        <Text style={styles.sideText}>Support App</Text>
+                    </TouchableOpacity>
+                }
+
                 <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
                     <Image source={configure} style={styles.configure}></Image>
                     <Text style={styles.sideText}>Configure</Text>
@@ -186,7 +190,6 @@ const SideBar = () => {
                 </TouchableOpacity>
             </View>
             <ConfirmationModal isVisible={isModalVisible} toggleModal={toggleModal} Modalfor={"logout"} />
-
         </View>
     );
 };
@@ -196,6 +199,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#2A2A31',
         padding: 20,
         flex: 1,
+
     },
     navigate: {
         flexDirection: 'row',
@@ -276,6 +280,11 @@ const styles = StyleSheet.create({
         marginTop: -5,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        ...Platform.select({
+            ios: {
+                marginTop: 40,
+            },
+        })
     },
     Profilelogo: {
         height: 90,

@@ -99,7 +99,15 @@ const styles = StyleSheet.create({
         // borderColor: '#00000033',
         elevation: 2,
         position: 'relative',
-        height: 62,
+        height: 80,
+        ...Platform.select({
+            ios: {
+                height: 80,
+            },
+            android: {
+                height: 62,
+            },
+        })
     },
     textDark: {
         color: "#55565C",
@@ -122,6 +130,12 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 16,
         position: 'relative',
+        ...Platform.select({
+            ios: {
+                marginBottom: 20,
+            },
+        })
+
     },
     borderHome: {
         position: 'absolute',

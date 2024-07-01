@@ -3,11 +3,13 @@ import { View, Text, ActivityIndicator, StyleSheet, PixelRatio, Platform } from 
 import Modal from "react-native-modal";
 
 const ModalLoader = ({ msg }) => {
+    const hasBackdrop = Platform.OS !== 'ios';
     return (
         <View>
-            <Modal isVisible={true}>
+            <Modal isVisible={true} 
+            hasBackdrop={hasBackdrop} >
                 <View style={styles.container}>
-                    <ActivityIndicator  size={ Platform.OS === 'android' ? 'large' : 'small' }   color="grey" /> 
+                    <ActivityIndicator  size={ 'large'}   color="grey" /> 
                     {
                         Platform.OS === 'android' && 
                         <Text style={styles.text}>Loading...</Text>
@@ -23,12 +25,12 @@ const styles = StyleSheet.create({
 
         ...Platform.select({
             ios: {
-                backgroundColor: 'white',
+                backgroundColor: '#EEF6F8',
                 paddingVertical: 20,
                 flexDirection: 'row', 
                 alignItems: 'center',
                 justifyContent:'center',
-                width:50,
+                width:60,
                 alignSelf:'center'
             },
             android: {

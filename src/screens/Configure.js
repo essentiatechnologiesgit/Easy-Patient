@@ -149,29 +149,33 @@ const Configure = () => {
                 <BackHeader name={"Configure"} />
                 <View style={styles.configureContainer}>
                     <Switch
-                        trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                        thumbColor={switch1 ? config.secondaryColor : config.primaryColor}
-                        ios_backgroundColor="#3e3e3e"
+                        trackColor={{ false: '#00cc00', true: '#36b336' }}
+                        thumbColor={switch1 ? 'white' : 'white'}
+                        ios_backgroundColor={config.primaryColor}
                         onValueChange={() => { toggleSwitch(1) }}
                         value={switch1}
                     />
                     <Text style={styles.mainText}>Notify the time to take the medicine</Text>
                 </View>
+                {
+                    Platform.OS === 'android' &&
+                    <View style={styles.configureContainer}>
+                        <Switch
+                            trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
+                            thumbColor={switch2 ? config.secondaryColor : config.primaryColor}
+                            ios_backgroundColor={config.primaryColor}
+                            onValueChange={() => { toggleSwitch(2) }}
+                            value={switch2}
+                        />
+                        <Text style={styles.mainText}>Open this app together with the medicine reminder</Text>
+                    </View>
+                }
+
                 <View style={styles.configureContainer}>
                     <Switch
-                        trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                        thumbColor={switch2 ? config.secondaryColor : config.primaryColor}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={() => { toggleSwitch(2) }}
-                        value={switch2}
-                    />
-                    <Text style={styles.mainText}>Open this app together with the medicine reminder</Text>
-                </View>
-                <View style={styles.configureContainer}>
-                    <Switch
-                        trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                        thumbColor={switch3 ? config.secondaryColor : config.primaryColor}
-                        ios_backgroundColor="#3e3e3e"
+                        trackColor={{ false: '#00cc00', true: '#36b336' }}
+                        thumbColor={switch1 ? 'white' : 'white'}
+                        ios_backgroundColor={config.primaryColor}
                         onValueChange={() => { toggleSwitch(3) }}
                         value={switch3}
                     />
@@ -182,9 +186,9 @@ const Configure = () => {
                 </View>
                 <View style={styles.configureContainer}>
                     <Switch
-                        trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                        thumbColor={switch4 ? config.secondaryColor : config.primaryColor}
-                        ios_backgroundColor="#3e3e3e"
+                        trackColor={{ false: '#00cc00', true: '#36b336' }}
+                        thumbColor={switch1 ? 'white' : 'white'}
+                        ios_backgroundColor={config.primaryColor}
                         onValueChange={() => { toggleSwitch(4) }}
                         value={switch4}
                     />
@@ -193,16 +197,20 @@ const Configure = () => {
                 <View style={styles.configureSideContainer}>
                     <Text style={styles.sideText}>To receive notification on time , enable the permission</Text>
                 </View>
-                <View style={styles.configureContainer}>
-                    <Switch
-                        trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                        thumbColor={switch5 ? config.secondaryColor : config.primaryColor}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={() => { toggleSwitch(5) }}
-                        value={switch5}
-                    />
-                    <Text style={styles.mainText}>Allow the app to enable FaceID/Fingerprint Authentication</Text>
-                </View>
+                {
+                    Platform.OS === 'android' &&
+                    <View style={styles.configureContainer}>
+                        <Switch
+                            trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
+                            thumbColor={switch5 ? config.secondaryColor : config.primaryColor}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => { toggleSwitch(5) }}
+                            value={switch5}
+                        />
+                        <Text style={styles.mainText}>Allow the app to enable FaceID/Fingerprint Authentication</Text>
+                    </View>
+                }
+
                 <TouchableOpacity onPress={() => { navigation.navigate("TermsAndConditions", { isConfigure: true }) }} style={styles.terms}><Text style={styles.termsText}>Terms & Conditions</Text></TouchableOpacity>
                 <TouchableOpacity onPress={() => { deletAccount() }} style={styles.delete}><Text style={styles.deleteText}>Delete Account</Text></TouchableOpacity>
             </View>
@@ -245,11 +253,21 @@ const styles = StyleSheet.create({
     mainText: {
         color: config.textColorHeadings,
         width: '90%',
+        ...Platform.select({
+            ios: {
+                marginLeft: 5,
+            },
+        }),
     },
     sideText: {
         color: config.primaryColor,
         width: '90%',
         marginLeft: '10%',
+        ...Platform.select({
+            ios: {
+                marginLeft: 45,
+            },
+        }),
     },
 });
 

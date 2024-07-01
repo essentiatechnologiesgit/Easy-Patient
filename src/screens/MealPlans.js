@@ -101,6 +101,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         right: 0,
+        ...Platform.select({
+            ios: {
+                marginTop: 38,
+            },
+        })
     },
     emptyText: {
         color: config.primaryColor,

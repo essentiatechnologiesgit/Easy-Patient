@@ -90,11 +90,15 @@ const BellAlarm = ({ time, Medicine, medicineId, reloadFunction }) => {
         <>
             <TouchableWithoutFeedback onPress={handleNavigate}>
                 <View style={styles.container}>
-                    <Swipeable renderRightActions={renderRightActions}>
+                    <View style={{ position: 'absolute', width: '100%' }}>
                         <View style={styles.child}>
                             <Image source={BellIcon} style={styles.bell} />
                             <Text style={styles.text}>{time} - {Medicine}</Text>
                         </View>
+                    </View>
+                    <Swipeable renderRightActions={renderRightActions}>
+                    <View style={styles.emptyView}>
+                    </View>
                     </Swipeable>
                 </View>
             </TouchableWithoutFeedback>
@@ -110,6 +114,11 @@ const styles = StyleSheet.create({
         width: '92%',
         paddingVertical: 1,
         alignSelf: 'center',
+    },
+    emptyView: {
+        backgroundColor: 'transparent',
+        height: 35,
+        // bottom: 50,
     },
     text: {
         marginLeft: 8,

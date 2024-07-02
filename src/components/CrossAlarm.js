@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableWithoutFeedback, Text, View, StyleSheet, TouchableOpacity,Image } from 'react-native';
+import { TouchableWithoutFeedback, Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import BottomModal from './BottomModal';
 import { Swipeable } from 'react-native-gesture-handler';
 import Svg, { Path } from 'react-native-svg';
@@ -8,15 +8,15 @@ import moment from 'moment';
 import DeleteModal from './DeleteModal';
 const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) => {
     const [modalVisible, setModalVisible] = useState(false);
-    const [deleteModal , setShowDeleteModal] = useState(false);
-   
+    const [deleteModal, setShowDeleteModal] = useState(false);
+
     const renderRightActions = (progress, dragX, swipeableRef) => (
         <TouchableOpacity onPress={(e) => handleDeletePress(e, swipeableRef)}>
             <View style={styles.deleteButton}>
-            <Image
-                source={require('../assets/deleteWhite.png')}
-                style={styles.image}
-            />
+                <Image
+                    source={require('../assets/deleteWhite.png')}
+                    style={styles.image}
+                />
             </View>
         </TouchableOpacity>
     );
@@ -27,7 +27,7 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
         swipeableRef.close();
     };
 
-    const handleDeleteConfirm = () =>{
+    const handleDeleteConfirm = () => {
         deleteAlarm(medicineId, time);
     }
 
@@ -70,25 +70,29 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
         <>
             {taken ? (
                 <View style={styles.container}>
-                    <Swipeable renderRightActions={renderRightActions}>
-                        <View style={styles.cont}>
+                    <View style={{ position: 'absolute', width: '100%', flexDirection: 'row', padding: 10 }}>
                         <Svg width="23" height="22" viewBox="0 0 24 24">
                             <Path fill="#50B76C" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" />
                         </Svg>
                         <Text style={styles.text}>{time} - {Medicine} </Text>
+                    </View>
+                    <Swipeable renderRightActions={renderRightActions}>
+                        <View style={styles.emptyView2}>
                         </View>
                     </Swipeable>
                 </View>
             ) : (
                 <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
                     <View style={styles.container}>
+                        <View style={{ position: 'absolute', width: '100%', flexDirection: 'row', padding: 10 }}>
+                            <View style={styles.circle}>
+                                <View style={[styles.line, styles.lineDiagonal]} />
+                                <View style={[styles.line, styles.lineDiagonal, styles.lineRotated]} />
+                            </View>
+                            <Text style={styles.text}>{time} - {Medicine}</Text>
+                        </View>
                         <Swipeable renderRightActions={renderRightActions}>
-                            <View style={styles.cont}>
-                                <View style={styles.circle}>
-                                    <View style={[styles.line, styles.lineDiagonal]} />
-                                    <View style={[styles.line, styles.lineDiagonal, styles.lineRotated]} />
-                                </View>
-                                <Text style={styles.text}>{time} - {Medicine}</Text>
+                            <View style={styles.emptyView2}>
                             </View>
                         </Swipeable>
                     </View>
@@ -105,30 +109,31 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
                 reloadFunction={reloadFunction}
                 onClose={() => setModalVisible(false)}
             />
-               <DeleteModal visible={deleteModal} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setShowDeleteModal(false)} Medicine={Medicine} time={time} handleDeleteConfirm={handleDeleteConfirm} />
-      
+            <DeleteModal visible={deleteModal} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setShowDeleteModal(false)} Medicine={Medicine} time={time} handleDeleteConfirm={handleDeleteConfirm} />
+
         </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
         paddingVertical: 1,
         alignSelf: 'center',
     },
-    cont:{
-        flexDirection:'row',
-        padding:8,
+    cont: {
+        flexDirection: 'row',
+        padding: 8,
     },
     containerSuccess: {
         justifyContent: 'center',
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        padding:10,
+        padding: 10,
         alignSelf: 'center',
     },
     text: {
@@ -160,15 +165,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
-        padding: 9,
+        height: 42,
     },
-    image:{
-        height:20,
-        width:20,
+    image: {
+        height: 20,
+        width: 20,
     },
     deleteButtonText: {
         color: 'white',
         fontWeight: 'bold',
+    },
+    emptyView2: {
+        backgroundColor: 'transparent',
+        height: 40,
+        // bottom: 50,
     },
 });
 

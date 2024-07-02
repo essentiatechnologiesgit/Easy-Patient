@@ -10,7 +10,7 @@ import CustomizedAppIntro from '../components/CustomizedAppIntro';
 import BellIntro from '../components/BellIntro';
 import MapsAccess from '../components/MapsAccess';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 const IntroScreens = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const navigation = useNavigation();
@@ -32,8 +32,31 @@ const IntroScreens = () => {
             scrollViewRef.current.scrollTo({ x: (currentPage + 1) * Dimensions.get('window').width, animated: true });
         } else {
             requestLocationPermission();
+            requestCameraPermission();
+            requestStoragePermission();
         }
     };
+    
+      const requestStoragePermission = async () => {
+        let result;
+        if (Platform.OS === 'android') {
+          result = await request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
+        } else if (Platform.OS === 'ios') {
+          result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+        }
+      };
+
+    const requestCameraPermission = async () => {
+        let result;
+        if (Platform.OS === 'android') {
+          result = await request(PERMISSIONS.ANDROID.CAMERA);
+        } else if (Platform.OS === 'ios') {
+          result = await request(PERMISSIONS.IOS.CAMERA);
+        }
+      };
+
+
+
 
     const requestLocationPermission = async () => {
         if (Platform.OS === 'android') {
@@ -50,7 +73,9 @@ const IntroScreens = () => {
                 );
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     console.log("Location permission granted (Android)");
+
                     setLocationPermission(true);
+
                 } else {
                     console.log("Location permission denied (Android)");
                 }

@@ -6,7 +6,7 @@ import profileIcon from '../assets/profile.png';
 import leftArrow from '../assets/leftArrow.png';
 import fork from '../assets/forkWhite.png';
 import { Email, openComposer } from 'react-native-email-link';
-import heartBeat from '../assets/heartWhite.png';
+import heartBeat from '../assets/whiteScale.png';
 import fileAdd from '../assets/fileAddWhite.png';
 import fileCapsule from '../assets/fileCapsuleWhite.png';
 import calendar from '../assets/calendarWhite.png';
@@ -16,7 +16,8 @@ import pen from '../assets/pen.png';
 import EmailIcon from '../assets/EmailIcon.png';
 import fileEditWhite from '../assets/fileEditWhite.png';
 import Exam from '../assets/exam.png';
-import Attestations from '../assets/attestations.png';
+import ExamReq from '../assets/examWhite.png';
+import Attestations from '../assets/writeWhite.png';
 import fileWhite from '../assets/fileWhite.png';
 import ConfirmationModal from '../components/ConfirmationModal';
 import configure from '../assets/configureWhite.png';
@@ -105,7 +106,7 @@ const SideBar = () => {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("ExamRequest")} style={styles.appointments}>
                         <View style={styles.navigate}>
-                            <Image source={Exam} style={styles.file}></Image>
+                            <Image source={ExamReq} style={styles.ExamReq}></Image>
                             <Text style={styles.sideText}>Exam Request</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
@@ -136,7 +137,7 @@ const SideBar = () => {
                     <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={heartBeat} style={styles.heart}></Image>
-                            <Text style={styles.sideText}>Body Assessments</Text>
+                            <Text style={{ ...styles.sideText, marginHorizontal: 10 }}>Body Assessments</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
@@ -215,6 +216,10 @@ const styles = StyleSheet.create({
         height: 24,
         width: 16,
     },
+    ExamReq:{
+        width:25,
+        height:12.5,
+    },
     exit: {
         left: 4,
         height: 24,
@@ -241,8 +246,8 @@ const styles = StyleSheet.create({
         width: 21,
     },
     heart: {
-        height: 21,
-        width: 24,
+        height: 36,
+        width: 12,
     },
     calendar: {
         height: 23,

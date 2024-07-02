@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Dimensions, Image, StyleSheet, PixelRatio, ScrollView } from 'react-native';
 import Modal from "react-native-modal";
 import fork from '../assets/fork.png';
-import heartBeat from '../assets/heartBeat.png';
+import heartBeat from '../assets/zipBlack.png';
 import fileAdd from '../assets/fileAdd.png';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
-import fileLife from '../assets/fileLife.png';
-import Scale from '../assets/Scale.png';
-import fileEdit from '../assets/fileEdit.png';
+import fileLife from '../assets/examBlack.png';
+import Scale from '../assets/blackScale.png';
+import fileEdit from '../assets/writeBlack.png';
 import fileCapsule from '../assets/fileCapsule.png';
 import config from "../../config";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -234,7 +234,7 @@ const FolderSlider = () => {
                     <TouchableOpacity onPress={() => navigation.navigate("ExamRequest", { setExam })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
-                        <Image source={heartBeat} style={styles.heartlogo}></Image>
+                        <Image source={heartBeat} style={styles.zipBlack}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Exam Requests
@@ -289,7 +289,7 @@ const FolderSlider = () => {
                     <TouchableOpacity onPress={() => navigation.navigate("Attestations", { setAttestations })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
-                        <Image source={fileEdit} style={styles.fileEdit}></Image>
+                        <Image source={fileEdit} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Attestations/Declarations
@@ -320,7 +320,12 @@ const styles = StyleSheet.create({
     folderHeading: {
         fontSize: PixelRatio.getFontScale() * 16,
         color: "black",
-
+    },
+    zipBlack:{
+        top:-10,
+        left:8,
+        height:19,
+        width:38,
     },
     files: {
         fontSize: PixelRatio.getFontScale() * 14,
@@ -343,17 +348,16 @@ const styles = StyleSheet.create({
     },
     filelogo: {
         top: -10,
-        height: 25,
-        width: 20,
+        height: 26,
+        width: 20.5,
         marginLeft: 10,
     },
 
     Scale: {
         top: -10,
-        height: 26,
-        width: 25,
+        height: 28,
+        width: 9.5,
         marginLeft: 10,
-        transform: [{ rotate: '120deg' }],
 
     },
     heartlogo: {

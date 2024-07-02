@@ -24,18 +24,16 @@ const ProfileImagePopup = ({ visible, onClose, setImage }) => {
     }
 
     const handleCameraLaunch = async () => {
-        const options = {
-          mediaType:'photo',
-        };
-    
-        try {
-          const response = await launchCamera(options);
-            console.log('pickedFile',response.assets[0].originalPath);
-            setImage(response.assets[0].originalPath);
-            onClose();
-        } catch (error) {
-          console.error('Error:', error);
-        }
+
+        ImagePicker.openCamera({
+            cropping: true,
+          })
+          .then((image) => {
+            setImage(image.path);
+          })
+          .catch((error) => {
+          console.log(error);
+          });
       };
 
       const openGallery = () => {

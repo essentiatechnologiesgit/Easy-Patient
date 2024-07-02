@@ -30,6 +30,7 @@ const Dashboard = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const isFocused = useIsFocused();
     const [snackbarKey, setSnackbarKey] = useState(0);
+    const [userId , setUserId] = useState(0);
     useEffect(() => {
 
         const fetchData = async () => {
@@ -94,6 +95,7 @@ const Dashboard = () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         setName(responseObject.user.full_name);
+        setUserId(responseObject.user.user_id);
         const access_token = responseObject.access_token;
         setImage(responseObject.user.profile_pic);
         getHealthCheck(access_token);
@@ -151,14 +153,17 @@ const Dashboard = () => {
             const allAlarmComponents = [];
             const AlarmsArrayJSON = await AsyncStorage.getItem('Alarms');
             const AlarmsArray = AlarmsArrayJSON ? JSON.parse(AlarmsArrayJSON) : [];
-
+    
+            // Define the userId you want to check for
+            
+    
             if (AlarmsArray && AlarmsArray.length > 0) {
                 // Get today's date in 'YYYY-MM-DD' format
                 const today = moment().format('YYYY-MM-DD');
-
-                // Filter alarms for the current day and their times
+    
+                // Filter alarms for the current day and their times, and check if userId exists
                 const currentDayAlarms = AlarmsArray.filter(alarm => {
-                    return alarm.times && alarm.times.some(timeObj => {
+                    return alarm.userId === userId && alarm.times && alarm.times.some(timeObj => {
                         const alarmDateTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
                         return alarmDateTime.isSame(today, 'day');
                     });
@@ -171,7 +176,7 @@ const Dashboard = () => {
                         })
                     };
                 });
-
+    
                 // Flatten all times for sorting
                 const allTimes = currentDayAlarms.reduce((acc, alarm) => {
                     if (alarm.times) {
@@ -179,18 +184,18 @@ const Dashboard = () => {
                     }
                     return acc;
                 }, []);
-
+    
                 // Sort all times
                 allTimes.sort((a, b) => {
                     return moment(a.time, 'YYYY-MM-DD HH:mm').diff(moment(b.time, 'YYYY-MM-DD HH:mm'));
                 });
-
+    
                 // Generate alarm components for sorted times
                 allTimes.forEach((timeObj, index) => {
                     const { time, id: timeId, taken, medicine, id, dosage } = timeObj;
                     const alarmTime = moment(time, 'YYYY-MM-DD HH:mm');
                     const remainingTime = alarmTime.diff(moment(), 'minutes');
-
+    
                     let alarmComponent;
                     // Check if this is the next upcoming alarm
                     if (remainingTime > 0 && !allTimes.some((otherTime) => moment(otherTime.time, 'YYYY-MM-DD HH:mm').isBetween(moment(), alarmTime))) {
@@ -246,18 +251,18 @@ const Dashboard = () => {
                             );
                         }
                     }
-
+    
                     // Add the generated alarm component to the list
                     allAlarmComponents.push({ time: alarmTime.format('HH:mm'), component: alarmComponent });
                 });
-
+    
                 // Render components
                 const components = allAlarmComponents.map((item, index) => (
                     <View style={styles.component} key={index}>
                         {item.component}
                     </View>
                 ));
-
+    
                 // Update state with rendered components
                 setAlarmComponents(components);
             }
@@ -265,6 +270,7 @@ const Dashboard = () => {
             console.error('Error rendering alarm components:', error);
         }
     };
+    
 
 
 

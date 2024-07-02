@@ -153,12 +153,12 @@ const styles = StyleSheet.create({
     THeading: {
         fontSize: PixelRatio.getFontScale() * 16,
         color: config.primaryColor,
-        width: '70%',
+        width: '60%',
     },
     TLHeading: {
         fontSize: PixelRatio.getFontScale() * 14,
         color: config.primaryColor,
-        width: '70%',
+        width: '50%',
     },
     bothContainers: {
         backgroundColor: 'white',
@@ -178,12 +178,23 @@ const styles = StyleSheet.create({
         textAlign: 'right',
     },
     Profilelogo: {
-        height: 72,
-        width: 72,
+
         alignSelf: 'center',
         borderRadius: 36,
         borderColor: config.secondaryColor,
         borderWidth: 1,
+        ...Platform.select({
+            ios: {
+                top:-15,
+                height: 76,
+                width: 76,
+                left:-2.5,
+            },
+            android: {
+                height: 72,
+                width: 72,
+            },
+          })
     },
     ProfilelogoT: {
         height: 80,

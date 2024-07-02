@@ -88,6 +88,9 @@ const UpdateReminder = ({ route }) => {
         setShowDatePicker(true);
     };
     const onChange = (event, selectedDate) => {
+        if (Platform.OS === 'ios') {
+            setTime(selectedDate);
+        }
         const currentDate = selectedDate || date;
         setShowDatePicker(Platform.OS === 'ios');
         setDate(currentDate);
@@ -172,7 +175,7 @@ const UpdateReminder = ({ route }) => {
                         const [theDay, duration] = data.split(',');
                         setSelectedDays(theDay)
                         setDuration(duration);
-                        
+
                         console.log(response.data[i]);
                         setIsOpen(false);
                         // setPlaceholderVisible(false);
@@ -562,7 +565,7 @@ const UpdateReminder = ({ route }) => {
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Update Reminder"} />
-                <TouchableOpacity activeOpacity={1}  onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })} style={styles.medicineContiner}>
+                <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })} style={styles.medicineContiner}>
                     {
                         selectedImage || default_icon ?
                             renderImage()
@@ -573,8 +576,8 @@ const UpdateReminder = ({ route }) => {
 
                 </TouchableOpacity>
                 <TouchableWithoutFeedback onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })}>
-                <Text style={styles.EditImage}>Edit Image</Text>
-                </TouchableWithoutFeedback>    
+                    <Text style={styles.EditImage}>Edit Image</Text>
+                </TouchableWithoutFeedback>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
                         <View
@@ -629,6 +632,7 @@ const UpdateReminder = ({ route }) => {
                                             placeholderTextColor={!dateError ? config.primaryColor : 'red'}
                                             editable={false}
                                             value={date ? formattedDate : fetchDateFormat}
+                                            pointerEvents="none"
                                         />
                                     )}
                                     {date && (
@@ -643,25 +647,51 @@ const UpdateReminder = ({ route }) => {
                                 )}
                             </TouchableOpacity>
                         </View>
-                        {showDatePicker && (
-                            <>
-                                <DateTimePicker
-                                    testID="datePicker"
-                                    value={date || new Date()}
-                                    mode="date"
-                                    display="default"
-                                    onChange={onChange}
-                                />
-                            </>
-                        )}
-                        {showTimePicker && (
-                            <DateTimePicker
-                                testID="timePicker"
-                                value={time}
-                                mode="time"
-                                onChange={onChangeTime}
-                            />
-                        )}
+                        {
+                            Platform.OS === 'android' ?
+                                <>
+                                    {showDatePicker && (
+                                        <>
+                                            <DateTimePicker
+                                                testID="datePicker"
+                                                value={date || new Date()}
+                                                mode="date"
+                                                display="default"
+                                                onChange={onChange}
+                                            />
+                                        </>
+                                    )}
+                                    {showTimePicker && (
+                                        <DateTimePicker
+                                            testID="timePicker"
+                                            value={time}
+                                            mode="time"
+                                            onChange={onChangeTime}
+
+                                        />
+                                    )}
+                                </>
+                                :
+                                <>
+                                    {showDatePicker && (
+                                        <>
+                                            <View style={{ height: 30, width: '100%', justifyContent: 'center', backgroundColor: '#DAE2E4', position: 'absolute', zIndex: 999, bottom: 316 }} >
+                                                <TouchableOpacity onPress={() => { setShowDatePicker(false) }}>
+                                                    <Text style={{ alignSelf: 'flex-end', right: 10 }}>OK</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <DateTimePicker
+                                                style={{ position: 'absolute', width: '100%', bottom: 110, backgroundColor: 'white', zIndex: 998, }}
+                                                testID="datePicker"
+                                                value={date || new Date()}
+                                                mode="datetime"
+                                                display="spinner"
+                                                onChange={onChange}
+                                            />
+                                        </>
+                                    )}
+                                </>
+                        }
                         <View style={{ flexDirection: 'row', width: '90%', }}>
                             <View
                                 ref={(ref) => (errorRefs.current[5] = ref)}
@@ -741,7 +771,7 @@ const UpdateReminder = ({ route }) => {
                                         left: -7,
                                         top: 22,
                                         color: config.primaryColor,
-                                        zIndex: 999,
+                                        zIndex: 99,
                                     }}
                                     textStyle={{
                                         fontSize: PixelRatio.getFontScale() * 18,
@@ -811,8 +841,8 @@ const UpdateReminder = ({ route }) => {
                         )}
                         <View style={styles.switchContainer}>
                             <Switch
-                                trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                                thumbColor={isNotify ? config.secondaryColor : config.primaryColor}
+                                trackColor={{ false: '#00cc00', true: '#36b336' }}
+                                thumbColor={isNotify ? 'white' : 'white'}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={toggleNotifySwitch}
                                 value={isNotify}
@@ -821,8 +851,8 @@ const UpdateReminder = ({ route }) => {
                         </View>
                         <View style={styles.switchContainer}>
                             <Switch
-                                trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                                thumbColor={priority ? config.secondaryColor : config.primaryColor}
+                                trackColor={{ false: '#00cc00', true: '#36b336' }}
+                                thumbColor={priority ? 'white' : 'white'}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={togglePrioritySwitch}
                                 value={priority}
@@ -1177,7 +1207,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         width: '90%',
         height: '100%',
-        flex: 1
+        flex: 1,
+        zIndex: 998,
     },
     floatingLabelH: {
         marginBottom: 6,

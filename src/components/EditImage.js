@@ -55,8 +55,6 @@ const EditImage = ({ route }) => {
         });
       };
 
-      
-
     const updateProfilePicture = async (newProfilePic) => {
         let loginResponse = await AsyncStorage.getItem('loginResponse');
         loginResponse = JSON.parse(loginResponse);

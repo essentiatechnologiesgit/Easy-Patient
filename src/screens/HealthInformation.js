@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, ImageBackground, ScrollView, PixelRatio, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, ImageBackground, ScrollView, PixelRatio, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -66,6 +66,7 @@ const HealthInformation = () => {
                     Scopes.FITNESS_SLEEP_READ,
                 ],
                 webClientId: WEB_CLIENT_ID,
+                iosClientId: IOS_CLIENT_ID,
                 offlineAccess: true,
             });
             await googleLogin();
@@ -73,11 +74,6 @@ const HealthInformation = () => {
         }
 
         getScopes();
-        // configureGoogleSignIn();
-        // saveData();
-        // getWeights();
-
-
     }, []);
 
     const saveData = async () => {
@@ -240,7 +236,7 @@ const HealthInformation = () => {
     }
 
     const WEB_CLIENT_ID = '1019255833424-pc4qjroj6ug3ri52h57pmtq735rgbdrp.apps.googleusercontent.com';
-
+    const IOS_CLIENT_ID = '1019255833424-p2djlipcsphbkogdje8nktk7gs9erpq6.apps.googleusercontent.com';
 
 
     async function handleGoogleFitAuthorization(selectedAccount) {
@@ -248,22 +244,28 @@ const HealthInformation = () => {
             console.error("Please select a Google account to proceed");
             return;
         }
+        if (Platform.OS === 'ios') {
+            const access_token = await getAccessToken();
 
-        const isAuthorized = await GoogleFit.checkIsAuthorized();
-
-        if (isAuthorized) {
-            console.log("Google Fit already authorized");
+            await getData(access_token);
         } else {
-            const authResult = await GoogleFit.authorize({
-                scopes: [/* Your Scopes here */],
-            });
-            if (authResult.success) {
-                await getWeights();
-                // getSteps();
+            const isAuthorized = await GoogleFit.checkIsAuthorized();
+            console.log(isAuthorized);
+            if (isAuthorized) {
+                console.log("Google Fit already authorized");
             } else {
-                console.log("Authorization failed:", authResult.message);
+                const authResult = await GoogleFit.authorize({
+                    scopes: [/* Your Scopes here */],
+                });
+                if (authResult.success) {
+                    await getWeights();
+                    // getSteps();
+                } else {
+                    console.log("Authorization failed:", authResult.message);
+                }
             }
         }
+
     }
 
 
@@ -326,7 +328,7 @@ const HealthInformation = () => {
                 };
 
                 fetchData();
-            } 
+            }
 
 
         } catch (err) {
@@ -543,7 +545,7 @@ const styles = StyleSheet.create({
         width: 30,
         borderRadius: 15,
         position: 'absolute',
-        top: 20,
+         top: 40,
         right: 15,
         alignSelf: 'flex-end',
         justifyContent: 'center',
@@ -638,6 +640,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderColor: config.secondaryColor,
         left: 1,
+        
     },
     error: {
         color: 'red',

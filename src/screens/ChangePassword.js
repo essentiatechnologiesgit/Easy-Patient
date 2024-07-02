@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
 import ValidationError from '../components/ValidationError';
+import ValidationMessageError from '../components/ValidationMessageError';
 import axios from 'axios';
 import Snackbar from '../components/Snackbar';
 import ModalLoader from '../components/ModalLoader';
@@ -29,32 +30,61 @@ const ChangePassword = () => {
     const [errorMessage, setErrorMsg] = useState('');
     const [PLError, setPLError] = useState(false);
     const [CPLError, setCPLError] = useState(false);
-
+    const [IOSError, setIOSError] = useState(false);
     const handleConfirm = async () => {
         setErrorMsg('');
         setCPError(false);
         setPError(false);
         setCPLError(false);
         setPLError(false);
+        setIOSError(false);
         if (!password) {
-            setPError(true);
-            setErrorMsg('Enter password');
+
+            if (Platform.OS === 'android') {
+                setPError(true);
+                setErrorMsg('Enter password');
+            }
+            else {
+                setIOSError(true);
+                setErrorMsg('Please enter a password');
+            }
         }
         else if (password.length < 5) {
-            setPLError(true);
-            setErrorMsg('Password length should be more than 5');
+            if (Platform.OS === 'android') {
+                setPLError(true);
+                setErrorMsg('Password length should be more than 5');
+            } else {
+                setIOSError(true);
+                setErrorMsg('Password length should be more than 5');
+            }
+
         }
         else if (!Cpassword) {
-            setCPError(true);
-            setErrorMsg('Enter confirmation password');
+            if (Platform.OS === 'android') {
+                setCPError(true);
+                setErrorMsg('Enter confirmation password');
+            } else {
+                setIOSError(true);
+                setErrorMsg('Please enter confirm password');
+            }
         }
         else if (Cpassword.length < 5) {
-            setCPLError(true);
-            setErrorMsg('Confirm Password length should be more than 5');
+            if (Platform.OS === 'android') {
+                setCPLError(true);
+                setErrorMsg('Confirm Password length should be more than 5');
+            } else {
+                setIOSError(true);
+                setErrorMsg('Confirm Password length should be more than 5');
+            }
         }
         else if (password != Cpassword) {
-            setCPLError(true);
-            setErrorMsg('Password confirmation does not match the new password');
+            if(Platform.OS === 'android'){
+                setCPLError(true);
+                setErrorMsg('Password confirmation does not match the new password');
+            }else{
+                setIOSError(true);
+                setErrorMsg('Password confirmation does not match the new password');
+            }
         }
         else {
             setShowLoader(true);
@@ -85,16 +115,16 @@ const ChangePassword = () => {
                 .catch((error) => {
                     console.log(error);
                 })
-                .finally(()=>{
+                .finally(() => {
                     setShowLoader(false);
                 });
         }
     }
 
-
     return (
         <>
             <View style={styles.container}>
+                <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
                 <BackHeader name={"Change Password"} />
                 <ScrollView style={{ width: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>

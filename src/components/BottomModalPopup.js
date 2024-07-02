@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { View, Modal, TouchableOpacity, Text, PixelRatio, StyleSheet } from 'react-native';
-import { Picker } from 'react-native-wheel-pick';
+import RNPickerSelect from 'react-native-picker-select';
 import config from '../../config';
 import CustomButton from './CustomizedButton';
-import {
-    WheelPicker,
-} from "react-native-wheel-picker-android";
+
 const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
     const [selectedDuration, setSelectedDuration] = useState('Day');
     const [durationSelect, setDurationSelect] = useState(false);
@@ -17,25 +15,16 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
         onClose();
     };
 
+    const durationOptions = [
+        { label: 'Hour', value: 'Hour' },
+        { label: 'Day', value: 'Day' },
+        { label: 'Week', value: 'Week' },
+    ];
 
-    const [selectedItem, setSelectedItem] = useState(0);
-    
-    const handleItemSelected = (index) => {
-        switch (index) {
-            case 0:
-                setSelectedDuration("Hour");
-                break;
-            case 1:
-                setSelectedDuration("Day");
-                break;
-            case 2:
-                setSelectedDuration("Week");
-                break;
-            default:
-                setSelectedDuration("Day");
-        }
-    };
-
+    const frequencyOptions = Array.from({ length: 24 }, (_, i) => ({
+        label: (i + 1).toString(),
+        value: (i + 1).toString(),
+    }));
 
     const handleChange = () => {
         setDurationSelect(true);
@@ -43,17 +32,11 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
     };
 
     const handleConfirm = () => {
-        setFreNumber(frequencyNumber+1);
+        setFreNumber(frequencyNumber);
         setDuration(selectedDuration);
         setDurationSelect(false);
         setHeading('Type of duration');
         onClose();
-    }
-
-
-    const handleFrequencyChange = (index) => {
-        setFrequencyNumber(index);
-        console.log(frequencyNumber);
     };
 
     return (
@@ -79,52 +62,37 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                     {
                         !durationSelect &&
                         <>
-                            <WheelPicker
-                                style={styles.picker}
-                                selectedItem={selectedItem}
-                                data={["Hour","Day","Week"]}
-                                onItemSelected={handleItemSelected}
-                                selectedItemTextSize={28}
-                                itemTextColor={config.primaryColor}
-                                indicatorColor={config.secondaryColor}
-                                selectedItemTextColor={config.secondaryColor}
-                                indicatorWidth={2}
+                            <RNPickerSelect
+                                onValueChange={(value) => setSelectedDuration(value)}
+                                items={durationOptions}
+                                placeholder={{}}
+                                value={selectedDuration}
+                                style={pickerSelectStyles}
                             />
                             <View style={styles.buttonStyle}>
                                 <CustomButton onPress={handleChange} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"OK"} />
                             </View>
                         </>
-
                     }
                     {
                         durationSelect &&
                         <>
                             <View style={styles.freqContainer}>
-                            <View style={styles.freqContainer}>
-                            <Text style={styles.freqText}>Every</Text>
-                            
-                                <WheelPicker
-                                    style={styles.picker}
-                                    selectedItem={selectedItem}
-                                    data={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"]}
-                                    onItemSelected={handleFrequencyChange}
-                                    selectedItemTextSize={28}
-                                    itemTextColor={config.primaryColor}
-                                    indicatorColor={config.secondaryColor}
-                                    selectedItemTextColor={config.secondaryColor}
-                                    indicatorWidth={2}
+                                <Text style={styles.freqText}>Every</Text>
+                                <RNPickerSelect
+                                    onValueChange={(value) => setFrequencyNumber(value)}
+                                    items={frequencyOptions}
+                                    placeholder={{}}
+                                    value={frequencyNumber}
+                                    style={pickerSelectStyles}
                                 />
                                 <Text style={styles.freqText}>{selectedDuration}</Text>
                             </View>
-                            </View>
                             <View style={styles.buttonStyle}>
-                                {/* <CustomButton  buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"OK"} /> */}
                                 <CustomButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"OK"} />
-
                             </View>
                         </>
                     }
-
                 </View>
             </View>
         </Modal>
@@ -150,24 +118,45 @@ const styles = StyleSheet.create({
         top: -6,
         color: 'black',
     },
-    freqText:{
-        top:20,
-        textAlign:'center',
-        justifyContent:'center',
+    freqText: {
+        top: 20,
+        textAlign: 'center',
+        justifyContent: 'center',
     },
-    freqContainer:{
-        flexDirection:'row',
-        justifyContent:'center',
-        gap:20,
-    
-        alignItems:'center',
+    freqContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 20,
+        alignItems: 'center',
     },
+});
 
-    picker: {
-
-        height: 160,
-        width: '50%',
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: PixelRatio.getFontScale() * 17,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: config.secondaryColor,
+        borderRadius: 4,
+        color: 'black',
+        paddingRight: 10,
+        marginTop: 20,
         alignSelf: 'center',
+        // width: '10%',
+    },
+    inputAndroid: {
+        fontSize: PixelRatio.getFontScale() * 17,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        borderWidth: 0.5,
+        borderColor: config.secondaryColor,
+        borderRadius: 4,
+        color: 'black',
+        paddingRight: 30,
+        marginTop: 20,
+        alignSelf: 'center',
+        width: '50%',
     },
 });
 

@@ -318,7 +318,7 @@ const SignupScreen = () => {
   const getDetails = async () => {
     let data = qs.stringify({
       'grant_type': 'password',
-      'username': username,
+      'username': email,
       'password': password
     });
     let config = {
@@ -617,7 +617,7 @@ const SignupScreen = () => {
                         testID="dateTimePicker"
                         value={date || new Date()}
                         mode="date"
-                        display="spinner"
+                        display="default"
                         onChange={onChange}
                       />
                       :

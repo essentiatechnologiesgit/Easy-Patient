@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Animated, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
 import config from '../../config';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
 import ImagePicker from 'react-native-image-crop-picker';
+import ValidationMessageError from '../components/ValidationMessageError';
 import ValidationError from '../components/ValidationError';
 import axios from 'axios';
 import Snackbar from '../components/Snackbar';
@@ -29,6 +30,7 @@ const Profile = () => {
     const [date, setDate] = useState("");
     const [selectedGender, setSelectedGender] = useState('');
     const errorRefs = useRef([]);
+    const [IOSError, setIOSError] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarKey, setSnackbarKey] = useState(0);
     //validation feilds
@@ -45,6 +47,7 @@ const Profile = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [accessToken, setAccessToken] = useState('');
     const [image, setImage] = useState('');
+    const [newDate , setNewDate ] = useState(new Date());
     const genders = [
         { label: 'Male', value: 'm' },
         { label: 'Female', value: 'f' },
@@ -110,7 +113,7 @@ const Profile = () => {
     const handlePressDatePicker = () => {
         setShowDatePicker(true);
     };
-    
+
 
     const handleSelect = (item) => {
         setSelectedGender(item.value);
@@ -123,6 +126,7 @@ const Profile = () => {
         }).start();
     };
     const onChange = (event, selectedDate) => {
+        setNewDate(selectedDate);
         const currentDate = selectedDate || date;
         setShowDatePicker(Platform.OS === 'ios');
         const year = currentDate.getFullYear();
@@ -279,9 +283,13 @@ const Profile = () => {
     }
 
     handlePhotoNavigation = () => {
-        navigation.navigate('EditImage', {
-            imageURI: image,
-        });
+        if (Platform.OS === 'android') {
+            navigation.navigate('EditImage', {
+                imageURI: image,
+            });
+        } else {
+            handleEdit()
+        }
     }
 
     const handleEdit = () => {
@@ -292,6 +300,7 @@ const Profile = () => {
         <>
             <ScrollView style={styles.container}>
                 <ProfileImagePopup visible={modalVisible} onClose={() => setModalVisible(false)} setImage={setImage} />
+                <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
                 <BackHeader name={"Profile"} />
                 <View style={styles.formContainer}>
                     <TouchableOpacity onPress={() => handlePhotoNavigation()}>
@@ -360,7 +369,6 @@ const Profile = () => {
                                                 placeholderTextColor={config.primaryColor}
                                                 editable={false}
                                                 value={date}
-
                                             />
                                         )}
                                         {date && (
@@ -376,18 +384,38 @@ const Profile = () => {
                                 </TouchableOpacity>
                             </View>
                             {showDatePicker && (
-                                <DateTimePicker
-                                    testID="dateTimePicker"
-                                    value={new Date()}
-                                    mode="date"
-                                    display="default"
-                                    onChange={onChange}
-                                    textColor="red"
-                                />
+                                <>
+                                    {Platform.OS === 'android' ?
+                                        <DateTimePicker
+                                            style={{ position: 'absolute', width: '100%', bottom: 0, backgroundColor: 'white', zIndex: 999, }}
+                                            testID="dateTimePicker"
+                                            value={date || new Date()}
+                                            mode="date"
+                                            display="default"
+                                            onChange={onChange}
+                                        />
+                                        :
+                                        <>
+                                            <View style={{ height: 30, width: '100%', justifyContent: 'center', backgroundColor: '#DAE2E4', position: 'absolute', zIndex: 999, bottom: 216 }} >
+                                                <TouchableOpacity onPress={() => { setShowDatePicker(false) }}>
+                                                    <Text style={{ alignSelf: 'flex-end', right: 10 }}>OK</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <DateTimePicker
+                                                style={{ position: 'absolute', width: '100%', bottom: 0, backgroundColor: 'white', zIndex: 999, }}
+                                                testID="dateTimePicker"
+                                                value={newDate}
+                                                mode="date"
+                                                display="spinner"
+                                                onChange={onChange}
+                                            />
+                                        </>
+                                    }
+                                </>
                             )}
                             <View
                                 ref={(ref) => (errorRefs.current[3] = ref)}
-                                style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 5 }}>
+                                style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 998, marginTop: 5 }}>
                                 <Animated.Text
                                     style={[
                                         styles.placeholderLabel,

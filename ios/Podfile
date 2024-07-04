@@ -7,6 +7,17 @@ resolved_pod_script = Pod::Executable.execute_command('node', ['-p',
 
 require resolved_pod_script
 
+# Add the node_require method for react-native-permissions setup
+def node_require(script)
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve(
+      '#{script}',
+      {paths: [process.argv[1]]},
+    )", __dir__]).strip
+end
+
+node_require('react-native-permissions/scripts/setup.rb')
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -42,9 +53,30 @@ target 'EasyPatientDynamic' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # Add react-native-permissions
-  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
-
+  # Add react-native-permissions setup
+  setup_permissions([
+    # Uncomment the permissions you need
+    'AppTrackingTransparency',
+    'Bluetooth',
+    'Calendars',
+    'CalendarsWriteOnly',
+    'Camera',
+    'Contacts',
+    'FaceID',
+    'LocationAccuracy',
+    'LocationAlways',
+    'LocationWhenInUse',
+    'MediaLibrary',
+    'Microphone',
+    'Motion',
+    'Notifications',
+    'PhotoLibrary',
+    'PhotoLibraryAddOnly',
+    'Reminders',
+    'Siri',
+    'SpeechRecognition',
+    'StoreKit',
+  ])
 
   target 'EasyPatientDynamicTests' do
     inherit! :complete

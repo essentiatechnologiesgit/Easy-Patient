@@ -37,6 +37,7 @@ import AlertIcon from '../components/AlertIcon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import medicine from '../assets/medicine.png';
+import ValidationMessageError from '../components/ValidationMessageError';
 import MedicineImage from './MedicineImage';
 const UpdateReminder = ({ route }) => {
     // const routeInfo = useRoute();
@@ -61,6 +62,7 @@ const UpdateReminder = ({ route }) => {
     //validation feilds
     const [medicineError, setMedicineError] = useState(false);
     const [doseError, setDoseError] = useState(false);
+    const [IOSError, setIOSError] = useState(false);
     const [dateError, setDateError] = useState(false);
     const [fetchDateFormat, setFetchedDateFormat] = useState('');
     const [daysError, setDaysError] = useState('');
@@ -175,8 +177,6 @@ const UpdateReminder = ({ route }) => {
                         const [theDay, duration] = data.split(',');
                         setSelectedDays(theDay)
                         setDuration(duration);
-
-                        console.log(response.data[i]);
                         setIsOpen(false);
                         // setPlaceholderVisible(false);
                         Animated.timing(placeholderLabelAnim, {
@@ -208,7 +208,6 @@ const UpdateReminder = ({ route }) => {
     }
 
     const handleDelete = () => {
-
         Alert.alert(
             'Alert',
             `Do you want to delete ${MedicineName}?`,
@@ -287,25 +286,55 @@ const UpdateReminder = ({ route }) => {
         setErrorMessage('');
         setDateError(false);
         setDaysError(false);
+        setIOSError(false);
         setDoseError(false);
         if (!MedicineName) {
-            setMedicineError(true);
-            setErrorMessage('Enter the name of Medicine/Supplement');
+            if (Platform.OS === 'android') {
+                setMedicineError(true);
+                setErrorMessage('Enter the name of Medicine/Supplement');
+            } else {
+                setIOSError(true);
+                setErrorMessage('Please enter the name of Medicine/Supplement');
+            }
         }
         else if (!dose) {
-            setDoseError(true);
-            setErrorMessage('Enter dosage');
+            if (Platform.OS === 'android') {
+                setDoseError(true);
+                setErrorMessage('Enter dosage');
+            }
+            else {
+                setIOSError(true);
+                setErrorMessage('Please enter the dosage');
+            }
         }
         else if (!date && !fetchDateFormat) {
-            setDateError(true);
-            setErrorMessage('Enter start date and time');
+            if (Platform.OS === 'android') {
+                setDateError(true);
+                setErrorMessage('Enter start date and time');
+            }
+            else {
+                setIOSError(true);
+                setErrorMessage('Please enter the Date and Time');
+            }
         }
         else if (!days) {
-            setDaysError(true);
-            setErrorMessage('Enter number of days')
+            if (Platform.OS === 'android') {
+                setDaysError(true);
+                setErrorMessage('Enter number of days')
+            }
+            else {
+                setIOSError(true);
+                setErrorMessage('Please enter the number of Days');
+            }
         } else if (!freNumber) {
-            setFreNumberError(true);
-            setErrorMessage('Please enter the frequency');
+            if (Platform.OS === 'android') {
+                setFreNumberError(true);
+                setErrorMessage('Please enter the frequency');
+            }
+            else {
+                setIOSError(true);
+                setErrorMessage('Please enter the frequency');
+            }
         } else {
             setShowLoader(true);
             const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -562,6 +591,7 @@ const UpdateReminder = ({ route }) => {
     return (
         <>
             <View style={styles.container}>
+                <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Update Reminder"} />

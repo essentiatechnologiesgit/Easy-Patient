@@ -10,6 +10,7 @@ import CustomizedAppIntro from '../components/CustomizedAppIntro';
 import BellIntro from '../components/BellIntro';
 import MapsAccess from '../components/MapsAccess';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Permission } from 'react-native-permissions';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 const IntroScreens = () => {
     const [currentPage, setCurrentPage] = useState(0);
@@ -17,9 +18,7 @@ const IntroScreens = () => {
     const scrollViewRef = useRef(null);  // Create a reference to the ScrollView
     const [locationPermission, setLocationPermission] = useState(false);
 
-    useEffect(() => {
-        requestLocationPermission();
-    }, []);
+
 
     const handleScroll = (event) => {
         const { contentOffset, layoutMeasurement } = event.nativeEvent;
@@ -32,33 +31,84 @@ const IntroScreens = () => {
             scrollViewRef.current.scrollTo({ x: (currentPage + 1) * Dimensions.get('window').width, animated: true });
         } else {
             requestLocationPermission();
-            requestCameraPermission();
-            requestStoragePermission();
+        }
+    };
+
+    const requestLocationPermission = async () => {
+        await Asklocation();
+        await AskCamera();
+        await AskGallery();
+
+       navigation.navigate("Login");
+    };
+
+
+    const AskCamera = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    {
+                        title: "Camera Permission",
+                        message: "This app needs access to your camera to take photos.",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK",
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("Camera permission granted (Android)");
+                } else {
+                    console.log("Camera permission denied (Android)");
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        } else if (Platform.OS === 'ios') {
+            const permission = await request(PERMISSIONS.IOS.CAMERA);
+            if (permission === RESULTS.GRANTED) {
+                console.log("Camera permission granted (iOS)");
+                setLocationPermission(true);
+            } else {
+                console.log("Camera permission denied (iOS)");
+            }
+        }
+    }
+
+    const AskGallery = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                    {
+                        title: "Photos Permission",
+                        message: "This app needs access to your photos and media.",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK",
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("Photos permission granted (Android)");
+                } else {
+                    console.log("Photos permission denied (Android)");
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        } else if (Platform.OS === 'ios') {
+            const permission = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+            if (permission === RESULTS.GRANTED) {
+                console.log("Gallery permission granted (iOS)");
+                setLocationPermission(true);
+            } else {
+                console.log("Gallery permission denied (iOS)");
+            }
         }
     };
     
-      const requestStoragePermission = async () => {
-        let result;
-        if (Platform.OS === 'android') {
-          result = await request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
-        } else if (Platform.OS === 'ios') {
-          result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
-        }
-      };
 
-    const requestCameraPermission = async () => {
-        let result;
-        if (Platform.OS === 'android') {
-          result = await request(PERMISSIONS.ANDROID.CAMERA);
-        } else if (Platform.OS === 'ios') {
-          result = await request(PERMISSIONS.IOS.CAMERA);
-        }
-      };
-
-
-
-
-    const requestLocationPermission = async () => {
+    const Asklocation = async () => {
         if (Platform.OS === 'android') {
             try {
                 const granted = await PermissionsAndroid.request(
@@ -73,9 +123,7 @@ const IntroScreens = () => {
                 );
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     console.log("Location permission granted (Android)");
-
                     setLocationPermission(true);
-
                 } else {
                     console.log("Location permission denied (Android)");
                 }
@@ -83,12 +131,15 @@ const IntroScreens = () => {
                 console.warn(err);
             }
         } else if (Platform.OS === 'ios') {
-            console.log("Here");
-            // Implement iOS location permission request here
-            // For iOS, you generally don't need to request until you actually need it
-            // For example, when user agrees to proceed to the next screen.
+            const permission = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+            if (permission === RESULTS.GRANTED) {
+                console.log("Location permission granted (iOS)");
+                setLocationPermission(true);
+            } else {
+                console.log("Location permission denied (iOS)");
+            }
         }
-    };
+    }
 
     return (
         <View style={styles.parentContainer}>
@@ -133,7 +184,7 @@ const IntroScreens = () => {
                             marginHorizontal={4}
                         />
                         :
-                        <TouchableWithoutFeedback onPress={()=>navigation.navigate("Login")}>
+                        <TouchableWithoutFeedback onPress={() => navigation.navigate("Login")}>
                             <Text style={styles.missTrade}>Miss trade</Text>
                         </TouchableWithoutFeedback>
                 }

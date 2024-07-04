@@ -23,6 +23,7 @@ const PrescriptionsArchive = () => {
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [prescriptionsData, setPrescriptionsData] = useState([]);
+    const record_id = route?.params?.record_id ?? 0;
     const [showLoader , setShowLoader ] = useState(true);
     const isShow = route?.params?.isShow ?? false;
     useEffect(() => {
@@ -69,7 +70,7 @@ const PrescriptionsArchive = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 prescriptionsData.map((record, index) => (
-                                    <PrescriptionContainer key={index} record={record} isArchived={true} isShow={isShow} getData={getData} />
+                                    <PrescriptionContainer key={index} record={record} record_id={record_id} isArchived={true} isShow={isShow} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

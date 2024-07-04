@@ -14,6 +14,7 @@ import GoldenCapsule from '../assets/goldenCapsule.png';
 const Prescriptions = () => {
     const route = useRoute();
     const isHide = route?.params?.isHide ?? false;
+    const record_id = route?.params?.record_id ?? 0;
     const navigation = useNavigation();
     const scrollViewRef = useRef();
     const [prescriptionsData, setPrescriptionsData] = useState([]);
@@ -31,7 +32,6 @@ const Prescriptions = () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
-        console.log(access_token);
         let data = new FormData();
 
         let config = {
@@ -43,7 +43,7 @@ const Prescriptions = () => {
             },
             data: data
         };
-        console.log(config);
+        
         axios.request(config)
             .then((response) => {
                 // console.log(JSON.stringify(response.data));
@@ -68,7 +68,7 @@ const Prescriptions = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 prescriptionsData.map((record, index) => (
-                                    <PrescriptionContainer key={index} record={record}  isHide={isHide} getData={getData}/>
+                                    <PrescriptionContainer key={index} record={record} isHide={isHide} record_id={record_id} getData={getData}/>
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

@@ -17,6 +17,7 @@ import EmailIcon from '../assets/EmailIcon.png';
 import fileEditWhite from '../assets/fileEditWhite.png';
 import Exam from '../assets/exam.png';
 import ExamReq from '../assets/examWhite.png';
+import ValidationMessageError from '../components/ValidationMessageError';
 import Attestations from '../assets/writeWhite.png';
 import fileWhite from '../assets/fileWhite.png';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -28,7 +29,9 @@ const SideBar = () => {
     const navigation = useNavigation();
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
+    const [IOSError, setIOSError] = useState(false);
     const [image, setImage] = useState('');
+    const [errorMessage , setErrorMessage] = useState('');
     useEffect(() => {
         const fetchData = async () => {
             await getUserDetails();
@@ -41,8 +44,6 @@ const SideBar = () => {
         setModalVisible(!isModalVisible);
     };
 
-
-
     const getUserDetails = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
@@ -52,9 +53,7 @@ const SideBar = () => {
     }
 
     const Logout = async () => {
-        toggleModal();
-        // await AsyncStorage.setItem('loginResponse', '');
-        // navigation.navigate("Login");
+            toggleModal();
     }
 
     const handleEmailPress = () => {
@@ -65,6 +64,7 @@ const SideBar = () => {
 
     return (
         <View style={styles.container}>
+            <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
             <View style={styles.topHead}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
                     <Image source={leftArrow} style={styles.arrow}></Image>
@@ -180,7 +180,6 @@ const SideBar = () => {
                         <Text style={styles.sideText}>Support App</Text>
                     </TouchableOpacity>
                 }
-
                 <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
                     <Image source={configure} style={styles.configure}></Image>
                     <Text style={styles.sideText}>Configure</Text>
@@ -216,9 +215,9 @@ const styles = StyleSheet.create({
         height: 24,
         width: 16,
     },
-    ExamReq:{
-        width:25,
-        height:12.5,
+    ExamReq: {
+        width: 25,
+        height: 12.5,
     },
     exit: {
         left: 4,

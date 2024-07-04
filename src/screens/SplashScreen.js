@@ -59,9 +59,10 @@ const SplashScreen = () => {
         const location = await checkLocationPermission();
         const camera = await checkCameraPermission();
         const storage = await checkStoragePermission();
-        if (location === "granted" && camera === "granted" && storage === "granted") {
+        if (location === "granted" && camera === "granted" && storage === "limited" ||  storage === "granted") {
           navigation.navigate('Login');
-        } else {
+        }
+         else {
           navigation.navigate('IntroScreens');
         }
       }

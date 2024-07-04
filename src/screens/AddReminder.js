@@ -11,6 +11,7 @@ import redDrop from '../assets/redDrop.png';
 import blackDrop from '../assets/blackDrop.png';
 import blueDrop from '../assets/blueDrop.png';
 import { readFile } from 'react-native-fs';
+import ValidationMessageError from '../components/ValidationMessageError';
 import yellowDrink from '../assets/yellowDrink.png';
 import yellowDrop from '../assets/yellowDrop.png';
 import redDrink from '../assets/redDrink.png';
@@ -51,6 +52,7 @@ const AddReminder = ({ route }) => {
     //validation feilds
     const [medicineError, setMedicineError] = useState(false);
     const [doseError, setDoseError] = useState(false);
+    const [IOSError, setIOSError] = useState(false);
     const [dateError, setDateError] = useState(false);
     const [daysError, setDaysError] = useState('');
     const [frequencyError, setFrequencyError] = useState('');
@@ -131,25 +133,51 @@ const AddReminder = ({ route }) => {
         setErrorMessage('');
         setDateError(false);
         setDaysError(false);
+        setIOSError(false);
         setDoseError(false);
         if (!MedicineName) {
-            setMedicineError(true);
-            setErrorMessage('Enter the name of Medicine/Supplement');
+            if(Platform.OS === 'android'){
+                setMedicineError(true);
+                setErrorMessage('Enter the name of Medicine/Supplement');
+            }else{
+                setIOSError(true);
+                setErrorMessage('Please enter the name of Medicine/Supplement');
+            }
         }
         else if (!dose) {
+            if(Platform.OS === 'android'){
             setDoseError(true);
-            setErrorMessage('Enter dosage');
+            setErrorMessage('Enter dosage');}
+            else{
+                setIOSError(true);
+                setErrorMessage('Please enter the dosage');
+            }
         }
         else if (!date) {
+            if(Platform.OS === 'android'){
             setDateError(true);
-            setErrorMessage('Enter start date and time');
+            setErrorMessage('Enter start date and time');}
+            else{
+                setIOSError(true);
+                setErrorMessage('Please enter the Date and Time');
+            }
         }
         else if (!days) {
+            if(Platform.OS === 'android'){
             setDaysError(true);
-            setErrorMessage('Enter number of days')
+            setErrorMessage('Enter number of days')}
+            else{
+                setIOSError(true);
+                setErrorMessage('Please enter the number of Days');
+            }
         } else if (!freNumber) {
+            if(Platform.OS === 'android'){
             setFreNumberError(true);
-            setErrorMessage('Please enter the frequency');
+            setErrorMessage('Please enter the frequency');}
+            else{
+                setIOSError(true);
+                setErrorMessage('Please enter the frequency');
+            }
         } else {
             setShowLoader(true);
 
@@ -464,6 +492,7 @@ const AddReminder = ({ route }) => {
     return (
         <>
             <View style={styles.container}>
+                <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
                 {showLoader && <ModalLoader />}
                 <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
                 <BackHeader name={"Add Reminder"} />

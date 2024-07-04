@@ -78,11 +78,11 @@ const PrescriptionsView = () => {
                 {
                     isArchived ?
                         <>
-                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} title={"PrescriptionsArchive"} />}
+                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} record_id={record.id} title={"PrescriptionsArchive"} />}
                         </>
                         :
                         <>
-                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} title={"Prescriptions"} />}
+                            {showDropDown && <PrescriptionDropDown showDropDown={showDropDown} setShowDropDown={setShowDropDown} pdf={record.file} isArchived={isArchived} record_id={record.id} title={"Prescriptions"} />}
                         </>
                 }
             </View>

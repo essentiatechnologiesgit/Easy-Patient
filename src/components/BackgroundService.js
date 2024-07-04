@@ -5,37 +5,48 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image, Platform, NativeEventEmitter, NativeModules } from 'react-native';
 
 const BackgroundService = () => {
+
   // Ensure BackgroundTimer has addListener and removeListeners
   if (!BackgroundTimer.addListener) {
-    BackgroundTimer.addListener = () => {};
+    BackgroundTimer.addListener = () => { };
   }
   if (!BackgroundTimer.removeListeners) {
-    BackgroundTimer.removeListeners = () => {};
+    BackgroundTimer.removeListeners = () => { };
   }
 
   BackgroundTimer.start();
   BackgroundTimer.runBackgroundTimer(async () => {
-    // console.log("The time when function called", moment());
+    const userId = await getLoginResponse()
     try {
       const currentTime = moment().format('YYYY-MM-DD HH:mm');
       const AlarmsArray = JSON.parse(await AsyncStorage.getItem('Alarms'));
       if (AlarmsArray) {
         AlarmsArray.forEach(alarm => {
-          const { times, dosage, medicine, picture_link, selectedImage } = alarm;
-          times.forEach(timeObj => {
-            const { time } = timeObj;
-            if (time === currentTime) {
-              // console.log("Alarm Time and Curr Time", time, currentTime);
-              displayNotifications(dosage, medicine, picture_link, selectedImage);
-            }
-          });
+          const { times, dosage, medicine, picture_link, selectedImage, user_id } = alarm;
+          if (user_id === userId) {
+            times.forEach(timeObj => {
+              const { time } = timeObj;
+              if (time === currentTime) {
+                // console.log("Alarm Time and Curr Time", time, currentTime);
+                displayNotifications(dosage, medicine, picture_link, selectedImage);
+              }
+            });
+          }
         });
       }
     } catch (error) {
       console.error('Background task error:', error);
     }
-  }, 60000);
+  }, 60000); //60000
+
+  const getLoginResponse = async () => {
+    const loginResponse = await AsyncStorage.getItem('loginResponse');
+    const responseObject = await JSON.parse(loginResponse);
+    return responseObject?.user.user_id;
+  }
 };
+
+
 
 const displayNotifications = async (dosage, medicine, picture_link, selectedImage) => {
   const renderImage = (selectedImage) => {
@@ -103,6 +114,17 @@ const displayNotifications = async (dosage, medicine, picture_link, selectedImag
         id: 'default',
       },
     },
+    ios: {
+      critical: true,
+      sound: 'notification.wav', // Ensure this sound file is placed correctly in the iOS project
+      attachments: [
+        {
+          url: picture_link ? picture_link : renderImage(selectedImage), // Local or remote image
+          thumbnailHidden: false, // Optionally hide the thumbnail
+        },
+      ],
+      showTimestamp: true,
+    }
   });
 };
 

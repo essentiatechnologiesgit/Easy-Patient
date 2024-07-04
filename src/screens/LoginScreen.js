@@ -256,7 +256,6 @@ const LoginScreen = () => {
     <>
       <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
         <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
-
         {showLoader && <ModalLoader />}
         {showFingerAuth && <FingerPrint setShowFingerAuth={setShowFingerAuth} />}
         <View style={styles.container}>
@@ -369,7 +368,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         justifyContent: 'center',
-        gap: 5,
+        // gap: 5,
       },
       android: {
         paddingTop: 20,

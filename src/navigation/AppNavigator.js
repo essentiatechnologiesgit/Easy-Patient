@@ -70,7 +70,6 @@ const AppNavigator = () => {
         <Stack.Screen style={styles.container} name="IntroScreens" component={IntroScreens} />
         <Stack.Screen style={styles.container} name="Login" component={Login} />
         <Stack.Screen style={styles.container} name="PasswordError" component={PasswordError} />
-         
         <Stack.Screen style={styles.container} name="PatternAuth" component={PatternAuth} />
         <Stack.Screen style={styles.container} name="Signup" component={Signup} />
         <Stack.Screen style={styles.container} name="ForgotPassword" component={ForgotPassword} />

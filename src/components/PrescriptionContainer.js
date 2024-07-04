@@ -8,33 +8,41 @@ import { TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import showIcon from '../assets/showIcon.png';
-const PrescriptionContainer = ({ record, isArchived ,isHide,isShow,getData}) => {
+const PrescriptionContainer = ({ record, isArchived,isHide ,isShow,record_id,getData}) => {
     const navigation = useNavigation();
 
     useEffect(()=>{
         if(isHide)
-           handleHide();
+        {
+            handleHide();
+            console.log(isHide);
+        }
+           
     },[isHide])
 
     useEffect(()=>{
         
-        if(isShow)
-           handleShow();
+        if(isShow){
+            handleShow();
+            console.log(isHide);
+        }
+           
     },[isShow])
 
     const handleShow = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
+        
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
-            url: `https://api-patient-dev.easy-health.app/prescriptions/available/${record.id}`,
+            url: `https://api-patient-dev.easy-health.app/prescriptions/available/${record_id !== 0 ? record_id : record.id}`,
             headers: {
                 'Authorization': `Bearer ${access_token}`
             }
         };
-
+        
         axios.request(config)
             .then((response) => {
                 // console.log(JSON.stringify(response.data));
@@ -52,12 +60,12 @@ const PrescriptionContainer = ({ record, isArchived ,isHide,isShow,getData}) => 
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
-            url: `https://api-patient-dev.easy-health.app/prescriptions/archive/${record.id}`,
+            url: `https://api-patient-dev.easy-health.app/prescriptions/archive/${record_id !== 0 ? record_id : record.id}`,
             headers: {
                 'Authorization': `Bearer ${access_token}`
             }
         };
-
+        
         axios.request(config)
             .then((response) => {
                 // console.log(JSON.stringify(response.data));

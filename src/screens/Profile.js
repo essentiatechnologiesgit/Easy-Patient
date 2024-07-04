@@ -154,27 +154,53 @@ const Profile = () => {
         setDateError(false);
         setSnackbarMessage('');
         setGenderError(false);
+        setIOSError(false);
         setDateError(false);
         setErrorMessage('');
         if (!email) {
-            setEmailError(true);
-            setErrorMessage("Please provide email");
+            if(Platform.OS === 'android'){
+                setEmailError(true);
+                setErrorMessage("Please provide email");
+            }else{
+                setIOSError(true);
+                setErrorMessage("Please provide email");
+            }   
         }
         else if (!validateEmail(email)) {
+            if(Platform.OS === 'android'){
             setInvalidEmail(true);
             setErrorMessage("Invalid email");
+            }else{
+                setIOSError(true);
+                setErrorMessage("Please provide a valid email");
+            }
         }
         else if (!fullName) {
+            if(Platform.OS === 'android'){
             setFullNameError(true);
-            setErrorMessage("Please provide Full Name");
+            setErrorMessage("Please provide Full Name");}
+            else{
+                setIOSError(true);
+                setErrorMessage("Please provide full Name");
+            }
         }
         else if (!date) {
+            if(Platform.OS === 'android'){
             setDateError(true);
-            setErrorMessage("Please provide Date");
+            setErrorMessage("Please provide Date");}
+            else{
+                setIOSError(true);
+                setErrorMessage("Please provide Date");
+            }
         }
         else if (!selectedGender) {
+            if(Platform.OS === 'android'){
             setSelectedGender(true);
-            setErrorMessage("Please provide Gender");
+            setErrorMessage("Please provide Gender");}
+            else{
+                setIOSError(true);
+                setErrorMessage("Please provide Gender");
+            }
         } else {
             setShowLoader(true);
             let data = qs.stringify({
@@ -242,8 +268,6 @@ const Profile = () => {
         // console.log(updatedLoginResponse);
         await AsyncStorage.setItem('loginResponse', updatedLoginResponse);
     };
-
-
     const handleImageSave = async () => {
         try {
             if (!image) {
@@ -251,7 +275,6 @@ const Profile = () => {
                 handleEmptyImageSave();
                 return;
             }
-
             const formData = new FormData();
             const fileUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
             const fileExtension = getFileExtension(fileUri) || 'jpg'; // Default extension 'jpg'
@@ -291,7 +314,6 @@ const Profile = () => {
             handleEdit()
         }
     }
-
     const handleEdit = () => {
         setModalVisible(true);
     }
@@ -340,6 +362,7 @@ const Profile = () => {
                                     value={email}
                                     onChangeText={value => setEmail(value)}
                                     containerStyles={styles.containerStyles}
+                                    editable={false}
                                 />
                                 {emailError && !email && (
                                     <>

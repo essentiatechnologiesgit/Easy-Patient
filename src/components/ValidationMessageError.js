@@ -10,20 +10,20 @@ const ValidationMessageError = ({ visible, msg, setVisible }) => {
             {
                 msg === "Username not registered" ?
                     <Dialog.Container visible={visible}>
-                        <Dialog.Title> </Dialog.Title>
+                        <Dialog.Title>Easy Patient</Dialog.Title>
                         <Dialog.Description>
                             {msg}
                         </Dialog.Description>
-                        <Dialog.Button label="Ok" onPress={() => { navigation.navigate('Signup'); setVisible(false); }} />
+                        <Dialog.Button label="OK" onPress={() => { navigation.navigate('Signup'); setVisible(false); }} />
                         <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
                     </Dialog.Container>
                     :
                     <Dialog.Container visible={visible}>
-                        <Dialog.Title></Dialog.Title>
+                        <Dialog.Title>Easy Patient</Dialog.Title>
                         <Dialog.Description>
                             {msg}
                         </Dialog.Description>
-                        <Dialog.Button label="Ok" onPress={() => setVisible(false)} />
+                        <Dialog.Button label="OK" onPress={() => setVisible(false)} />
                     </Dialog.Container>
             }
         </>

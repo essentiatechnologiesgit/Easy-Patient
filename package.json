@@ -82,6 +82,18 @@
     "react-native-wheel-pick": "^1.2.2",
     "react-native-wheel-picker-android": "^2.0.6"
   },
+  "reactNativePermissionsIOS":[
+      "AppTrackingTransparency",
+      "Camera",
+      "LocationAccuracy",
+      "LocationAlways",
+      "LocationWhenInUse",
+      "Notifications",
+      "PhotoLibrary",
+      "PhotoLibraryAddOnly",
+      "Reminders"
+  ],
+
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/preset-env": "^7.20.0",

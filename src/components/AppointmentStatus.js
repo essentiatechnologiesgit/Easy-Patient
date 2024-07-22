@@ -32,8 +32,8 @@ const AppointmentStatus = ({scheduleStatusId,scheduleStatusName}) => {
                     <Text style={[ getStatusStyle(statusName)]}>{statusName}</Text>
                 </View>
                 <View style={styles.line}></View>
-                <Text style={styles.bodyHead}>{scheduleStatusName}</Text>
-                <Text style={styles.bodyText}>Consult , change or cancel your appointment , contact the clinic using the contact details below</Text>
+                <Text style={styles.bodyHead}>This consultation has already taken place</Text>
+                {/* <Text style={styles.bodyText}>Consult , change or cancel your appointment , contact the clinic using the contact details below</Text> */}
             </View>
         </>
     );

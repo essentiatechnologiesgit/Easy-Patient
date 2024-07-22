@@ -11,8 +11,8 @@ const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfo
     };
 
     return (
-        <Modal
-            animationType="fade"
+        <Modal     
+            animationType="slide"
             transparent={true}
             visible={visible}
             onRequestClose={onClose}
@@ -20,10 +20,10 @@ const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfo
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                 <TouchableOpacity
                     activeOpacity={1}
-                    style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                    style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)' }}
                     onPress={onClose}
                 />
-                <View style={{ backgroundColor: '#edf1f7', padding: 20 }}>
+                <View style={{ backgroundColor: '#edf1f7', padding: 15, height:200   }}>
                     {
                         modalfor === "CrossAlarm" ?
                             <CancelledAlarm AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction} Medicine={Medicine}/>
@@ -38,7 +38,8 @@ const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfo
 const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // You can change this as needed
+        justifyContent: 'space-between', 
+        // You can change this as needed
     },
     cont: {
         flexDirection: 'row',

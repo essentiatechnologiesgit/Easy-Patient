@@ -4,9 +4,9 @@ import CustomButton from './CustomizedButton';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
-const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction,Medicine  }) => {
+const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction, Medicine }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
-    
+
     // useEffect(() => {
     //     setTimeBoxes(false);
     // }, [onClose])
@@ -19,17 +19,17 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
         onCloseModal();
     };
 
-    const setTime = async ( minutesToAdd) => {
+    const setTime = async (minutesToAdd) => {
         try {
             // Retrieve the alarms array from AsyncStorage
             const alarmsArrayJSON = await AsyncStorage.getItem('Alarms');
             if (!alarmsArrayJSON) {
                 throw new Error('No alarms found in AsyncStorage');
             }
-    
+
             const alarmsArray = JSON.parse(alarmsArrayJSON);
             const today = moment().format('YYYY-MM-DD');
-    
+
             // Map through the alarms array and update the specific medicine time object
             const updatedAlarmsArray = alarmsArray.map(alarm => {
                 if (alarm.id === medicineId) {
@@ -38,7 +38,7 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
                         const alarmDateTime = moment(timeObj.time, 'YYYY-MM-DD HH:mm');
                         const timePart = alarmDateTime.format('HH:mm');
                         const datePart = alarmDateTime.format('YYYY-MM-DD');
-    
+
                         // Check if the time part matches and it belongs to today
                         if (timePart === timeUpdate && datePart === today) {
                             const updatedTime = alarmDateTime.add(minutesToAdd, 'minutes');
@@ -56,26 +56,26 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
                 }
                 return alarm;
             });
-    
+
             // Save the updated alarms array back to AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsArray));
-            
+
             // Call the reload function to refresh the UI
             if (typeof reloadFunction === 'function') {
                 reloadFunction();
             }
-    
+
             // Call the handleCloseModal function to close the modal
             if (typeof handleCloseModal === 'function') {
                 handleCloseModal();
             }
-    
+
             console.log('Alarm updated successfully.');
         } catch (error) {
             console.error('Error updating alarm:', error);
         }
     };
-    
+
 
 
     const setTakenTrue = async () => {
@@ -85,10 +85,10 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
             if (!alarmsArrayJSON) {
                 throw new Error('No alarms found in AsyncStorage');
             }
-    
+
             const alarmsArray = JSON.parse(alarmsArrayJSON);
             const today = moment().format('YYYY-MM-DD');
-    
+
             // Map through the alarms array and update the specific medicine time object
             const updatedAlarmsArray = alarmsArray.map(alarm => {
                 if (alarm.id === medicineId) {
@@ -96,7 +96,7 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
                         // Extract time part (HH:mm) and date part (YYYY-MM-DD) from the time object
                         const timePart = moment(timeObj.time, 'YYYY-MM-DD HH:mm').format('HH:mm');
                         const datePart = moment(timeObj.time, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD');
-    
+
                         // Check if the time part matches and it belongs to today
                         if (timePart === timeUpdate && datePart === today) {
                             return {
@@ -113,20 +113,20 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
                 }
                 return alarm;
             });
-    
+
             // Save the updated alarms array back to AsyncStorage
             await AsyncStorage.setItem('Alarms', JSON.stringify(updatedAlarmsArray));
-            
+
             // Call the reload function to refresh the UI
             if (typeof reloadFunction === 'function') {
                 reloadFunction();
             }
-    
+
             // Call the handleCloseModal function to close the modal
             if (typeof handleCloseModal === 'function') {
                 handleCloseModal();
             }
-    
+
             console.log('Taken updated successfully.');
         } catch (error) {
             console.error('Error updating taken:', error);
@@ -139,22 +139,24 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
             {
                 !timeBoxes &&
                 <>
-                    <Text style={styles.textHead}>{timeUpdate} {Medicine}</Text>
-                    <Text style={styles.textMed}>You didnt take your medicine</Text>
-                    <Text style={[styles.textMed, { marginBottom: 20 }]}>Mark as taken?</Text>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.buttonA}
-                            onPress={EditTime}
-                        >
-                            <Text style={styles.textA}>Snooze</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.button}
-                        onPress={()=>setTakenTrue()}
-                        >
-                            <Text style={styles.text}>Yes</Text>
-                        </TouchableOpacity>
+                    <View style={{gap:5}}>
+                        <Text style={styles.textHead}>{timeUpdate} {Medicine}</Text>
+                        <Text style={styles.textMed}>You didnt take your medicine</Text>
+                        <Text style={[styles.textMed, { marginBottom: 20 }]}>Mark as taken?</Text>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={styles.buttonA}
+                                onPress={EditTime}
+                            >
+                                <Text style={styles.textA}>Snooze</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => setTakenTrue()}
+                            >
+                                <Text style={styles.text}>Yes</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </>
             }
@@ -169,7 +171,7 @@ const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, re
                     </View>
                     <View style={styles.container}>
                         <View style={styles.buttonContainer}>
-                        <TouchableOpacity
+                            <TouchableOpacity
                                 style={styles.buttonT}
                                 onPress={() => setTime(15)}
                             >
@@ -228,7 +230,7 @@ const styles = StyleSheet.create({
     textMed: {
         fontSize: 12,
         color: 'black',
-        marginBottom:2,
+        marginBottom: 2,
     },
     cont: {
         flexDirection: 'row',

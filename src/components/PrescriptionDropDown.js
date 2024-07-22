@@ -42,40 +42,48 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
 
     const downloadPDF = async () => {
         try {
-            const pdfUrl = pdf;
+            const pdfUrl =pdf;
             const { config, fs } = RNFetchBlob;
             const { DocumentDir, DownloadDir } = fs.dirs;
-
+    
             // Choose appropriate directory based on platform
             const downloadDir = Platform.OS === 'android' ? DownloadDir : DocumentDir;
-
-            // Request storage permission
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'Storage Permission Required',
-                    message: 'This app needs access to your storage to download PDF files.',
-                    buttonPositive: 'OK',
+    
+            if (Platform.OS === 'android') {
+                // Request storage permission
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'Storage Permission Required',
+                        message: 'This app needs access to your storage to download PDF files.',
+                        buttonPositive: 'OK',
+                    }
+                );
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                    console.error('Storage permission denied');
+                    return;
                 }
-            );
-            if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-                console.error('Storage permission denied');
-                return;
             }
-
+    
             const options = {
                 fileCache: true,
-                addAndroidDownloads: {
+                addAndroidDownloads: Platform.OS === 'android' ? {
                     useDownloadManager: true,
                     notification: true,
                     path: `${downloadDir}/prescricao_medicamentos.pdf`, // Change the file name as needed
-                },
+                } : undefined,
+                path: Platform.OS === 'ios' ? `${downloadDir}/prescricao_medicamentos.pdf` : undefined,
             };
-
+    
             // Download the PDF file
-            await config(options).fetch('GET', pdfUrl);
-
-            // console.log('PDF downloaded successfully.');
+            const res = await config(options).fetch('GET', pdfUrl);
+    
+            if (Platform.OS === 'ios') {
+                // Open the downloaded file using the default file viewer
+                RNFetchBlob.ios.openDocument(res.data);
+            }
+    
+            console.log('PDF downloaded successfully.');
         } catch (error) {
             console.error('Error downloading PDF:', error);
         }
@@ -114,7 +122,7 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
                 <TouchableWithoutFeedback onPress={() => handleDownload()}>
                     <View style={styles.lineContainer}>
                         <Image source={downArrow} style={styles.arrow}></Image>
-                        <Text style={styles.text}>Download</Text>
+                        <Text style={styles.text2}>Download</Text>
                     </View>
                 </TouchableWithoutFeedback>
             </View>
@@ -154,6 +162,11 @@ const styles = StyleSheet.create({
     },
 
     text: {
+        color: config.textColorHeadings,
+        fontSize: PixelRatio.getFontScale() * 20,
+    },
+    text2: {
+        left:6,
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 20,
     },

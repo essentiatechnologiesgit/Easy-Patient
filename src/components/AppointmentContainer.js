@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderBottomWidth: 1,
         borderBottomColor: config.primaryColor,
+
     },
     head: {
         flexDirection: 'row',
@@ -62,8 +63,8 @@ const styles = StyleSheet.create({
     },
     headings: {
         color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 20,
-        fontWeight: 'bold',
+        fontSize: PixelRatio.getFontScale() * 18,
+        fontWeight: '600',
     },
     subHeading: {
         color: config.primaryColor,
@@ -83,11 +84,14 @@ const styles = StyleSheet.create({
     },
     contentWrapper: {
         flex: 1, // Ensure the content takes all available space
+        gap:2,
     },
     arrowLogo: {
         position: 'absolute', // Position the arrow absolutely
         top: 50, // Adjust this value as needed
-        right: 0, // Position the arrow to the right
+        right: 0,
+        height:18,
+        width:11, // Position the arrow to the right
     },
 });
 

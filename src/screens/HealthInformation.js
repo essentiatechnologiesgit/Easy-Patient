@@ -151,11 +151,11 @@ const HealthInformation = () => {
 
         if (!height) {
             setEmptyHeight(true);
-            setErrorMessage('Reuired feilds')
+            setErrorMessage('Reuired fields')
         }
         else if (!weight) {
             setEmptyWeight(true);
-            setErrorMessage('Reuired feilds')
+            setErrorMessage('Reuired fields')
         } else {
             if (dataId) {
                 UpdateData()
@@ -385,7 +385,7 @@ const HealthInformation = () => {
                 </TouchableOpacity>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
-                        <Text style={styles.requiredText}>Required feilds</Text>
+                        <Text style={styles.requiredText}>Required fields</Text>
                         <View
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
@@ -399,7 +399,7 @@ const HealthInformation = () => {
                             />
                             {emptyHeight && !height && (
                                 <>
-                                    <Text style={styles.error}>Required feilds</Text>
+                                    <Text style={styles.error}>Required fields</Text>
                                 </>
                             )}
                         </View>
@@ -416,11 +416,11 @@ const HealthInformation = () => {
                             />
                             {emptyWeight && !weight && (
                                 <>
-                                    <Text style={styles.error}>Required feilds</Text>
+                                    <Text style={styles.error}>Required fields</Text>
                                 </>
                             )}
                         </View>
-                        <Text style={styles.otherText}>Other feilds</Text>
+                        <Text style={styles.otherText}>Other fields</Text>
                         <View
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>

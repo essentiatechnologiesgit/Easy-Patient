@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
+import RNPickerSelect from 'react-native-picker-select';
 import CustomizedButton from '../components/CustomizedButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import redDrop from '../assets/redDrop.png';
@@ -136,45 +137,49 @@ const AddReminder = ({ route }) => {
         setIOSError(false);
         setDoseError(false);
         if (!MedicineName) {
-            if(Platform.OS === 'android'){
+            if (Platform.OS === 'android') {
                 setMedicineError(true);
                 setErrorMessage('Enter the name of Medicine/Supplement');
-            }else{
+            } else {
                 setIOSError(true);
                 setErrorMessage('Please enter the name of Medicine/Supplement');
             }
         }
         else if (!dose) {
-            if(Platform.OS === 'android'){
-            setDoseError(true);
-            setErrorMessage('Enter dosage');}
-            else{
+            if (Platform.OS === 'android') {
+                setDoseError(true);
+                setErrorMessage('Enter dosage');
+            }
+            else {
                 setIOSError(true);
                 setErrorMessage('Please enter the dosage');
             }
         }
         else if (!date) {
-            if(Platform.OS === 'android'){
-            setDateError(true);
-            setErrorMessage('Enter start date and time');}
-            else{
+            if (Platform.OS === 'android') {
+                setDateError(true);
+                setErrorMessage('Enter start date and time');
+            }
+            else {
                 setIOSError(true);
                 setErrorMessage('Please enter the Date and Time');
             }
         }
         else if (!days) {
-            if(Platform.OS === 'android'){
-            setDaysError(true);
-            setErrorMessage('Enter number of days')}
-            else{
+            if (Platform.OS === 'android') {
+                setDaysError(true);
+                setErrorMessage('Enter number of days')
+            }
+            else {
                 setIOSError(true);
                 setErrorMessage('Please enter the number of Days');
             }
         } else if (!freNumber) {
-            if(Platform.OS === 'android'){
-            setFreNumberError(true);
-            setErrorMessage('Please enter the frequency');}
-            else{
+            if (Platform.OS === 'android') {
+                setFreNumberError(true);
+                setErrorMessage('Please enter the frequency');
+            }
+            else {
                 setIOSError(true);
                 setErrorMessage('Please enter the frequency');
             }
@@ -636,134 +641,159 @@ const AddReminder = ({ route }) => {
                                     </>
                                 )}
                             </View>
+                            {
+                                Platform.OS === 'ios' ? (
+                                    <>
+                                        <View
+                                            ref={(ref) => (errorRefs.current[3] = ref)}
+                                            style={{ ...styles.floatingLabelNN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
 
-                            <View
-                                ref={(ref) => (errorRefs.current[3] = ref)}
-                                style={{ ...styles.floatingLabelN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
-                                <Animated.Text
-                                    style={[
-                                        styles.placeholderLabel,
-                                        {
-                                            transform: [
+                                            <RNPickerSelect
+                                                onValueChange={(value) => console.log(value)}
+                                                style={{
+                                                    inputIOS: styles.inputIOS,
+                                                    inputAndroid: styles.inputAndroid,
+                                                    placeholder: styles.placeholder,
+                                                    iconContainer: styles.iconContainer,
+                                                }}
+                                                placeholder={{ label: "Select an item", value: null, color: 'gray' }}
+                                                items={[
+                                                    { label: 'Days', value: '1' },
+                                                    { label: 'Weeks', value: '2' },
+                                                    { label: 'Months', value: '3' },
+                                                ]}
+                                                useNativeAndroidPickerStyle={false} // This is important to apply custom styles on Android
+                                                itemStyle={styles.itemStyle} // This is for styling picker items
+                                            />
+                                        </View>
+                                    </>
+                                ) : (
+                                    <View
+                                        ref={(ref) => (errorRefs.current[3] = ref)}
+                                        style={{ ...styles.floatingLabelN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
+                                        <Animated.Text
+                                            style={[
+                                                styles.placeholderLabel,
                                                 {
-                                                    translateY: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1.2],
-                                                        outputRange: [0, -25],
+                                                    transform: [
+                                                        {
+                                                            translateY: placeholderLabelAnim.interpolate({
+                                                                inputRange: [0, 1.2],
+                                                                outputRange: [0, -25],
+                                                            }),
+                                                        },
+                                                        {
+                                                            scale: placeholderLabelAnim.interpolate({
+                                                                inputRange: [0, 1],
+                                                                outputRange: [0.95, 0.9],
+                                                            }),
+                                                        },
+                                                    ],
+                                                    // Apply margin left conditionally
+                                                    marginLeft: placeholderLabelAnim.interpolate({
+                                                        inputRange: [0, 1.5],
+                                                        outputRange: [0, -5],
+                                                    }),
+                                                    // Interpolate font size
+                                                    fontSize: placeholderLabelAnim.interpolate({
+                                                        inputRange: [0, 1.5],
+                                                        outputRange: [PixelRatio.getFontScale() * 18, PixelRatio.getFontScale() * 16],
+                                                    }),
+                                                    color: placeholderLabelAnim.interpolate({
+                                                        inputRange: [0, 1.5],
+                                                        outputRange: [config.primaryColor, config.secondaryColor],
                                                     }),
                                                 },
-                                                {
-                                                    scale: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1],
-                                                        outputRange: [0.95, 0.9],
-                                                    }),
-                                                },
-                                            ],
-                                            // Apply margin left conditionally
-                                            marginLeft: placeholderLabelAnim.interpolate({
-                                                inputRange: [0, 1.5],
-                                                outputRange: [0, -5],
-                                            }),
-                                            // Interpolate font size
-                                            fontSize: placeholderLabelAnim.interpolate({
-                                                inputRange: [0, 1.5],
-                                                outputRange: [PixelRatio.getFontScale() * 18, PixelRatio.getFontScale() * 16],
-                                            }),
-                                            color: placeholderLabelAnim.interpolate({
-                                                inputRange: [0, 1.5],
-                                                outputRange: [config.primaryColor, config.secondaryColor],
-                                            }),
-                                        },
-                                    ]}
-                                >
-                                    Days
-                                </Animated.Text>
+                                            ]}
+                                        >
+                                            Days
+                                        </Animated.Text>
 
-                                <DropDownPicker
-                                    items={DaysArray}
-                                    value={selectedDays}
-                                    onSelectItem={handleSelect}
-                                    placeholder=""
-                                    open={isOpen}
-                                    showArrowIcon={false}
-                                    onOpen={handleOpen}
-                                    onClose={handleOpen}
-                                    listMode="SCROLLVIEW"
-                                    style={{
-                                        backgroundColor: styles.primaryColor,
-                                        borderWidth: 0,
-                                        left: -7,
-                                        top: 22,
-                                        color: config.primaryColor,
-                                        zIndex: 999,
-                                    }}
-                                    textStyle={{
-                                        fontSize: PixelRatio.getFontScale() * 18,
-                                    }}
-                                />
-                            </View>
+                                        <DropDownPicker
+                                            items={DaysArray}
+                                            value={selectedDays}
+                                            onSelectItem={handleSelect}
+                                            placeholder=""
+                                            open={isOpen}
+                                            showArrowIcon={false}
+                                            onOpen={handleOpen}
+                                            onClose={handleOpen}
+                                            listMode="SCROLLVIEW"
+                                            style={{
+                                                backgroundColor: styles.primaryColor,
+                                                borderWidth: 0,
+                                                left: -7,
+                                                top: 22,
+                                                color: config.primaryColor,
+                                                zIndex: 999,
+                                            }}
+                                            textStyle={{
+                                                fontSize: PixelRatio.getFontScale() * 18,
+                                            }}
+                                        />
+                                    </View>
+
+                                )
+                            }
+
                         </View>
 
-
-                        <TouchableOpacity
-                            onPress={() => handleCounter()}
-                            ref={(ref) => (errorRefs.current[5] = ref)}
-                            style={styles.floatingLabel}>
-                            {
-                                freNumber &&
-                                <>
-                                    <View style={{ marginTop: 10, }}></View>
-                                    <FloatingLabelInput
-                                        label={'Frequency'}
-                                        inputStyles={styles.inputStyles}
-                                        customLabelStyles={styles.customLabelStyles}
-                                        value={`Every ${freNumber} ${duration}`}
-                                        onChangeText={value => setFrequency(value)}
-                                        containerStyles={styles.containerStyles}
-                                        onPressOut={() => handleCounter()}
-                                    />
-                                </>
-                            }
-                            {
-                                !freNumber &&
-
-                                <TextInput
-                                    style={
-                                        !freNumberError ?
-                                            {
-                                                ...styles.containerStyles,
-                                                marginTop: 10,
-                                                paddingLeft: 10,
-                                                marginBottom: 20
-                                            } :
-                                            {
-                                                ...styles.containerStylesEmpty,
-                                                marginTop: 10,
-                                                paddingLeft: 10,
-                                                marginBottom: 20
+                        <>
+                            <TouchableOpacity
+                                onPress={() => handleCounter()}
+                                ref={(ref) => (errorRefs.current[5] = ref)}
+                                style={styles.floatingLabel}>
+                                {
+                                    freNumber ? (
+                                        <>
+                                            <View style={{ marginTop: 10 }}></View>
+                                            <FloatingLabelInput
+                                                label={'Frequency'}
+                                                inputStyles={styles.inputStyles}
+                                                customLabelStyles={styles.customLabelStyles}
+                                                value={`Every ${freNumber} ${duration}`}
+                                                onChangeText={value => setFrequency(value)}
+                                                containerStyles={styles.containerStyles}
+                                                onPressOut={() => handleCounter()}
+                                            />
+                                        </>
+                                    ) : (
+                                        <TextInput
+                                            style={
+                                                !freNumberError ?
+                                                    {
+                                                        ...styles.containerStyles,
+                                                        marginTop: 10,
+                                                        paddingLeft: 10,
+                                                        marginBottom: 20
+                                                    } :
+                                                    {
+                                                        ...styles.containerStylesEmpty,
+                                                        marginTop: 10,
+                                                        paddingLeft: 10,
+                                                        marginBottom: 20
+                                                    }
                                             }
-                                    }
-                                    editable={false}
-                                    placeholder="Frequency"
-                                    placeholderTextColor={!freNumberError ? config.primaryColor : 'red'}
-                                    onChangeText={value => setFrequency(value)} // You can remove this line
-                                    pointerEvents="none"
-                                />
+                                            editable={false}
+                                            placeholder="Frequency"
+                                            placeholderTextColor={!freNumberError ? config.primaryColor : 'red'}
+                                            onChangeText={value => setFrequency(value)} // You can remove this line
+                                            pointerEvents="none"
+                                        />
+                                    )
+                                }
 
-                            }
+                                {freNumberError && Platform.OS === 'android' && !freNumber && (
+                                    <View><Text style={styles.ErrorTextFrequency}>{errorMessage}</Text></View>
+                                )}
+                            </TouchableOpacity>
 
                             {freNumberError && Platform.OS === 'android' && !freNumber && (
-                                <>
-                                    <View><Text style={styles.ErrorTextFrequency}>{errorMessage}</Text></View>
-                                </>
-                            )}
-
-                        </TouchableOpacity>
-
-                        {freNumberError && Platform.OS === 'android' && !freNumber && (
-                            <>
                                 <View style={{ marginBottom: 30 }}></View>
-                            </>
-                        )}
+                            )}
+                        </>
+
+
                         <View style={styles.switchContainer}>
                             <Switch
                                 trackColor={{ false: '#00cc00', true: '#36b336' }}
@@ -810,6 +840,39 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         top: -15,
     },
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        // borderWidth: 1,
+        // borderColor: 'gray',
+        // borderRadius: 4,
+        color: config.textColorHeadings,
+        // paddingRight: 30, // to ensure the text is never behind the icon
+      },
+      inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: 'gray',
+        borderRadius: 8,
+        color: 'black',
+        paddingRight: 30, // to ensure the text is never behind the icon
+      },
+      placeholder: {
+        color: config.primaryColor,
+        fontSize: 16,
+      },
+      iconContainer: {
+        top: 10,
+        right: 12,
+      },
+      itemStyle: {
+        fontSize: 16,
+        height: 44,
+        color: 'black',
+      },
     medicineContiner: {
         borderRadius: 40,
         width: 80,
@@ -1134,6 +1197,14 @@ const styles = StyleSheet.create({
         marginStart: 20,
         width: '60%',
         height: '100%',
+        flex: 0.5
+    },
+    floatingLabelNN: {
+        marginBottom: 0,
+        top: 20,
+        marginStart: 20,
+        width: '60%',
+        height: '65%',
         flex: 0.5
     },
     containerStyles: {

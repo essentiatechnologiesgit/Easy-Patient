@@ -59,8 +59,10 @@ const SideBar = () => {
     const handleEmailPress = () => {
         openComposer({
             to: "support@easy-health.app",
+        }).catch((error) => {
+            alert("No email apps available");
         });
-    }
+    };
 
     return (
         <View style={styles.container}>
@@ -173,13 +175,10 @@ const SideBar = () => {
             </ScrollView>
             <View style={[styles.horizontalLine, { marginBottom: 5, marginTop: 10, }]}></View>
             <View style={styles.containerList}>
-                {
-                    Platform.OS === 'android' &&
                     <TouchableOpacity onPress={() => handleEmailPress()} style={styles.navigate}>
                         <Image source={EmailIcon} style={styles.mail}></Image>
                         <Text style={styles.sideText}>Support App</Text>
                     </TouchableOpacity>
-                }
                 <TouchableOpacity onPress={() => navigation.navigate("Configure")} style={styles.navigate}>
                     <Image source={configure} style={styles.configure}></Image>
                     <Text style={styles.sideText}>Configure</Text>
@@ -245,8 +244,8 @@ const styles = StyleSheet.create({
         width: 21,
     },
     heart: {
-        height: 36,
-        width: 12,
+        height: 26,
+        width: 9.2,
     },
     calendar: {
         height: 23,

@@ -93,7 +93,7 @@ const Footer = (props) => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: '#9CA29926',
+        
         justifyContent: 'space-evenly',
         borderTopColor: '#00000033',
         // borderColor: '#00000033',
@@ -103,9 +103,15 @@ const styles = StyleSheet.create({
         ...Platform.select({
             ios: {
                 height: 80,
+                backgroundColor: '#FFFF',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: -5 }, // Negative height for top shadow
+                shadowOpacity: 0.1,
+                shadowRadius: 6,
             },
             android: {
                 height: 62,
+                backgroundColor: '#9CA29926',
             },
         })
     },
@@ -113,14 +119,28 @@ const styles = StyleSheet.create({
         color: "#55565C",
     },
     iconR: {
-        top: 3,
-        height: 28,
-        width: 24,
+        height: 26,
+        width: 22,
+        ...Platform.select({
+            ios: {
+                marginBottom:5,
+            },
+            android: {
+                top: 3,
+            },
+        })
     },
     iconA: {
-        top: 2,
-        height: 26,
-        width: 24,
+        height: 25,
+        width: 23,
+        ...Platform.select({
+            ios: {
+                marginBottom:6,
+            },
+            android: {
+                top: 2,
+            },
+        })
     },
 
     touchable: {
@@ -144,7 +164,7 @@ const styles = StyleSheet.create({
         right: 10,
         height: 3,
         backgroundColor: '#707070',
-        marginTop: 2, // Adjust this value to control the distance between the border and the content
+        // marginTop: 2, // Adjust this value to control the distance between the border and the content
     },
     borderReminder: {
         position: 'absolute',
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
         right: 20,
         height: 3,
         backgroundColor: '#707070',
-        marginTop: 2, // Adjust this value to control the distance between the border and the content
+        // marginTop: 2, // Adjust this value to control the distance between the border and the content
     },
     border: {
         position: 'absolute',
@@ -162,20 +182,35 @@ const styles = StyleSheet.create({
         right: 30,
         height: 3,
         backgroundColor: '#707070',
-        marginTop: 2, // Adjust this value to control the distance between the border and the content
+        // marginTop: 2, // Adjust this value to control the distance between the border and the content
     },
     icon: {
         // top:1,
-        height: 25,
-        width: 25,
+        height: 23,
+        width: 23,
+        ...Platform.select({
+            ios: {
+                marginBottom:4,
+            },
+            android: {
+                // top: 1,
+            },
+        })
     },
     iconM: {
-        top: 1,
-        height: 25,
-        width: 25,
+        height: 23,
+        width: 23,
+        ...Platform.select({
+            ios: {
+                marginBottom:5,
+            },
+            android: {
+                top: 1,
+            },
+        })
     },
     text: {
-        fontSize: PixelRatio.getFontScale() * 14,
+        fontSize: PixelRatio.getFontScale() * 13,
         color: config.primaryColor,
     },
     indicator: {

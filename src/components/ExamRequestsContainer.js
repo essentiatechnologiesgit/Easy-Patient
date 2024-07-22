@@ -76,7 +76,6 @@ const ExamRequestsContainer = ({ record, isArchived, isHide, isShow, record_id,g
                     <Text style={styles.subHeadings}>Recieved {record.title}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
                     <Text style={styles.text2}>Dr. {record.specialist}</Text>
-                    
                     {
                         !isArchived ?
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
@@ -109,6 +108,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         width: '90%',
         alignSelf: 'center',
+        gap:4,
     },
     showIcon: {
         height: 16,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     text: {
         color: config.textColorHeadings,

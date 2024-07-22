@@ -52,25 +52,6 @@ const AttestationContainer = ({ record, isArchived, isHide, isShow, record_id ,g
         const responseObject = JSON.parse(loginResponse);
         const access_token = responseObject.access_token;
 
-
-        // let config = {
-        //     method: 'put',
-        //     maxBodyLength: Infinity,
-        //     url: `'https://api-patient-dev.easy-health.app/attestation/archive/${record_id !== 0 ? record_id : record.id}`,
-        //     headers: {
-        //         'Authorization': `Bearer ${access_token}`
-        //     }
-        // };
-        // console.log(config);
-        // axios.request(config)
-        //     .then((response) => {
-        //         console.log(JSON.stringify(response.data));
-        //         navigation.navigate("AttestationsArchive");
-        //     })
-        //     .catch((error) => {
-        //         console.log(error);
-        //     });
-
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
@@ -127,6 +108,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         width: '90%',
         alignSelf: 'center',
+        gap:3,
     },
     showIcon: {
         height: 16,
@@ -182,7 +164,7 @@ const styles = StyleSheet.create({
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     text: {
         color: config.textColorHeadings,

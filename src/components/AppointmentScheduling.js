@@ -20,7 +20,7 @@ const AppointmentScheduling = ({date,responsible,local,query}) => {
                     <View style={styles.timeContainer}>
                         <View style={styles.list}>
                             <Text style={styles.bodyHead}>Time</Text>
-                            <Text style={styles.bodyHead}>Yes</Text>
+                            <Text style={styles.bodyHead}>Date</Text>
                             <Text style={styles.bodyHead}>local</Text>
                             <Text style={styles.bodyHead}>Responsible</Text>
                             <Text style={styles.bodyHead}>Query Type</Text>

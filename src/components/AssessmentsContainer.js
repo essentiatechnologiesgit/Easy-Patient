@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         width: '90%',
         alignSelf: 'center',
+        gap:3,
     },
     NewContainer: {
         height: 25,
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     hideContainer: {
         flexDirection: 'row',
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     text: {
         color: config.textColorHeadings,

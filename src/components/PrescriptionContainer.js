@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         width: '93%',
         alignSelf: 'center',
+        gap:5,
     },
     showIcon: {
         height: 16,
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     hideContainer: {
         flexDirection: 'row',

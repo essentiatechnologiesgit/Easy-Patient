@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         width: '93%',
         alignSelf: 'center',
+        gap:4,
     },
     showIcon: {
         height: 16,
@@ -148,10 +149,10 @@ const styles = StyleSheet.create({
     },
     arrowLogo: {
         position: 'absolute', // Position the arrow absolutely
-        height: 20,
-        width: 13,
-        top: 55, // Adjust this value as needed
-        right: 0, // Position the arrow to the right
+        right: 0,
+        height:18,
+        top:'50%',
+        width:11,
     },
     archiveIcon: {
         height: 15.5,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
-        fontWeight: 'bold',
+        fontWeight: '500',
     },
     hideContainer: {
         flexDirection: 'row',
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     text: {
         color: config.primaryColor,

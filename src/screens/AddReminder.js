@@ -729,6 +729,7 @@ const AddReminder = ({ route }) => {
                                             }}
                                             textStyle={{
                                                 fontSize: PixelRatio.getFontScale() * 18,
+                                                fontFamily:config.fontStyle,
                                             }}
                                         />
                                     </View>
@@ -929,6 +930,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         borderBottomColor: config.secondaryColor,
         borderBottomWidth: 2,
         width: '90%',
@@ -937,6 +939,7 @@ const styles = StyleSheet.create({
         color: config.secondaryColor,
         width: '90%',
         fontSize: PixelRatio.getFontScale() * 14,
+        fontFamily:config.fontStyle,
     },
     placeholderLabel: {
         position: 'absolute',
@@ -946,6 +949,7 @@ const styles = StyleSheet.create({
         color: config.primaryColor,
         zIndex: 1,
         lineHeight: PixelRatio.getFontScale() * 20,
+        fontFamily:config.fontStyle,
     },
     TextContainer: {
         width: '80%',
@@ -953,6 +957,7 @@ const styles = StyleSheet.create({
     },
     TextContainerText: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         textAlign: 'center',
         color: 'gray'
     },

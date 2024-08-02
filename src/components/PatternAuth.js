@@ -94,7 +94,7 @@ const PatternAuth = ({}) => {
                 }
                 onReset={handleOnReset}
            />
-        <TouchableOpacity style={{height:100,width:'100%'}}><Text style={{color:'white',fontSize: PixelRatio.getFontScale() * 17,}}>User Finger print</Text></TouchableOpacity>
+        <TouchableOpacity style={{height:100,width:'100%'}}><Text style={{color:'white',fontSize: PixelRatio.getFontScale() * 17,fontFamily:config.fontStyle,}}>User Finger print</Text></TouchableOpacity>
                 
         </View>
        </>

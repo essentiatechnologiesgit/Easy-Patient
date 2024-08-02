@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
         marginTop: 45,
         textAlign: 'center',
         fontSize: PixelRatio.getFontScale() * 12,
+        fontFamily:config.fontStyle,
         color: config.secondaryColor,
         textDecorationLine: 'underline',
     },

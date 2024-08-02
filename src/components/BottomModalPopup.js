@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         marginLeft: 20,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     buttonStyle: {
         backgroundColor: '#edf1f7',
@@ -134,6 +135,7 @@ const styles = StyleSheet.create({
 const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderWidth: 1,
@@ -147,6 +149,7 @@ const pickerSelectStyles = StyleSheet.create({
     },
     inputAndroid: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         paddingVertical: 8,
         paddingHorizontal: 10,
         borderWidth: 0.5,

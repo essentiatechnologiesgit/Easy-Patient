@@ -356,6 +356,7 @@ const styles = StyleSheet.create({
         // textAlign: 'center',
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     sliderContainer: {
         minHeight: 170,
@@ -397,6 +398,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: PixelRatio.getFontScale() * 24,
         color: config.textColorHeadings,
+        fontFamily:config.fontStyle,
     },
     logo: {
         width: '10%',
@@ -409,6 +411,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
         fontWeight: '600',  // semi-bold
         marginLeft: 16,
+        fontFamily:config.fontStyle,
     },
     ProfileLogo: {
         width: '100%',
@@ -430,6 +433,7 @@ const styles = StyleSheet.create({
     nameSideHeading: {
         fontSize: PixelRatio.getFontScale() * 20,
         color: config.textColorHeadings,
+        fontFamily:config.fontStyle,
     },
     parentView: {
         marginTop: '6%',

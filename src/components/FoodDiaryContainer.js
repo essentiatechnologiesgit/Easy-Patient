@@ -91,11 +91,13 @@ const styles = StyleSheet.create({
     },
     medicineTextHeading: {
         fontSize: PixelRatio.getFontScale() * 20,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
         color: config.textColorHeadings,
     },
     medicineTextSide: {
         fontSize: PixelRatio.getFontScale() * 16,
+        fontFamily:config.fontStyle,
         color: config.textColorHeadings,
     },
     Profilelogo: {
@@ -105,6 +107,7 @@ const styles = StyleSheet.create({
     },
     medicineTextGrey: {
         fontSize: PixelRatio.getFontScale() * 16,
+        fontFamily:config.fontStyle,
         color: config.primaryColor,
     },
     imageContainer: {

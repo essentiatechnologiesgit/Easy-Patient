@@ -43,10 +43,12 @@ const styles = StyleSheet.create({
     bodyText: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     status: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
     firstContainer: {
@@ -60,19 +62,23 @@ const styles = StyleSheet.create({
     bodyHead: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
     confirmed: {
         color: '#50B76C',
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     waiting:{
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     cancelled:{
         color: '#54A5B8',
         fontSize: PixelRatio.getFontScale() * 17, 
+        fontFamily:config.fontStyle,
     },
     line: {
         marginTop: 5,

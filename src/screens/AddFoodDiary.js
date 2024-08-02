@@ -412,6 +412,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
         borderBottomColor: config.secondaryColor,
+        fontFamily:config.fontStyle,
         borderBottomWidth: 2,
         width: '90%',
     },
@@ -419,12 +420,14 @@ const styles = StyleSheet.create({
         color: config.secondaryColor,
         width: '90%',
         fontSize: PixelRatio.getFontScale() * 14,
+        fontFamily:config.fontStyle,
     },
     placeholderLabel: {
         position: 'absolute',
         left: 0,
         top: 25,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         color: config.primaryColor,
         zIndex: 1,
         lineHeight: PixelRatio.getFontScale() * 20,
@@ -435,6 +438,7 @@ const styles = StyleSheet.create({
     },
     TextContainerText: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         textAlign: 'center',
         color: 'gray'
     },
@@ -443,6 +447,7 @@ const styles = StyleSheet.create({
         marginBottom: -8,
         flex: 1,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     icon: {
         marginBottom: -8,
@@ -483,6 +488,7 @@ const styles = StyleSheet.create({
     dropdownTextStyle: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     button: {
         marginTop: 10,
@@ -494,6 +500,7 @@ const styles = StyleSheet.create({
     NotifyText: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     centeredView: {
         flex: 1,
@@ -572,6 +579,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
         width: '90%',
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         borderBottomColor: config.secondaryColor,
     },
     backgroundImage: {
@@ -591,6 +599,7 @@ const styles = StyleSheet.create({
     signup: {
         fontWeight: 'bold',
         fontSize: PixelRatio.getFontScale() * 20,
+        fontFamily:config.fontStyle,
         marginTop: '6%',
         color: config.textColorHeadings,
     },
@@ -608,6 +617,7 @@ const styles = StyleSheet.create({
         color: config.secondaryColor,
         borderColor: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         // backgroundColor: 'rgba(0,0,0,0)', // Set background color directly
     },
     forgotPassword: {
@@ -616,14 +626,15 @@ const styles = StyleSheet.create({
         width: '90%',
         textAlign: 'right',
         marginTop: 20,
-        fontSize: PixelRatio.getFontScale() * 17
+        fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     login: {
         paddingTop: '15%',
         textDecorationLine: 'underline',
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 15,
-
+        fontFamily:config.fontStyle,
     },
     checkbox: {
         marginTop: '4%',
@@ -634,6 +645,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         padding: 2,
         color: config.secondaryColor,
         flexDirection: 'row',
@@ -642,6 +654,7 @@ const styles = StyleSheet.create({
     },
     textt: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         padding: 2,
         color: 'gray',
         flexDirection: 'row',
@@ -685,6 +698,7 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 17,
         borderWidth: 0,
         height: '100%',
+        fontFamily:config.fontStyle,
         paddingVertical: 0,
         paddingHorizontal: 0,
         borderBottomWidth: 1,
@@ -693,6 +707,7 @@ const styles = StyleSheet.create({
     containerStylesEmpty: {
         fontSize: PixelRatio.getFontScale() * 17,
         borderWidth: 0,
+        fontFamily:config.fontStyle,
         height: '100%',
         paddingVertical: 0,
         paddingHorizontal: 0,
@@ -705,6 +720,7 @@ const styles = StyleSheet.create({
         colorBlurred: config.primaryColor,
         fontSizeFocused: PixelRatio.getFontScale() * 14,
         fontSizeBlurred: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         paddingVertical: 0,
         paddingHorizontal: 0,
         marginVertical: 0
@@ -715,6 +731,7 @@ const styles = StyleSheet.create({
         fontSizeFocused: PixelRatio.getFontScale() * 14,
         fontSizeBlurred: PixelRatio.getFontScale() * 17,
         paddingVertical: 0,
+        fontFamily:config.fontStyle,
         paddingHorizontal: 0,
         marginVertical: 0
     },
@@ -722,6 +739,7 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 17,
         paddingBottom: 0,
         paddingHorizontal: 0,
+        fontFamily:config.fontStyle,
         paddingTop: 30,
         color: config.textColorHeadings
 

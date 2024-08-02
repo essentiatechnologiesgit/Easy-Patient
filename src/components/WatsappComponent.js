@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         alignSelf: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
 });
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, PixelRatio, Platform } from 'react-native';
 import Modal from "react-native-modal";
-
+import config from '../../config';
 const ModalLoader = ({ msg }) => {
     const hasBackdrop = Platform.OS !== 'ios';
     return (
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
         color:'gray',
         marginLeft: 20, 
         fontSize: PixelRatio.getFontScale() * 18,
+        fontFamily:config.fontStyle,
     }
 });
 

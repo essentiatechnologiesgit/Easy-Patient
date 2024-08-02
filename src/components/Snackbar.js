@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
       message: {
         color: '#fff',
         fontSize: PixelRatio.getFontScale() * 18,
+        fontFamily:config.fontStyle,
       },
 });
 

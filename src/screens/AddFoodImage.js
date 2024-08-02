@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: PixelRatio.getFontScale() * 13,
         color: config.secondaryColor,
+        fontFamily:config.fontStyle,
     },
     button: {
         marginTop: 45,

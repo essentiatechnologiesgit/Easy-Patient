@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     heading: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 25,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
         width: '60%',
         textAlign: 'center',
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
         width: '50%',
         textAlign: 'center',
         fontSize: PixelRatio.getFontScale() * 16,
+        fontFamily:config.fontStyle,
     }
 });
 

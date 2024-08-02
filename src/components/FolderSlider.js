@@ -235,7 +235,7 @@ const FolderSlider = () => {
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={heartBeat} style={styles.zipBlack}></Image>
-                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                        <View style={{ marginLeft: 10, marginTop: 2 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
                                 Exam Requests
                             </Text>
@@ -313,6 +313,7 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         marginBottom: -10,
         fontWeight: '600',
+        fontFamily:config.fontStyle,
     },
     scrollViewContent: {
         alignItems: "center",
@@ -320,6 +321,7 @@ const styles = StyleSheet.create({
     folderHeading: {
         fontSize: PixelRatio.getFontScale() * 16,
         color: "black",
+        fontFamily:config.fontStyle,
     },
     zipBlack:{
         top:-10,

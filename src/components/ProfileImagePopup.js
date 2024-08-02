@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
     },
     Canceltext: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         color: config.textColorHeadings,
         fontWeight: '500',
     },
@@ -156,9 +157,11 @@ const styles = StyleSheet.create({
     text: {
         fontSize: PixelRatio.getFontScale() * 17,
         color: config.textColorHeadings,
+        fontFamily:config.fontStyle,
     },
     delete: {
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         color: 'red',
     },
     imageIcon: {

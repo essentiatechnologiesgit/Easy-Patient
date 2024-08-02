@@ -13,5 +13,7 @@ export default {
     modalColor:'#FFFFFF',
     buttonText:'#FFFFFF',
     headerColor:'#FFFFFF',
+    fontStyle:'OpenSans-Regular',
+
   };
 

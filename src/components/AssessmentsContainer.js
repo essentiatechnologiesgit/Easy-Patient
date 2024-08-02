@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
     New: {
         color: '#146229',
         fontSize: PixelRatio.getFontScale() * 12,
+        fontFamily:config.fontStyle,
     },
     arrowLogo: {
         position: 'absolute', // Position the arrow absolutely
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
+        fontFamily:config.fontStyle,
         fontWeight: '600',
     },
     hideContainer: {
@@ -164,19 +166,23 @@ const styles = StyleSheet.create({
     hide: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 12,
+        fontFamily:config.fontStyle,
     },
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: '600',
     },
     text: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     text2: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
 });
 

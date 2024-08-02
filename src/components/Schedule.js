@@ -39,12 +39,14 @@ const styles = StyleSheet.create({
         width:'90%',
         color:'#2A2A31',
         fontSize: PixelRatio.getFontScale() * 15,
+        fontFamily:config.fontStyle,
     },
     textB:{
         marginLeft:20,
         width:'90%',
         color:'#55565C',
         fontSize: PixelRatio.getFontScale() * 14,
+        fontFamily:config.fontStyle,
     },
 });
 

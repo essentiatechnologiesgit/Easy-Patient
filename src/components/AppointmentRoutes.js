@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     bodyText: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     container: {
         ...StyleSheet.absoluteFillObject,
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
     status: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
     carContainer: {
@@ -106,15 +108,18 @@ const styles = StyleSheet.create({
     routeHead: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
     routeText: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     bodyHead: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
 
@@ -125,6 +130,7 @@ const styles = StyleSheet.create({
     bodyHead: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
 

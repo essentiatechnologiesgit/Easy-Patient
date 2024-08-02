@@ -257,6 +257,7 @@ const styles = StyleSheet.create({
     },
     sideText: {
         fontSize: PixelRatio.getFontScale() * 18,
+        fontFamily:config.fontStyle,
         color: 'white',
     },
     home: {
@@ -297,6 +298,7 @@ const styles = StyleSheet.create({
     },
     nameHeading: {
         color: 'white',
+        fontFamily:config.fontStyle,
         fontSize: PixelRatio.getFontScale() * 22,
         textAlign: 'center',
         fontWeight: '400',
@@ -304,12 +306,14 @@ const styles = StyleSheet.create({
     emailHeading: {
         color: 'white',
         fontSize: PixelRatio.getFontScale() * 19,
+        fontFamily:config.fontStyle,
         textAlign: 'center',
     },
     head: {
         textAlign: 'center',
         fontSize: PixelRatio.getFontScale() * 24,
         left: '70%',
+        fontFamily:config.fontStyle,
         color: 'black',
     },
     arrow: {

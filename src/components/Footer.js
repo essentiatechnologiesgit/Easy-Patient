@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: PixelRatio.getFontScale() * 13,
+        fontFamily:config.fontStyle,
         color: config.primaryColor,
     },
     indicator: {

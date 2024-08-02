@@ -164,11 +164,13 @@ const styles = StyleSheet.create({
     text: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 20,
+        fontFamily:config.fontStyle,
     },
     text2: {
         left:6,
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 20,
+        fontFamily:config.fontStyle,
     },
 });
 

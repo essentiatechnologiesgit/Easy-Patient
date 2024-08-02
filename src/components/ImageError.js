@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         marginLeft:20,
         color:'white',
         fontSize: PixelRatio.getFontScale() * 16,
+        fontFamily:config.fontStyle,
     },
 });
 

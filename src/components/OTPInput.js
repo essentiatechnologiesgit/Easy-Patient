@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 62,
     fontSize: PixelRatio.getFontScale() * 18,
+    fontFamily:config.fontStyle,
     textAlign: 'center',
     borderWidth: 2.5,
     borderRadius:5,

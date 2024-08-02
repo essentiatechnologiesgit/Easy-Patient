@@ -251,11 +251,13 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 20,
         fontWeight: 'bold',
         color: config.textColorHeadings,
+        fontFamily:'OpenSans-Regular',
     },
     medicineTextSide: {
         fontSize: PixelRatio.getFontScale() * 16,
         fontWeight: 'bold',
         color: config.textColorHeadings,
+        fontFamily:'OpenSans-Regular',
     },
     Profilelogo: {
         height: 36,
@@ -264,6 +266,7 @@ const styles = StyleSheet.create({
     },
     medicineTextGrey: {
         fontSize: PixelRatio.getFontScale() * 16,
+        fontFamily:'OpenSans-Regular',
         color: config.primaryColor,
     },
     imageContainer: {

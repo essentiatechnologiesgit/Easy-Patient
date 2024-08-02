@@ -42,10 +42,12 @@ const styles = StyleSheet.create({
     bodyText: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
     status: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
     firstContainer: {
@@ -59,6 +61,7 @@ const styles = StyleSheet.create({
     bodyHead: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
     },
 
     line: {

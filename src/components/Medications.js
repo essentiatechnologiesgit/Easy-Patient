@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
         color:config.primaryColor,
         textAlign:'center',
         width:'85%',
+        fontFamily:config.fontStyle,
     },
     container:{
         backgroundColor:config.modalColor,

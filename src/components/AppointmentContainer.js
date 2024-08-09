@@ -14,7 +14,7 @@ const AppointmentContainer = ({ record, isArchived, isHide, isShow, record_id })
     const statusName = statusMapping[record.schedule_status_id] || 'null';
     const dateTime = moment(record.date);
     const formattedTime = dateTime.format('HH:mm');
-    const formattedDate = dateTime.format('ddd, MMMM Do');
+    const formattedDate = dateTime.format('ddd, MMMM Do y');
     const getStatusStyle = (status) => {
         switch (status) {
             case 'Waiting':
@@ -64,28 +64,27 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
-        fontFamily:config.fontStyle,
         fontWeight: '600',
     },
     subHeading: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        
     },
     confirmed: {
         color: '#50B76C',
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        
     },
     waiting:{
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        
     },
     cancelled:{
         color: '#54A5B8',
         fontSize: PixelRatio.getFontScale() * 17, 
-        fontFamily:config.fontStyle,
+        
     },
     contentWrapper: {
         flex: 1, // Ensure the content takes all available space

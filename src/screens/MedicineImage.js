@@ -82,8 +82,7 @@ const MedicineImage = ({ route }) => {
     }
 
     const handleConfirm = () => {
-        console.log(isUpdate);
-        if (isUpdate) {
+         if (isUpdate) {
 
             navigation.navigate('UpdateReminder', { selectedImage, image, MedicineId });
         } else {
@@ -284,7 +283,7 @@ const styles = StyleSheet.create({
     },
     Profilelogo: {
         height: 36,
-        width: 24,
+        width: 30,
         borderColor: config.secondaryColor,
     },
     capsulelogo: {

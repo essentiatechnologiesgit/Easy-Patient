@@ -8,7 +8,7 @@ const AppointmentScheduling = ({date,responsible,local,query}) => {
     const navigation = useNavigation();
     const dateTime = moment(date);
     const formattedTime = dateTime.format('HH:mm');
-    const formattedDate = dateTime.format('ddd, MMMM Do');
+    const formattedDate = dateTime.format('ddd, MMMM Do y');
    
     return (
         <>

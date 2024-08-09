@@ -11,7 +11,7 @@ const DeleteAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, rel
     return (
         <>
                     <Text style={styles.textHead}>{timeUpdate}-{Medicine}</Text>
-                    <Text style={styles.textMed}>Do you really want to delete this reminder</Text>
+                    <Text style={styles.textMed}>Do you really want to delete this reminder?</Text>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.buttonA}

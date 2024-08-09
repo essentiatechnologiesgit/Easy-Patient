@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         })
     },
     head: {
-        fontSize: PixelRatio.getFontScale() * 24,
+        fontSize: PixelRatio.getFontScale() * 22,
         fontFamily:config.fontStyle,
         color: 'black',
         ...Platform.select({

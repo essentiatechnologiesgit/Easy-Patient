@@ -8,8 +8,7 @@ import BackgroundService from './src/components/BackgroundService';
 const App: React.FC = () => {
   useEffect(() => {
 
-    console.log("Image:", config.backgroundImage)
-    BackgroundService();
+   BackgroundService();
 
   }, []);
   return (
@@ -21,10 +20,7 @@ const App: React.FC = () => {
           <AppNavigator />
         </ImageBackground>
       }
-
-
     </View>
-
   );
 };
 

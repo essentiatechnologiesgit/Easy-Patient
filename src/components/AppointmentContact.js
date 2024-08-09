@@ -8,16 +8,14 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import CallComponent from './CallComponent';
 import WhatsappComponent from './WatsappComponent';
 const AppointmentContact = ({ watsappNo, phone, email }) => {
-    const navigation = useNavigation();
     return (
         <>
             <View style={styles.firstContainer}>
-                {
-                    phone && watsappNo && email &&
+                {(phone || watsappNo || email) && (
                     <View style={styles.head}>
                         <Text style={styles.status}>Contacts</Text>
                     </View>
-                }
+                )}
 
                 <View style={styles.line}></View>
                 {
@@ -55,7 +53,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignSelf: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     emailIcon: {
         width: 28,
@@ -77,18 +75,18 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 20,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
         fontWeight: 'bold',
     },
     subHeading: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     confirmed: {
         color: '#50B76C',
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     contentWrapper: {
         flex: 1, // Ensure the content takes all available space

@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     clinicText: {
         color: config.secondaryColor,
         marginLeft: '30%',
+        fontSize: PixelRatio.getFontScale() * 17,
     },
     carIcon: {
         height: 23,

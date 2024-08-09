@@ -28,7 +28,7 @@ const AnamnesisView = () => {
                     <Text style={styles.heading}>Medicine / Custom</Text>
                     <View style={styles.recievedCont}>
                         <Image source={downArrow} style={styles.arrowIcon} />
-                        <Text style={styles.subHeadings}>Recieved on: 13/8/19</Text>
+                        <Text style={styles.subHeadings}>Received on: 13/8/19</Text>
                     </View>
                     <View style={styles.specialistCont}>
                         <Text style={styles.subHeadings}>Specialist: Dr Ahmed</Text>

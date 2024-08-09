@@ -729,9 +729,14 @@ const AddReminder = ({ route }) => {
                                             }}
                                             textStyle={{
                                                 fontSize: PixelRatio.getFontScale() * 18,
-                                                fontFamily:config.fontStyle,
+                                                fontFamily: config.fontStyle,
+                                            }}
+                                            dropDownContainerStyle={{
+                                                backgroundColor: 'white', 
+                                                zIndex:999,
                                             }}
                                         />
+
                                     </View>
 
                                 )
@@ -797,8 +802,8 @@ const AddReminder = ({ route }) => {
 
                         <View style={styles.switchContainer}>
                             <Switch
-                                trackColor={{ false: '#00cc00', true: '#36b336' }}
-                                thumbColor={isNotify ? 'white' : 'white'}
+                                trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                                thumbColor={isNotify ? '#4CB56A' : '#EEEFF1'}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={toggleNotifySwitch}
                                 value={isNotify}
@@ -807,8 +812,8 @@ const AddReminder = ({ route }) => {
                         </View>
                         <View style={styles.switchContainer}>
                             <Switch
-                                trackColor={{ false: '#00cc00', true: '#36b336' }}
-                                thumbColor={priority ? 'white' : 'white'}
+                                trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                                thumbColor={priority ? '#4CB56A' : '#EEEFF1'}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={togglePrioritySwitch}
                                 value={priority}
@@ -850,8 +855,8 @@ const styles = StyleSheet.create({
         // borderRadius: 4,
         color: config.textColorHeadings,
         // paddingRight: 30, // to ensure the text is never behind the icon
-      },
-      inputAndroid: {
+    },
+    inputAndroid: {
         fontSize: 16,
         paddingHorizontal: 10,
         paddingVertical: 8,
@@ -860,20 +865,20 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         color: 'black',
         paddingRight: 30, // to ensure the text is never behind the icon
-      },
-      placeholder: {
+    },
+    placeholder: {
         color: config.primaryColor,
         fontSize: 16,
-      },
-      iconContainer: {
+    },
+    iconContainer: {
         top: 10,
         right: 12,
-      },
-      itemStyle: {
+    },
+    itemStyle: {
         fontSize: 16,
         height: 44,
         color: 'black',
-      },
+    },
     medicineContiner: {
         borderRadius: 40,
         width: 80,
@@ -930,7 +935,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
         borderBottomColor: config.secondaryColor,
         borderBottomWidth: 2,
         width: '90%',
@@ -939,7 +944,7 @@ const styles = StyleSheet.create({
         color: config.secondaryColor,
         width: '90%',
         fontSize: PixelRatio.getFontScale() * 14,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     placeholderLabel: {
         position: 'absolute',
@@ -949,7 +954,7 @@ const styles = StyleSheet.create({
         color: config.primaryColor,
         zIndex: 1,
         lineHeight: PixelRatio.getFontScale() * 20,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     TextContainer: {
         width: '80%',
@@ -957,7 +962,7 @@ const styles = StyleSheet.create({
     },
     TextContainerText: {
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
         textAlign: 'center',
         color: 'gray'
     },
@@ -1189,7 +1194,7 @@ const styles = StyleSheet.create({
         width: '90%',
         height: '100%',
         flex: 1,
-        zIndex: 999,
+        zIndex: 998,
     },
     floatingLabelH: {
         marginBottom: 6,

@@ -7,6 +7,7 @@ export default {
     tertiaryColor: '#fff',
     logo: require('./src/assets/logo.png'), // Use the selected logo path from state
     backgroundImage: require('./src/assets/background-image.png'),
+    backgroundColorImage:'#EEF6F8',
     backgroundImageType:'png',
     subLogo: require('./src/assets/sub-logo.png'),
     backgroundColor: '#FFFFFF',

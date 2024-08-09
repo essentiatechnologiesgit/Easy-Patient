@@ -37,26 +37,17 @@ const Dashboard = () => {
         const fetchData = async () => {
             await getLoginResponse();
             // await renderAlarmComponents();
-   
+
         };
         fetchData();
 
     }, [isFocused]);
 
-    useEffect(()=>{
+    useEffect(() => {
         if (userId !== 0) {
             renderTimeComponents(userId);
-          }
-    },[userId])
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         await getLoginResponse();
-    //         renderTimeComponents();
-    //     };
-    //     fetchData();
-    // }, [route]);
-
+        }
+    }, [userId])
 
     const [backPressedOnce, setBackPressedOnce] = useState(false);
     const backPressedOnceRef = useRef(backPressedOnce);
@@ -96,8 +87,18 @@ const Dashboard = () => {
 
     const getLoginResponse = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
-        const responseObject = await  JSON.parse(loginResponse);
-        setName(responseObject.user.full_name);
+        const responseObject = await JSON.parse(loginResponse);
+        let fullName = responseObject.user.full_name;
+        let firstName = '';
+
+        for (let str of fullName.split(" ")) {
+            if (typeof str === 'string' && str.trim() !== '') {
+                firstName = str;
+                break;
+            }
+        }
+
+        setName(firstName.trim())
         setUserId(responseObject.user.user_id);
         const access_token = responseObject.access_token;
         setImage(responseObject.user.profile_pic);
@@ -128,8 +129,8 @@ const Dashboard = () => {
 
 
     const renderTimeComponents = async () => {
-       
-   try {
+
+        try {
             const allAlarmComponents = [];
             const AlarmsArrayJSON = await AsyncStorage.getItem('Alarms');
             const AlarmsArray = AlarmsArrayJSON ? JSON.parse(AlarmsArrayJSON) : [];
@@ -270,85 +271,102 @@ const Dashboard = () => {
         inActiveStrokeOpacity: 0.2
     };
 
-    return (
-        <>
-            <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-                <ScrollView
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-                >
-                    <View style={styles.headerContainer}>
 
-                        <Image source={config.logo} style={styles.logo} />
-                        {
-                            image &&
-                            <>
-                                <ImageLogo imageURI={image} name={name} healthInfo={healthInfo} />
-                            </>
-                        }
-                        {
-                            !image &&
-                            <>
-                                <View style={{ position: 'absolute', right: 0 }}>
-                                    <CircularProgressBase
-                                        {...props}
-                                        value={healthInfo === false ? 30 : 100}
-                                        radius={26}
-                                        activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
-                                        inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
-                                    />
-                                </View>
-                                <TouchableOpacity onPress={() => navigation.navigate('ProfileAndHealth', { imageURI: image, name: name, healthInfo: healthInfo })} style={styles.profileButton}>
-                                    <Image source={profileIcon} style={styles.ProfileLogo} />
-                                </TouchableOpacity>
-                            </>
-                        }
+    const content = (<>
+        <View style={styles.container}>
+            <ScrollView
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+            >
+                <View style={styles.headerContainer}>
 
-                    </View>
-                    <View style={styles.nameContainer}>
-                        <Text style={styles.nameHeading}>Hello {name}!</Text>
-                        <Text style={styles.nameSideHeading}>Welcome to Easy Patient</Text>
-                    </View>
+                    <Image source={config.logo} style={styles.logo} />
+                    {
+                        image &&
+                        <>
+                            <ImageLogo imageURI={image} name={name} healthInfo={healthInfo} />
+                        </>
+                    }
+                    {
+                        !image &&
+                        <>
+                            <View style={{ position: 'absolute', right: 0 }}>
+                                <CircularProgressBase
+                                    {...props}
+                                    value={healthInfo === false ? 30 : 100}
+                                    radius={26}
+                                    activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                                    inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                                />
+                            </View>
+                            <TouchableOpacity onPress={() => navigation.navigate('ProfileAndHealth', { imageURI: image, name: name, healthInfo: healthInfo })} style={styles.profileButton}>
+                                <Image source={profileIcon} style={styles.ProfileLogo} />
+                            </TouchableOpacity>
+                        </>
+                    }
+                </View>
+                <View style={styles.nameContainer}>
+                    <Text style={styles.nameHeading}>Hello {name}!</Text>
+                    <Text style={styles.nameSideHeading}>Welcome to Easy Patient</Text>
+                </View>
 
 
-                    <View style={styles.parentView}>
-                        {/* <Text style={styles.heading}>Notifications</Text>
+                <View style={styles.parentView}>
+                    {/* <Text style={styles.heading}>Notifications</Text>
                     <View style={styles.NotificationContainer}>
                         <Image source={goodHealth} style={styles.healthIcon} />
                         <Text style={styles.reminder}>Dr Ahmed sent you a package of reminders</Text>
                     </View> */}
-                        <View style={styles.sliderContainer}>
-                            <FolderSlider />
-                        </View>
-                        <Text style={styles.heading}>Todays Medications</Text>
-                        {
-                            !alarmComponents.length > 0 &&
-                            <View style={styles.component}>
-                                <Medications />
-                            </View>
-                        }
-                        {
-                            alarmComponents.map((component, index) => (
-                                <View style={styles.component} key={index}>
-                                    {component}
-                                </View>
-                            ))
-                        }
-
+                    <View style={styles.sliderContainer}>
+                        <FolderSlider />
                     </View>
+                    <Text style={styles.heading}>Todays Medications</Text>
+                    {
+                        !alarmComponents.length > 0 &&
+                        <View style={styles.component}>
+                            <Medications />
+                        </View>
+                    }
+                    {
+                        alarmComponents.map((component, index) => (
+                            <View style={styles.component} key={index}>
+                                {component}
+                            </View>
+                        ))
+                    }
 
-                </ScrollView>
+                </View>
 
-                <Footer prop={0} />
+            </ScrollView>
 
-            </ImageBackground>
+            <Footer prop={0} />
             <View style={{ alignItems: 'center', bottom: 100 }}>
                 {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
             </View>
+        </View>
+    </>);
+
+    return (
+        <>
+            {
+                (config.backgroundColorImage) ?
+                    <View style={styles.container}>
+                        {content}
+                    </View>
+                    :
+                    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+                        {content}
+                    </ImageBackground>
+            }
+
         </>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: config.backgroundColorImage,
+        flex: 1,
+    },
     component: {
         marginBottom: 8,
     },
@@ -356,7 +374,7 @@ const styles = StyleSheet.create({
         // textAlign: 'center',
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     sliderContainer: {
         minHeight: 170,
@@ -395,10 +413,10 @@ const styles = StyleSheet.create({
         marginTop: -5,
     },
     nameHeading: {
-        fontWeight: '600',
+        fontWeight: '500',
         fontSize: PixelRatio.getFontScale() * 24,
         color: config.textColorHeadings,
-        fontFamily:config.fontStyle,
+        // fontFamily:config.fontStyle,
     },
     logo: {
         width: '10%',
@@ -411,7 +429,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
         fontWeight: '600',  // semi-bold
         marginLeft: 16,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     ProfileLogo: {
         width: '100%',
@@ -431,9 +449,10 @@ const styles = StyleSheet.create({
         }),
     },
     nameSideHeading: {
-        fontSize: PixelRatio.getFontScale() * 20,
+        fontSize: PixelRatio.getFontScale() * 18,
         color: config.textColorHeadings,
-        fontFamily:config.fontStyle,
+        // fontFamily:config.fontStyle,
+        fontWeight: '500'
     },
     parentView: {
         marginTop: '6%',

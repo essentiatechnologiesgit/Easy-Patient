@@ -149,8 +149,8 @@ const Configure = () => {
                 <BackHeader name={"Configure"} />
                 <View style={styles.configureContainer}>
                     <Switch
-                        trackColor={{ false: '#00cc00', true: '#36b336' }}
-                        thumbColor={switch1 ? 'white' : 'white'}
+                        trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                        thumbColor={switch1 ? '#4CB56A' : '#EEEFF1'}
                         ios_backgroundColor={config.primaryColor}
                         onValueChange={() => { toggleSwitch(1) }}
                         value={switch1}
@@ -161,8 +161,8 @@ const Configure = () => {
                     Platform.OS === 'android' &&
                     <View style={styles.configureContainer}>
                         <Switch
-                            trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                            thumbColor={switch2 ? config.secondaryColor : config.primaryColor}
+                            trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                            thumbColor={switch2 ? '#4CB56A' : '#EEEFF1'}
                             ios_backgroundColor={config.primaryColor}
                             onValueChange={() => { toggleSwitch(2) }}
                             value={switch2}
@@ -173,8 +173,8 @@ const Configure = () => {
 
                 <View style={styles.configureContainer}>
                     <Switch
-                        trackColor={{ false: '#00cc00', true: '#36b336' }}
-                        thumbColor={switch1 ? 'white' : 'white'}
+                        trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                        thumbColor={switch3 ? '#4CB56A' : '#EEEFF1'}
                         ios_backgroundColor={config.primaryColor}
                         onValueChange={() => { toggleSwitch(3) }}
                         value={switch3}
@@ -186,8 +186,8 @@ const Configure = () => {
                 </View>
                 <View style={styles.configureContainer}>
                     <Switch
-                        trackColor={{ false: '#00cc00', true: '#36b336' }}
-                        thumbColor={switch1 ? 'white' : 'white'}
+                        trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                        thumbColor={switch4 ? '#4CB56A' : '#EEEFF1'}
                         ios_backgroundColor={config.primaryColor}
                         onValueChange={() => { toggleSwitch(4) }}
                         value={switch4}
@@ -201,8 +201,8 @@ const Configure = () => {
                     Platform.OS === 'android' &&
                     <View style={styles.configureContainer}>
                         <Switch
-                            trackColor={{ false: config.primaryColor, true: '#CFB53B' }}
-                            thumbColor={switch5 ? config.secondaryColor : config.primaryColor}
+                            trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                            thumbColor={switch5 ? '#4CB56A' : '#EEEFF1'}
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={() => { toggleSwitch(5) }}
                             value={switch5}

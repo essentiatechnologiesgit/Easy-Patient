@@ -139,7 +139,7 @@ const SideBar = () => {
                     <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments")} style={styles.appointments}>
                         <View style={styles.navigate}>
                             <Image source={heartBeat} style={styles.heart}></Image>
-                            <Text style={{ ...styles.sideText, marginHorizontal: 10 }}>Body Assessments</Text>
+                            <Text style={{ ...styles.sideText, marginHorizontal: 5 }}>Body Assessments</Text>
                         </View>
                         <Text style={styles.sideText}>{'>'}</Text>
                     </TouchableOpacity>
@@ -185,7 +185,7 @@ const SideBar = () => {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => Logout()} style={styles.navigate}>
                     <Image source={exit} style={styles.exit}></Image>
-                    <Text style={styles.sideText}>Exit</Text>
+                    <Text style={styles.exitText}>Exit</Text>
                 </TouchableOpacity>
             </View>
             <ConfirmationModal isVisible={isModalVisible} toggleModal={toggleModal} Modalfor={"logout"} />
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     heart: {
         height: 26,
-        width: 9.2,
+        width: 18, 
     },
     calendar: {
         height: 23,
@@ -259,6 +259,11 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 18,
         fontFamily:config.fontStyle,
         color: 'white',
+    },
+    exitText:{
+        fontSize: PixelRatio.getFontScale() * 18,
+        fontFamily:config.fontStyle,
+        color: config.secondaryColor,
     },
     home: {
         top: -5,

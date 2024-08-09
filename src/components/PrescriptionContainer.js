@@ -82,9 +82,9 @@ const PrescriptionContainer = ({ record, isArchived,isHide ,isShow,record_id,get
             <TouchableWithoutFeedback onPress={() => navigation.navigate('PrescriptionsView', { record: record, isArchived,isArchived })}>
                 <View style={styles.container}>
                     <Text style={styles.headings}>{record.type}</Text>
-                    <Text style={styles.subHeadings}>Recieved {record.title}</Text>
-                    <Text style={styles.text}>{record.specialist}</Text>
+                    <Text style={styles.subHeadings}>Received {record.title}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
+                    <Text style={styles.text}>{record.specialist}</Text>
                     {
                         !isArchived ?
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
         fontFamily:config.fontStyle,
-        fontWeight: '600',
+        fontWeight: '900',
     },
     hideContainer: {
         flexDirection: 'row',

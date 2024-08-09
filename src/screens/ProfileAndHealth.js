@@ -18,93 +18,107 @@ const ProfileAndHealth = ({ route }) => {
         inActiveStrokeWidth: 12,
         inActiveStrokeOpacity: 0.2
     };
-    return (
+
+    const content = (
         <>
-            <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-                <BackHeader name={"Profile"} />
-                <View style={styles.formContainer}>
-                    <View style={{ top: -2, left: -12 }}>
-                        <CircularProgressBase
-                            {...props}
-                            value={healthInfo === false ? 30 : 100}
-                            radius={52}
-                            activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
-                            inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
-                        />
-                        <View style={styles.Percentage}>
-                            <Text style={styles.percent}> {healthInfo === false ? '30%' : '100%'}</Text>
-                        </View>
+            <BackHeader name={"Profile"} />
+            <View style={styles.formContainer}>
+                <View style={{ top: -2, left: -12 }}>
+                    <CircularProgressBase
+                        {...props}
+                        value={healthInfo === false ? 30 : 100}
+                        radius={52}
+                        activeStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                        inActiveStrokeColor={healthInfo === false ? '#9e1b32' : '#379237'}
+                    />
+                    <View style={styles.Percentage}>
+                        <Text style={styles.percent}> {healthInfo === false ? '30%' : '100%'}</Text>
                     </View>
-                    <View style={styles.header}>
+                </View>
+                <View style={styles.header}>
+                    {
+                        healthInfo === false ?
+                            <Image source={imageURI ? { uri: imageURI } : profileIcon} style={styles.Profilelogo} />
+                            :
+                            <Image source={imageURI ? { uri: imageURI } : profileIcon} style={styles.ProfilelogoT} />
+                    }
+                    <View>
+                        <Text style={styles.name}>{name}</Text>
                         {
                             healthInfo === false ?
-                                <Image source={imageURI ? { uri: imageURI } : profileIcon} style={styles.Profilelogo} />
+                                <>
+                                    <Text style={styles.msg}>Edit your details and complete your registration</Text>
+                                    <Text style={styles.complete}>Complete profile at 30%</Text>
+                                </>
                                 :
-                                <Image source={imageURI ? { uri: imageURI } : profileIcon} style={styles.ProfilelogoT} />
+                                <>
+                                    <Text style={styles.complete}>Profile Complete 100%</Text>
+                                </>
                         }
-                        <View>
-                            <Text style={styles.name}>{name}</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={styles.ProfilesContainer}>
+                <TouchableOpacity onPress={() => { navigation.navigate("Profile") }} style={styles.bothContainers}>
+                    <Image source={user} style={styles.userIcon} />
+                    <View style={styles.profileParent}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.FHeading}>Basic Information</Text>
+                            {/* <Text style={styles.arrow}>&gt;</Text> */}
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
+                            <View style={styles.greenCircle}></View>
+                            <Text style={styles.SHeading}>Complete stage</Text>
+                        </View>
+                        <Text style={styles.THeading}>Edit your profile photo, name , email , date of birth and gender</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { navigation.navigate("HealthInformation") }} style={styles.bothContainers}>
+                    <Image source={goodHealth} style={styles.userIcon} />
+                    <View style={styles.profileParent}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.FHeading}>Health Information</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
                             {
                                 healthInfo === false ?
                                     <>
-                                        <Text style={styles.msg}>Edit your details and complete your registration</Text>
-                                        <Text style={styles.complete}>Complete profile at 30%</Text>
+                                        <View style={styles.redCircle}></View>
+                                        <Text style={styles.SHeading}>Incomplate stage</Text>
                                     </>
                                     :
                                     <>
-                                        <Text style={styles.complete}>Profile Complete 100%</Text>
+                                        <View style={styles.greenCircle}></View>
+                                        <Text style={styles.SHeading}>Complete Stage</Text>
                                     </>
                             }
                         </View>
+                        <Text style={styles.TLHeading}>Describe your health status and sync your data with health apps you already use.</Text>
                     </View>
-                </View>
-                <View style={styles.ProfilesContainer}>
-                    <TouchableOpacity onPress={() => { navigation.navigate("Profile") }} style={styles.bothContainers}>
-                        <Image source={user} style={styles.userIcon} />
-                        <View style={styles.profileParent}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.FHeading}>Basic Information</Text>
-                                {/* <Text style={styles.arrow}>&gt;</Text> */}
-                            </View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
-                                <View style={styles.greenCircle}></View>
-                                <Text style={styles.SHeading}>Complete stage</Text>
-                            </View>
-                            <Text style={styles.THeading}>Edit your profile photo, name , email , date of birth and gender</Text>
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => { navigation.navigate("HealthInformation") }} style={styles.bothContainers}>
-                        <Image source={goodHealth} style={styles.userIcon} />
-                        <View style={styles.profileParent}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.FHeading}>Health Information</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
-                                {
-                                    healthInfo === false ?
-                                        <>
-                                            <View style={styles.redCircle}></View>
-                                            <Text style={styles.SHeading}>Incomplate stage</Text>
-                                        </>
-                                        :
-                                        <>
-                                            <View style={styles.greenCircle}></View>
-                                            <Text style={styles.SHeading}>Complete Stage</Text>
-                                        </>
-                                }
-                            </View>
-                            <Text style={styles.TLHeading}>Descrbe your health status and sync your data with health apps you already use.</Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
-            </ImageBackground>
+                </TouchableOpacity>
+            </View>
+        </>
+    )
+
+    return (
+        <>
+            {
+                (config.backgroundColorImage) ?
+                    <View style={styles.container}>
+                        {content}
+                    </View>
+                    :
+                    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+                        {content}
+                    </ImageBackground>
+            }
         </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: config.backgroundColorImage,
         flex: 1,
     },
     ProfilesContainer: {
@@ -162,7 +176,7 @@ const styles = StyleSheet.create({
     },
     bothContainers: {
         backgroundColor: 'white',
-        height: 100,
+        height: 110,
         borderRadius: 8,
         width: '90%',
         alignSelf: 'center',
@@ -185,16 +199,16 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         ...Platform.select({
             ios: {
-                top:-15,
+                top: -15,
                 height: 76,
                 width: 76,
-                left:-2.5,
+                left: -2.5,
             },
             android: {
                 height: 72,
                 width: 72,
             },
-          })
+        })
     },
     ProfilelogoT: {
         height: 80,

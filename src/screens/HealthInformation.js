@@ -376,10 +376,8 @@ const HealthInformation = () => {
             });
     }
 
-    return (
-        <>
-            <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-                <BackHeader name={"Health Information"} />
+    const content = (<>
+                    <BackHeader name={"Health Information"} />
                 <TouchableOpacity onPress={() => handleSync()} style={styles.SyncButton}>
                     <Image source={profileSync} style={styles.Profilelogo} />
                 </TouchableOpacity>
@@ -524,15 +522,27 @@ const HealthInformation = () => {
                 </ScrollView>
 
                 {showLoader && <ModalLoader />}
+    </>)
 
-            </ImageBackground>
+    return (
+        <>
+            {
+                (config.backgroundColorImage) ?
+                    <View style={styles.container}>
+                        {content}
+                    </View>
+                    :
+                    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+                        {content}
+                    </ImageBackground>
+            }
         </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: '#EEF6F8',
         flex: 1,
         // justifyContent:'center',
     },
@@ -545,11 +555,18 @@ const styles = StyleSheet.create({
         width: 30,
         borderRadius: 15,
         position: 'absolute',
-         top: 40,
         right: 15,
         alignSelf: 'flex-end',
         justifyContent: 'center',
         alignItems: 'center',
+        ...Platform.select({
+            ios: {
+                top: 40,
+            },
+            android:{
+                top:20,
+            }
+        })
     },
     profileParent: {
 
@@ -640,7 +657,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderColor: config.secondaryColor,
         left: 1,
-        
+
     },
     error: {
         color: 'red',

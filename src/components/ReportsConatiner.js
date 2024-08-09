@@ -72,7 +72,7 @@ const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id ,getDa
         <>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('ReportsView', { record: record, isArchived, isArchived })}>
                 <View style={styles.container}>
-                    <Text style={styles.subHeadings}>Recieved {record.title}</Text>
+                    <Text style={styles.subHeadings}>Received {record.title}</Text>
                     <Text style={styles.text}>{record.specialist}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
                     {
@@ -139,12 +139,12 @@ const styles = StyleSheet.create({
     hide: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 12,
-        fontFamily:config.fontStyle,
+        
     },
     New: {
         color: '#146229',
         fontSize: PixelRatio.getFontScale() * 12,
-        fontFamily:config.fontStyle,
+        
     },
     arrowLogo: {
         position: 'absolute', // Position the arrow absolutely
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
-        fontFamily:config.fontStyle,
+        
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -178,18 +178,18 @@ const styles = StyleSheet.create({
     hide: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 12,
-        fontFamily:config.fontStyle,
+        
     },
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        
         fontWeight: '600',
     },
     text: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        
     },
 });
 

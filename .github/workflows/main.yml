@@ -106,3 +106,28 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
 
+      - name: Extract Bundle ID and App Name from Config
+        id: extract_bundle_id
+        run: |
+          identifier=$(jq -r '.identifier' config.js)
+          name=$(jq -r '.name' config.js)
+          echo "identifier=$identifier" >> $GITHUB_ENV
+          echo "name=$name" >> $GITHUB_ENV
+
+      - name: Register Bundle ID
+        run: |
+          echo "Registering Bundle ID..."
+          curl -X POST https://api.appstoreconnect.apple.com/v1/bundleIds \
+          -H "Authorization: Bearer ${{ steps.generate_jwt.outputs.token }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "data": {
+                  "type": "bundleIds",
+                  "attributes": {
+                    "identifier": "com.example.yourapp",
+                    "name": "YourApp",
+                    "platform": "IOS"
+                  }
+                }
+              }'
+

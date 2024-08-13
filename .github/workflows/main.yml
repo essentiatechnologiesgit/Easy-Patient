@@ -65,12 +65,30 @@ jobs:
         id: get_devices
         run: |
           echo "Retrieving Devices..."
-          devices=$(curl -X GET https://api.appstoreconnect.apple.com/v1/devices \
-          -H "Authorization: Bearer ${{ env.token }}" \
-          -H "Content-Type: application/json")
-          echo "$devices" > devices.json
-          device_id=$(echo "$devices" | jq -r '.data[0].id') # Adjust the jq path if necessary
+          response=$(curl -s -w "%{http_code}" -X GET https://api.appstoreconnect.apple.com/v1/devices \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json")
+          
+          # Extract response body and status code
+          body=$(echo "$response" | sed -e 's/^[0-9]*$//')
+          status_code=$(echo "$response" | tail -n1)
+          
+          echo "Response Status Code: $status_code"
+          echo "Response Body: $body"
+          
+          if [ "$status_code" -ne 200 ]; then
+            echo "Failed to retrieve devices. Status code: $status_code"
+            exit 1
+          fi
+      
+          echo "$body" > devices.json
+          device_id=$(echo "$body" | jq -r '.data[0].id') # Adjust the jq path if necessary
+          if [ -z "$device_id" ]; then
+            echo "No device ID found in response"
+            exit 1
+          fi
           echo "device_id=$device_id" >> $GITHUB_ENV
+
 
       - name: Create Profile
         run: |

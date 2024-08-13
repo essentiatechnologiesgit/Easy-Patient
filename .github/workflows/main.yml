@@ -74,11 +74,28 @@ jobs:
         id: get_certificates
         run: |
           echo "Retrieving Certificates..."
-          certificates=$(curl -X GET https://api.appstoreconnect.apple.com/v1/certificates \
-          -H "Authorization: Bearer ${{ env.token }}" \
-          -H "Content-Type: application/json")
-          echo "$certificates" > certificates.json
-          certificate_id=$(echo "$certificates" | jq -r '.data[0].id') # Adjust the jq path if necessary
+          response=$(curl -s -w "%{http_code}" -X GET https://api.appstoreconnect.apple.com/v1/certificates \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json")
+          
+          # Extract response body and status code
+          body=$(echo "$response" | sed -e 's/^[0-9]*$//')
+          status_code=$(echo "$response" | tail -n1)
+          
+          echo "Response Status Code: $status_code"
+          echo "Response Body: $body"
+          
+          if [ "$status_code" -ne 200 ]; then
+            echo "Failed to retrieve certificates. Status code: $status_code"
+            exit 1
+          fi
+      
+          echo "$body" > certificates.json
+          certificate_id=$(echo "$body" | jq -r '.data[0].id') # Adjust the jq path if necessary
+          if [ -z "$certificate_id" ]; then
+            echo "No certificate ID found in response"
+            exit 1
+          fi
           echo "certificate_id=$certificate_id" >> $GITHUB_ENV
 
       - name: Retrieve Devices

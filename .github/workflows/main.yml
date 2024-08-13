@@ -76,7 +76,7 @@ jobs:
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json")
           echo "$certificates" > certificates.json
-          certificate_id=$(echo "$certificates" | jq -r '.data[0].id') # Adjust the jq path to get the correct ID
+          certificate_id=$(echo "$certificates" | jq -r '.data[0].id') # Adjust the jq path if necessary
           echo "certificate_id=$certificate_id" >> $GITHUB_ENV
 
       - name: Retrieve Devices
@@ -87,7 +87,7 @@ jobs:
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json")
           echo "$devices" > devices.json
-          device_id=$(echo "$devices" | jq -r '.data[0].id') # Adjust the jq path to get the correct ID
+          device_id=$(echo "$devices" | jq -r '.data[0].id') # Adjust the jq path if necessary
           echo "device_id=$device_id" >> $GITHUB_ENV
 
       - name: Create Profile
@@ -103,8 +103,15 @@ jobs:
                     "name": "YourApp Development Profile",
                     "profileType": "IOS_APP_DEVELOPMENT",
                     "bundleId": "com.org.easypatientdynamic",
-                    "certificates": ["${{ env.certificate_id }}"],
-                    "devices": ["${{ env.device_id }}"]
+                    "certificates": ["'${{ env.certificate_id }}'"],
+                    "devices": ["'${{ env.device_id }}'"]
                   }
                 }
               }'
+
+      - name: Clean up
+        run: |
+          echo "Cleaning up..."
+          security delete-keychain $KEYCHAIN_PATH
+          rm -f $CERTIFICATE_PATH $PP_PATH
+

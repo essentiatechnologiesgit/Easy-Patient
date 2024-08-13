@@ -29,16 +29,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install the Apple certificate and provisioning profile
+      - name: Install the Apple certificate
         run: |
           # Create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # Import certificate and provisioning profile from secrets
+          # Import certificate from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
           
           # Create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -49,16 +47,10 @@ jobs:
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
-          # Apply provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-
-      - name: Check Certificate and provisioning profile
+      - name: Check Certificate
         run: |
           echo "Checking certificate..."
           security find-identity -v -p codesigning
-          echo "Checking provisioning profile..."
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Generate JWT
         id: generate_jwt
@@ -68,35 +60,6 @@ jobs:
           token=$(node -e "const jwt = require('jsonwebtoken'); const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n'); const token = jwt.sign({}, privateKey, { algorithm: 'ES256', expiresIn: '5m', issuer: process.env.APP_STORE_CONNECT_ISSUER_ID, header: { alg: 'ES256', kid: process.env.APP_STORE_CONNECT_KEY_ID }}); console.log(token);")
           echo "Generated token: $token"  # This will print the token to the console
           echo "token=$token" >> $GITHUB_ENV
-
-
-      - name: Retrieve Certificates
-        id: get_certificates
-        run: |
-          echo "Retrieving Certificates..."
-          response=$(curl -s -w "%{http_code}" -X GET https://api.appstoreconnect.apple.com/v1/certificates \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json")
-          
-          # Extract response body and status code
-          body=$(echo "$response" | sed -e 's/^[0-9]*$//')
-          status_code=$(echo "$response" | tail -n1)
-          
-          echo "Response Status Code: $status_code"
-          echo "Response Body: $body"
-          
-          if [ "$status_code" -ne 200 ]; then
-            echo "Failed to retrieve certificates. Status code: $status_code"
-            exit 1
-          fi
-      
-          echo "$body" > certificates.json
-          certificate_id=$(echo "$body" | jq -r '.data[0].id') # Adjust the jq path if necessary
-          if [ -z "$certificate_id" ]; then
-            echo "No certificate ID found in response"
-            exit 1
-          fi
-          echo "certificate_id=$certificate_id" >> $GITHUB_ENV
 
       - name: Retrieve Devices
         id: get_devices

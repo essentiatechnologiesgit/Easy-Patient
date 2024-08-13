@@ -14,6 +14,7 @@ export default {
     buttonText:'#FFFFFF',
     headerColor:'#FFFFFF',
     fontStyle:'OpenSans-Regular',
-    identifier:'com.easypatientdynamic'
+    identifier:'com.easypatientdynamic',
+    name:'NewApp'
   };
 

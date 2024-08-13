@@ -33,7 +33,7 @@ jobs:
           gem install cocoapods
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: npm install --force
 
       - name: Install Pods
         run: |

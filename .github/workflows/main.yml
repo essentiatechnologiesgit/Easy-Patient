@@ -1,37 +1,28 @@
 name: CI/CD for STAGE
-
-on:
+'on':
   push:
     branches:
-      - development  # or specify your branch
-
+      - development
 env:
-  BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-  P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-  BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
-  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-  APPLIED_USERNAME: ${{ secrets.APPLIED_USERNAME }}
-  APPLIED_PASSWORD: ${{ secrets.APPLIED_PASSWORD }}
-  APP_SPEC_PASSWORD: ${{ secrets.APP_SPEC_PASSWORD }}
-  
-
+  BUILD_CERTIFICATE_BASE64: '${{ secrets.BUILD_CERTIFICATE_BASE64 }}'
+  P12_PASSWORD: '${{ secrets.P12_PASSWORD }}'
+  BUILD_PROVISION_PROFILE_BASE64: '${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}'
+  KEYCHAIN_PASSWORD: '${{ secrets.KEYCHAIN_PASSWORD }}'
+  APPSTORE_USERNAME: '${{ secrets.APPLEID_USERNAME }}'
+  APPSTORE_PASSWORD: '${{ secrets.APPLEID_PASSWORD }}'
+  APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPEC_PASSWORD }}'
+  EXPORT_OPTIONS_PLIST: '${{ secrets.EXPORT_OPTIONS_PLIST }}'
 jobs:
   build:
     runs-on: macos-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          gem install cocoapods
 
-    - name: Display environment variables
-      run: |
-        echo "BUILD_CERTIFICATE_BASE64=${{ env.BUILD_CERTIFICATE_BASE64 }}"
-        echo "P12_PASSWORD=${{ env.P12_PASSWORD }}"
-        echo "BUILD_PROVISION_PROFILE_BASE64=${{ env.BUILD_PROVISION_PROFILE_BASE64 }}"
-        echo "KEYCHAIN_PASSWORD=${{ env.KEYCHAIN_PASSWORD }}"
-        echo "APPSTORE_USERNAME=${{ env.APPLIED_USERNAME }}"
-        echo "APPSTORE_PASSWORD=${{ env.APPLIED_PASSWORD }}"
-        echo "APP_SPECIFIC_PASSWORD=${{ env.APP_SPEC_PASSWORD }}"
+          cd ios
+          pod install
 
-
-
+          npm install  

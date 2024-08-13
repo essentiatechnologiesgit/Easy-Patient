@@ -78,14 +78,14 @@ jobs:
             console.log(token);
           ")
           echo "Generated token: $token"  # This will print the token to the console
-          echo "token=$token" >> $GITHUB_ENV
+          echo "token=$token"
 
       - name: Retrieve Devices
         id: get_devices
         run: |
           echo "Retrieving Devices..."
           response=$(curl -s -w "%{http_code}" -X GET https://api.appstoreconnect.apple.com/v1/devices \
-            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Authorization: Bearer ${{token}}" \
             -H "Content-Type: application/json")
           
           # Extract response body and status code

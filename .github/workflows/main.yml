@@ -26,42 +26,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.12.1
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 20.12.1
 
-      - name: Install Ruby and Cocoapods
-        run: |
-          gem install cocoapods
+      # - name: Install Ruby and Cocoapods
+      #   run: |
+      #     gem install cocoapods
 
-      - name: Install Node.js dependencies
-        run: npm install --force
+      # - name: Install Node.js dependencies
+      #   run: npm install --force
 
-      - name: Install Pods
-        run: |
-          cd ios
-          pod install
-          cd ..
+      # - name: Install Pods
+      #   run: |
+      #     cd ios
+      #     pod install
+      #     cd ..
 
-      - name: Select Xcode version
-        run: |
-          echo "Checking for Xcode ${{ env.XCODE_VERSION }}..."
+      # - name: Select Xcode version
+      #   run: |
+      #     echo "Checking for Xcode ${{ env.XCODE_VERSION }}..."
 
-          # List installed Xcode versions
-          ls /Applications | grep Xcode
+      #     # List installed Xcode versions
+      #     ls /Applications | grep Xcode
 
-          echo "-----------------------------------------"
+      #     echo "-----------------------------------------"
 
-          # Check if the desired Xcode version is installed
-          if ! xcode_exists=$(ls /Applications | grep "Xcode_${{ env.XCODE_VERSION }}.app"); then
-            echo "Xcode ${{ env.XCODE_VERSION }} not found. Please install it or update the XCODE_VERSION variable."
-            exit 1
-          else
-            echo "Xcode ${{ env.XCODE_VERSION }} is already installed."
-            sudo xcode-select -switch /Applications/Xcode_${{ env.XCODE_VERSION }}.app
-            /usr/bin/xcodebuild -version
-          fi
+      #     # Check if the desired Xcode version is installed
+      #     if ! xcode_exists=$(ls /Applications | grep "Xcode_${{ env.XCODE_VERSION }}.app"); then
+      #       echo "Xcode ${{ env.XCODE_VERSION }} not found. Please install it or update the XCODE_VERSION variable."
+      #       exit 1
+      #     else
+      #       echo "Xcode ${{ env.XCODE_VERSION }} is already installed."
+      #       sudo xcode-select -switch /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+      #       /usr/bin/xcodebuild -version
+      #     fi
 
       - name: Install the Apple certificate and provisioning profile
         run: |
@@ -106,13 +106,13 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
 
-      - name: Extract Bundle ID and App Name from Config
-        id: extract_bundle_id
-        run: |
-          identifier=$(jq -r '.identifier' config.js)
-          name=$(jq -r '.name' config.js)
-          echo "identifier=$identifier" >> $GITHUB_ENV
-          echo "name=$name" >> $GITHUB_ENV
+      # - name: Extract Bundle ID and App Name from Config
+      #   id: extract_bundle_id
+      #   run: |
+      #     identifier=$(jq -r '.identifier' config.js)
+      #     name=$(jq -r '.name' config.js)
+      #     echo "identifier=$identifier" >> $GITHUB_ENV
+      #     echo "name=$name" >> $GITHUB_ENV
 
       - name: Register Bundle ID
         run: |

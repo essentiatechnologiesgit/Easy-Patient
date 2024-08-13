@@ -99,12 +99,14 @@ jobs:
         run: |
           echo "Generating JWT..."
           npm install jsonwebtoken --force
-          node -e "const jwt = require('jsonwebtoken'); const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n'); const token = jwt.sign({}, privateKey, { algorithm: 'ES256', expiresIn: '5m', issuer: process.env.APP_STORE_CONNECT_ISSUER_ID, header: { alg: 'ES256', kid: process.env.APP_STORE_CONNECT_KEY_ID }}); console.log('TOKEN=' + token);"
-          echo "TOKEN=$token" >> $GITHUB_ENV
+          token=$(node -e "const jwt = require('jsonwebtoken'); const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n'); const token = jwt.sign({}, privateKey, { algorithm: 'ES256', expiresIn: '5m', issuer: process.env.APP_STORE_CONNECT_ISSUER_ID, header: { alg: 'ES256', kid: process.env.APP_STORE_CONNECT_KEY_ID }}); console.log(token);")
+          echo "token=$token" >> $GITHUB_ENV
+          echo "::set-output name=token::$token"
         env:
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+
 
       # - name: Extract Bundle ID and App Name from Config
       #   id: extract_bundle_id
@@ -113,7 +115,7 @@ jobs:
       #     name=$(jq -r '.name' config.js)
       #     echo "identifier=$identifier" >> $GITHUB_ENV
       #     echo "name=$name" >> $GITHUB_ENV
-
+      
       - name: Register Bundle ID
         run: |
           echo "Registering Bundle ID..."
@@ -130,4 +132,5 @@ jobs:
                   }
                 }
               }'
+
 

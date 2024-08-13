@@ -57,7 +57,22 @@ jobs:
         run: |
           echo "Generating JWT..."
           npm install jsonwebtoken --force
-          token=$(node -e "const jwt = require('jsonwebtoken'); const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n'); const token = jwt.sign({}, privateKey, { algorithm: 'ES256', expiresIn: '5m', issuer: process.env.APP_STORE_CONNECT_ISSUER_ID, header: { alg: 'ES256', kid: process.env.APP_STORE_CONNECT_KEY_ID }}); console.log(token);")
+          token=$(node -e "
+            const jwt = require('jsonwebtoken');
+            const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n');
+            console.log('Private Key:', privateKey); // Debug: Print private key
+            const token = jwt.sign({}, privateKey, {
+              algorithm: 'ES256',
+              expiresIn: '5m',
+              issuer: process.env.APP_STORE_CONNECT_ISSUER_ID,
+              header: {
+                alg: 'ES256',
+                kid: process.env.APP_STORE_CONNECT_KEY_ID
+              }
+            });
+            console.log('Generated Token:', token); // Debug: Print the token
+            console.log(token);
+          ")
           echo "Generated token: $token"  # This will print the token to the console
           echo "token=$token" >> $GITHUB_ENV
 

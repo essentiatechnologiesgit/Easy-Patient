@@ -29,18 +29,18 @@ jobs:
         with:
           node-version: 20.12.1
 
-      # - name: Install Ruby and Cocoapods
-      #   run: |
-      #     gem install cocoapods
+      - name: Install Ruby and Cocoapods
+        run: |
+          gem install cocoapods
 
-      # - name: Install Node.js dependencies
-      #   run: npm install --force
+      - name: Install Node.js dependencies
+        run: npm install --force
 
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod install
-      #     cd ..
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
+          cd ..
 
       - name: Select Xcode version
         run: |

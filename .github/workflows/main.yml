@@ -65,18 +65,16 @@ jobs:
           npm install jsonwebtoken --force
           token=$(node -e "
             const jwt = require('jsonwebtoken');
-            const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n');
-            console.log('Private Key:', privateKey); // Debug: Print private key
+            const privateKey = \`$(echo '${{ env.APP_STORE_CONNECT_PRIVATE_KEY }}' | sed 's/^[[:space:]]*//')\`;
             const token = jwt.sign({}, privateKey, {
               algorithm: 'ES256',
               expiresIn: '5m',
-              issuer: process.env.APP_STORE_CONNECT_ISSUER_ID,
+              issuer: '${{ env.APP_STORE_CONNECT_ISSUER_ID }}',
               header: {
                 alg: 'ES256',
-                kid: process.env.APP_STORE_CONNECT_KEY_ID
+                kid: '${{ env.APP_STORE_CONNECT_KEY_ID }}'
               }
             });
-            console.log('Generated Token:', token); // Debug: Print the token
             console.log(token);
           ")
           echo "Generated token: $token"  # This will print the token to the console
@@ -109,7 +107,6 @@ jobs:
             exit 1
           fi
           echo "device_id=$device_id" >> $GITHUB_ENV
-
 
       - name: Create Profile
         run: |

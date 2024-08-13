@@ -3,7 +3,7 @@ name: CI/CD for STAGE
 on:
   push:
     branches:
-      - main  # or specify your branch
+      - development  # or specify your branch
 
 env:
   BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}

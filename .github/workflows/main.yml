@@ -13,7 +13,6 @@ env:
   APPSTORE_USERNAME: '${{ secrets.APPLEID_USERNAME }}'
   APPSTORE_PASSWORD: '${{ secrets.APPLEID_PASSWORD }}'
   APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPECIFIC_PASSWORD }}'
-  EXPORT_OPTIONS_PLIST: '${{ secrets.EXPORT_OPTIONS_PLIST }}'
   XCODE_VERSION: '15.3'
   APP_STORE_CONNECT_PRIVATE_KEY: '${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}'
   APP_STORE_CONNECT_ISSUER_ID: '${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}'
@@ -26,64 +25,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 20.12.1
-
-      # - name: Install Ruby and Cocoapods
-      #   run: |
-      #     gem install cocoapods
-
-      # - name: Install Node.js dependencies
-      #   run: npm install --force
-
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod install
-      #     cd ..
-
-      # - name: Select Xcode version
-      #   run: |
-      #     echo "Checking for Xcode ${{ env.XCODE_VERSION }}..."
-
-      #     # List installed Xcode versions
-      #     ls /Applications | grep Xcode
-
-      #     echo "-----------------------------------------"
-
-      #     # Check if the desired Xcode version is installed
-      #     if ! xcode_exists=$(ls /Applications | grep "Xcode_${{ env.XCODE_VERSION }}.app"); then
-      #       echo "Xcode ${{ env.XCODE_VERSION }} not found. Please install it or update the XCODE_VERSION variable."
-      #       exit 1
-      #     else
-      #       echo "Xcode ${{ env.XCODE_VERSION }} is already installed."
-      #       sudo xcode-select -switch /Applications/Xcode_${{ env.XCODE_VERSION }}.app
-      #       /usr/bin/xcodebuild -version
-      #     fi
-
       - name: Install the Apple certificate and provisioning profile
         run: |
-          # create variables
+          # Create variables
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # import certificate and provisioning profile from secrets
+          # Import certificate and provisioning profile from secrets
           echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
           
-          # create temporary keychain
+          # Create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-          # import certificate to keychain
+          # Import certificate to keychain
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
-          # apply provisioning profile
+          # Apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
@@ -101,37 +63,48 @@ jobs:
           npm install jsonwebtoken --force
           token=$(node -e "const jwt = require('jsonwebtoken'); const privateKey = process.env.APP_STORE_CONNECT_PRIVATE_KEY.replace(/\\n/g, '\n'); const token = jwt.sign({}, privateKey, { algorithm: 'ES256', expiresIn: '5m', issuer: process.env.APP_STORE_CONNECT_ISSUER_ID, header: { alg: 'ES256', kid: process.env.APP_STORE_CONNECT_KEY_ID }}); console.log(token);")
           echo "token=$token" >> $GITHUB_ENV
-          echo "::set-output name=token::$token"
         env:
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
 
-
-      # - name: Extract Bundle ID and App Name from Config
-      #   id: extract_bundle_id
-      #   run: |
-      #     identifier=$(jq -r '.identifier' config.js)
-      #     name=$(jq -r '.name' config.js)
-      #     echo "identifier=$identifier" >> $GITHUB_ENV
-      #     echo "name=$name" >> $GITHUB_ENV
-      
-      - name: Register Bundle ID
+      - name: Retrieve Certificates
+        id: get_certificates
         run: |
-          echo "Registering Bundle ID..."
-          curl -X POST https://api.appstoreconnect.apple.com/v1/bundleIds \
-          -H "Authorization: Bearer ${{ steps.generate_jwt.outputs.token }}" \
+          echo "Retrieving Certificates..."
+          certificates=$(curl -X GET https://api.appstoreconnect.apple.com/v1/certificates \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json")
+          echo "$certificates" > certificates.json
+          certificate_id=$(echo "$certificates" | jq -r '.data[0].id') # Adjust the jq path to get the correct ID
+          echo "certificate_id=$certificate_id" >> $GITHUB_ENV
+
+      - name: Retrieve Devices
+        id: get_devices
+        run: |
+          echo "Retrieving Devices..."
+          devices=$(curl -X GET https://api.appstoreconnect.apple.com/v1/devices \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json")
+          echo "$devices" > devices.json
+          device_id=$(echo "$devices" | jq -r '.data[0].id') # Adjust the jq path to get the correct ID
+          echo "device_id=$device_id" >> $GITHUB_ENV
+
+      - name: Create Profile
+        run: |
+          echo "Creating Profile..."
+          curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+          -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
           -d '{
                 "data": {
-                  "type": "bundleIds",
+                  "type": "profiles",
                   "attributes": {
-                    "identifier": "com.example.yourapp",
-                    "name": "YourApp",
-                    "platform": "IOS"
+                    "name": "YourApp Development Profile",
+                    "profileType": "IOS_APP_DEVELOPMENT",
+                    "bundleId": "com.org.easypatientdynamic",
+                    "certificates": ["${{ env.certificate_id }}"],
+                    "devices": ["${{ env.device_id }}"]
                   }
                 }
               }'
-
-
-

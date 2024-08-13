@@ -12,9 +12,10 @@ env:
   KEYCHAIN_PASSWORD: '${{ secrets.KEYCHAIN_PASSWORD }}'
   APPSTORE_USERNAME: '${{ secrets.APPLEID_USERNAME }}'
   APPSTORE_PASSWORD: '${{ secrets.APPLEID_PASSWORD }}'
-  APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPEC_PASSWORD }}'
+  APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPECIFIC_PASSWORD }}'
   EXPORT_OPTIONS_PLIST: '${{ secrets.EXPORT_OPTIONS_PLIST }}'
   XCODE_VERSION: '15.3'
+  PRIVATE_KEY: ${{ secrets.API_PRIVATE_KEY }}
 
 jobs:
   build:
@@ -28,23 +29,23 @@ jobs:
         with:
           node-version: 20.12.1
 
-      - name: Install Ruby and Cocoapods
-        run: |
-          gem install cocoapods
+      # - name: Install Ruby and Cocoapods
+      #   run: |
+      #     gem install cocoapods
 
-      - name: Install Node.js dependencies
-        run: npm install --force
+      # - name: Install Node.js dependencies
+      #   run: npm install --force
 
-      - name: Install Pods
-        run: |
-          cd ios
-          pod install
-          cd ..
+      # - name: Install Pods
+      #   run: |
+      #     cd ios
+      #     pod install
+      #     cd ..
 
       - name: Select Xcode version
         run: |
           echo "Checking for Xcode ${{ env.XCODE_VERSION }}..."
-          
+
           # List installed Xcode versions
           ls /Applications | grep Xcode
 
@@ -83,3 +84,21 @@ jobs:
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+      - name: Check Certificate and provisioning profile
+        run: |
+          echo "Checking certificate..."
+          security find-identity -v -p codesigning
+          echo "Checking provisioning profile..."
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
+
+      - name: Get Latest TestFlight Build Number
+        run: |
+          python --version
+          python -m pip install PyJWT requests cryptography
+          echo "$PRIVATE_KEY" > private_key.p8
+          python .github/scripts/get_latest_testflight_build_number.py > build_number.txt
+        env:
+          PRIVATE_KEY: ${{ secrets.API_PRIVATE_KEY }}
+
+      

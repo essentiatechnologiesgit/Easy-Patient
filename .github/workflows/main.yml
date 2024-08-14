@@ -120,7 +120,7 @@ jobs:
           PROFILE_NAME="Easy Patient Testing profile"
           BUNDLE_ID="com.org.easypatientdynamic"
           CERTIFICATE_ID="${{ env.certificate_id }}"
-          DEVICE_IDS="P9UXBZRD6V"
+          DEVICE_IDS='[{"type": "devices", "id": "P9UXBZRD6V"}]'  # Properly format as JSON array
       
           # Create provisioning profile
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
@@ -154,19 +154,10 @@ jobs:
                 }
               }
             }')
-            
+      
           echo "Profile Response: $response"
       
           # Save the profile ID or the profile content if needed
           profile_id=$(echo "$response" | jq -r '.data.id')
           echo "Extracted Profile ID: $profile_id"
           echo "profile_id=$profile_id" >> $GITHUB_ENV
-      
-            
-                echo "$body" > devices.json
-                device_id=$(echo "$body" | jq -r '.data[0].id')
-                if [ -z "$device_id" ]; then
-                  echo "No device ID found in response"
-                  exit 1
-                fi
-                echo "device_id=$device_id" >> $GITHUB_ENV

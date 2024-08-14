@@ -118,7 +118,7 @@ jobs:
           
           # Define your parameters
           PROFILE_NAME="Easy Patient Testing profile"
-          BUNDLE_ID="com.org.easypatientdynamic"
+          BUNDLE_ID="com.easypatientdynamic.org"
           CERTIFICATE_ID="${{ env.certificate_id }}"
           DEVICE_IDS='[{"type": "devices", "id": "P9UXBZRD6V"}]'  # Ensure this is a valid JSON array
       

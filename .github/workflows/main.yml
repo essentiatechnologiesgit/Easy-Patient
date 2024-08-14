@@ -119,8 +119,8 @@ jobs:
           # Define your parameters
           PROFILE_NAME="Easy Patient Testing profile"
           BUNDLE_ID="com.org.easypatientdynamic"
-          CERTIFICATE_ID=" ${{ env.certificate_id }}"
-          DEVICE_IDS=$(jq -r '.data[].id' devices.json | jq -cRs 'split("\n")[:-1]')
+          CERTIFICATE_ID="${{ env.certificate_id }}"
+          DEVICE_IDS="P9UXBZRD6V"
       
           # Create provisioning profile
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \

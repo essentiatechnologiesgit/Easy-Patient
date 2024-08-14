@@ -94,12 +94,21 @@ jobs:
         run: |
           echo "Retrieving Certificates..."
           response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/certificates \
-            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Authorization: Bearer ${{ secrets.JWT_TOKEN }}" \
             -H "Content-Type: application/json")
-      
+          
           echo "$response" > certificates.json
+          
+          # Print the JSON file content for debugging
+          cat certificates.json
+      
+          # Extract and print certificate ID
           certificate_id=$(jq -r '.data[0].id' certificates.json)
+          echo "Extracted Certificate ID: $certificate_id"
+      
+          # Save the certificate ID to the environment variables
           echo "certificate_id=$certificate_id" >> $GITHUB_ENV
+
 
 
 

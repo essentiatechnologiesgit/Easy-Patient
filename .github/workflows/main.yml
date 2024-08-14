@@ -94,7 +94,7 @@ jobs:
         run: |
           echo "Retrieving Certificates..."
           response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/certificates \
-            -H "Authorization: Bearer ${{ secrets.JWT_TOKEN }}" \
+            -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json")
           
           echo "$response" > certificates.json

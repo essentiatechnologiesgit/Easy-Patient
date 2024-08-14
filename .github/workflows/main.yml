@@ -112,60 +112,61 @@ jobs:
 
 
 
-      # - name: Create Provisioning Profile
-      #   run: |
-      #     echo "Creating Provisioning Profile..."
+      - name: Create Provisioning Profile
+        run: |
+          echo "Creating Provisioning Profile..."
           
-      #     # Define your parameters
-      #     PROFILE_NAME="Easy Patient Testing profile"
-      #     BUNDLE_ID="com.org.easypatientdynamic"
-      #     CERTIFICATE_ID="YOUR_CERTIFICATE_ID"
-      #     DEVICE_IDS=$(jq -r '.data[].id' devices.json | jq -cRs 'split("\n")[:-1]')
+          # Define your parameters
+          PROFILE_NAME="Easy Patient Testing profile"
+          BUNDLE_ID="com.org.easypatientdynamic"
+          CERTIFICATE_ID="env.certificate_id"
+          DEVICE_IDS=$(jq -r '.data[].id' devices.json | jq -cRs 'split("\n")[:-1]')
       
-      #     # Create provisioning profile
-      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-      #       -H "Authorization: Bearer ${{ secrets.JWT_TOKEN }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d '{
-      #         "data": {
-      #           "type": "profiles",
-      #           "attributes": {
-      #             "name": "'$PROFILE_NAME'",
-      #             "profileType": "IOS_APP_DEVELOPMENT"
-      #           },
-      #           "relationships": {
-      #             "bundleId": {
-      #               "data": {
-      #                 "type": "bundleIds",
-      #                 "id": "'$BUNDLE_ID'"
-      #               }
-      #             },
-      #             "certificates": {
-      #               "data": [
-      #                 {
-      #                   "type": "certificates",
-      #                   "id": "'$CERTIFICATE_ID'"
-      #                 }
-      #               ]
-      #             },
-      #             "devices": {
-      #               "data": '"$DEVICE_IDS"'
-      #             }
-      #           }
-      #         }
-      #       }')
+          # Create provisioning profile
+          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+            -H "Authorization: Bearer ${{ secrets.JWT_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "profiles",
+                "attributes": {
+                  "name": "'$PROFILE_NAME'",
+                  "profileType": "IOS_APP_DEVELOPMENT"
+                },
+                "relationships": {
+                  "bundleId": {
+                    "data": {
+                      "type": "bundleIds",
+                      "id": "'$BUNDLE_ID'"
+                    }
+                  },
+                  "certificates": {
+                    "data": [
+                      {
+                        "type": "certificates",
+                        "id": "'$CERTIFICATE_ID'"
+                      }
+                    ]
+                  },
+                  "devices": {
+                    "data": '"$DEVICE_IDS"'
+                  }
+                }
+              }
+            }')
             
-      #     echo "Profile Response: $response"
+          echo "Profile Response: $response"
       
-      #     # Save the profile ID or the profile content if needed
-      #     profile_id=$(echo "$response" | jq -r '.data.id')
-      #     echo "profile_id=$profile_id" >> $GITHUB_ENV
+          # Save the profile ID or the profile content if needed
+          profile_id=$(echo "$response" | jq -r '.data.id')
+          echo "Extracted Profile ID: $profile_id"
+          echo "profile_id=$profile_id" >> $GITHUB_ENV
       
             
-      #           echo "$body" > devices.json
-      #           device_id=$(echo "$body" | jq -r '.data[0].id')
-      #           if [ -z "$device_id" ]; then
-      #             echo "No device ID found in response"
-      #             exit 1
-      #           fi
-      #           echo "device_id=$device_id" >> $GITHUB_ENV
+                echo "$body" > devices.json
+                device_id=$(echo "$body" | jq -r '.data[0].id')
+                if [ -z "$device_id" ]; then
+                  echo "No device ID found in response"
+                  exit 1
+                fi
+                echo "device_id=$device_id" >> $GITHUB_ENV

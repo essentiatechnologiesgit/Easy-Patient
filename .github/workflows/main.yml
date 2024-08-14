@@ -10,71 +10,138 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3
-
-      - name: Install dependencies (optional)
+        
+      - name: Install the Apple certificate
         run: |
-          gem install jwt
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-      - name: Generate JWT
-        id: generate_jwt
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
-
-          token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
+          # Import certificate from secrets
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
           
-          echo "token=$token" >> $GITHUB_ENV
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-      - name: Retrieve Devices from App Store Connect
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+      - name: Check Certificate
         run: |
-          echo "Retrieving Devices..."
-          response=$(curl -s -w "%{http_code}" -X GET https://api.appstoreconnect.apple.com/v1/devices \
+          echo "Checking certificate..."
+          security find-identity -v -p codesigning
+
+      - name: Retrieve Certificate ID
+        id: retrieve_certificate
+        run: |
+          echo "Retrieving Certificates..."
+          response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/certificates \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json")
-          
-          # Extract response body and status code
-          body=$(echo "$response" | sed -e 's/^[0-9]*$//')
-          status_code=$(echo "$response" | tail -n1)
-          
-          echo "Response Status Code: $status_code"
-          echo "Response Body: $body"
-          
-          if [ "$status_code" -ne 200 ]; then
-            echo "Failed to retrieve devices. Status code: $status_code"
-            exit 1
-          fi
       
-          echo "$body" > devices.json
-          device_id=$(echo "$body" | jq -r '.data[0].id')
-          if [ -z "$device_id" ]; then
-            echo "No device ID found in response"
-            exit 1
-          fi
-          echo "device_id=$device_id" >> $GITHUB_ENV
+          echo "$response" > certificates.json
+          certificate_id=$(jq -r '.data[0].id' certificates.json)
+          echo "certificate_id=$certificate_id" >> $GITHUB_ENV
+
+      # - name: Set up Ruby
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: 3.3
+
+      # - name: Install dependencies (optional)
+      #   run: |
+      #     gem install jwt
+
+      # - name: Generate JWT
+      #   id: generate_jwt
+      #   run: |
+      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+      #     KEY_ID="74H4QHFPVP"
+      #     private_key="
+      #     -----BEGIN PRIVATE KEY-----
+      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+      #     +EG+nw8t
+      #     -----END PRIVATE KEY-----
+      #     "
+
+      #     token=$(ruby -rjwt -ropenssl -e "
+      #       private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+      #       token = JWT.encode(
+      #         {
+      #           iss: '$ISSUER_ID',
+      #           exp: Time.now.to_i + 20 * 60,
+      #           aud: 'appstoreconnect-v1'
+      #         },
+      #         private_key_obj,
+      #         'ES256',
+      #         header_fields = {
+      #           kid: '$KEY_ID'
+      #         }
+      #       )
+      #       puts token
+      #     ")
+          
+      #     echo "token=$token" >> $GITHUB_ENV
+
+      # - name: Create Provisioning Profile
+      #   run: |
+      #     echo "Creating Provisioning Profile..."
+          
+      #     # Define your parameters
+      #     PROFILE_NAME="Easy Patient Testing profile"
+      #     BUNDLE_ID="com.org.easypatientdynamic"
+      #     CERTIFICATE_ID="YOUR_CERTIFICATE_ID"
+      #     DEVICE_IDS=$(jq -r '.data[].id' devices.json | jq -cRs 'split("\n")[:-1]')
+      
+      #     # Create provisioning profile
+      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+      #       -H "Authorization: Bearer ${{ secrets.JWT_TOKEN }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d '{
+      #         "data": {
+      #           "type": "profiles",
+      #           "attributes": {
+      #             "name": "'$PROFILE_NAME'",
+      #             "profileType": "IOS_APP_DEVELOPMENT"
+      #           },
+      #           "relationships": {
+      #             "bundleId": {
+      #               "data": {
+      #                 "type": "bundleIds",
+      #                 "id": "'$BUNDLE_ID'"
+      #               }
+      #             },
+      #             "certificates": {
+      #               "data": [
+      #                 {
+      #                   "type": "certificates",
+      #                   "id": "'$CERTIFICATE_ID'"
+      #                 }
+      #               ]
+      #             },
+      #             "devices": {
+      #               "data": '"$DEVICE_IDS"'
+      #             }
+      #           }
+      #         }
+      #       }')
+            
+      #     echo "Profile Response: $response"
+      
+      #     # Save the profile ID or the profile content if needed
+      #     profile_id=$(echo "$response" | jq -r '.data.id')
+      #     echo "profile_id=$profile_id" >> $GITHUB_ENV
+      
+            
+      #           echo "$body" > devices.json
+      #           device_id=$(echo "$body" | jq -r '.data[0].id')
+      #           if [ -z "$device_id" ]; then
+      #             echo "No device ID found in response"
+      #             exit 1
+      #           fi
+      #           echo "device_id=$device_id" >> $GITHUB_ENV

@@ -120,44 +120,45 @@ jobs:
           PROFILE_NAME="Easy Patient Testing profile"
           BUNDLE_ID="com.org.easypatientdynamic"
           CERTIFICATE_ID="${{ env.certificate_id }}"
-          DEVICE_IDS='[{"type": "devices", "id": "P9UXBZRD6V"}]'  # Properly format as JSON array
+          DEVICE_IDS='[{"type": "devices", "id": "P9UXBZRD6V"}]'  # Ensure this is a valid JSON array
       
           # Create provisioning profile
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "profiles",
-                "attributes": {
-                  "name": "'$PROFILE_NAME'",
-                  "profileType": "IOS_APP_DEVELOPMENT"
+            -d "{
+              \"data\": {
+                \"type\": \"profiles\",
+                \"attributes\": {
+                  \"name\": \"$PROFILE_NAME\",
+                  \"profileType\": \"IOS_APP_DEVELOPMENT\"
                 },
-                "relationships": {
-                  "bundleId": {
-                    "data": {
-                      "type": "bundleIds",
-                      "id": "'$BUNDLE_ID'"
+                \"relationships\": {
+                  \"bundleId\": {
+                    \"data\": {
+                      \"type\": \"bundleIds\",
+                      \"id\": \"$BUNDLE_ID\"
                     }
                   },
-                  "certificates": {
-                    "data": [
+                  \"certificates\": {
+                    \"data\": [
                       {
-                        "type": "certificates",
-                        "id": "'$CERTIFICATE_ID'"
+                        \"type\": \"certificates\",
+                        \"id\": \"$CERTIFICATE_ID\"
                       }
                     ]
                   },
-                  "devices": {
-                    "data": '"$DEVICE_IDS"'
+                  \"devices\": {
+                    \"data\": $DEVICE_IDS
                   }
                 }
               }
-            }')
-      
+            }")
+            
           echo "Profile Response: $response"
       
           # Save the profile ID or the profile content if needed
           profile_id=$(echo "$response" | jq -r '.data.id')
           echo "Extracted Profile ID: $profile_id"
           echo "profile_id=$profile_id" >> $GITHUB_ENV
+

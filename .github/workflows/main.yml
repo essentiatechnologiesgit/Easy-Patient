@@ -89,39 +89,39 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      # - name: Create Bundle ID
-      #   id: create_bundle_id
-      #   run: |
-      #     echo "Creating Bundle ID..."
+      - name: Create Bundle ID
+        id: create_bundle_id
+        run: |
+          echo "Creating Bundle ID..."
           
-      #     # Define the Bundle ID parameters
-      #     BUNDLE_ID="com.org.easyPatientTesting"  # Replace with your desired Bundle ID
-      #     NAME="Easy Patient Testing"                   # Replace with your app name
-      #     PLATFORM="IOS"                  # Use "IOS" or "MAC_OS"
+          # Define the Bundle ID parameters
+          BUNDLE_ID="com.org.easyPatientTesting2"  # Replace with your desired Bundle ID
+          NAME="Easy Patient Testing 2"                   # Replace with your app name
+          PLATFORM="IOS"                  # Use "IOS" or "MAC_OS"
           
-      #     # Create the Bundle ID
-      #     response=$(curl -s -X POST https://api.appstoreconnect.apple.com/v1/bundleIds \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d '{
-      #         "data": {
-      #           "type": "bundleIds",
-      #           "attributes": {
-      #             "identifier": "'"$BUNDLE_ID"'",
-      #             "name": "'"$NAME"'",
-      #             "platform": "'"$PLATFORM"'"
-      #           }
-      #         }
-      #       }')
+          # Create the Bundle ID
+          response=$(curl -s -X POST https://api.appstoreconnect.apple.com/v1/bundleIds \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "bundleIds",
+                "attributes": {
+                  "identifier": "'"$BUNDLE_ID"'",
+                  "name": "'"$NAME"'",
+                  "platform": "'"$PLATFORM"'"
+                }
+              }
+            }')
           
-      #     echo "Bundle ID Creation Response: $response"
+          echo "Bundle ID Creation Response: $response"
           
-      #     # Extract the created Bundle ID
-      #     bundle_id=$(echo "$response" | jq -r '.data.id')
-      #     echo "Created Bundle ID: $bundle_id"
+          # Extract the created Bundle ID
+          bundle_id=$(echo "$response" | jq -r '.data.id')
+          echo "Created Bundle ID: $bundle_id"
           
-      #     # Save the Bundle ID to the environment variables
-      #     echo "bundle_id=$bundle_id" >> $GITHUB_ENV
+          # Save the Bundle ID to the environment variables
+          echo "bundle_id=$bundle_id" >> $GITHUB_ENV
 
           
       - name: Retrieve Certificate ID
@@ -144,70 +144,70 @@ jobs:
           # Save the certificate ID to the environment variables
           echo "certificate_id=$certificate_id" >> $GITHUB_ENV
 
-      - name: Retrieve All App IDs
-        run: |
-          echo "Retrieving App IDs..."
-          response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json")
-          
-          echo "$response" > bundle_ids.json
-          echo "Bundle IDs Response: $response"
-
-          # Extract and print App IDs
-          bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
-          echo "App IDs: $bundle_ids"
-          echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
-
-
-      # - name: Create Distribution Provisioning Profile
+      # - name: Retrieve All App IDs
       #   run: |
-      #     echo "Creating Distribution Provisioning Profile..."
-          
-      #     # Define your parameters
-      #     PROFILE_NAME="Easy Patient Distribution Profile"
-      #     BUNDLE_ID="7Y7S27X27N"  # Make sure this is the correct bundle ID
-      #     CERTIFICATE_ID="62SAZ2F6F4"
-          
-      #     # Create provisioning profile
-      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+      #     echo "Retrieving App IDs..."
+      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
       #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d @- <<EOF
-      #     {
-      #       "data": {
-      #         "type": "profiles",
-      #         "attributes": {
-      #           "name": "$PROFILE_NAME",
-      #           "profileType": "IOS_APP_STORE"
-      #         },
-      #         "relationships": {
-      #           "bundleId": {
-      #             "data": {
-      #               "type": "bundleIds",
-      #               "id": "$BUNDLE_ID"
-      #             }
-      #           },
-      #           "certificates": {
-      #             "data": [
-      #               {
-      #                 "type": "certificates",
-      #                 "id": "$CERTIFICATE_ID"
-      #               }
-      #             ]
-      #           }
-      #         }
-      #       }
-      #     }
-      #     EOF
-      #     )
-      
-      #         echo "Profile Response: $response"
+      #       -H "Content-Type: application/json")
           
-      #         # Save the profile ID or the profile content if needed
-      #         profile_id=$(echo "$response" | jq -r '.data.id')
-      #         echo "Extracted Profile ID: $profile_id"
-      #         echo "profile_id=$profile_id" >> $GITHUB_ENV
+      #     echo "$response" > bundle_ids.json
+      #     echo "Bundle IDs Response: $response"
+
+      #     # Extract and print App IDs
+      #     bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
+      #     echo "App IDs: $bundle_ids"
+      #     echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
+
+
+      - name: Create Distribution Provisioning Profile
+        run: |
+          echo "Creating Distribution Provisioning Profile..."
+          
+          # Define your parameters
+          PROFILE_NAME="Easy Patient Distribution Profile"
+          BUNDLE_ID="${{ env.bundle_id }}"  
+          CERTIFICATE_ID="62SAZ2F6F4"
+          
+          # Create provisioning profile
+          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "data": {
+              "type": "profiles",
+              "attributes": {
+                "name": "$PROFILE_NAME",
+                "profileType": "IOS_APP_STORE"
+              },
+              "relationships": {
+                "bundleId": {
+                  "data": {
+                    "type": "bundleIds",
+                    "id": "$BUNDLE_ID"
+                  }
+                },
+                "certificates": {
+                  "data": [
+                    {
+                      "type": "certificates",
+                      "id": "$CERTIFICATE_ID"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+          EOF
+          )
+      
+              echo "Profile Response: $response"
+          
+              # Save the profile ID or the profile content if needed
+              profile_id=$(echo "$response" | jq -r '.data.id')
+              echo "Extracted Profile ID: $profile_id"
+              echo "profile_id=$profile_id" >> $GITHUB_ENV
 
       
 

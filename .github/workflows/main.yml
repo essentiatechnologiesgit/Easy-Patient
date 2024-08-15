@@ -132,7 +132,7 @@ jobs:
           # Define your parameters
           PROFILE_NAME="Easy Patient Distribution Profile"
           BUNDLE_ID="7Y7S27X27N"  # Make sure this is the correct bundle ID
-          CERTIFICATE_ID="${{ env.certificate_id }}"
+          CERTIFICATE_ID="62SAZ2F6F4"
           
           # Create provisioning profile
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \

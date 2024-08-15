@@ -15,8 +15,8 @@ const config = {
   buttonText: '#FFFFFF',
   headerColor: '#FFFFFF',
   fontStyle: 'OpenSans-Regular',
-  BUNDLE_ID: 'com.org.easyPatientTesting5',
-  NAME: 'Easy Patient Testing 5',
+  BUNDLE_ID: 'com.org.easyPatientTesting6',
+  NAME: 'Easy Patient Testing 6',
 };
 
 module.exports = config;

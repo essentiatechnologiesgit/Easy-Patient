@@ -14,7 +14,7 @@ export default {
     buttonText:'#FFFFFF',
     headerColor:'#FFFFFF',
     fontStyle:'OpenSans-Regular',
-    identifier:'com.easypatientdynamic',
-    name:'NewApp'
+    BUNDLE_ID: 'com.org.easyPatientTesting4',
+    NAME: 'Easy Patient Testing 4',
   };
 

@@ -51,30 +51,35 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      
-      - name: Read Config and Print Values
-        id: print_config
+
+      - name: List Files
         run: |
-          echo "Reading config and printing values..."
+          echo "Listing files in the working directory:"
+          ls -l
       
-          # Run Node.js script to get configuration values using dynamic import
-          node -e "
-            (async () => {
-              const config = await import('./Easy-Patient/config.mjs');
-              console.log('BUNDLE_ID=' + config.default.BUNDLE_ID);
-              console.log('NAME=' + config.default.NAME);
-            })();
-          " > config.env
+      # - name: Read Config and Print Values
+      #   id: print_config
+      #   run: |
+      #     echo "Reading config and printing values..."
       
-          # Print the config.env file to debug the values
-          cat config.env
+      #     # Run Node.js script to get configuration values using dynamic import
+      #     node -e "
+      #       (async () => {
+      #         const config = await import('./Easy-Patient/config.mjs');
+      #         console.log('BUNDLE_ID=' + config.default.BUNDLE_ID);
+      #         console.log('NAME=' + config.default.NAME);
+      #       })();
+      #     " > config.env
       
-          # Source the config values
-          source config.env
+      #     # Print the config.env file to debug the values
+      #     cat config.env
       
-          # Print the values to verify they are set
-          echo "BUNDLE_ID=${BUNDLE_ID}"
-          echo "NAME=${NAME}"
+      #     # Source the config values
+      #     source config.env
+      
+      #     # Print the values to verify they are set
+      #     echo "BUNDLE_ID=${BUNDLE_ID}"
+      #     echo "NAME=${NAME}"
 
 
 

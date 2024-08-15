@@ -144,7 +144,7 @@ jobs:
               "type": "profiles",
               "attributes": {
                 "name": "$PROFILE_NAME",
-                "profileType": "IOS_DISTRIBUTION"
+                "profileType": "IOS_APP_STORE"
               },
               "relationships": {
                 "bundleId": {

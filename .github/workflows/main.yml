@@ -60,7 +60,7 @@ jobs:
           # Run Node.js script to get configuration values using dynamic import
           node -e "
             (async () => {
-              const config = await import('./ProjectDirectory/config.js');
+              const config = await import('././config.js');
               console.log('BUNDLE_ID=' + config.BUNDLE_ID);
               console.log('NAME=' + config.NAME);
             })();

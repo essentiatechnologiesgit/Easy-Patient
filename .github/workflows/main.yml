@@ -24,28 +24,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Install the Apple certificate
-        run: |
-          # Create variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+      # - name: Install the Apple certificate
+      #   run: |
+      #     # Create variables
+      #     CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+      #     KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # Import certificate from secrets
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+      #     # Import certificate from secrets
+      #     echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
           
-          # Create temporary keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+      #     # Create temporary keychain
+      #     security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+      #     security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-          # Import certificate to keychain
-          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
+      #     # Import certificate to keychain
+      #     security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+      #     security list-keychain -d user -s $KEYCHAIN_PATH
 
-      - name: Check Certificate
-        run: |
-          echo "Checking certificate..."
-          security find-identity -v -p codesigning
+      # - name: Check Certificate
+      #   run: |
+      #     echo "Checking certificate..."
+      #     security find-identity -v -p codesigning
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -89,6 +89,41 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
+      - name: Create Bundle ID
+        id: create_bundle_id
+        run: |
+          echo "Creating Bundle ID..."
+          
+          # Define the Bundle ID parameters
+          BUNDLE_ID="com.org.easyPatientTesting"  # Replace with your desired Bundle ID
+          NAME="Easy Patient Testing"                   # Replace with your app name
+          PLATFORM="IOS"                  # Use "IOS" or "MAC_OS"
+          
+          # Create the Bundle ID
+          response=$(curl -s -X POST https://api.appstoreconnect.apple.com/v1/bundleIds \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "bundleIds",
+                "attributes": {
+                  "identifier": "'"$BUNDLE_ID"'",
+                  "name": "'"$NAME"'",
+                  "platform": "'"$PLATFORM"'"
+                }
+              }
+            }')
+          
+          echo "Bundle ID Creation Response: $response"
+          
+          # Extract the created Bundle ID
+          bundle_id=$(echo "$response" | jq -r '.data.id')
+          echo "Created Bundle ID: $bundle_id"
+          
+          # Save the Bundle ID to the environment variables
+          echo "bundle_id=$bundle_id" >> $GITHUB_ENV
+
+          
       - name: Retrieve Certificate ID
         id: retrieve_certificate
         run: |
@@ -125,54 +160,54 @@ jobs:
       #     echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
 
 
-      - name: Create Distribution Provisioning Profile
-        run: |
-          echo "Creating Distribution Provisioning Profile..."
+      # - name: Create Distribution Provisioning Profile
+      #   run: |
+      #     echo "Creating Distribution Provisioning Profile..."
           
-          # Define your parameters
-          PROFILE_NAME="Easy Patient Distribution Profile"
-          BUNDLE_ID="7Y7S27X27N"  # Make sure this is the correct bundle ID
-          CERTIFICATE_ID="62SAZ2F6F4"
+      #     # Define your parameters
+      #     PROFILE_NAME="Easy Patient Distribution Profile"
+      #     BUNDLE_ID="7Y7S27X27N"  # Make sure this is the correct bundle ID
+      #     CERTIFICATE_ID="62SAZ2F6F4"
           
-          # Create provisioning profile
-          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d @- <<EOF
-          {
-            "data": {
-              "type": "profiles",
-              "attributes": {
-                "name": "$PROFILE_NAME",
-                "profileType": "IOS_APP_STORE"
-              },
-              "relationships": {
-                "bundleId": {
-                  "data": {
-                    "type": "bundleIds",
-                    "id": "$BUNDLE_ID"
-                  }
-                },
-                "certificates": {
-                  "data": [
-                    {
-                      "type": "certificates",
-                      "id": "$CERTIFICATE_ID"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-          EOF
-          )
+      #     # Create provisioning profile
+      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d @- <<EOF
+      #     {
+      #       "data": {
+      #         "type": "profiles",
+      #         "attributes": {
+      #           "name": "$PROFILE_NAME",
+      #           "profileType": "IOS_APP_STORE"
+      #         },
+      #         "relationships": {
+      #           "bundleId": {
+      #             "data": {
+      #               "type": "bundleIds",
+      #               "id": "$BUNDLE_ID"
+      #             }
+      #           },
+      #           "certificates": {
+      #             "data": [
+      #               {
+      #                 "type": "certificates",
+      #                 "id": "$CERTIFICATE_ID"
+      #               }
+      #             ]
+      #           }
+      #         }
+      #       }
+      #     }
+      #     EOF
+      #     )
       
-              echo "Profile Response: $response"
+      #         echo "Profile Response: $response"
           
-              # Save the profile ID or the profile content if needed
-              profile_id=$(echo "$response" | jq -r '.data.id')
-              echo "Extracted Profile ID: $profile_id"
-              echo "profile_id=$profile_id" >> $GITHUB_ENV
+      #         # Save the profile ID or the profile content if needed
+      #         profile_id=$(echo "$response" | jq -r '.data.id')
+      #         echo "Extracted Profile ID: $profile_id"
+      #         echo "profile_id=$profile_id" >> $GITHUB_ENV
 
       
 

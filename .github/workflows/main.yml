@@ -56,30 +56,34 @@ jobs:
         run: |
           echo "Listing files in the working directory:"
           ls -l
+      - name: Read Config and Print Values
+        id: print_config
+        run: |
+          echo "Reading config and printing values..."
       
-      # - name: Read Config and Print Values
-      #   id: print_config
-      #   run: |
-      #     echo "Reading config and printing values..."
+          # Run Node.js script to get configuration values using dynamic import
+          node -e "
+            (async () => {
+              try {
+                const config = await import('./config.mjs');  // Path to config.mjs
+                console.log('BUNDLE_ID=' + config.default.BUNDLE_ID);
+                console.log('NAME=' + config.default.NAME);
+              } catch (error) {
+                console.error('Error:', error.message);
+              }
+            })();
+          " > config.env
       
-      #     # Run Node.js script to get configuration values using dynamic import
-      #     node -e "
-      #       (async () => {
-      #         const config = await import('./Easy-Patient/config.mjs');
-      #         console.log('BUNDLE_ID=' + config.default.BUNDLE_ID);
-      #         console.log('NAME=' + config.default.NAME);
-      #       })();
-      #     " > config.env
+          # Print the config.env file to debug the values
+          cat config.env
       
-      #     # Print the config.env file to debug the values
-      #     cat config.env
+          # Source the config values
+          source config.env
       
-      #     # Source the config values
-      #     source config.env
-      
-      #     # Print the values to verify they are set
-      #     echo "BUNDLE_ID=${BUNDLE_ID}"
-      #     echo "NAME=${NAME}"
+          # Print the values to verify they are set
+        
+          echo "NAME=${NAME}"
+
 
 
 

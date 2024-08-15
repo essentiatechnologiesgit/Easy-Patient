@@ -57,11 +57,13 @@ jobs:
         run: |
           echo "Reading config and printing values..."
       
-          # Run Node.js script to get configuration values
+          # Run Node.js script to get configuration values using dynamic import
           node -e "
-            const config = require('././config.js');
-            console.log('BUNDLE_ID=' + config.BUNDLE_ID);
-            console.log('NAME=' + config.NAME);
+            (async () => {
+              const config = await import('./ProjectDirectory/config.js');
+              console.log('BUNDLE_ID=' + config.BUNDLE_ID);
+              console.log('NAME=' + config.NAME);
+            })();
           " > config.env
       
           # Print the config.env file to debug the values
@@ -73,6 +75,7 @@ jobs:
           # Print the values to verify they are set
           echo "BUNDLE_ID=${BUNDLE_ID}"
           echo "NAME=${NAME}"
+
 
       
       # - name: Set up Ruby

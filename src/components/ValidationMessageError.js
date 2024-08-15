@@ -1,7 +1,7 @@
 import Dialog from "react-native-dialog";
 import React, { useEffect, useState } from 'react';
 import { PixelRatio, StyleSheet, Text, Image, View } from 'react-native';
-import config from '../../config';
+import config from '../../config.mjs';
 import { useNavigation } from '@react-navigation/native';
 const ValidationMessageError = ({ visible, msg, setVisible }) => {
     const navigation = useNavigation();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Modal, TouchableOpacity, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import CustomButton from './CustomizedButton';
-import config from '../../config';
+import config from '../../config.mjs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 const SnoozeNotify = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction, Medicine }) => {

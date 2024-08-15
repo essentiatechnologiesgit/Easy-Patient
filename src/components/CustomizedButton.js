@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
 import faceID from '../assets/faceID.png';
 import touchId from '../assets/TouchId.png';
-import config from '../../config';
+import config from '../../config.mjs';
 const CustomButton = ({ buttonColor, borderColor, textColor, text, onPress, title }) => {
   return (
     <View style={styles.container}>

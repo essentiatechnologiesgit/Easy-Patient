@@ -10,7 +10,7 @@ import ModalLoader from '../components/ModalLoader';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import mealGolden from '../assets/mealGolden.png';
-import config from '../../config';
+import config from '../../config.mjs';
 const MealPlans = () => {
     const route = useRoute();
     const isHide = route?.params?.isHide ?? false;

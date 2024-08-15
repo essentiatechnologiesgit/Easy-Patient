@@ -1,7 +1,7 @@
 import React from 'react';
 import { PixelRatio, StyleSheet, Text, Image, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import config from '../../config';
+import config from '../../config.mjs';
 import handHeart from '../assets/hand-heart.png';
 const Notifications = ({ time, prescriptionText }) => {
     const navigation = useNavigation();

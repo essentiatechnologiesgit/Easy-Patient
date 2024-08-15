@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity, Linking, PixelRatio } from 'react-native';
 import callIcon from '../assets/callIcon.png'; // Update the path as necessary
-import config from '../../config'; // Update the path as necessary
+import config from '../../config.mjs'; // Update the path as necessary
 
 
 

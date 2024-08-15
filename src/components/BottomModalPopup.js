@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Modal, TouchableOpacity, Text, PixelRatio, StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import config from '../../config';
+import config from '../../config.mjs';
 import CustomButton from './CustomizedButton';
 
 const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {

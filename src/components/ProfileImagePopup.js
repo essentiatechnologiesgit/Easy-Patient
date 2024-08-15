@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Modal, TouchableOpacity, PixelRatio, Text, StyleSheet, Image, TouchableWithoutFeedback } from 'react-native';
 import CustomButton from './CustomizedButton';
-import config from '../../config';
+import config from '../../config.mjs';
 import { launchCamera } from 'react-native-image-picker';
 import SnoozeNotify from './SnoozeNotify';
 import deleteIcon from '../assets/delete.png';

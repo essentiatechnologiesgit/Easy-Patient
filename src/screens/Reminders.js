@@ -3,7 +3,7 @@ import { View, Text, Image, PixelRatio, StyleSheet, TouchableWithoutFeedback } f
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import arrow from '../assets/arrow.png';
-import config from '../../config';
+import config from '../../config.mjs';
 import Footer from '../components/Footer';
 import { useNavigation } from "@react-navigation/native";
 import { useIsFocused } from '@react-navigation/native';

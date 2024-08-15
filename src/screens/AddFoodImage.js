@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, PixelRatio } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
-import config from '../../config';
+import config from '../../config.mjs';
 import { useNavigation } from '@react-navigation/native';
 import BackHeader from '../components/backHeader';
 import CustomButton from '../components/CustomizedButton';

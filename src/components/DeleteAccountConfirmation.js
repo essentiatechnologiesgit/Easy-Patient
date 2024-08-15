@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Text, View, PixelRatio, TouchableWithoutFeedback } from "react-native";
 import Modal from "react-native-modal";
-import config from "../../config";
+import config from "../../config.mjs";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 

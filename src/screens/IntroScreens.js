@@ -3,7 +3,7 @@ import { ScrollView, View, StyleSheet, Dimensions, Text, PixelRatio, Alert } fro
 import { useNavigation } from '@react-navigation/native';
 import { PermissionsAndroid, Platform } from 'react-native';
 import Dots from 'react-native-dots-pagination';
-import config from '../../config';
+import config from '../../config.mjs';
 import HealthIntroScreen from '../components/HealthIntroScreen';
 import CustomButton from '../components/CustomizedButton';
 import CustomizedAppIntro from '../components/CustomizedAppIntro';

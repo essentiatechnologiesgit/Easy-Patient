@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableWithoutFeedback, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
-import config from '../../config';
+import config from '../../config.mjs';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
 import { ScrollView } from 'react-native-gesture-handler';

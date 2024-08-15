@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, BackHandler, Alert, Platform } from 'react-native';
-import config from '../../config';
+import config from '../../config.mjs';
 import { useNavigation } from '@react-navigation/native';
 import AlertIcon from '../components/AlertIcon';
 import ValidationError from '../components/ValidationError';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity, Linking, Alert, PixelRatio } from 'react-native';
 import GoldEmailIcon from '../assets/goldEmailIcon.png'; // Update the path as necessary
-import config from '../../config';
+import config from '../../config.mjs';
 
 
 const openEmailClient = (email) => {

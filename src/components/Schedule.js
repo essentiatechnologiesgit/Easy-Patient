@@ -3,7 +3,7 @@ import { PixelRatio, StyleSheet, Text, Image, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Path } from 'react-native-svg'; // Import Path from react-native-svg
 import calendarDark from '../assets/calendarDark.png';
-import config from '../../config';
+import config from '../../config.mjs';
 const Schedule = ({ time, prescriptionText }) => {
     const navigation = useNavigation();
 

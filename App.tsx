@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, ImageBackground, Image } from 'react-native'; // Add necessary imports
 import Header from './src/components/Header';
 import AppNavigator from './src/navigation/AppNavigator';
-import config from './config';
+import config from './config.mjs';
 import BackgroundService from './src/components/BackgroundService';
 
 const App: React.FC = () => {

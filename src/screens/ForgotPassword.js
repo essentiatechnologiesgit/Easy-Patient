@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
-import config from '../../config';
+import config from '../../config.mjs';
 import { useNavigation } from '@react-navigation/native';
 import CustomizedButton from '../components/CustomizedButton';
 import axios from 'axios';

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, TextInput, StyleSheet,PixelRatio } from 'react-native';
-import config from '../../config';
+import config from '../../config.mjs';
 const OtpInput = ({ onChange }) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];

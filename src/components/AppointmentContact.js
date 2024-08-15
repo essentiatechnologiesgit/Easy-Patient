@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
-import config from '../../config';
+import config from '../../config.mjs';
 import EmailComponent from './EmailComponent';
 import GoldEmailIcon from '../assets/goldEmailIcon.png';
 import { useNavigation, useRoute } from '@react-navigation/native';

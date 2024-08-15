@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, StyleSheet, TouchableOpacity, PixelRatio } from 'react-native';
 import Modal from "react-native-modal";
-import config from '../../config';
+import config from '../../config.mjs';
 import { useNavigation } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
 import { CircularProgressBase } from 'react-native-circular-progress-indicator';

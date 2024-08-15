@@ -6,7 +6,7 @@ import archive from '../assets/archive.png';
 import BackHeader from '../components/backHeader';
 import MealArchiveContainer from '../components/MealArchiveContainer';
 import { touch } from 'react-native-fs';
-import config from '../../config';
+import config from '../../config.mjs';
 import MealGolden from '../assets/mealGolden.png';
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';

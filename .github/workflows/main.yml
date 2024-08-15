@@ -51,7 +51,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      
+
+      - name: List Files
+        run: |
+          echo "Listing files in the working directory:"
+          ls -l
       - name: Read Config and Print Values
         id: print_config
         run: |
@@ -60,21 +64,18 @@ jobs:
           # Run Node.js script to get configuration values using dynamic import
           node -e "
             (async () => {
-              const config = await import('././config.js');
-              console.log('BUNDLE_ID=' + config.BUNDLE_ID);
-              console.log('NAME=' + config.NAME);
+              try {
+                const config = await import('./config.mjs');  // Ensure this path is correct
+                console.log('BUNDLE_ID=' + config.default.BUNDLE_ID);
+                console.log('NAME=' + config.default.NAME);
+              } catch (error) {
+                console.error('Error:', error.message);
+                process.exit(1);  // Exit with error code
+              }
             })();
-          " > config.env
-      
-          # Print the config.env file to debug the values
-          cat config.env
-      
-          # Source the config values
-          source config.env
-      
-          # Print the values to verify they are set
-          echo "BUNDLE_ID=${BUNDLE_ID}"
-          echo "NAME=${NAME}"
+          "
+
+
 
 
       

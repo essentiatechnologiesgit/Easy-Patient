@@ -95,8 +95,8 @@ jobs:
           echo "Creating Bundle ID..."
           
           # Define the Bundle ID parameters
-          BUNDLE_ID="com.org.easyPatientTesting2"  # Replace with your desired Bundle ID
-          NAME="Easy Patient Testing 2"                   # Replace with your app name
+          BUNDLE_ID="com.org.easyPatientTesting3"  # Replace with your desired Bundle ID
+          NAME="Easy Patient Testing 3"                   # Replace with your app name
           PLATFORM="IOS"                  # Use "IOS" or "MAC_OS"
           
           # Create the Bundle ID
@@ -165,7 +165,7 @@ jobs:
           echo "Creating Distribution Provisioning Profile..."
           
           # Define your parameters
-          PROFILE_NAME="Easy Patient Distribution Profile"
+          PROFILE_NAME="Easy Patient Distribution Profile 3"
           BUNDLE_ID="${{ env.bundle_id }}"  
           CERTIFICATE_ID="62SAZ2F6F4"
           

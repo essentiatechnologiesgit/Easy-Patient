@@ -109,62 +109,60 @@ jobs:
           # Save the certificate ID to the environment variables
           echo "certificate_id=$certificate_id" >> $GITHUB_ENV
 
-      # - name: Retrieve All App IDs
-      #   run: |
-      #     echo "Retrieving App IDs..."
-      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json")
-          
-      #     echo "$response" > bundle_ids.json
-      #     echo "Bundle IDs Response: $response"
-
-      #     # Extract and print App IDs
-      #     bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
-      #     echo "App IDs: $bundle_ids"
-      #     echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
-
-
-      - name: Create Provisioning Profile
+      - name: Retrieve All App IDs
         run: |
-          echo "Creating Provisioning Profile..."
+          echo "Retrieving App IDs..."
+          response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json")
+          
+          echo "$response" > bundle_ids.json
+          echo "Bundle IDs Response: $response"
+
+          # Extract and print App IDs
+          bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
+          echo "App IDs: $bundle_ids"
+          echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
+
+
+      - name: Create Distribution Provisioning Profile
+        run: |
+          echo "Creating Distribution Provisioning Profile..."
           
           # Define your parameters
-          PROFILE_NAME="Easy Patient Testing profile"
-          BUNDLE_ID="7Y7S27X27N"
+          PROFILE_NAME="Easy Patient Distribution Profile"
+          BUNDLE_ID="7Y7S27X27N"  # Make sure this is the correct bundle ID
           CERTIFICATE_ID="${{ env.certificate_id }}"
-          DEVICE_IDS='[{"type": "devices", "id": "P9UXBZRD6V"}]'  # Ensure this is a valid JSON array
-      
-          # Create provisioning profile
+          
           # Create provisioning profile
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
-            -d "{
-              \"data\": {
-                \"type\": \"profiles\",
-                \"attributes\": {
-                  \"name\": \"$PROFILE_NAME\",
-                  \"profileType\": \"IOS_APP_STORE\"  # Changed to distribution
+            -d '{
+              "data": {
+                "type": "profiles",
+                "attributes": {
+                  "name": "'"$PROFILE_NAME"'",
+                  "profileType": "IOS_DISTRIBUTION"  # Set for distribution profile
                 },
-                \"relationships\": {
-                  \"bundleId\": {
-                    \"data\": {
-                      \"type\": \"bundleIds\",
-                      \"id\": \"$BUNDLE_ID\"
+                "relationships": {
+                  "bundleId": {
+                    "data": {
+                      "type": "bundleIds",
+                      "id": "'"$BUNDLE_ID"'"
                     }
                   },
-                  \"certificates\": {
-                    \"data\": [
+                  "certificates": {
+                    "data": [
                       {
-                        \"type\": \"certificates\",
-                        \"id\": \"$CERTIFICATE_ID\"
+                        "type": "certificates",
+                        "id": "'"$CERTIFICATE_ID"'"
                       }
                     ]
                   }
                 }
               }
-            }")
+            }')
             
           echo "Profile Response: $response"
       
@@ -172,4 +170,3 @@ jobs:
           profile_id=$(echo "$response" | jq -r '.data.id')
           echo "Extracted Profile ID: $profile_id"
           echo "profile_id=$profile_id" >> $GITHUB_ENV
-

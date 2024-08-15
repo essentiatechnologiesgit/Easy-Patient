@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, Alert, StyleSheet, Switch, ImageBackground, Image, PixelRatio, TouchableOpacity } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';

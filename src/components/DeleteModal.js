@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Modal, TouchableOpacity, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import CustomButton from './CustomizedButton';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import SnoozeNotify from './SnoozeNotify';
 import CancelledAlarm from './CancelledAlarm';
 import DeleteAlarm from './DeleteAlarm';

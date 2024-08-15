@@ -7,7 +7,7 @@ import BackHeader from '../components/backHeader';
 import GuidelinesArchiveContainer from '../components/GuidelinesArchiveContainer';
 import { touch } from 'react-native-fs';
 import GuidelineContainer from '../components/GuidelineContainer';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import guideleinsGold from '../assets/guidelinesGold.png';

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, RefreshControl, ScrollView, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, BackHandler } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FolderSlider from '../components/FolderSlider';

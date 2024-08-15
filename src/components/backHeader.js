@@ -2,7 +2,7 @@ import React from 'react';
 import { PixelRatio, StyleSheet, Text, Image, View, TouchableOpacity, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import CircleButton from '../components/CircleButton';
 const BackHeader = ({ name }) => {
     const navigation = useNavigation();

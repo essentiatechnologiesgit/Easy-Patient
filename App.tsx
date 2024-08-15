@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, ImageBackground, Image } from 'react-native'; // Add necessary imports
 import Header from './src/components/Header';
 import AppNavigator from './src/navigation/AppNavigator';
-import config from './config.mjs';
+import config from './config.js';
 import BackgroundService from './src/components/BackgroundService';
 
 const App: React.FC = () => {
@@ -11,11 +11,15 @@ const App: React.FC = () => {
    BackgroundService();
 
   }, []);
+
+  const resolveAssetSource = (path:any) => {
+    return { uri: path };
+  };
   return (
     // <Image source={config.backgroundImage} style={styles.backgroundImage}></Image>
     <View style={styles.container}>
       {config.backgroundImageType != 'svg' &&
-        <ImageBackground style={styles.backgroundImage} source={config.backgroundImage}>
+        <ImageBackground style={styles.backgroundImage} source={resolveAssetSource(config.backgroundImage)}>
           {/* <Header />  */}
           <AppNavigator />
         </ImageBackground>

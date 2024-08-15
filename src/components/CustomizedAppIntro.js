@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Image, View, StyleSheet, ImageBackground, Text, PixelRatio } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SelfieMan from '../assets/selfieMan.png';

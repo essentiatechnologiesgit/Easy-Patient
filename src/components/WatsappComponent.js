@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, TouchableOpacity, Linking, Alert,PixelRatio } from 'react-native';
 import callIcon from '../assets/callIcon.png'; // Update the path as necessary
-import config from '../../config.mjs'; // Update the path as necessary
+import config from '../../config.js'; // Update the path as necessary
 import watsappIcon from '../assets/watsappIcon.png';
 
 

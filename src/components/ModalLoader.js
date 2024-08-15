@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, PixelRatio, Platform } from 'react-native';
 import Modal from "react-native-modal";
-import config from '../../config.mjs';
+import config from '../../config.js';
 const ModalLoader = ({ msg }) => {
     const hasBackdrop = Platform.OS !== 'ios';
     return (

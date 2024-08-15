@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Animated, StyleSheet, Image,PixelRatio } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 
 const Snackbar = ({ message, keyProp }) => {
   const [fadeAnim] = useState(new Animated.Value(0));

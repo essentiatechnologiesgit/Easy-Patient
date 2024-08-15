@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithoutFeedback, Text } from 'react-native';
 import arrow from '../assets/arrow.png';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
 import axios from 'axios';

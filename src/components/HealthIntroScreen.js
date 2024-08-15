@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, View, StyleSheet, Text, PixelRatio } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import HealthInfo from '../assets/healthInfo.png';
 
 const HealthIntroScreen = () => {

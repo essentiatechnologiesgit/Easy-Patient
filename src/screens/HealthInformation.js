@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, ImageBackground, ScrollView, PixelRatio, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';

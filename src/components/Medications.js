@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { View, Text, Dimensions, Image, StyleSheet, PixelRatio, ScrollView } from 'react-native';
 import Modal from "react-native-modal";
-import config from "../../config.mjs";
+import config from "../../config.js";
 import CircleButton from "./CircleButton";
 const Medications = () => {
   

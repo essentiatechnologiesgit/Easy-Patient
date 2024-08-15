@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, PixelRatio, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import BackHeader from '../components/backHeader';
 import PrescriptionDropDown from '../components/PrescriptionDropDown';
 import downArrow from '../assets/downArrow.png';

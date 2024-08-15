@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Image, StyleSheet} from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 
 const Header = () => {
   return (

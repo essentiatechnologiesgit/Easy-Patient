@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, PixelRatio, PermissionsAndroid, TouchableOpacity, Linking } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import CarIcon from '../assets/CarIcon.png';
 import MapView, { Marker } from 'react-native-maps';
 

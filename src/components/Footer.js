@@ -11,7 +11,7 @@ import jar from '../assets/jar.png';
 import jarLight from '../assets/jarLight.png';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-import config from "../../config.mjs";
+import config from "../../config.js";
 const Footer = (props) => {
     const navigation = useNavigation();
     const [indicatorPosition, setIndicatorPosition] = useState(0);

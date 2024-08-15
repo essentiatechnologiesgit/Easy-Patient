@@ -1,6 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import {Image, View, StyleSheet, ImageBackground, Text} from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';

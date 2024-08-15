@@ -5,7 +5,7 @@ import BackHeader from '../components/backHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ModalLoader from '../components/ModalLoader';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CustomButton from '../components/CustomizedButton';
 import { TouchableOpacity } from 'react-native-gesture-handler';

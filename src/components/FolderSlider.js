@@ -9,7 +9,7 @@ import fileLife from '../assets/examBlack.png';
 import Scale from '../assets/blackScale.png';
 import fileEdit from '../assets/writeBlack.png';
 import fileCapsule from '../assets/fileCapsule.png';
-import config from "../../config.mjs";
+import config from "../../config.js";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";

@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelRatio, StyleSheet, Text, Image, View } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';

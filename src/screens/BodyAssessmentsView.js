@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Animated, StyleSheet, Dimensions, Image, PixelRatio, TouchableOpacity } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import downArrow from '../assets/downArrow.png';
 import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';

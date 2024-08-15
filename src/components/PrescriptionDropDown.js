@@ -3,7 +3,7 @@ import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithou
 import downArrow from '../assets/downArrowBlack.png';
 import shareBlack from '../assets/shareBlack.png';
 import archiveBlack from '../assets/archiveBlack.png';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Share from 'react-native-share';
 import RNFetchBlob from 'react-native-blob-util';

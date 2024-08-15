@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, RefreshControl, ScrollView, StyleSheet, TouchableWithoutFeedback, Image, PixelRatio, TouchableOpacity, Platform } from 'react-native';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
 import leftArrow from '../assets/leftArrow.png';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TouchableWithoutFeedback, StyleSheet, Text, Image, View, TouchableOpacity, } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import config from '../../config.mjs';
+import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
 import CrossBellIcon from '../assets/crossBell.png';
 import BottomModal from './BottomModal';

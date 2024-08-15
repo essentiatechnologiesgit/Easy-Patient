@@ -179,7 +179,7 @@ jobs:
           echo "Creating Distribution Provisioning Profile..."
           
           # Define your parameters
-          PROFILE_NAME="Easy Patient Distribution Profile 3"
+          PROFILE_NAME="${{ env.NAME }} Distribution Profile"
           BUNDLE_ID="${{ env.bundle_id }}"  
           CERTIFICATE_ID="62SAZ2F6F4"
           

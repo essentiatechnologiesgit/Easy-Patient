@@ -109,20 +109,20 @@ jobs:
           # Save the certificate ID to the environment variables
           echo "certificate_id=$certificate_id" >> $GITHUB_ENV
 
-      - name: Retrieve All App IDs
-        run: |
-          echo "Retrieving App IDs..."
-          response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json")
+      # - name: Retrieve All App IDs
+      #   run: |
+      #     echo "Retrieving App IDs..."
+      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json")
           
-          echo "$response" > bundle_ids.json
-          echo "Bundle IDs Response: $response"
+      #     echo "$response" > bundle_ids.json
+      #     echo "Bundle IDs Response: $response"
 
-          # Extract and print App IDs
-          bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
-          echo "App IDs: $bundle_ids"
-          echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
+      #     # Extract and print App IDs
+      #     bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
+      #     echo "App IDs: $bundle_ids"
+      #     echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
 
 
       - name: Create Distribution Provisioning Profile

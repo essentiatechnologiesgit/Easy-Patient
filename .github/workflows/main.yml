@@ -136,6 +136,7 @@ jobs:
           DEVICE_IDS='[{"type": "devices", "id": "P9UXBZRD6V"}]'  # Ensure this is a valid JSON array
       
           # Create provisioning profile
+          # Create provisioning profile
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
@@ -144,7 +145,7 @@ jobs:
                 \"type\": \"profiles\",
                 \"attributes\": {
                   \"name\": \"$PROFILE_NAME\",
-                  \"profileType\": \"IOS_APP_DEVELOPMENT\"
+                  \"profileType\": \"IOS_APP_STORE\"  # Changed to distribution
                 },
                 \"relationships\": {
                   \"bundleId\": {
@@ -160,9 +161,6 @@ jobs:
                         \"id\": \"$CERTIFICATE_ID\"
                       }
                     ]
-                  },
-                  \"devices\": {
-                    \"data\": $DEVICE_IDS
                   }
                 }
               }

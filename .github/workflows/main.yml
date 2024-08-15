@@ -59,7 +59,7 @@ jobs:
       
           # Run Node.js script to get configuration values
           node -e "
-            const config = require('./ProjectDirectory/config.js');
+            const config = require('./././config.js');
             console.log('BUNDLE_ID=' + config.BUNDLE_ID);
             console.log('NAME=' + config.NAME);
           " > config.env

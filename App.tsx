@@ -11,15 +11,11 @@ const App: React.FC = () => {
    BackgroundService();
 
   }, []);
-
-  const resolveAssetSource = (path:any) => {
-    return { uri: path };
-  };
   return (
     // <Image source={config.backgroundImage} style={styles.backgroundImage}></Image>
     <View style={styles.container}>
       {config.backgroundImageType != 'svg' &&
-        <ImageBackground style={styles.backgroundImage} source={resolveAssetSource(config.backgroundImage)}>
+        <ImageBackground style={styles.backgroundImage} source={config.backgroundImage}>
           {/* <Header />  */}
           <AppNavigator />
         </ImageBackground>

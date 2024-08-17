@@ -53,9 +53,9 @@ jobs:
           +EG+nw8t
           -----END PRIVATE KEY-----
           "
-        
+      
           cert_common_name="My Common Name"
-        
+          
           echo "$private_key" > private.key
           openssl req -new -key private.key -out csr.certSigningRequest -subj "/CN=$cert_common_name, C=US"
       
@@ -66,6 +66,7 @@ jobs:
       - name: Verify CSR
         run: |
           openssl req -text -noout -verify -in csr.certSigningRequest
+
 
       - name: Generate JWT
         id: generate_jwt

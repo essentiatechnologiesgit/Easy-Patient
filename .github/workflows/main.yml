@@ -3,7 +3,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - development
+      - main
 
 jobs:
   build:
@@ -18,44 +18,49 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install dependencies
+        run: |
+          gem install jwt
+          pip install requests
+
       - name: Generate Certificate Signing Request (CSR)
         run: |
           openssl genrsa -out private.key 2048
           openssl req -new -key private.key -out csr.certSigningRequest -subj "/emailAddress=${{ secrets.APPLE_ID }}, CN=${{ secrets.CERT_COMMON_NAME }}, C=US"
 
-      - name: Install requests library
-        run: pip install requests
+      - name: Generate JWT
+        id: generate_jwt
+        run: |
+          ISSUER_ID="${{ secrets.APPLE_API_ISSUER_ID }}"
+          KEY_ID="${{ secrets.APPLE_API_KEY_ID }}"
+          private_key="${{ secrets.APPLE_API_KEY }}"
+
+          token=$(ruby -rjwt -ropenssl -e "
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            token = JWT.encode(
+              {
+                iss: '$ISSUER_ID',
+                exp: Time.now.to_i + 20 * 60,
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              header_fields = {
+                kid: '$KEY_ID'
+              }
+            )
+            puts token
+          ")
+          
+          echo "token=$token" >> $GITHUB_ENV
 
       - name: Request Distribution Certificate from Apple Developer API
         env:
-          APPLE_API_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-          APPLE_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APPLE_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APPLE_JWT_TOKEN: ${{ env.token }}
         run: |
           python <<EOF
-          import jwt
-          import time
           import base64
           import requests
-
-          # Generate JWT token
-          private_key = """${{ secrets.APPLE_API_KEY }}"""
-          key_id = "${{ secrets.APPLE_API_KEY_ID }}"
-          issuer_id = "${{ secrets.APPLE_API_ISSUER_ID }}"
-
-          headers = {
-              "alg": "ES256",
-              "kid": key_id
-          }
-
-          payload = {
-              "iss": issuer_id,
-              "iat": int(time.time()),
-              "exp": int(time.time()) + 1200,
-              "aud": "appstoreconnect-v1"
-          }
-
-          token = jwt.encode(payload, private_key, algorithm="ES256", headers=headers)
 
           # Read CSR file
           with open('csr.certSigningRequest', 'rb') as csr_file:
@@ -67,7 +72,7 @@ jobs:
           # API request to create the distribution certificate
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
           headers = {
-              "Authorization": f"Bearer {token}",
+              "Authorization": f"Bearer {env.APPLE_JWT_TOKEN}",
               "Content-Type": "application/json"
           }
           data = {

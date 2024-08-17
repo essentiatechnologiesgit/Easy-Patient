@@ -1,227 +1,114 @@
-name: CI/CD Pipeline
+name: iOS Certificate Automation
 
-on: [push]
-
-env:
-  BUILD_CERTIFICATE_BASE64: '${{ secrets.BUILD_CERTIFICATE_BASE64 }}'
-  P12_PASSWORD: '${{ secrets.P12_PASSWORD }}'
-  BUILD_PROVISION_PROFILE_BASE64: '${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}'
-  KEYCHAIN_PASSWORD: '${{ secrets.KEYCHAIN_PASSWORD }}'
-  APPSTORE_USERNAME: '${{ secrets.APPLEID_USERNAME }}'
-  APPSTORE_PASSWORD: '${{ secrets.APPLEID_PASSWORD }}'
-  APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPECIFIC_PASSWORD }}'
-  EXPORT_OPTIONS_PLIST: '${{ secrets.EXPORT_OPTIONS_PLIST }}'
-  XCODE_VERSION: '15.3'
-  APP_STORE_CONNECT_PRIVATE_KEY: '${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}'
-  APP_STORE_CONNECT_ISSUER_ID: 'ad39d400-3314-48f8-977c-29a272eebad0'
-  APP_STORE_CONNECT_KEY_ID: '74H4QHFPVP'
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: macos-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      # - name: Install the Apple certificate
-      #   run: |
-      #     # Create variables
-      #     CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-      #     KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-      #     # Import certificate from secrets
-      #     echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-          
-      #     # Create temporary keychain
-      #     security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-      #     security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-      #     # Import certificate to keychain
-      #     security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-      #     security list-keychain -d user -s $KEYCHAIN_PATH
-
-      # - name: Check Certificate
-      #   run: |
-      #     echo "Checking certificate..."
-      #     security find-identity -v -p codesigning
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
         with:
-          node-version: '16'
+          python-version: '3.x'
 
-
-      - name: Extract and Set Config as Environment Variables
-        id: extract-config
+      - name: Generate Certificate Signing Request (CSR)
         run: |
-          config=$(node -p "require('./config.js')")
-          echo "BUNDLE_Identifier=$(node -e 'console.log(require("./config.js").BUNDLE_ID)')" >> $GITHUB_ENV
-          echo "NAME=$(node -e 'console.log(require("./config.js").NAME)')" >> $GITHUB_ENV
+          openssl genrsa -out private.key 2048
+          openssl req -new -key private.key -out csr.certSigningRequest -subj "/emailAddress=${{ secrets.APPLE_ID }}, CN=${{ secrets.CERT_COMMON_NAME }}, C=US"
 
-      
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3
+      - name: Install requests library
+        run: pip install requests
 
-      - name: Install dependencies (optional)
+      - name: Request Distribution Certificate from Apple Developer API
+        env:
+          APPLE_API_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APPLE_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
         run: |
-          gem install jwt
+          python <<EOF
+          import jwt
+          import time
+          import base64
+          import requests
 
-      - name: Generate JWT
-        id: generate_jwt
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
+          # Generate JWT token
+          private_key = """${{ secrets.APPLE_API_KEY }}"""
+          key_id = "${{ secrets.APPLE_API_KEY_ID }}"
+          issuer_id = "${{ secrets.APPLE_API_ISSUER_ID }}"
 
-          token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
-          
-          echo "token=$token" >> $GITHUB_ENV
-
-      - name: Create Bundle ID
-        id: create_bundle_id
-        run: |
-          echo "Creating Bundle ID..."
-          
-          # Define the Bundle ID parameters
-          BUNDLE_ID="${{ env.BUNDLE_Identifier }}"  # Replace with your desired Bundle ID
-          NAME="${{ env.NAME }}"                   # Replace with your app name
-          PLATFORM="IOS"                  # Use "IOS" or "MAC_OS"
-          
-          # Create the Bundle ID
-          response=$(curl -s -X POST https://api.appstoreconnect.apple.com/v1/bundleIds \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "bundleIds",
-                "attributes": {
-                  "identifier": "'"$BUNDLE_ID"'",
-                  "name": "'"$NAME"'",
-                  "platform": "'"$PLATFORM"'"
-                }
-              }
-            }')
-          
-          echo "Bundle ID Creation Response: $response"
-          
-          # Extract the created Bundle ID
-          bundle_id=$(echo "$response" | jq -r '.data.id')
-          echo "Created Bundle ID: $bundle_id"
-          
-          # Save the Bundle ID to the environment variables
-          echo "bundle_id=$bundle_id" >> $GITHUB_ENV
-
-          
-      - name: Retrieve Certificate ID
-        id: retrieve_certificate
-        run: |
-          echo "Retrieving Certificates..."
-          response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/certificates \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json")
-          
-          echo "$response" > certificates.json
-          
-          # Print the JSON file content for debugging
-          cat certificates.json
-      
-          # Extract and print certificate ID
-          certificate_id=$(jq -r '.data[0].id' certificates.json)
-          echo "Extracted Certificate ID: $certificate_id"
-      
-          # Save the certificate ID to the environment variables
-          echo "certificate_id=$certificate_id" >> $GITHUB_ENV
-
-      # - name: Retrieve All App IDs
-      #   run: |
-      #     echo "Retrieving App IDs..."
-      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json")
-          
-      #     echo "$response" > bundle_ids.json
-      #     echo "Bundle IDs Response: $response"
-
-      #     # Extract and print App IDs
-      #     bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
-      #     echo "App IDs: $bundle_ids"
-      #     echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
-
-
-      - name: Create Distribution Provisioning Profile
-        run: |
-          echo "Creating Distribution Provisioning Profile..."
-          
-          # Define your parameters
-          PROFILE_NAME="${{ env.NAME }} Distribution Profile"
-          BUNDLE_ID="${{ env.bundle_id }}"  
-          CERTIFICATE_ID="62SAZ2F6F4"
-          
-          # Create provisioning profile
-          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d @- <<EOF
-          {
-            "data": {
-              "type": "profiles",
-              "attributes": {
-                "name": "$PROFILE_NAME",
-                "profileType": "IOS_APP_STORE"
-              },
-              "relationships": {
-                "bundleId": {
-                  "data": {
-                    "type": "bundleIds",
-                    "id": "$BUNDLE_ID"
-                  }
-                },
-                "certificates": {
-                  "data": [
-                    {
-                      "type": "certificates",
-                      "id": "$CERTIFICATE_ID"
-                    }
-                  ]
-                }
-              }
-            }
+          headers = {
+              "alg": "ES256",
+              "kid": key_id
           }
-          EOF
-          )
-      
-              echo "Profile Response: $response"
+
+          payload = {
+              "iss": issuer_id,
+              "iat": int(time.time()),
+              "exp": int(time.time()) + 1200,
+              "aud": "appstoreconnect-v1"
+          }
+
+          token = jwt.encode(payload, private_key, algorithm="ES256", headers=headers)
+
+          # Read CSR file
+          with open('csr.certSigningRequest', 'rb') as csr_file:
+              csr_content = csr_file.read()
           
-              # Save the profile ID or the profile content if needed
-              profile_id=$(echo "$response" | jq -r '.data.id')
-              echo "Extracted Profile ID: $profile_id"
-              echo "profile_id=$profile_id" >> $GITHUB_ENV
+          # Base64 encode the CSR content
+          csr_b64 = base64.b64encode(csr_content).decode('utf-8')
 
-      
+          # API request to create the distribution certificate
+          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Content-Type": "application/json"
+          }
+          data = {
+              "data": {
+                  "type": "certificates",
+                  "attributes": {
+                      "certificateType": "IOS_DISTRIBUTION",
+                      "csrContent": csr_b64
+                  }
+              }
+          }
 
+          response = requests.post(url, json=data, headers=headers)
+
+          if response.status_code == 201:
+              cert_content = response.json()['data']['attributes']['certificateContent']
+              with open('distribution.cer', 'w') as cert_file:
+                  cert_file.write(cert_content)
+              print("Distribution Certificate created successfully")
+          else:
+              print("Failed to create Distribution Certificate")
+              print(response.json())
+          EOF
+
+      - name: Convert Certificate to .p12 format
+        run: |
+          openssl x509 -in distribution.cer -inform PEM -outform DER -out distribution.der
+          openssl pkcs12 -export -inkey private.key -in distribution.der -out distribution.p12 -name "iOS Distribution" -password pass:${{ secrets.P12_PASSWORD }}
+
+      - name: Upload .p12 file as GitHub Actions artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-distribution-p12
+          path: distribution.p12
+
+      - name: Import certificate to keychain for signing
+        run: |
+          security create-keychain -p "temp_password" build.keychain
+          security import distribution.p12 -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -A
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "temp_password" build.keychain
+          security set-keychain-settings build.keychain
+          security set-key-partition-list -S apple-tool:,apple: -s -k "temp_password" build.keychain

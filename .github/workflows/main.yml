@@ -17,6 +17,11 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
 
       - name: Install dependencies
         run: |
@@ -31,9 +36,16 @@ jobs:
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID="${{ secrets.APPLE_API_ISSUER_ID }}"
-          KEY_ID="${{ secrets.APPLE_API_KEY_ID }}"
-          private_key="${{ secrets.APPLE_API_KEY }}"
+          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+          KEY_ID="74H4QHFPVP"
+          private_key="
+          -----BEGIN PRIVATE KEY-----
+          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+          +EG+nw8t
+          -----END PRIVATE KEY-----
+          "
 
           token=$(ruby -rjwt -ropenssl -e "
             private_key_obj = OpenSSL::PKey::EC.new('$private_key')
@@ -53,6 +65,7 @@ jobs:
           ")
           
           echo "token=$token" >> $GITHUB_ENV
+
 
       - name: Request Distribution Certificate from Apple Developer API
         env:

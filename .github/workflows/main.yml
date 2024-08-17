@@ -54,7 +54,7 @@ jobs:
           -----END PRIVATE KEY-----
           "
       
-          cert_common_name="My Common Name"
+          cert_common_name="www.example.com"
           
           echo "$private_key" > private.key
           openssl req -new -key private.key -out csr.certSigningRequest -subj "/CN=$cert_common_name, C=US"

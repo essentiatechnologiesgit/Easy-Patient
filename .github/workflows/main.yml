@@ -57,7 +57,7 @@ jobs:
           cert_common_name="www.example.com"
           
           echo "$private_key" > private.key
-          openssl req -new -key private.key -out csr.certSigningRequest -subj "/CN=$cert_common_name, C=US"
+          openssl req -new -key private.key -out csr.certSigningRequest -subj "/CN=www.example.com, C=US"
       
       - name: Display CSR Contents
         run: |

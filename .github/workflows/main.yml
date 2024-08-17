@@ -68,8 +68,6 @@ jobs:
           
 
       - name: Request Distribution Certificate from Apple Developer API
-        env:
-          APPLE_JWT_TOKEN: ${{ env.token }}
         run: |
           python <<EOF
           import base64

@@ -87,32 +87,32 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
           
-      - name: Revoke the hardcoded certificate
-        run: |
-          import requests
-          import os
+      # - name: Revoke the hardcoded certificate
+      #   run: |
+      #     import requests
+      #     import os
 
-          # Hardcoded JWT and Certificate ID
+      #     # Hardcoded JWT and Certificate ID
        
-          certificate_id = "VUADYF43SC"
+      #     certificate_id = "VUADYF43SC"
 
-          # API URL
-          url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
-          headers = {
-              "Authorization": f"Bearer {os.getenv('token')}",
-          }
+      #     # API URL
+      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #     }
           
-          # Making the DELETE request to revoke the certificate
-          response = requests.delete(url, headers=headers)
+      #     # Making the DELETE request to revoke the certificate
+      #     response = requests.delete(url, headers=headers)
           
-          # Print the status and response content
-          print(f"Status Code: {response.status_code}")
-          if response.status_code == 204:
-              print("Certificate revoked successfully.")
-          else:
-              print("Failed to revoke certificate.")
-              print(response.text)
-        shell: python
+      #     # Print the status and response content
+      #     print(f"Status Code: {response.status_code}")
+      #     if response.status_code == 204:
+      #         print("Certificate revoked successfully.")
+      #     else:
+      #         print("Failed to revoke certificate.")
+      #         print(response.text)
+      #   shell: python
 
       # - name: Make API request and print full response
       #   run: |
@@ -144,75 +144,75 @@ jobs:
       #     csr_content=$(cat csr.certSigningRequest | base64 | fold -w 64)
       #     echo "$csr_content" > csr_base64.txt
       
-      # - name: Request Distribution Certificate from Apple Developer API
-      #   run: |
-      #     python <<EOF
-      #     import os
-      #     import requests
+      - name: Request Distribution Certificate from Apple Developer API
+        run: |
+          python <<EOF
+          import os
+          import requests
       
-      #     # Get the CSR content from the environment variable
-      #     csr_content = os.getenv('CSR_CONTENT')
+          # Get the CSR content from the environment variable
+          csr_content = os.getenv('CSR_CONTENT')
       
-      #     # Print CSR content for debugging
-      #     print(f"CSR Content (Dynamic): {csr_content}")
+          # Print CSR content for debugging
+          print(f"CSR Content (Dynamic): {csr_content}")
       
-      #     # Hard-coded CSR content (Base64-encoded) for comparison
-      #     csr_b64_hardcoded = '''-----BEGIN CERTIFICATE REQUEST-----
-      #     MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
-      #     IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvYfftj0a1CXQO32nAilqBPRi
-      #     8ISg5JZFoZ+NAuv3RFxBwS7U32Bprk/IyBuwmWGu55X+h6xvdRmDhzXqtfF1uDXG
-      #     ADs4cpTticEhm5qrF7cTbQ58/YXR8OKAby58wrHVVtxQPTyWUGgVcvfiBv4fWQzE
-      #     5umxyevxxQa2MtWd79DtO6riQ+7bMiJvnyyVTwtJVj5c/cuzmbKL9by6kwILhpD9
-      #     PocuQDBRxwwp4X/lryQUOmXu5KTYClbBeLXErtxCKDR+fd0F9MEsYjsq032rQubp
-      #     dlZ+JVI+1iH8J2NH5Evj4HdH9pwyaziIfMBoVdOHKs0GsSZCfxakf5UeuMKSfQID
-      #     AQABoAAwDQYJKoZIhvcNAQELBQADggEBAELkjiEzizdqHpvMPxSh15V18p2avpXW
-      #     iYjmcMHM7Q9T4QP8/C1Ab/Dux2+rScLjsQl/5Wols+dchSTC2uL9fHP/0tLrsygl
-      #     Zd4PueD+SvoACWo12SizGt0rK/X+AwGx3hwYqr2xtQqA0CF66vwYlh7Pk6KhFz/b
-      #     T9lMBWkbY8Aw+zZnwC5d1LW6gjYcRzXdpj3bFViSmOsa+dGNGJOX3ZV4mXkxdSro
-      #     qFcMUR2nolMSdKThaOlXhtP4uo0zHAPdOe0HU5Vpr9cBIgF2D5pSoJ2xYXy+bPMx
-      #     rPGVpPwQULyI6zdSGafYz8Uyv5KfLdh2DlxbHRim2D3QeKkWyrge8bw=
-      #     -----END CERTIFICATE REQUEST-----'''
+          # Hard-coded CSR content (Base64-encoded) for comparison
+          csr_b64_hardcoded = '''-----BEGIN CERTIFICATE REQUEST-----
+          MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
+          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvYfftj0a1CXQO32nAilqBPRi
+          8ISg5JZFoZ+NAuv3RFxBwS7U32Bprk/IyBuwmWGu55X+h6xvdRmDhzXqtfF1uDXG
+          ADs4cpTticEhm5qrF7cTbQ58/YXR8OKAby58wrHVVtxQPTyWUGgVcvfiBv4fWQzE
+          5umxyevxxQa2MtWd79DtO6riQ+7bMiJvnyyVTwtJVj5c/cuzmbKL9by6kwILhpD9
+          PocuQDBRxwwp4X/lryQUOmXu5KTYClbBeLXErtxCKDR+fd0F9MEsYjsq032rQubp
+          dlZ+JVI+1iH8J2NH5Evj4HdH9pwyaziIfMBoVdOHKs0GsSZCfxakf5UeuMKSfQID
+          AQABoAAwDQYJKoZIhvcNAQELBQADggEBAELkjiEzizdqHpvMPxSh15V18p2avpXW
+          iYjmcMHM7Q9T4QP8/C1Ab/Dux2+rScLjsQl/5Wols+dchSTC2uL9fHP/0tLrsygl
+          Zd4PueD+SvoACWo12SizGt0rK/X+AwGx3hwYqr2xtQqA0CF66vwYlh7Pk6KhFz/b
+          T9lMBWkbY8Aw+zZnwC5d1LW6gjYcRzXdpj3bFViSmOsa+dGNGJOX3ZV4mXkxdSro
+          qFcMUR2nolMSdKThaOlXhtP4uo0zHAPdOe0HU5Vpr9cBIgF2D5pSoJ2xYXy+bPMx
+          rPGVpPwQULyI6zdSGafYz8Uyv5KfLdh2DlxbHRim2D3QeKkWyrge8bw=
+          -----END CERTIFICATE REQUEST-----'''
       
-      #     print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
+          print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
       
-      #     # API request to create the distribution certificate
-      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #         "Content-Type": "application/json"
-      #     }
-      #     data = {
-      #         "data": {
-      #             "type": "certificates",
-      #             "attributes": {
-      #                 "certificateType": "IOS_DISTRIBUTION",
-      #                 "csrContent": csr_content
-      #             }
-      #         }
-      #     }
-      #     print(f"Request Data: {data}")
+          # API request to create the distribution certificate
+          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+              "Content-Type": "application/json"
+          }
+          data = {
+              "data": {
+                  "type": "certificates",
+                  "attributes": {
+                      "certificateType": "IOS_DISTRIBUTION",
+                      "csrContent": csr_content
+                  }
+              }
+          }
+          print(f"Request Data: {data}")
       
-      #     response = requests.post(url, json=data, headers=headers)
+          response = requests.post(url, json=data, headers=headers)
       
-      #     if response.status_code == 201:
-      #         cert_data = response.json()['data']
-      #         cert_id = cert_data['id']
-      #         cert_serial_number = cert_data['attributes']['serialNumber']
+          if response.status_code == 201:
+              cert_data = response.json()['data']
+              cert_id = cert_data['id']
+              cert_serial_number = cert_data['attributes']['serialNumber']
               
-      #         print(f"Certificate ID: {cert_id}")
-      #         print(f"Serial Number: {cert_serial_number}")
+              print(f"Certificate ID: {cert_id}")
+              print(f"Serial Number: {cert_serial_number}")
               
-      #         # Save the certificate content to a file
-      #         cert_content = cert_data['attributes']['certificateContent']
-      #         with open('distribution.cer', 'w') as cert_file:
-      #             cert_file.write(cert_content)
-      #         print("Distribution Certificate created successfully")
-      #     else:
-      #         print("Failed to create Distribution Certificate")
-      #         print(response.status_code)
-      #         print(response.json())
-      #         exit(1)
-      #     EOF
+              # Save the certificate content to a file
+              cert_content = cert_data['attributes']['certificateContent']
+              with open('distribution.cer', 'w') as cert_file:
+                  cert_file.write(cert_content)
+              print("Distribution Certificate created successfully")
+          else:
+              print("Failed to create Distribution Certificate")
+              print(response.status_code)
+              print(response.json())
+              exit(1)
+          EOF
 
       # - name: Convert Certificate to .p12 format
       #   run: |

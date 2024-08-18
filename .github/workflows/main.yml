@@ -127,7 +127,7 @@ jobs:
           # with open('csr_base64.txt', 'r') as f:
           #     csr_b64 = f.read().strip()
           
-          print(f"CSR Base64 (Dynamic): {CSR_CONTENT}")
+          print(f"CSR Base64 (Dynamic): {$CSR_CONTENT}")
           
           # Hard-coded CSR content (Base64-encoded)
           csr_b64_hardcoded = '''-----BEGIN CERTIFICATE REQUEST-----
@@ -159,7 +159,7 @@ jobs:
                   "type": "certificates",
                   "attributes": {
                       "certificateType": "IOS_DISTRIBUTION",
-                      "csrContent": CSR_CONTENT
+                      "csrContent": {CSR_CONTENT}
                   }
               }
           }

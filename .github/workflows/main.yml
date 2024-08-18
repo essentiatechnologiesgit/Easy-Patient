@@ -77,6 +77,7 @@ jobs:
         run: |
           import requests
           import json
+          import os
           
           # Your JWT and API URL
           url = "https://api.appstoreconnect.apple.com/v1/certificates"

@@ -116,19 +116,21 @@ jobs:
           print(f"CSR Base64 (Dynamic): {csr_b64}")
           
           # Hard-coded CSR content (Base64-encoded)
-          csr_b64_hardcoded = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
-          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAprJdE64nnhah7BxtsiabeGGd
-          zwtC30cbrULAJywLs8IMB1uF7F4GPFJLSXXbBg+BnX2tvPAhI4T92ytUQRRKPIKU
-          gaJ1bWkQcjIf6EBP/PhKlKtWkBHZ46bv2Q4pcmoLjvXSWU2C82XZopuDwgFoqNkJ
-          0UqgmW3NbJDyvKmsy3JCoyL5kCmtbPMQOrTxq+2RK8zUqEJthiEiEeA18WkP4l1V
-          ZjpMAM1eL7OAdFMHmPXWMmv7xBjwjVab/fpFOFP9g3JpssySvRK388MVRUzMNG9x
-          yzeWq32KNSVGQTrzPvUIh3SP0AvLTUE14CV1TmvREhMfV6KO1tJCAgy+v3+E7wID
-          AQABoAAwDQYJKoZIhvcNAQELBQADggEBACSUwZxeJKqICO2aVVXCuOO1UfG+9yQi
-          Sf5v1p2lHORhVSBF9K82YMdVA5pW4G0lPKwdY3t1Fvxtzks5hoQiMUcL/QF4dsUS
-          p7ay9xumw2aC1XzwD1Z0VeJ91eRGXD1a/J9eGYI0y3VNLkujmU4zJP5MRizdOwoF
-          5Yikg9QdScMYLL/gbl8kJCme5yhsbCSsR8P8XMzadeqJkHDm/GiDAHdZ1ZLPIH/G
-          E23VQDZ7pzulTiBo0nuuzls3inVGN3EbPBAvBu2Py2VtDdPTAv3I3zC5OrER7lWb
-          0CaAObxBoUa6CAfRDa3H6tc7nrS1W3xy7ToaBZyVwoBEY/BSS7BzFUw='''
+          csr_b64_hardcoded = '''-----BEGIN CERTIFICATE REQUEST-----
+          MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
+          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvYfftj0a1CXQO32nAilqBPRi
+          8ISg5JZFoZ+NAuv3RFxBwS7U32Bprk/IyBuwmWGu55X+h6xvdRmDhzXqtfF1uDXG
+          ADs4cpTticEhm5qrF7cTbQ58/YXR8OKAby58wrHVVtxQPTyWUGgVcvfiBv4fWQzE
+          5umxyevxxQa2MtWd79DtO6riQ+7bMiJvnyyVTwtJVj5c/cuzmbKL9by6kwILhpD9
+          PocuQDBRxwwp4X/lryQUOmXu5KTYClbBeLXErtxCKDR+fd0F9MEsYjsq032rQubp
+          dlZ+JVI+1iH8J2NH5Evj4HdH9pwyaziIfMBoVdOHKs0GsSZCfxakf5UeuMKSfQID
+          AQABoAAwDQYJKoZIhvcNAQELBQADggEBAELkjiEzizdqHpvMPxSh15V18p2avpXW
+          iYjmcMHM7Q9T4QP8/C1Ab/Dux2+rScLjsQl/5Wols+dchSTC2uL9fHP/0tLrsygl
+          Zd4PueD+SvoACWo12SizGt0rK/X+AwGx3hwYqr2xtQqA0CF66vwYlh7Pk6KhFz/b
+          T9lMBWkbY8Aw+zZnwC5d1LW6gjYcRzXdpj3bFViSmOsa+dGNGJOX3ZV4mXkxdSro
+          qFcMUR2nolMSdKThaOlXhtP4uo0zHAPdOe0HU5Vpr9cBIgF2D5pSoJ2xYXy+bPMx
+          rPGVpPwQULyI6zdSGafYz8Uyv5KfLdh2DlxbHRim2D3QeKkWyrge8bw=
+          -----END CERTIFICATE REQUEST-----'''
       
           print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
       

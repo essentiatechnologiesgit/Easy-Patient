@@ -78,12 +78,21 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
+      - name: Read and Base64-encode CSR Content
+            
+        id: read_csr
+        run: |
+          csr_content=$(cat csr.certSigningRequest | base64 | tr -d '\n')
+          echo "csr_b64=$csr_content" >> $GITHUB_ENV
+
       - name: Request Distribution Certificate from Apple Developer API
         run: |
           python <<EOF
-          import base64
-          import requests
           import os
+          import requests
+          
+          csr_b64 = os.getenv('csr_b64')
+          print(f"CSR Base64 (Dynamic): {csr_b64}")
           
           # Hard-coded CSR content (Base64-encoded)
           csr_b64 = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
@@ -101,6 +110,8 @@ jobs:
           eM1rVariI9TOF4Laqgud6R/jmfqKp8KrKwv8ezlcMwB5gPiszLula5A='''
       
           print(f"CSR Base64 (Hardcoded): {csr_b64}")
+      
+    
       
           # API request to create the distribution certificate
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
@@ -132,6 +143,7 @@ jobs:
               print(response.json())
               exit(1)
           EOF
+
 
 
       - name: Convert Certificate to .p12 format

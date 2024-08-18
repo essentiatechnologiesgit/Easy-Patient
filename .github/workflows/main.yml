@@ -86,30 +86,57 @@ jobs:
           ")
           
           echo "token=$token" >> $GITHUB_ENV
-
-      - name: Make API request and print full response
+          
+      - name: Revoke the hardcoded certificate
         run: |
           import requests
-          import json
           import os
-          
-          # Your JWT and API URL
-          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+
+          # Hardcoded JWT and Certificate ID
+       
+          certificate_id = "VUADYF43SC"
+
+          # API URL
+          url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",
           }
           
-          # Making the request
-          response = requests.get(url, headers=headers)
+          # Making the DELETE request to revoke the certificate
+          response = requests.delete(url, headers=headers)
           
-          # Print the complete response content
-          try:
-              response_data = response.json()
-              print(json.dumps(response_data, indent=4))
-          except json.JSONDecodeError:
-              print("Failed to decode JSON response.")
+          # Print the status and response content
+          print(f"Status Code: {response.status_code}")
+          if response.status_code == 204:
+              print("Certificate revoked successfully.")
+          else:
+              print("Failed to revoke certificate.")
               print(response.text)
         shell: python
+
+      # - name: Make API request and print full response
+      #   run: |
+      #     import requests
+      #     import json
+      #     import os
+          
+      #     # Your JWT and API URL
+      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #     }
+          
+      #     # Making the request
+      #     response = requests.get(url, headers=headers)
+          
+      #     # Print the complete response content
+      #     try:
+      #         response_data = response.json()
+      #         print(json.dumps(response_data, indent=4))
+      #     except json.JSONDecodeError:
+      #         print("Failed to decode JSON response.")
+      #         print(response.text)
+      #   shell: python
 
 
       # - name: Read and Base64-encode CSR Content with Line Breaks

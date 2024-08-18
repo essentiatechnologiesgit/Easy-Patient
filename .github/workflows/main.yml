@@ -117,18 +117,18 @@ jobs:
           
           # Hard-coded CSR content (Base64-encoded)
           csr_b64_hardcoded = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
-          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzRh+syfiqL7ocuxASfrhqE9E
-          JDMUMXNeQIqoyxwl+bAy5TSGpuRjB63dYmZuLqh1hoaQwGJzBl3L7WtWgNQ8koRH
-          2MpmUc3u0RI/xF3GZjb4O0TuUos/aeDHFmuLx3Ng8X7e5D3lZ3GfnsgENX4tgQ+6
-          GDCz1nK0F5OXYz9oRNzI3oE1oAuGujws3R7OFEzK7USLWpGLuhct4Od6Ul64nAly
-          SOuB9tQrElSWCdNSKDPfGeLfOOp9H12Y5yv5VsjyeBfwGoFVnZ6Ohry07V+AoRjs
-          PP5RpXEZoMz+0xDcR6PbY+BQHmISfTsHY6bW9Y30148/yCCHRuoqWSBfAKyUzwID
-          AQABoAAwDQYJKoZIhvcNAQELBQADggEBAIuIsfROgrQaNnlmFSAqdsTteHQbZe38
-          oRg91xVaUabrtxpqzZWGYmezTbk3eCYsDgrSc4DG8iwGdhY2gK24y+MUw/mFVjPL
-          9CcHZg8ZnwhfnUANbmGcVm5KqE7p8BIbqtd2MYZXmwNzCsBguStHQS/tC4BOKxcO
-          1k6gN2vE/d+SGCNe6+zaglk66TqcgjaQbHfEKQ9nu98stBEsUnYHe/WWUZVKSOco
-          HXIRs2MesH2BN7Jiqrin/LyRpi1GLctp5zyIJZrJNQeV7IDv6VwscgpejXRGQCGm
-          eM1rVariI9TOF4Laqgud6R/jmfqKp8KrKwv8ezlcMwB5gPiszLula5A='''
+          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAprJdE64nnhah7BxtsiabeGGd
+          zwtC30cbrULAJywLs8IMB1uF7F4GPFJLSXXbBg+BnX2tvPAhI4T92ytUQRRKPIKU
+          gaJ1bWkQcjIf6EBP/PhKlKtWkBHZ46bv2Q4pcmoLjvXSWU2C82XZopuDwgFoqNkJ
+          0UqgmW3NbJDyvKmsy3JCoyL5kCmtbPMQOrTxq+2RK8zUqEJthiEiEeA18WkP4l1V
+          ZjpMAM1eL7OAdFMHmPXWMmv7xBjwjVab/fpFOFP9g3JpssySvRK388MVRUzMNG9x
+          yzeWq32KNSVGQTrzPvUIh3SP0AvLTUE14CV1TmvREhMfV6KO1tJCAgy+v3+E7wID
+          AQABoAAwDQYJKoZIhvcNAQELBQADggEBACSUwZxeJKqICO2aVVXCuOO1UfG+9yQi
+          Sf5v1p2lHORhVSBF9K82YMdVA5pW4G0lPKwdY3t1Fvxtzks5hoQiMUcL/QF4dsUS
+          p7ay9xumw2aC1XzwD1Z0VeJ91eRGXD1a/J9eGYI0y3VNLkujmU4zJP5MRizdOwoF
+          5Yikg9QdScMYLL/gbl8kJCme5yhsbCSsR8P8XMzadeqJkHDm/GiDAHdZ1ZLPIH/G
+          E23VQDZ7pzulTiBo0nuuzls3inVGN3EbPBAvBu2Py2VtDdPTAv3I3zC5OrER7lWb
+          0CaAObxBoUa6CAfRDa3H6tc7nrS1W3xy7ToaBZyVwoBEY/BSS7BzFUw='''
       
           print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
       

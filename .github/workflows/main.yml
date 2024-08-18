@@ -147,7 +147,7 @@ jobs:
           -----END CERTIFICATE REQUEST-----'''
       
           print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
-      
+          csr_content = os.getenv('CSR_CONTENT')
           # API request to create the distribution certificate
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
           headers = {
@@ -159,10 +159,11 @@ jobs:
                   "type": "certificates",
                   "attributes": {
                       "certificateType": "IOS_DISTRIBUTION",
-                      "csrContent": {CSR_CONTENT}
+                      "csrContent": csr_content
                   }
               }
           }
+
           print(f"Request Data: {data}")
       
           response = requests.post(url, json=data, headers=headers)

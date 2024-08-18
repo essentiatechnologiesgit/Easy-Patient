@@ -73,88 +73,126 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Read and Base64-encode CSR Content with Line Breaks
-        run: |
-          csr_content=$(cat csr.certSigningRequest | base64 | fold -w 64)
-          echo "$csr_content" > csr_base64.txt
-      
-      - name: Request Distribution Certificate from Apple Developer API
-        run: |
-          python <<EOF
-          import os
-          import requests
-          
-          # Read the CSR content from the file
-          with open('csr_base64.txt', 'r') as f:
-              csr_b64 = f.read().strip()
-          
-          print(f"CSR Base64 (Dynamic): {csr_b64}")
-          
-          # Hard-coded CSR content (Base64-encoded)
-          csr_b64_hardcoded = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
-          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzRh+syfiqL7ocuxASfrhqE9E
-          JDMUMXNeQIqoyxwl+bAy5TSGpuRjB63dYmZuLqh1hoaQwGJzBl3L7WtWgNQ8koRH
-          2MpmUc3u0RI/xF3GZjb4O0TuUos/aeDHFmuLx3Ng8X7e5D3lZ3GfnsgENX4tgQ+6
-          GDCz1nK0F5OXYz9oRNzI3oE1oAuGujws3R7OFEzK7USLWpGLuhct4Od6Ul64nAly
-          SOuB9tQrElSWCdNSKDPfGeLfOOp9H12Y5yv5VsjyeBfwGoFVnZ6Ohry07V+AoRjs
-          PP5RpXEZoMz+0xDcR6PbY+BQHmISfTsHY6bW9Y30148/yCCHRuoqWSBfAKyUzwID
-          AQABoAAwDQYJKoZIhvcNAQELBQADggEBAIuIsfROgrQaNnlmFSAqdsTteHQbZe38
-          oRg91xVaUabrtxpqzZWGYmezTbk3eCYsDgrSc4DG8iwGdhY2gK24y+MUw/mFVjPL
-          9CcHZg8ZnwhfnUANbmGcVm5KqE7p8BIbqtd2MYZXmwNzCsBguStHQS/tC4BOKxcO
-          1k6gN2vE/d+SGCNe6+zaglk66TqcgjaQbHfEKQ9nu98stBEsUnYHe/WWUZVKSOco
-          HXIRs2MesH2BN7Jiqrin/LyRpi1GLctp5zyIJZrJNQeV7IDv6VwscgpejXRGQCGm
-          eM1rVariI9TOF4Laqgud6R/jmfqKp8KrKwv8ezlcMwB5gPiszLula5A='''
-      
-          print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
-      
-          # API request to create the distribution certificate
-          url = "https://api.appstoreconnect.apple.com/v1/certificates"
-          headers = {
-              "Authorization": f"Bearer {os.getenv('token')}",
-              "Content-Type": "application/json"
-          }
-          data = {
-              "data": {
-                  "type": "certificates",
-                  "attributes": {
-                      "certificateType": "IOS_DISTRIBUTION",
-                      "csrContent": csr_b64
-                  }
-              }
-          }
-          print(f"Request Data: {data}")
-      
-          response = requests.post(url, json=data, headers=headers)
-      
-          if response.status_code == 201:
-              cert_content = response.json()['data']['attributes']['certificateContent']
-              with open('distribution.cer', 'w') as cert_file:
-                  cert_file.write(cert_content)
-              print("Distribution Certificate created successfully")
-          else:
-              print("Failed to create Distribution Certificate")
-              print(response.status_code)
-              print(response.json())
-              exit(1)
-          EOF
+      - name: Check Pending Certificate Requests
+  id: check_requests
+  run: |
+    python <<EOF
+    import os
+    import requests
+    
+    # API request to list certificates
+    url = "https://api.appstoreconnect.apple.com/v1/certificates"
+    headers = {
+        "Authorization": f"Bearer {os.getenv('token')}",
+        "Content-Type": "application/json"
+    }
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        certificates = response.json().get('data', [])
+        pending_requests = [cert for cert in certificates if cert['attributes']['status'] == 'PENDING']
+        
+        if pending_requests:
+            print("Pending Certificate Requests found:")
+            for request in pending_requests:
+                print(f"Request ID: {request['id']}")
+                print(f"Certificate Type: {request['attributes']['certificateType']}")
+                print(f"Status: {request['attributes']['status']}")
+                print("-----")
+        else:
+            print("No pending certificate requests found.")
+    
+    else:
+        print("Failed to retrieve certificate requests")
+        print(response.status_code)
+        print(response.json())
+        exit(1)
+    EOF
 
-      - name: Convert Certificate to .p12 format
-        run: |
-          openssl x509 -in distribution.cer -inform PEM -outform DER -out distribution.der
-          openssl pkcs12 -export -inkey rsa_private.key -in distribution.der -out distribution.p12 -name "iOS Distribution" -password pass:${{ secrets.P12_PASSWORD }}
 
-      - name: Upload .p12 file as GitHub Actions artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ios-distribution-p12
-          path: distribution.p12
+      # - name: Read and Base64-encode CSR Content with Line Breaks
+      #   run: |
+      #     csr_content=$(cat csr.certSigningRequest | base64 | fold -w 64)
+      #     echo "$csr_content" > csr_base64.txt
+      
+      # - name: Request Distribution Certificate from Apple Developer API
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
+          
+      #     # Read the CSR content from the file
+      #     with open('csr_base64.txt', 'r') as f:
+      #         csr_b64 = f.read().strip()
+          
+      #     print(f"CSR Base64 (Dynamic): {csr_b64}")
+          
+      #     # Hard-coded CSR content (Base64-encoded)
+      #     csr_b64_hardcoded = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
+      #     IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzRh+syfiqL7ocuxASfrhqE9E
+      #     JDMUMXNeQIqoyxwl+bAy5TSGpuRjB63dYmZuLqh1hoaQwGJzBl3L7WtWgNQ8koRH
+      #     2MpmUc3u0RI/xF3GZjb4O0TuUos/aeDHFmuLx3Ng8X7e5D3lZ3GfnsgENX4tgQ+6
+      #     GDCz1nK0F5OXYz9oRNzI3oE1oAuGujws3R7OFEzK7USLWpGLuhct4Od6Ul64nAly
+      #     SOuB9tQrElSWCdNSKDPfGeLfOOp9H12Y5yv5VsjyeBfwGoFVnZ6Ohry07V+AoRjs
+      #     PP5RpXEZoMz+0xDcR6PbY+BQHmISfTsHY6bW9Y30148/yCCHRuoqWSBfAKyUzwID
+      #     AQABoAAwDQYJKoZIhvcNAQELBQADggEBAIuIsfROgrQaNnlmFSAqdsTteHQbZe38
+      #     oRg91xVaUabrtxpqzZWGYmezTbk3eCYsDgrSc4DG8iwGdhY2gK24y+MUw/mFVjPL
+      #     9CcHZg8ZnwhfnUANbmGcVm5KqE7p8BIbqtd2MYZXmwNzCsBguStHQS/tC4BOKxcO
+      #     1k6gN2vE/d+SGCNe6+zaglk66TqcgjaQbHfEKQ9nu98stBEsUnYHe/WWUZVKSOco
+      #     HXIRs2MesH2BN7Jiqrin/LyRpi1GLctp5zyIJZrJNQeV7IDv6VwscgpejXRGQCGm
+      #     eM1rVariI9TOF4Laqgud6R/jmfqKp8KrKwv8ezlcMwB5gPiszLula5A='''
+      
+      #     print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
+      
+      #     # API request to create the distribution certificate
+      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+      #     data = {
+      #         "data": {
+      #             "type": "certificates",
+      #             "attributes": {
+      #                 "certificateType": "IOS_DISTRIBUTION",
+      #                 "csrContent": csr_b64
+      #             }
+      #         }
+      #     }
+      #     print(f"Request Data: {data}")
+      
+      #     response = requests.post(url, json=data, headers=headers)
+      
+      #     if response.status_code == 201:
+      #         cert_content = response.json()['data']['attributes']['certificateContent']
+      #         with open('distribution.cer', 'w') as cert_file:
+      #             cert_file.write(cert_content)
+      #         print("Distribution Certificate created successfully")
+      #     else:
+      #         print("Failed to create Distribution Certificate")
+      #         print(response.status_code)
+      #         print(response.json())
+      #         exit(1)
+      #     EOF
 
-      - name: Import certificate to keychain for signing
-        run: |
-          security create-keychain -p "temp_password" build.keychain
-          security import distribution.p12 -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -A
-          security list-keychains -s build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "temp_password" build.keychain
-          security set-keychain-settings build.keychain
-          security set-key-partition-list -S apple-tool:,apple: -s -k "temp_password" build.keychain
+      # - name: Convert Certificate to .p12 format
+      #   run: |
+      #     openssl x509 -in distribution.cer -inform PEM -outform DER -out distribution.der
+      #     openssl pkcs12 -export -inkey rsa_private.key -in distribution.der -out distribution.p12 -name "iOS Distribution" -password pass:${{ secrets.P12_PASSWORD }}
+
+      # - name: Upload .p12 file as GitHub Actions artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ios-distribution-p12
+      #     path: distribution.p12
+
+      # - name: Import certificate to keychain for signing
+      #   run: |
+      #     security create-keychain -p "temp_password" build.keychain
+      #     security import distribution.p12 -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -A
+      #     security list-keychains -s build.keychain
+      #     security default-keychain -s build.keychain
+      #     security unlock-keychain -p "temp_password" build.keychain
+      #     security set-keychain-settings build.keychain
+      #     security set-key-partition-list -S apple-tool:,apple: -s -k "temp_password" build.keychain

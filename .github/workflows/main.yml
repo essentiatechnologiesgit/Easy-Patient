@@ -39,11 +39,6 @@ jobs:
       - name: Display Generated CSR Contents
         run: |
           cat csr.certSigningRequest
-      
-      # - name: Display Generated CSR Base64 Content
-      #   run: |
-      #     csr_b64_generated=$(base64 csr.certSigningRequest)
-      #     echo "Generated CSR Base64: $csr_b64_generated"
 
       - name: Generate JWT
         id: generate_jwt
@@ -78,11 +73,10 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Read and Base64-encode CSR Content
-            
+      - name: Read and Base64-encode CSR Content with Line Breaks
         id: read_csr
         run: |
-          csr_content=$(cat csr.certSigningRequest | base64 | tr -d '\n')
+          csr_content=$(cat csr.certSigningRequest | base64 | fold -w 64)
           echo "csr_b64=$csr_content" >> $GITHUB_ENV
 
       - name: Request Distribution Certificate from Apple Developer API
@@ -95,7 +89,7 @@ jobs:
           print(f"CSR Base64 (Dynamic): {csr_b64}")
           
           # Hard-coded CSR content (Base64-encoded)
-          csr_b64 = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
+          csr_b64_hardcoded = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
           IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzRh+syfiqL7ocuxASfrhqE9E
           JDMUMXNeQIqoyxwl+bAy5TSGpuRjB63dYmZuLqh1hoaQwGJzBl3L7WtWgNQ8koRH
           2MpmUc3u0RI/xF3GZjb4O0TuUos/aeDHFmuLx3Ng8X7e5D3lZ3GfnsgENX4tgQ+6
@@ -108,11 +102,9 @@ jobs:
           1k6gN2vE/d+SGCNe6+zaglk66TqcgjaQbHfEKQ9nu98stBEsUnYHe/WWUZVKSOco
           HXIRs2MesH2BN7Jiqrin/LyRpi1GLctp5zyIJZrJNQeV7IDv6VwscgpejXRGQCGm
           eM1rVariI9TOF4Laqgud6R/jmfqKp8KrKwv8ezlcMwB5gPiszLula5A='''
-      
-          print(f"CSR Base64 (Hardcoded): {csr_b64}")
-      
+
+          print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
     
-      
           # API request to create the distribution certificate
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
           headers = {
@@ -143,8 +135,6 @@ jobs:
               print(response.json())
               exit(1)
           EOF
-
-
 
       - name: Convert Certificate to .p12 format
         run: |

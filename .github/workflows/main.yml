@@ -40,10 +40,10 @@ jobs:
         run: |
           cat csr.certSigningRequest
       
-      - name: Display Generated CSR Base64 Content
-        run: |
-          csr_b64_generated=$(base64 csr.certSigningRequest)
-          echo "Generated CSR Base64: $csr_b64_generated"
+      # - name: Display Generated CSR Base64 Content
+      #   run: |
+      #     csr_b64_generated=$(base64 csr.certSigningRequest)
+      #     echo "Generated CSR Base64: $csr_b64_generated"
 
       - name: Generate JWT
         id: generate_jwt

@@ -143,7 +143,7 @@ jobs:
                   "type": "certificates",
                   "attributes": {
                       "certificateType": "IOS_DISTRIBUTION",
-                      "csrContent": csr_b64
+                      "csrContent": csr_b64_hardcoded
                   }
               }
           }

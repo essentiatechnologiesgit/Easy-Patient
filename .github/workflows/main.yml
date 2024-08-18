@@ -32,11 +32,18 @@ jobs:
           pip install requests
 
       - name: Generate RSA Private Key and CSR
-        id: generate_csr
         run: |
           openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
-          csr=$(openssl req -new -key rsa_private.key -subj "/CN=www.example.com, C=US" | base64)
-          echo "csr=$csr" >> $GITHUB_ENV
+          openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=www.example.com, C=US"
+
+      - name: Display Generated CSR Contents
+        run: |
+          cat csr.certSigningRequest
+      
+      - name: Display Generated CSR Base64 Content
+        run: |
+          csr_b64_generated=$(base64 csr.certSigningRequest)
+          echo "Generated CSR Base64: $csr_b64_generated"
 
       - name: Generate JWT
         id: generate_jwt
@@ -77,15 +84,23 @@ jobs:
           import base64
           import requests
           import os
-      
+          
           # Hard-coded CSR content (Base64-encoded)
-          csr_b64 = '''MIHaMIGCAgEAMCAxHjAcBgNVBAMMFXd3dy5leGFtcGxlLmNvbSwgQz1VUzBZMBMG
-          ByqGSM49AgEGCCqGSM49AwEHA0IABJDF9nQ3Kpmt7nTo0ajBhqFCy+oRB7DkxK1R
-          z3hyHGiLxCq1U1M5yyDOp+WdD+/th4ROedRf4/7b7YT4Qb6fDy2gADAKBggqhkjO
-          PQQDAgNHADBEAiBXUgXh/L/rmpYYKMDneykQPGzIyX6R5AQIHstj+NaKWwIgG6Mp
-          bsLjRiUp+x81PwVh3S3topSdCfPoZK68+zEJEdA='''
+          csr_b64 = '''MIICZTCCAU0CAQAwIDEeMBwGA1UEAwwVd3d3LmV4YW1wbGUuY29tLCBDPVVTMIIB
+          IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7kYoaMRTZ4UovLCg/7FR0I9a
+          1CDTyBY8Z6lrMevP1IB/mGEmFY0XHMTCn/CkR1sj7dHyTzXGkooCdp52KFHDZPyE
+          U3Z0eP9kQSWgUThDrHgtxTCa3mbEZgGTVR1kKkJuevMhpQS2kkpxxOcfHdTMvYRJ
+          AVrthCoxrGBzVcSK+KiagHnHUu9dQp26Ag3CNS9UfICCx0Bn0Xz6v19c6f81Aj6S
+          NVCCUUM7/yL7hqgPVPLsUny+ZKpKcW3lenxB6i96CFXjdb4qg85p21VzgwmOWd0m
+          jsxmDXyAHxCBndiqGadk4rpQz3Brb4dzQiW8l3fIAXr+YO0gP1aPawqwWbJKUwID
+          AQABoAAwDQYJKoZIhvcNAQELBQADggEBADhqpDAUslOnR/sBegE8xk+LK5H6+0Hm
+          i1lwaWMrSO0zL5CH/c63+ZJDzwLpyfT9J/7kCv4HHY4TIVZ8QDnkvmvbZz7Uflny
+          FCnIlivPXpyt5/DNGT8Q/TdQILwwGyeDHjjRrToyzSZMFdZDMxopKSuzJJ/xmYJl
+          1u96pVot1/LsqYRRaGBtPOnegzxWrz6oIqy3QS9rqEsivpU4Yd5Qa+3szYgOvGF4
+          Qua+iIN7YN8qf6CSrZqbA9hkijXTtv2Cyol9ZGZlPAGQHN4J9b8l4TnD0TMoAahV
+          MtCFlvDYw4vEyJuX+DW9GfFKzPC2c6mc6fIx2PXIuCuOFWZtm27/l8Q='''
       
-          print(f"CSR Base64: {csr_b64}")
+          print(f"CSR Base64 (Hardcoded): {csr_b64}")
       
           # API request to create the distribution certificate
           url = "https://api.appstoreconnect.apple.com/v1/certificates"

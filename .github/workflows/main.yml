@@ -167,6 +167,7 @@ jobs:
                   cert_file.write(cert_content)
               print("Distribution Certificate created successfully")
           else:
+              print(f"CSR Base64 (Dynaddsmic): {csr_b64}")
               print("Failed to create Distribution Certificate")
               print(response.status_code)
               print(response.json())

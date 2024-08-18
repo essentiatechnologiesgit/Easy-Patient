@@ -81,7 +81,7 @@ jobs:
           # Your JWT and API URL
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
           headers = {
-              'Authorization': f'Bearer ${{ secrets.JWT_TOKEN }}',
+              "Authorization": f"Bearer {os.getenv('token')}",
           }
           
           # Making the request

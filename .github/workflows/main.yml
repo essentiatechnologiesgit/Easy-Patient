@@ -155,11 +155,11 @@ jobs:
               cert_data = response.json()['data']
               cert_id = cert_data['id']
               cert_serial_number = cert_data['attributes']['serialNumber']
-              cert_created_date = cert_data['attributes']['createdDate']
+              # cert_created_date = cert_data['attributes']['createdDate']
           
               print(f"Certificate ID: {cert_id}")
               print(f"Serial Number: {cert_serial_number}")
-              print(f"Created Date: {cert_created_date}")
+              # print(f"Created Date: {cert_created_date}")
           
               # Save the certificate content to a file
               cert_content = cert_data['attributes']['certificateContent']

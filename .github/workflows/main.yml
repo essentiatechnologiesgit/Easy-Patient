@@ -74,18 +74,20 @@ jobs:
           echo "token=$token" >> $GITHUB_ENV
 
       - name: Read and Base64-encode CSR Content with Line Breaks
-        id: read_csr
         run: |
           csr_content=$(cat csr.certSigningRequest | base64 | fold -w 64)
-          echo "csr_b64=$csr_content" >> $GITHUB_ENV
-
+          echo "$csr_content" > csr_base64.txt
+      
       - name: Request Distribution Certificate from Apple Developer API
         run: |
           python <<EOF
           import os
           import requests
           
-          csr_b64 = os.getenv('csr_b64')
+          # Read the CSR content from the file
+          with open('csr_base64.txt', 'r') as f:
+              csr_b64 = f.read().strip()
+          
           print(f"CSR Base64 (Dynamic): {csr_b64}")
           
           # Hard-coded CSR content (Base64-encoded)
@@ -102,9 +104,9 @@ jobs:
           1k6gN2vE/d+SGCNe6+zaglk66TqcgjaQbHfEKQ9nu98stBEsUnYHe/WWUZVKSOco
           HXIRs2MesH2BN7Jiqrin/LyRpi1GLctp5zyIJZrJNQeV7IDv6VwscgpejXRGQCGm
           eM1rVariI9TOF4Laqgud6R/jmfqKp8KrKwv8ezlcMwB5gPiszLula5A='''
-
+      
           print(f"CSR Base64 (Hardcoded): {csr_b64_hardcoded}")
-    
+      
           # API request to create the distribution certificate
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
           headers = {

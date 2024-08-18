@@ -114,29 +114,29 @@ jobs:
       #         print(response.text)
       #   shell: python
 
-      # - name: Make API request and print full response
-      #   run: |
-      #     import requests
-      #     import json
-      #     import os
+      - name: Make API request and print full response
+        run: |
+          import requests
+          import json
+          import os
           
-      #     # Your JWT and API URL
-      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #     }
+          # Your JWT and API URL
+          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+          }
           
-      #     # Making the request
-      #     response = requests.get(url, headers=headers)
+          # Making the request
+          response = requests.get(url, headers=headers)
           
-      #     # Print the complete response content
-      #     try:
-      #         response_data = response.json()
-      #         print(json.dumps(response_data, indent=4))
-      #     except json.JSONDecodeError:
-      #         print("Failed to decode JSON response.")
-      #         print(response.text)
-      #   shell: python
+          # Print the complete response content
+          try:
+              response_data = response.json()
+              print(json.dumps(response_data, indent=4))
+          except json.JSONDecodeError:
+              print("Failed to decode JSON response.")
+              print(response.text)
+        shell: python
 
 
       # - name: Read and Base64-encode CSR Content with Line Breaks

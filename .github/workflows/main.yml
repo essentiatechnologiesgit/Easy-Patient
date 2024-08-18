@@ -124,8 +124,8 @@ jobs:
           import requests
           
           # Read the CSR content from the file
-          with open('csr_base64.txt', 'r') as f:
-              csr_b64 = f.read().strip()
+          # with open('csr_base64.txt', 'r') as f:
+          #     csr_b64 = f.read().strip()
           
           print(f"CSR Base64 (Dynamic): {CSR_CONTENT}")
           

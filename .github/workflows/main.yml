@@ -5,8 +5,8 @@ on:
     branches:
       - development
 
-env:
-  APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPECIFIC_PASSWORD }}'
+# env:
+  # APP_SPECIFIC_PASSWORD: '${{ secrets.APP_SPECIFIC_PASSWORD }}'
 
 jobs:
   build:

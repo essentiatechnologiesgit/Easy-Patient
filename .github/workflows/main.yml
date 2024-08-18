@@ -73,42 +73,28 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Check Pending Certificate Requests
-        id: check_requests
+      - name: Make API request and print full response
         run: |
-          python <<EOF
-          import os
           import requests
+          import json
           
-          # API request to list certificates
+          # Your JWT and API URL
           url = "https://api.appstoreconnect.apple.com/v1/certificates"
           headers = {
-              "Authorization": f"Bearer {os.getenv('token')}",
-              "Content-Type": "application/json"
+              'Authorization': f'Bearer ${{ secrets.JWT_TOKEN }}',
           }
           
+          # Making the request
           response = requests.get(url, headers=headers)
           
-          if response.status_code == 200:
-              certificates = response.json().get('data', [])
-              pending_requests = [cert for cert in certificates if cert['attributes']['status'] == 'PENDING']
-              
-              if pending_requests:
-                  print("Pending Certificate Requests found:")
-                  for request in pending_requests:
-                      print(f"Request ID: {request['id']}")
-                      print(f"Certificate Type: {request['attributes']['certificateType']}")
-                      print(f"Status: {request['attributes']['status']}")
-                      print("-----")
-              else:
-                  print("No pending certificate requests found.")
-          
-          else:
-              print("Failed to retrieve certificate requests")
-              print(response.status_code)
-              print(response.json())
-              exit(1)
-          EOF
+          # Print the complete response content
+          try:
+              response_data = response.json()
+              print(json.dumps(response_data, indent=4))
+          except json.JSONDecodeError:
+              print("Failed to decode JSON response.")
+              print(response.text)
+        shell: python
 
 
       # - name: Read and Base64-encode CSR Content with Line Breaks

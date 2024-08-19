@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.12.1'  # Adjust version if needed
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -75,21 +76,21 @@ jobs:
       #          -H "Content-Type: application/json" \
       #          "https://api.appstoreconnect.apple.com/v1/teams"
 
-
       - name: Install Ruby and Cocoapods
         run: |
           gem install cocoapods
 
-      - name: Install Node.js dependencies
-        run: npm install --force
+      - name: Update Podfile Deployment Target
+        run: |
+          sed -i '' 's/platform :ios, \'[0-9.]*\'/platform :ios, \'12.0\'/' ios/Podfile
 
       - name: Install Pods
         run: |
           cd ios
           pod install
-      
+
+      - name: Install Node.js dependencies
+        run: npm install --force
+
       - name: Build Archive
         run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"
-
-
-

@@ -83,9 +83,9 @@ jobs:
 
       - name: Install Pods
         run: |
-        cd ios
-        rm -rf Pods Podfile.lock
-        pod install
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install
 
       - name: Install Node.js dependencies
         run: npm install --force

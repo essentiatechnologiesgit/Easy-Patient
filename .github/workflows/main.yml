@@ -87,32 +87,32 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
           
-      - name: Revoke the hardcoded certificate
-        run: |
-          import requests
-          import os
+      # - name: Revoke the hardcoded certificate
+      #   run: |
+      #     import requests
+      #     import os
 
-          # Hardcoded JWT and Certificate ID
+      #     # Hardcoded JWT and Certificate ID
        
-          certificate_id = "UT9Z2C6H6H"
+      #     certificate_id = "UT9Z2C6H6H"
 
-          # API URL
-          url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
-          headers = {
-              "Authorization": f"Bearer {os.getenv('token')}",
-          }
+      #     # API URL
+      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #     }
           
-          # Making the DELETE request to revoke the certificate
-          response = requests.delete(url, headers=headers)
+      #     # Making the DELETE request to revoke the certificate
+      #     response = requests.delete(url, headers=headers)
           
-          # Print the status and response content
-          print(f"Status Code: {response.status_code}")
-          if response.status_code == 204:
-              print("Certificate revoked successfully.")
-          else:
-              print("Failed to revoke certificate.")
-              print(response.text)
-        shell: python
+      #     # Print the status and response content
+      #     print(f"Status Code: {response.status_code}")
+      #     if response.status_code == 204:
+      #         print("Certificate revoked successfully.")
+      #     else:
+      #         print("Failed to revoke certificate.")
+      #         print(response.text)
+      #   shell: python
 
       # - name: Make API request and print full response
       #   run: |
@@ -138,78 +138,78 @@ jobs:
       #         print(response.text)
       #   shell: python
 
-      # - name: Request and Save Distribution Certificate
-      #   run: |
-      #     python <<EOF
-      #     import os
-      #     import requests
+      - name: Request and Save Distribution Certificate
+        run: |
+          python <<EOF
+          import os
+          import requests
           
-      #     csr_content = os.getenv('CSR_CONTENT')
+          csr_content = os.getenv('CSR_CONTENT')
           
-      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #         "Content-Type": "application/json"
-      #     }
-      #     data = {
-      #         "data": {
-      #             "type": "certificates",
-      #             "attributes": {
-      #                 "certificateType": "IOS_DISTRIBUTION",
-      #                 "csrContent": csr_content
-      #             }
-      #         }
-      #     }
+          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+              "Content-Type": "application/json"
+          }
+          data = {
+              "data": {
+                  "type": "certificates",
+                  "attributes": {
+                      "certificateType": "IOS_DISTRIBUTION",
+                      "csrContent": csr_content
+                  }
+              }
+          }
           
-      #     response = requests.post(url, json=data, headers=headers)
+          response = requests.post(url, json=data, headers=headers)
           
-            # if response.status_code == 201:
-            #     cert_data = response.json()['data']
-            #     cert_id = cert_data['id']
-            #     cert_serial_number = cert_data['attributes']['serialNumber']
+            if response.status_code == 201:
+                cert_data = response.json()['data']
+                cert_id = cert_data['id']
+                cert_serial_number = cert_data['attributes']['serialNumber']
                 
-            #     print(f"Certificate ID: {cert_id}")
-            #     print(f"Serial Number: {cert_serial_number}")
+                print(f"Certificate ID: {cert_id}")
+                print(f"Serial Number: {cert_serial_number}")
                 
-            #     # Save the certificate content to a file
-            #     cert_content = cert_data['attributes']['certificateContent']
-            #     with open('distribution.cer', 'w') as cert_file:
-            #         cert_file.write("-----BEGIN CERTIFICATE-----\n")
-            #         cert_file.write(cert_content + "\n")
-            #         cert_file.write("-----END CERTIFICATE-----\n")
-            #     print("Distribution Certificate created successfully")
-      #     else:
-      #         print("Failed to create Distribution Certificate")
-      #         print(response.status_code)
-      #         print(response.json())
-      #         exit(1)
-      #     EOF
+                # Save the certificate content to a file
+                cert_content = cert_data['attributes']['certificateContent']
+                with open('distribution.cer', 'w') as cert_file:
+                    cert_file.write("-----BEGIN CERTIFICATE-----\n")
+                    cert_file.write(cert_content + "\n")
+                    cert_file.write("-----END CERTIFICATE-----\n")
+                print("Distribution Certificate created successfully")
+          else:
+              print("Failed to create Distribution Certificate")
+              print(response.status_code)
+              print(response.json())
+              exit(1)
+          EOF
     
-      # - name: Debug - Print Certificate Content
-      #   run: cat distribution.cer
+      - name: Debug - Print Certificate Content
+        run: cat distribution.cer
       
-      # - name: Convert Certificate to .p12 format
-      #   run: |
-      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-      #     KEY_ID="74H4QHFPVP"
-      #     private_key="-----BEGIN PRIVATE KEY-----
-      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-      #     +EG+nw8t
-      #     -----END PRIVATE KEY-----"
+      - name: Convert Certificate to .p12 format
+        run: |
+          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+          KEY_ID="74H4QHFPVP"
+          private_key="-----BEGIN PRIVATE KEY-----
+          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+          +EG+nw8t
+          -----END PRIVATE KEY-----"
           
-      #     CERT_P12_PASSWORD="private_pass"
+          CERT_P12_PASSWORD="private_pass"
       
-      #     echo "$private_key" > private_key.pem
+          echo "$private_key" > private_key.pem
       
-      #     openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
+          openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
      
-      # - name: Upload .p12 file as GitHub Actions artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: distribution-certificate
-      #     path: distribution.p12
+      - name: Upload .p12 file as GitHub Actions artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: distribution-certificate
+          path: distribution.p12
       
       # - name: Import certificate to keychain
       #   run: |

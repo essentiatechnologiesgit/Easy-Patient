@@ -23,11 +23,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.x'  # Specify the Ruby version you need
-
       - name: Install CocoaPods
         run: gem install cocoapods
 

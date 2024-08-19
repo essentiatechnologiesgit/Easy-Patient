@@ -22,9 +22,22 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
-      
-      - name: Install Ruby and Cocoapods
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.x'  # Specify the Ruby version you need
+
+      - name: Install CocoaPods
         run: gem install cocoapods
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - name: Install Node.js dependencies
         run: npm install --force
@@ -35,40 +48,10 @@ jobs:
           rm -rf Pods Podfile.lock
           pod install
 
-      # - name: Install Provisioning Profile
-      #   run: |
-      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-      #     echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o ~/Library/MobileDevice/Provisioning\ Profiles/YourProfile.mobileprovision
-
-      # - name: Disable Automatic Signing
-      #   run: |
-      #     cd ios
-      #     xcodebuild -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release -sdk iphoneos PROVISIONING_PROFILE_SPECIFIER="" CODE_SIGN_STYLE="Manual"
-
-      # - name: Build Archive with Manual Signing
-      #   run: |
-      #     xcodebuild clean archive \
-      #     -workspace ios/EasyPatientDynamic.xcworkspace \
-      #     -scheme EasyPatientDynamic \
-      #     -sdk iphoneos \
-      #     -configuration Release \
-      #     -derivedDataPath ios/build/DerivedData \
-      #     -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #     PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" \
-      #     CODE_SIGN_IDENTITY="Apple Distribution"
-
-      # Optionally re-enable automatic signing after the build
-
-
-      - name: Build Archive with Automated Signing
+      - name: Install Xcode 15.3
         run: |
-          xcodebuild clean archive \
-          -workspace ios/EasyPatientDynamic.xcworkspace \
-          -scheme EasyPatientDynamic \
-          -sdk iphoneos \
-          -configuration Release \
-          -derivedDataPath ios/build/DerivedData \
-          -archivePath ios/build/archive/TestingArchive.xcarchive \
-          CODE_SIGN_STYLE="Automatic" \
-          DEVELOPMENT_TEAM="XGK8AJH7WW" \
-          CODE_SIGN_IDENTITY="Apple Distribution"
+          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Build Archive
+        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"

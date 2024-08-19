@@ -58,7 +58,17 @@ jobs:
       #     CODE_SIGN_IDENTITY="Apple Distribution"
 
       # Optionally re-enable automatic signing after the build
-      - name: Enable Automatic Signing
+
+
+      - name: Build Archive with Automated Signing
         run: |
-          cd ios
-          xcodebuild -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release -sdk iphoneos CODE_SIGN_STYLE="Automatic"
+          xcodebuild clean archive \
+          -workspace ios/EasyPatientDynamic.xcworkspace \
+          -scheme EasyPatientDynamic \
+          -sdk iphoneos \
+          -configuration Release \
+          -derivedDataPath ios/build/DerivedData \
+          -archivePath ios/build/archive/TestingArchive.xcarchive \
+          CODE_SIGN_STYLE="Automatic" \
+          DEVELOPMENT_TEAM="XGK8AJH7WW" \
+          CODE_SIGN_IDENTITY="Apple Distribution"

@@ -23,30 +23,95 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install CocoaPods
-        run: gem install cocoapods
-
-      - name: Cache CocoaPods
-        uses: actions/cache@v3
+      - name: Set up Ruby       
+        uses: ruby/setup-ruby@v1
         with:
-          path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+          ruby-version: 3.3
 
-      - name: Install Node.js dependencies
-        run: npm install --force
-
-      - name: Install Pods
+      - name: Install dependencies
         run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install
+          gem install jwt
+          pip install requests
 
-      - name: Install Xcode 15.3
+
+      - name: Generate JWT
+        id: generate_jwt
         run: |
-          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-          xcodebuild -version
+          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+          KEY_ID="74H4QHFPVP"
+          private_key="
+          -----BEGIN PRIVATE KEY-----
+          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+          +EG+nw8t
+          -----END PRIVATE KEY-----
+          "
 
-      - name: Build Archive
-        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"
+          token=$(ruby -rjwt -ropenssl -e "
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            token = JWT.encode(
+              {
+                iss: '$ISSUER_ID',
+                exp: Time.now.to_i + 20 * 60,
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              header_fields = {
+                kid: '$KEY_ID'
+              }
+            )
+            puts token
+          ")
+          
+          echo "token=$token" >> $GITHUB_ENV
+
+      - name: Retrieve and Display All Bundle IDs
+        run: |
+          echo "Retrieving all bundle IDs..."
+      
+          # Perform the API request to get the list of bundle IDs
+          response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json")
+      
+          echo "Response: $response"
+      
+          # Extract and display the bundle IDs using jq (if jq is available)
+          if command -v jq >/dev/null 2>&1; then
+            bundle_ids=$(echo "$response" | jq -r '.data[].id')
+            echo "Extracted Bundle IDs:"
+            echo "$bundle_ids"
+          else
+            echo "jq not found, displaying raw JSON response"
+          fi
+
+
+      # - name: Install CocoaPods
+      #   run: gem install cocoapods
+
+      # - name: Cache CocoaPods
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ios/Pods
+      #     key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pods-
+
+      # - name: Install Node.js dependencies
+      #   run: npm install --force
+
+      # - name: Install Pods
+      #   run: |
+      #     cd ios
+      #     rm -rf Pods Podfile.lock
+      #     pod install
+
+      # - name: Install Xcode 15.3
+      #   run: |
+      #     sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+      #     xcodebuild -version
+
+      # - name: Build Archive
+      #   run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"

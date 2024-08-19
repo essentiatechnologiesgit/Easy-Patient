@@ -139,74 +139,74 @@ jobs:
       #   shell: python
 
       
-      # - name: Request Distribution Certificate from Apple Developer API
-      #   run: |
-      #     python <<EOF
-      #     import os
-      #     import requests
+      - name: Request Distribution Certificate from Apple Developer API
+        run: |
+          python <<EOF
+          import os
+          import requests
       
-      #     # Get the CSR content from the environment variable
-      #     csr_content = os.getenv('CSR_CONTENT')
+          # Get the CSR content from the environment variable
+          csr_content = os.getenv('CSR_CONTENT')
       
-      #     # Print CSR content for debugging
-      #     print(f"CSR Content (Dynamic): {csr_content}")
+          # Print CSR content for debugging
+          print(f"CSR Content (Dynamic): {csr_content}")
       
-      #     # API request to create the distribution certificate
-      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #         "Content-Type": "application/json"
-      #     }
-      #     data = {
-      #         "data": {
-      #             "type": "certificates",
-      #             "attributes": {
-      #                 "certificateType": "IOS_DISTRIBUTION",
-      #                 "csrContent": csr_content
-      #             }
-      #         }
-      #     }
-      #     print(f"Request Data: {data}")
+          # API request to create the distribution certificate
+          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+              "Content-Type": "application/json"
+          }
+          data = {
+              "data": {
+                  "type": "certificates",
+                  "attributes": {
+                      "certificateType": "IOS_DISTRIBUTION",
+                      "csrContent": csr_content
+                  }
+              }
+          }
+          print(f"Request Data: {data}")
       
-      #     response = requests.post(url, json=data, headers=headers)
+          response = requests.post(url, json=data, headers=headers)
       
-      #     if response.status_code == 201:
-      #         cert_data = response.json()['data']
-      #         cert_id = cert_data['id']
-      #         cert_serial_number = cert_data['attributes']['serialNumber']
+          if response.status_code == 201:
+              cert_data = response.json()['data']
+              cert_id = cert_data['id']
+              cert_serial_number = cert_data['attributes']['serialNumber']
               
-      #         print(f"Certificate ID: {cert_id}")
-      #         print(f"Serial Number: {cert_serial_number}")
+              print(f"Certificate ID: {cert_id}")
+              print(f"Serial Number: {cert_serial_number}")
               
-      #         # Save the certificate content to a file
-      #         cert_content = cert_data['attributes']['certificateContent']
-      #         with open('distribution.cer', 'w') as cert_file:
-      #             cert_file.write(cert_content)
-      #         print("Distribution Certificate created successfully")
+              # Save the certificate content to a file
+              cert_content = cert_data['attributes']['certificateContent']
+              with open('distribution.cer', 'w') as cert_file:
+                  cert_file.write(cert_content)
+              print("Distribution Certificate created successfully")
       
-      #         # Export the Certificate ID to an environment variable
-      #         with open(os.environ['GITHUB_ENV'], 'a') as env_file:
-      #             env_file.write(f"CERTIFICATE_ID={cert_id}\n")
-      #     else:
-      #         print("Failed to create Distribution Certificate")
-      #         print(response.status_code)
-      #         print(response.json())
-      #         exit(1)
-      #     EOF
+              # Export the Certificate ID to an environment variable
+              with open(os.environ['GITHUB_ENV'], 'a') as env_file:
+                  env_file.write(f"CERTIFICATE_ID={cert_id}\n")
+          else:
+              print("Failed to create Distribution Certificate")
+              print(response.status_code)
+              print(response.json())
+              exit(1)
+          EOF
       
-      # - name: Convert Certificate to .p12 format
-      #   run: |
-      #     openssl pkcs12 -export -inkey path/to/private/key -in distribution.cer -out distribution.p12 -password pass:${{ secrets.CERT_P12_PASSWORD }}
+      - name: Convert Certificate to .p12 format
+        run: |
+          openssl pkcs12 -export -inkey path/to/private/key -in distribution.cer -out distribution.p12 -password pass:${{ secrets.CERT_P12_PASSWORD }}
       
-      # - name: Upload .p12 file as GitHub Actions artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: distribution-certificate
-      #     path: distribution.p12
+      - name: Upload .p12 file as GitHub Actions artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: distribution-certificate
+          path: distribution.p12
       
-      # - name: Import certificate to keychain
-      #   run: |
-      #     security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
-      #     security import distribution.p12 -k ~/Library/Keychains/build.keychain -P "${{ secrets.CERT_P12_PASSWORD }}" -T /usr/bin/codesign
-      #     security list-keychains -s ~/Library/Keychains/build.keychain
-      #     security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/build.keychain
+      - name: Import certificate to keychain
+        run: |
+          security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+          security import distribution.p12 -k ~/Library/Keychains/build.keychain -P "${{ secrets.CERT_P12_PASSWORD }}" -T /usr/bin/codesign
+          security list-keychains -s ~/Library/Keychains/build.keychain
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/build.keychain

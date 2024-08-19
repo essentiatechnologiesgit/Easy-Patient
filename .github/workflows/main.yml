@@ -214,7 +214,7 @@ jobs:
           
           PROFILE_NAME="MyApp Distribution Profile"  
           # BUNDLE_ID="${{ env.bundle_id }}"  
-          BUNDLE_ID="com.org.easyPatientTesting3"
+          BUNDLE_ID="6636531546"
           # CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
            CERTIFICATE_ID="5QW8CZ7GNM"
           

@@ -73,7 +73,7 @@ jobs:
           # Make API request to list teams
           curl -H "Authorization: Bearer $JWT_TOKEN" \
                -H "Content-Type: application/json" \
-               "https://api.appstoreconnect.apple.com/v1/users" | jq '.'
+               "https://api.appstoreconnect.apple.com/v1/teams"
 
 
       # - name: Install Ruby and Cocoapods

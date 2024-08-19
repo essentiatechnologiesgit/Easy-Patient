@@ -3,7 +3,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - prod
+      - development
 
 jobs:
   build:
@@ -83,6 +83,14 @@ jobs:
           ")
           
           echo "token=$token" >> $GITHUB_ENV
+
+      - name: List Teams
+        run: |
+          JWT_TOKEN=${{ env.token }}
+          
+          curl -H "Authorization: Bearer $JWT_TOKEN" \
+               -H "Content-Type: application/json" \
+               "https://api.appstoreconnect.apple.com/v1/teams"
 
       # - name: Revoke the hardcoded certificate
       #   run: |
@@ -273,48 +281,48 @@ jobs:
       #     echo "Extracted Profile ID: $profile_id"
       #     echo "profile_id=$profile_id" >> $GITHUB_ENV
 
-      - name: Update App Metadata
-        run: |
-          python <<EOF
-          import os
-          import requests
+      # - name: Update App Metadata
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
           
-          app_id = "36FLSCQT6V"  # The ID of the app you want to update
-          token = os.getenv('token')  # Your JWT token for authorization
+      #     app_id = "36FLSCQT6V"  # The ID of the app you want to update
+      #     token = os.getenv('token')  # Your JWT token for authorization
       
-          # Define the metadata you want to update
-          metadata = {
-              "data": {
-                  "type": "apps",
-                  "id": app_id,
-                  "attributes": {
-                      "name": "Health App",
-                      "subtitle": "New Subtitle",
-                      "description": "Updated app description.",
-                      "keywords": "keyword1, keyword2",
-                      "supportUrl": "https://support.example.com",
-                      "marketingUrl": "https://marketing.example.com",
-                      "privacyPolicyUrl": "https://privacy.example.com",
-                      "primaryCategory": "6021",  # Example category ID for "Business"
-                      "secondaryCategory": "6011",  # Example category ID for "Productivity"
-                      "ageRating": "12+"  
-                  }
-              }
-          }
+      #     # Define the metadata you want to update
+      #     metadata = {
+      #         "data": {
+      #             "type": "apps",
+      #             "id": app_id,
+      #             "attributes": {
+      #                 "name": "Health App",
+      #                 "subtitle": "New Subtitle",
+      #                 "description": "Updated app description.",
+      #                 "keywords": "keyword1, keyword2",
+      #                 "supportUrl": "https://support.example.com",
+      #                 "marketingUrl": "https://marketing.example.com",
+      #                 "privacyPolicyUrl": "https://privacy.example.com",
+      #                 "primaryCategory": "6021",  # Example category ID for "Business"
+      #                 "secondaryCategory": "6011",  # Example category ID for "Productivity"
+      #                 "ageRating": "12+"  
+      #             }
+      #         }
+      #     }
       
-          url = f"https://api.appstoreconnect.apple.com/v1/apps/{app_id}"
-          headers = {
-              "Authorization": f"Bearer {token}",
-              "Content-Type": "application/json"
-          }
+      #     url = f"https://api.appstoreconnect.apple.com/v1/apps/{app_id}"
+      #     headers = {
+      #         "Authorization": f"Bearer {token}",
+      #         "Content-Type": "application/json"
+      #     }
       
-          response = requests.patch(url, json=metadata, headers=headers)
+      #     response = requests.patch(url, json=metadata, headers=headers)
       
-          if response.status_code == 200:
-              print("App metadata updated successfully")
-          else:
-              print("Failed to update app metadata")
-              print(response.status_code)
-              print(response.json())
-              exit(1)
-          EOF
+      #     if response.status_code == 200:
+      #         print("App metadata updated successfully")
+      #     else:
+      #         print("Failed to update app metadata")
+      #         print(response.status_code)
+      #         print(response.json())
+      #         exit(1)
+      #     EOF

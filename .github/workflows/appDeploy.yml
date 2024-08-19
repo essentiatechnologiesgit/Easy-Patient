@@ -80,11 +80,6 @@ jobs:
         run: |
           gem install cocoapods
 
-      - name: Update Podfile Deployment Target
-        run: |
-          sed -i '' 's/platform :ios, \([0-9.]*\)/platform :ios, 12.0/' ios/Podfile
-
-
 
       - name: Install Pods
         run: |

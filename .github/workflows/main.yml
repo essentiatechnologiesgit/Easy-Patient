@@ -281,7 +281,7 @@ jobs:
           
           app_id = "36FLSCQT6V"  # The ID of the app you want to update
           token = os.getenv('token')  # Your JWT token for authorization
-
+      
           # Define the metadata you want to update
           metadata = {
               "data": {
@@ -297,19 +297,19 @@ jobs:
                       "privacyPolicyUrl": "https://privacy.example.com",
                       "primaryCategory": "6021",  # Example category ID for "Business"
                       "secondaryCategory": "6011",  # Example category ID for "Productivity"
-                      "ageRating": "12+",  
-                  },
+                      "ageRating": "12+"  
+                  }
               }
           }
-
+      
           url = f"https://api.appstoreconnect.apple.com/v1/apps/{app_id}"
           headers = {
-              "Authorization": f"Bearer  ${{ env.token }}"",
+              "Authorization": f"Bearer {token}",
               "Content-Type": "application/json"
           }
-
+      
           response = requests.patch(url, json=metadata, headers=headers)
-
+      
           if response.status_code == 200:
               print("App metadata updated successfully")
           else:

@@ -22,74 +22,74 @@ jobs:
         with:
           python-version: '3.x'
       
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3
+      # - name: Set up Ruby
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: 3.3
 
-      - name: Install dependencies
-        run: |
-          gem install jwt
-          pip install requests
+      # - name: Install dependencies
+      #   run: |
+      #     gem install jwt
+      #     pip install requests
 
-      - name: Generate JWT
-        id: generate_jwt
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
+      # - name: Generate JWT
+      #   id: generate_jwt
+      #   run: |
+      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+      #     KEY_ID="74H4QHFPVP"
+      #     private_key="
+      #     -----BEGIN PRIVATE KEY-----
+      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+      #     +EG+nw8t
+      #     -----END PRIVATE KEY-----
+      #     "
 
-          token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
+      #     token=$(ruby -rjwt -ropenssl -e "
+      #       private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+      #       token = JWT.encode(
+      #         {
+      #           iss: '$ISSUER_ID',
+      #           exp: Time.now.to_i + 20 * 60,
+      #           aud: 'appstoreconnect-v1'
+      #         },
+      #         private_key_obj,
+      #         'ES256',
+      #         header_fields = {
+      #           kid: '$KEY_ID'
+      #         }
+      #       )
+      #       puts token
+      #     ")
           
-          echo "token=$token" >> $GITHUB_ENV
+      #     echo "token=$token" >> $GITHUB_ENV
 
-      - name: List Teams
+      # - name: List Teams
+      #   run: |
+      #     # Fetch token from environment
+      #     JWT_TOKEN=${{ env.token }}
+      
+      #     # Make API request to list teams
+      #     curl -H "Authorization: Bearer $JWT_TOKEN" \
+      #          -H "Content-Type: application/json" \
+      #          "https://api.appstoreconnect.apple.com/v1/teams"
+
+
+      - name: Install Ruby and Cocoapods
         run: |
-          # Fetch token from environment
-          JWT_TOKEN=${{ env.token }}
+          gem install cocoapods
+
+      - name: Install Node.js dependencies
+        run: npm install --force
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
       
-          # Make API request to list teams
-          curl -H "Authorization: Bearer $JWT_TOKEN" \
-               -H "Content-Type: application/json" \
-               "https://api.appstoreconnect.apple.com/v1/teams"
-
-
-      # - name: Install Ruby and Cocoapods
-      #   run: |
-      #     gem install cocoapods
-
-      # - name: Install Node.js dependencies
-      #   run: npm install --force
-
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod install
-      
-      # - name: Build Archive
-      #   run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"
+      - name: Build Archive
+        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"
 
 
 

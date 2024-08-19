@@ -28,28 +28,28 @@ jobs:
           gem install jwt
           pip install requests
 
-      - name: Generate RSA Private Key and CSR
-        run: |
-          openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
-          openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=www.example.com, C=US"
+      # - name: Generate RSA Private Key and CSR
+      #   run: |
+      #     openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
+      #     openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=www.example.com, C=US"
 
-      - name: Display Generated CSR Contents
-        run: |
-          cat csr.certSigningRequest
+      # - name: Display Generated CSR Contents
+      #   run: |
+      #     cat csr.certSigningRequest
 
-      - name: Display CSR Contents
-        id: display_csr
-        run: |
-          csr_content=$(cat csr.certSigningRequest)
-          echo "CSR Content: $csr_content"
-          echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
-          echo "$csr_content" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+      # - name: Display CSR Contents
+      #   id: display_csr
+      #   run: |
+      #     csr_content=$(cat csr.certSigningRequest)
+      #     echo "CSR Content: $csr_content"
+      #     echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
+      #     echo "$csr_content" >> $GITHUB_ENV
+      #     echo "EOF" >> $GITHUB_ENV
 
-      - name: Use CSR Content
-        run: |
-          echo "CSR Content saved in env variable:"
-          echo "$CSR_CONTENT"
+      # - name: Use CSR Content
+      #   run: |
+      #     echo "CSR Content saved in env variable:"
+      #     echo "$CSR_CONTENT"
 
       - name: Generate JWT
         id: generate_jwt
@@ -85,32 +85,32 @@ jobs:
           echo "token=$token" >> $GITHUB_ENV
 
 
-      # - name: Revoke the hardcoded certificate
-      #   run: |
-      #     import requests
-      #     import os
+      - name: Revoke the hardcoded certificate
+        run: |
+          import requests
+          import os
 
-      #     # Hardcoded JWT and Certificate ID
+          # Hardcoded JWT and Certificate ID
        
-      #     certificate_id = "J2N5N2XQ42"
+          certificate_id = "J2N5N2XQ42"
 
-      #     # API URL
-      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #     }
+          # API URL
+          url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+          }
           
-      #     # Making the DELETE request to revoke the certificate
-      #     response = requests.delete(url, headers=headers)
+          # Making the DELETE request to revoke the certificate
+          response = requests.delete(url, headers=headers)
           
-      #     # Print the status and response content
-      #     print(f"Status Code: {response.status_code}")
-      #     if response.status_code == 204:
-      #         print("Certificate revoked successfully.")
-      #     else:
-      #         print("Failed to revoke certificate.")
-      #         print(response.text)
-      #   shell: python
+          # Print the status and response content
+          print(f"Status Code: {response.status_code}")
+          if response.status_code == 204:
+              print("Certificate revoked successfully.")
+          else:
+              print("Failed to revoke certificate.")
+              print(response.text)
+        shell: python
 
       # - name: Request and Save Distribution Certificate
       #   run: |

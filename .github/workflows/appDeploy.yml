@@ -18,22 +18,17 @@ jobs:
         with:
           node-version: '20.12.1'  # Adjust version if needed
 
-      # - name: Install Ruby and Cocoapods
-      #   run: |
-      #     gem install cocoapods
+      - name: Install Ruby and Cocoapods
+        run: |
+          gem install cocoapods
 
-      # - name: Install Node.js dependencies
-      #   run: npm install --force
+      - name: Install Node.js dependencies
+        run: npm install --force
 
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod install
-      # #     cd ..
-      # - name: Get Scheme
-      #   run: xcodebuild -workspace ios/EasyPatientDynamic.xcworkspace -list
-
-
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
+      
       - name: Build Archive
-        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive
-
+        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="f0e5619e-928e-482b-8ade-826100407dd5" CODE_SIGN_IDENTITY="Apple Distribution"

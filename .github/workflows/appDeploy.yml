@@ -29,11 +29,11 @@ jobs:
       #   run: |
       #     cd ios
       #     pod install
-      #     cd ..
-      - name: Get Scheme
-        run: xcodebuild -workspace ios/EasyPatientDynamic.xcworkspace -list
+      # #     cd ..
+      # - name: Get Scheme
+      #   run: xcodebuild -workspace ios/EasyPatientDynamic.xcworkspace -list
 
 
-      # - name: Build Archive
-      #   run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme CommunionStaging -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive
+      - name: Build Archive
+        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive
 

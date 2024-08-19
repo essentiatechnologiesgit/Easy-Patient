@@ -1,39 +1,4 @@
-# name: CI/CD for STAGE
-
-# on:
-#   push:
-#     branches:
-#       - development
-
-# jobs:
-#   build:
-#     runs-on: macos-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: '20.12.1'  # Adjust version if needed
-
-#       - name: Install Ruby and Cocoapods
-#         run: |
-#           gem install cocoapods
-
-#       - name: Install Node.js dependencies
-#         run: npm install --force
-
-#       - name: Install Pods
-#         run: |
-#           cd ios
-#           pod install
-      
-#       - name: Build Archive
-#         run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="f0e5619e-928e-482b-8ade-826100407dd5" CODE_SIGN_IDENTITY="Apple Distribution"
-
-name: Check Provisioning Profile
+name: CI/CD for STAGE
 
 on:
   push:
@@ -41,69 +6,32 @@ on:
       - development
 
 jobs:
-  check-profile:
+  build:
     runs-on: macos-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          python-version: '3.x'
+          node-version: '20.12.1'  # Adjust version if needed
+
+      - name: Install Ruby and Cocoapods
+        run: |
+          gem install cocoapods
+
+      - name: Install Node.js dependencies
+        run: npm install --force
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod install
       
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3
+      - name: Build Archive
+        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"
 
-      - name: Install dependencies
-        run: |
-          gem install jwt
-          pip install requests
-
-      - name: Generate JWT
-        id: generate_jwt
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
-
-          token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
-          
-          echo "token=$token" >> $GITHUB_ENV
-
-      - name: Check Provisioning Profile
-        run: |
-          # Replace this with your provisioning profile ID
-          PROFILE_ID="J2N5N2XQ42"
-
-          # Make the API request to get the provisioning profile details
-          curl -X GET "https://api.appstoreconnect.apple.com/v1/profiles/${PROFILE_ID}" \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json"
 
 

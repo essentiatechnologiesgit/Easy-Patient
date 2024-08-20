@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 4"
+          PROFILE_NAME="MyApp Distribution Profile 5"
           BUNDLE_ID="7Y7S27X27N"
           # CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"
           CERTIFICATE_ID="SBN7N5SU5Q"
@@ -109,11 +109,11 @@ jobs:
       
           echo "Profile Response: $response"
           
-          # Assuming you get a URL to download the provisioning profile
-          profile_url=$(echo "$response" | jq -r '.data.attributes.downloadUrl')
+          # Extract the Base64 encoded profile content
+          profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
           
-          # Download the provisioning profile
-          curl -o ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_3.mobileprovision "$profile_url"
+          # Decode the Base64 content and save it as a .mobileprovision file
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_3.mobileprovision
 
       - name: Install CocoaPods
         run: gem install cocoapods
@@ -149,5 +149,5 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 4" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 5" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"

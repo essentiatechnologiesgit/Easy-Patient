@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 5"
+          PROFILE_NAME="MyApp Distribution Profile 6"
           BUNDLE_ID="7Y7S27X27N"
           # CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"
           CERTIFICATE_ID="SBN7N5SU5Q"
@@ -152,5 +152,5 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 5" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 6" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"

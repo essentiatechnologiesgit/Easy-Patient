@@ -122,7 +122,7 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="BQ7X96D4S7" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 3" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
 
         # xcodebuild archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -archivePath Archive/EasyPatientDynamic.xcarchive

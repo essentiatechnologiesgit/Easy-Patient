@@ -37,6 +37,7 @@ jobs:
         run: |
           cat csr.certSigningRequest
 
+          
       - name: Display CSR Contents
         id: display_csr
         run: |

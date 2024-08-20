@@ -3,7 +3,7 @@ name: CI/CD for STAGE
 on:
   push:
     branches:
-      - development
+      - prod
 
 jobs:
   build:

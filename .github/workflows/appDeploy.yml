@@ -114,7 +114,7 @@ jobs:
           xcodebuild -version
 
       - name: Build Archive
-        run:    xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="BQ7X96D4S7" CODE_SIGN_IDENTITY="KLQ SOLUCOES TECNOLOGICAS LTDA"
+        run:    xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="BQ7X96D4S7" CODE_SIGN_IDENTITY="DISTRIBUTION: KLQ SOLUCOES TECNOLOGICAS LTDA"
   
         # xcodebuild archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -archivePath Archive/EasyPatientDynamic.xcarchive
             

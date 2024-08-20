@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - development
-
 jobs:
   build:
     runs-on: macos-latest
@@ -16,14 +15,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.12.1'  # Adjust version if needed
+          node-version: '20.12.1'
 
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
 
-      - name: Set up Ruby       
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3
@@ -33,21 +32,13 @@ jobs:
           gem install jwt
           pip install requests
 
-
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
           KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
-
+          private_key="YOUR_PRIVATE_KEY"
+          
           token=$(ruby -rjwt -ropenssl -e "
             private_key_obj = OpenSSL::PKey::EC.new('$private_key')
             token = JWT.encode(
@@ -67,26 +58,54 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      # - name: Retrieve and Display All Bundle IDs
-      #   run: |
-      #     echo "Retrieving all bundle IDs..."
+      - name: Create Distribution Provisioning Profile
+        run: |
+          echo "Creating Distribution Provisioning Profile..."
+          
+          PROFILE_NAME="MyApp Distribution Profile 4"
+          BUNDLE_ID="7Y7S27X27N"
+          # CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"
+          CERTIFICATE_ID="SBN7N5SU5Q"
+          
+          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "data": {
+              "type": "profiles",
+              "attributes": {
+                "name": "$PROFILE_NAME",
+                "profileType": "IOS_APP_STORE"
+              },
+              "relationships": {
+                "bundleId": {
+                  "data": {
+                    "type": "bundleIds",
+                    "id": "$BUNDLE_ID"
+                  }
+                },
+                "certificates": {
+                  "data": [
+                    {
+                      "type": "certificates",
+                      "id": "$CERTIFICATE_ID"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+          EOF
+          )
       
-      #     # Perform the API request to get the list of bundle IDs
-      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json")
-      
-      #     echo "Response: $response"
-      
-      #     # Extract and display the bundle IDs using jq (if jq is available)
-      #     if command -v jq >/dev/null 2>&1; then
-      #       bundle_ids=$(echo "$response" | jq -r '.data[].id')
-      #       echo "Extracted Bundle IDs:"
-      #       echo "$bundle_ids"
-      #     else
-      #       echo "jq not found, displaying raw JSON response"
-      #     fi
-
+          echo "Profile Response: $response"
+          
+          # Assuming you get a URL to download the provisioning profile
+          profile_url=$(echo "$response" | jq -r '.data.attributes.downloadUrl')
+          
+          # Download the provisioning profile
+          curl -o ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_3.mobileprovision "$profile_url"
 
       - name: Install CocoaPods
         run: gem install cocoapods
@@ -122,8 +141,5 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 3" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 4" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
-
-        # xcodebuild archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -archivePath Archive/EasyPatientDynamic.xcarchive
-            

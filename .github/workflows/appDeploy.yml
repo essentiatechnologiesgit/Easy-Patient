@@ -112,8 +112,11 @@ jobs:
           # Extract the Base64 encoded profile content
           profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
           
+          # Log the profile content length
+          echo "Profile content length: $(echo "$profile_content" | wc -c)"
+          
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_3.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_5.mobileprovision
 
       - name: Install CocoaPods
         run: gem install cocoapods

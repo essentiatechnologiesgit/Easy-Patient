@@ -3,7 +3,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - pro
+      - development
 
 jobs:
   build:

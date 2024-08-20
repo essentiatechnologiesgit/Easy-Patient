@@ -229,7 +229,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 3"  
+          PROFILE_NAME="MyApp Distribution Profile 4"  
           # BUNDLE_ID="${{ env.bundle_id }}"  
           BUNDLE_ID="7Y7S27X27N"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
@@ -282,7 +282,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_3.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_4.mobileprovision
   
 
       - name: Install CocoaPods
@@ -319,8 +319,8 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 3" \
-            CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 4" \
+            CODE_SIGN_IDENTITY="KLQ SOLUCOES TECNOLOGICAS LTDA"
 
       # - name: Update App Metadata
       #   run: |

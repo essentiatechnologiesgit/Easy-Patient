@@ -231,7 +231,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 8"  
+          PROFILE_NAME="MyApp Distribution Profile 9"  
           # BUNDLE_ID="${{ env.bundle_id }}"  
           BUNDLE_ID="7Y7S27X27N"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
@@ -284,7 +284,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_8.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
   
 
       - name: Install CocoaPods
@@ -311,6 +311,10 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
           xcodebuild -version
+
+      - name: Clean Derived Data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
      
       - name: Clean Build Folder
         run: |
@@ -327,7 +331,7 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 8" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
 
       # - name: Update App Metadata

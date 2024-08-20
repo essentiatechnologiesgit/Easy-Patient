@@ -28,28 +28,28 @@ jobs:
           gem install jwt
           pip install requests
 
-      - name: Generate RSA Private Key and CSR
-        run: |
-          openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
-          openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=www.example.com, C=US"
+      # - name: Generate RSA Private Key and CSR
+      #   run: |
+      #     openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
+      #     openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=www.example.com, C=US"
 
-      - name: Display Generated CSR Contents
-        run: |
-          cat csr.certSigningRequest
+      # - name: Display Generated CSR Contents
+      #   run: |
+      #     cat csr.certSigningRequest
 
-      - name: Display CSR Contents
-        id: display_csr
-        run: |
-          csr_content=$(cat csr.certSigningRequest)
-          echo "CSR Content: $csr_content"
-          echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
-          echo "$csr_content" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+      # - name: Display CSR Contents
+      #   id: display_csr
+      #   run: |
+      #     csr_content=$(cat csr.certSigningRequest)
+      #     echo "CSR Content: $csr_content"
+      #     echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
+      #     echo "$csr_content" >> $GITHUB_ENV
+      #     echo "EOF" >> $GITHUB_ENV
 
-      - name: Use CSR Content
-        run: |
-          echo "CSR Content saved in env variable:"
-          echo "$CSR_CONTENT"
+      # - name: Use CSR Content
+      #   run: |
+      #     echo "CSR Content saved in env variable:"
+      #     echo "$CSR_CONTENT"
 
       - name: Generate JWT
         id: generate_jwt
@@ -85,129 +85,129 @@ jobs:
           echo "token=$token" >> $GITHUB_ENV
 
 
-      # - name: Revoke the hardcoded certificate
-      #   run: |
-      #     import requests
-      #     import os
-
-      #     # Hardcoded JWT and Certificate ID
-       
-      #     certificate_id = "5QW8CZ7GNM"
-
-      #     # API URL
-      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #     }
-          
-      #     # Making the DELETE request to revoke the certificate
-      #     response = requests.delete(url, headers=headers)
-          
-      #     # Print the status and response content
-      #     print(f"Status Code: {response.status_code}")
-      #     if response.status_code == 204:
-      #         print("Certificate revoked successfully.")
-      #     else:
-      #         print("Failed to revoke certificate.")
-      #         print(response.text)
-      #   shell: python
-
-      - name: Request and Save Distribution Certificate
+      - name: Revoke the hardcoded certificate
         run: |
-          python <<EOF
-          import os
           import requests
-          
-          csr_content = os.getenv('CSR_CONTENT')
-          
-          url = "https://api.appstoreconnect.apple.com/v1/certificates"
+          import os
+
+          # Hardcoded JWT and Certificate ID
+       
+          certificate_id = "LDXBV2688Z"
+
+          # API URL
+          url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",
-              "Content-Type": "application/json"
-          }
-          data = {
-              "data": {
-                "type": "certificates",
-                "attributes": {
-                  "certificateType": "IOS_DISTRIBUTION",
-                  "csrContent": csr_content
-                }
-              }
           }
           
-          response = requests.post(url, json=data, headers=headers)
+          # Making the DELETE request to revoke the certificate
+          response = requests.delete(url, headers=headers)
           
-          if response.status_code == 201:
-              cert_data = response.json()['data']
-              cert_id = cert_data['id']
-              cert_serial_number = cert_data['attributes']['serialNumber']
-              
-              print(f"Certificate ID: {cert_id}")
-              print(f"Serial Number: {cert_serial_number}")
-              
-              # Save the certificate content to a file
-              cert_content = cert_data['attributes']['certificateContent']
-              with open('distribution.cer', 'w') as cert_file:
-                  cert_file.write("-----BEGIN CERTIFICATE-----\n")
-                  cert_file.write(cert_content + "\n")
-                  cert_file.write("-----END CERTIFICATE-----\n")
-              print("Distribution Certificate created successfully")
-              
-              # Save Certificate ID to a file
-              with open('certificate_id.txt', 'w') as id_file:
-                  id_file.write(cert_id)
+          # Print the status and response content
+          print(f"Status Code: {response.status_code}")
+          if response.status_code == 204:
+              print("Certificate revoked successfully.")
           else:
-              print("Failed to create Distribution Certificate")
-              print(response.status_code)
-              print(response.json())
-              exit(1)
-          EOF
-      
-      - name: Set Certificate ID as Environment Variable
-        run: echo "CERTIFICATE_ID=$(cat certificate_id.txt)" >> $GITHUB_ENV
+              print("Failed to revoke certificate.")
+              print(response.text)
+        shell: python
 
-      - name: Debug - Print Certificate Content
-        run: cat distribution.cer
-
-      - name: Convert Certificate to .p12 format
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="-----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----"
+      # - name: Request and Save Distribution Certificate
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
           
-          CERT_P12_PASSWORD="private_pass"
+      #     csr_content = os.getenv('CSR_CONTENT')
+          
+      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+      #     data = {
+      #         "data": {
+      #           "type": "certificates",
+      #           "attributes": {
+      #             "certificateType": "IOS_DISTRIBUTION",
+      #             "csrContent": csr_content
+      #           }
+      #         }
+      #     }
+          
+      #     response = requests.post(url, json=data, headers=headers)
+          
+      #     if response.status_code == 201:
+      #         cert_data = response.json()['data']
+      #         cert_id = cert_data['id']
+      #         cert_serial_number = cert_data['attributes']['serialNumber']
+              
+      #         print(f"Certificate ID: {cert_id}")
+      #         print(f"Serial Number: {cert_serial_number}")
+              
+      #         # Save the certificate content to a file
+      #         cert_content = cert_data['attributes']['certificateContent']
+      #         with open('distribution.cer', 'w') as cert_file:
+      #             cert_file.write("-----BEGIN CERTIFICATE-----\n")
+      #             cert_file.write(cert_content + "\n")
+      #             cert_file.write("-----END CERTIFICATE-----\n")
+      #         print("Distribution Certificate created successfully")
+              
+      #         # Save Certificate ID to a file
+      #         with open('certificate_id.txt', 'w') as id_file:
+      #             id_file.write(cert_id)
+      #     else:
+      #         print("Failed to create Distribution Certificate")
+      #         print(response.status_code)
+      #         print(response.json())
+      #         exit(1)
+      #     EOF
       
-          echo "$private_key" > private_key.pem
+      # - name: Set Certificate ID as Environment Variable
+      #   run: echo "CERTIFICATE_ID=$(cat certificate_id.txt)" >> $GITHUB_ENV
+
+      # - name: Debug - Print Certificate Content
+      #   run: cat distribution.cer
+
+      # - name: Convert Certificate to .p12 format
+      #   run: |
+      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+      #     KEY_ID="74H4QHFPVP"
+      #     private_key="-----BEGIN PRIVATE KEY-----
+      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+      #     +EG+nw8t
+      #     -----END PRIVATE KEY-----"
+          
+      #     CERT_P12_PASSWORD="private_pass"
       
-          openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
+      #     echo "$private_key" > private_key.pem
+      
+      #     openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
      
-      - name: Upload .p12 file as GitHub Actions artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: distribution-certificate
-          path: distribution.p12
+      # - name: Upload .p12 file as GitHub Actions artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: distribution-certificate
+      #     path: distribution.p12
       
-      - name: Import certificate to keychain
-        run: |
-          KEYCHAIN_PASSWORD="private_pass"
-          CERT_P12_PASSWORD="private_pass"
+      # - name: Import certificate to keychain
+      #   run: |
+      #     KEYCHAIN_PASSWORD="private_pass"
+      #     CERT_P12_PASSWORD="private_pass"
           
-          # Create a new keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+      #     # Create a new keychain
+      #     security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           
-          # Import the .p12 file into the keychain
-          security import distribution.p12 -k ~/Library/Keychains/build.keychain -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
+      #     # Import the .p12 file into the keychain
+      #     security import distribution.p12 -k ~/Library/Keychains/build.keychain -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
           
-          # Add the keychain to the list of keychains
-          security list-keychains -s ~/Library/Keychains/build.keychain
+      #     # Add the keychain to the list of keychains
+      #     security list-keychains -s ~/Library/Keychains/build.keychain
           
-          # Unlock the keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" ~/Library/Keychains/build.keychain
+      #     # Unlock the keychain
+      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" ~/Library/Keychains/build.keychain
 
 
       # - name: Retrieve All App IDs
@@ -225,54 +225,54 @@ jobs:
       #     # echo "App IDs: $bundle_ids"
       #     # echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
 
-      - name: Create Distribution Provisioning Profile
-        run: |
-          echo "Creating Distribution Provisioning Profile..."
+      # - name: Create Distribution Provisioning Profile
+      #   run: |
+      #     echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 2"  
-          # BUNDLE_ID="${{ env.bundle_id }}"  
-          BUNDLE_ID="7Y7S27X27N"
-          CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
-           # CERTIFICATE_ID="5QW8CZ7GNM"
+      #     PROFILE_NAME="MyApp Distribution Profile 2"  
+      #     # BUNDLE_ID="${{ env.bundle_id }}"  
+      #     BUNDLE_ID="7Y7S27X27N"
+      #     CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
+      #      # CERTIFICATE_ID="5QW8CZ7GNM"
           
-          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d @- <<EOF
-          {
-            "data": {
-              "type": "profiles",
-              "attributes": {
-                "name": "$PROFILE_NAME",
-                "profileType": "IOS_APP_STORE"
-              },
-              "relationships": {
-                "bundleId": {
-                  "data": {
-                    "type": "bundleIds",
-                    "id": "$BUNDLE_ID"
-                  }
-                },
-                "certificates": {
-                  "data": [
-                    {
-                      "type": "certificates",
-                      "id": "$CERTIFICATE_ID"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-          EOF
-          )
+      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d @- <<EOF
+      #     {
+      #       "data": {
+      #         "type": "profiles",
+      #         "attributes": {
+      #           "name": "$PROFILE_NAME",
+      #           "profileType": "IOS_APP_STORE"
+      #         },
+      #         "relationships": {
+      #           "bundleId": {
+      #             "data": {
+      #               "type": "bundleIds",
+      #               "id": "$BUNDLE_ID"
+      #             }
+      #           },
+      #           "certificates": {
+      #             "data": [
+      #               {
+      #                 "type": "certificates",
+      #                 "id": "$CERTIFICATE_ID"
+      #               }
+      #             ]
+      #           }
+      #         }
+      #       }
+      #     }
+      #     EOF
+      #     )
       
-          echo "Profile Response: $response"
+      #     echo "Profile Response: $response"
           
-          # Save the profile ID or the profile content if needed
-          profile_id=$(echo "$response" | jq -r '.data.id')
-          echo "Extracted Profile ID: $profile_id"
-          echo "profile_id=$profile_id" >> $GITHUB_ENV
+      #     # Save the profile ID or the profile content if needed
+      #     profile_id=$(echo "$response" | jq -r '.data.id')
+      #     echo "Extracted Profile ID: $profile_id"
+      #     echo "profile_id=$profile_id" >> $GITHUB_ENV
 
       # - name: Update App Metadata
       #   run: |

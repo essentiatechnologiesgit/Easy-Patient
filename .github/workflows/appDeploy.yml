@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - development
+
 jobs:
   build:
     runs-on: macos-latest
@@ -65,14 +66,12 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-
       - name: Create Distribution Provisioning Profile
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 7"
+          PROFILE_NAME="MyApp Distribution Profile 8"
           BUNDLE_ID="7Y7S27X27N"
-          # CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"
           CERTIFICATE_ID="SBN7N5SU5Q"
           
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
@@ -106,7 +105,7 @@ jobs:
           }
           EOF
           )
-      
+          
           echo "Profile Response: $response"
           
           # Extract the Base64 encoded profile content
@@ -115,8 +114,11 @@ jobs:
           # Log the profile content length
           echo "Profile content length: $(echo "$profile_content" | wc -c)"
           
+          # Ensure the directory exists before saving the profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_7.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_8.mobileprovision
 
       - name: Install CocoaPods
         run: gem install cocoapods
@@ -152,5 +154,5 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 7" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 8" \
             CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"

@@ -322,7 +322,6 @@ jobs:
           cd ios
           xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-
       - name: Build Archive
         run: |
           xcodebuild clean archive \

@@ -3,7 +3,7 @@ name: CI/CD for STAGE
 on:
   push:
     branches:
-      - development
+      - prod
 
 jobs:
   build:
@@ -16,83 +16,143 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.12.1'  # Adjust version if needed
+          node-version: '20.12.1'
 
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.x'
-      
-      # - name: Set up Ruby
-      #   uses: ruby/setup-ruby@v1
-      #   with:
-      #     ruby-version: 3.3
 
-      # - name: Install dependencies
-      #   run: |
-      #     gem install jwt
-      #     pip install requests
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
 
-      # - name: Generate JWT
-      #   id: generate_jwt
-      #   run: |
-      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-      #     KEY_ID="74H4QHFPVP"
-      #     private_key="
-      #     -----BEGIN PRIVATE KEY-----
-      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-      #     +EG+nw8t
-      #     -----END PRIVATE KEY-----
-      #     "
+      - name: Install dependencies
+        run: |
+          gem install jwt
+          pip install requests
 
-      #     token=$(ruby -rjwt -ropenssl -e "
-      #       private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-      #       token = JWT.encode(
-      #         {
-      #           iss: '$ISSUER_ID',
-      #           exp: Time.now.to_i + 20 * 60,
-      #           aud: 'appstoreconnect-v1'
-      #         },
-      #         private_key_obj,
-      #         'ES256',
-      #         header_fields = {
-      #           kid: '$KEY_ID'
-      #         }
-      #       )
-      #       puts token
-      #     ")
+      - name: Generate JWT
+        id: generate_jwt
+        run: |
+          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+          KEY_ID="74H4QHFPVP"
+          private_key="
+          -----BEGIN PRIVATE KEY-----
+          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+          +EG+nw8t
+          -----END PRIVATE KEY-----
+          "
+
+          token=$(ruby -rjwt -ropenssl -e "
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            token = JWT.encode(
+              {
+                iss: '$ISSUER_ID',
+                exp: Time.now.to_i + 20 * 60,
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              header_fields = {
+                kid: '$KEY_ID'
+              }
+            )
+            puts token
+          ")
           
-      #     echo "token=$token" >> $GITHUB_ENV
+          echo "token=$token" >> $GITHUB_ENV
 
-      # - name: List Teams
-      #   run: |
-      #     # Fetch token from environment
-      #     JWT_TOKEN=${{ env.token }}
-      
-      #     # Make API request to list teams
-      #     curl -H "Authorization: Bearer $JWT_TOKEN" \
-      #          -H "Content-Type: application/json" \
-      #          "https://api.appstoreconnect.apple.com/v1/teams"
-
-      - name: Install Ruby and Cocoapods
+      - name: Create Distribution Provisioning Profile
         run: |
-          gem install cocoapods
+          echo "Creating Distribution Provisioning Profile..."
+          
+          PROFILE_NAME="MyApp Distribution Profile 8"
+          BUNDLE_ID="7Y7S27X27N"
+          CERTIFICATE_ID="SBN7N5SU5Q"
+          
+          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "data": {
+              "type": "profiles",
+              "attributes": {
+                "name": "$PROFILE_NAME",
+                "profileType": "IOS_APP_STORE"
+              },
+              "relationships": {
+                "bundleId": {
+                  "data": {
+                    "type": "bundleIds",
+                    "id": "$BUNDLE_ID"
+                  }
+                },
+                "certificates": {
+                  "data": [
+                    {
+                      "type": "certificates",
+                      "id": "$CERTIFICATE_ID"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+          EOF
+          )
+          
+          echo "Profile Response: $response"
+          
+          # Extract the Base64 encoded profile content
+          profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
+          
+          # Log the profile content length
+          echo "Profile content length: $(echo "$profile_content" | wc -c)"
+          
+          # Ensure the directory exists before saving the profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          
+          # Decode the Base64 content and save it as a .mobileprovision file
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_8.mobileprovision
 
-      - name: Update Podfile Deployment Target
-        run: |
-          sed -i '' 's/platform :ios, \([0-9.]*\)/platform :ios, 12.0/' ios/Podfile
+      - name: Install CocoaPods
+        run: gem install cocoapods
 
-
-
-      - name: Install Pods
-        run: |
-          cd ios
-          pod install
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - name: Install Node.js dependencies
         run: npm install --force
 
+      - name: Install Pods
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install
+
+      - name: Install Xcode 15.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+          xcodebuild -version
+
       - name: Build Archive
-        run: xcodebuild clean archive -workspace ios/EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -sdk iphoneos -configuration Release -derivedDataPath ios/build/DerivedData -archivePath ios/build/archive/TestingArchive.xcarchive PROVISIONING_PROFILE_SPECIFIER="J2N5N2XQ42" CODE_SIGN_IDENTITY="Apple Distribution"
+        run: |
+          xcodebuild clean archive \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath ios/build/DerivedData \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 8" \
+            CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"

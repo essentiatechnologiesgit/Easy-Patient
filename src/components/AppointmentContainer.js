@@ -27,6 +27,8 @@ const AppointmentContainer = ({ record, isArchived, isHide, isShow, record_id })
                 return styles.defaultStatus;
         }
     };
+
+    console.log(record);
     return (
         <>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('AppointmentsDetails', { record: record, isArchived,isArchived })}>
@@ -38,6 +40,7 @@ const AppointmentContainer = ({ record, isArchived, isHide, isShow, record_id })
                         </View>
                         <Text style={styles.headings}>{formattedDate}</Text>
                         <Text style={styles.subHeading}>{record.clinic}</Text>
+                        <Text style={styles.subHeading}>Dr(a). {record.specialist}</Text>
                         <Text style={styles.subHeading}>{record.type}</Text>
                     </View>
                     <Image source={arrow} style={styles.arrowLogo} />

@@ -190,6 +190,8 @@ const UpdateReminder = ({ route }) => {
                         }
                         if (response.data[i].st_critical == '1') {
                             setPriority(true);
+                        }else{
+                            setPriority(false);
                         }
                     }
                 }
@@ -727,7 +729,7 @@ const UpdateReminder = ({ route }) => {
                                 ref={(ref) => (errorRefs.current[5] = ref)}
                                 style={{ ...styles.floatingLabelH, borderBottomWidth: 0.5, borderBottomColor: config.secondaryColor }}>
                                 <FloatingLabelInput
-                                    label={'Number of Days'}
+                                    label={'Treatment Duration'}
                                     inputStyles={styles.inputStyles}
                                     labelStyles={{ paddingHorizontal: 0 }}
                                     customLabelStyles={!daysError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
@@ -747,49 +749,13 @@ const UpdateReminder = ({ route }) => {
                             <View
                                 ref={(ref) => (errorRefs.current[3] = ref)}
                                 style={{ ...styles.floatingLabelN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
-                                <Animated.Text
-                                    style={[
-                                        styles.placeholderLabel,
-                                        {
-                                            transform: [
-                                                {
-                                                    translateY: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1.2],
-                                                        outputRange: [0, -25],
-                                                    }),
-                                                },
-                                                {
-                                                    scale: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1],
-                                                        outputRange: [0.95, 0.9],
-                                                    }),
-                                                },
-                                            ],
-                                            // Apply margin left conditionally
-                                            marginLeft: placeholderLabelAnim.interpolate({
-                                                inputRange: [0, 1.5],
-                                                outputRange: [0, -5],
-                                            }),
-                                            // Interpolate font size
-                                            fontSize: placeholderLabelAnim.interpolate({
-                                                inputRange: [0, 1.5],
-                                                outputRange: [PixelRatio.getFontScale() * 18, PixelRatio.getFontScale() * 16],
-                                            }),
-                                            color: placeholderLabelAnim.interpolate({
-                                                inputRange: [0, 1.5],
-                                                outputRange: [config.primaryColor, config.secondaryColor],
-                                            }),
-                                        },
-                                    ]}
-                                >
-                                    Days
-                                </Animated.Text>
+                  
 
                                 <DropDownPicker
                                     items={DaysArray}
                                     value={selectedDays}
                                     onSelectItem={handleSelect}
-                                    placeholder=""
+                                    placeholder="Days"
                                     open={isOpen}
                                     showArrowIcon={false}
                                     onOpen={handleOpen}
@@ -881,8 +847,8 @@ const UpdateReminder = ({ route }) => {
                         </View>
                         <View style={styles.switchContainer}>
                             <Switch
-                                trackColor={{ false: '#00cc00', true: '#36b336' }}
-                                thumbColor={priority ? 'white' : 'white'}
+                                trackColor={{ false: '#EEEFF1', true: '#36b336' }}
+                                thumbColor={priority ? 'white' : '#EEEFF1'}
                                 ios_backgroundColor="#3e3e3e"
                                 onValueChange={togglePrioritySwitch}
                                 value={priority}

@@ -5,7 +5,7 @@ import config from '../../config.js';
 import SnoozeNotify from './SnoozeNotify';
 import CancelledAlarm from './CancelledAlarm';
 // Did you take you Medicine
-const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfor, reloadFunction, Medicine }) => {
+const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfor, reloadFunction, Medicine,dosage }) => {
     const handleCloseModal = () => {
         onClose();
     };
@@ -26,7 +26,7 @@ const BottomModal = ({ visible,medicineId, AlarmId, time,taken, onClose, modalfo
                 <View style={{ backgroundColor: '#edf1f7', padding: 15, height:200   }}>
                     {
                         modalfor === "CrossAlarm" ?
-                            <CancelledAlarm AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction} Medicine={Medicine}/>
+                            <CancelledAlarm AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction} Medicine={Medicine} dosage={dosage}/>
                             :
                             <SnoozeNotify  AlarmId={AlarmId} taken={taken} medicineId={medicineId}  timeUpdate={time} onCloseModal={handleCloseModal} reloadFunction={reloadFunction}  Medicine={Medicine}/>
                     }

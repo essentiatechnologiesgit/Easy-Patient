@@ -39,10 +39,14 @@ const AppointmentContact = ({ watsappNo, phone, email }) => {
 
 const styles = StyleSheet.create({
     firstContainer: {
-        padding: 20,
+        paddingTop: 10,
+        padding:20
     },
     status: {
         color: config.secondaryColor,
+        fontSize: PixelRatio.getFontScale() * 17,
+        fontFamily:config.fontStyle,
+        fontWeight: 'bold',
     },
     watsappIcon: {
         height: 25,

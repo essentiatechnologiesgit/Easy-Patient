@@ -63,7 +63,7 @@ const Appointments = () => {
                         <ScrollView style={styles.scroll}>
                             {
                                 appointmentsData.map((record, index) => (
-                                    <AppointmentContainer key={index} record={record} getData={getData}  />
+                                    <AppointmentContainer key={index} record={record} getData={getData} />
                                 ))
                             }
                             <View style={{ marginTop: 20, }}></View>

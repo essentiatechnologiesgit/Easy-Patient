@@ -84,7 +84,7 @@ const PrescriptionContainer = ({ record, isArchived,isHide ,isShow,record_id,get
                     <Text style={styles.headings}>{record.type}</Text>
                     <Text style={styles.subHeadings}>Received {record.title}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
-                    <Text style={styles.text}>{record.specialist}</Text>
+                    <Text style={styles.text}>Dr(a). {record.specialist}</Text>
                     {
                         !isArchived ?
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
@@ -134,18 +134,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#B8E0C3',
     },
-    hideContainer: {
-        flexDirection: 'row',
-        borderWidth: 1,
-        borderColor: config.secondaryColor,
-        height: 25,
-        width: 62,
-        gap: 3,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 14,
-        marginTop: 5,
-    },
     hide: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 12,
@@ -178,8 +166,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: config.secondaryColor,
         height: 25,
-        gap: 3,
-        width: 55,
+        gap: 5,
+        width: 60,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,

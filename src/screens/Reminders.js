@@ -136,7 +136,12 @@ const Reminders = () => {
         }
     };
 
-
+    const currentTime = new Date().toLocaleTimeString([], {
+        year : 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        month:'long',
+    });
 
     return (
         <>
@@ -163,7 +168,9 @@ const Reminders = () => {
                                             </View>
                                             <View style={styles.textContainer}>
                                                 <Text style={styles.medicineTextHeading}>{item.medicine}</Text>
-                                                <Text style={styles.medicineTextSide}>{`Next dose: ${calculateNextDosageTime(item.times)}`}</Text>
+                                                <Text style={styles.medicineTextSide}>
+                                                    {`Next dose: ${(item.times && item.times.length > 0) ? calculateNextDosageTime(item.times) : currentTime}`}
+                                                </Text>
                                                 <Text style={styles.medicineTextGrey}>After every {item.frequency} hour</Text>
                                                 <Text style={styles.medicineTextGrey}>{item.dosage}</Text>
                                             </View>
@@ -251,13 +258,13 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 20,
         fontWeight: 'bold',
         color: config.textColorHeadings,
-        fontFamily:'OpenSans-Regular',
+        fontFamily: 'OpenSans-Regular',
     },
     medicineTextSide: {
         fontSize: PixelRatio.getFontScale() * 16,
         fontWeight: 'bold',
         color: config.textColorHeadings,
-        fontFamily:'OpenSans-Regular',
+        fontFamily: 'OpenSans-Regular',
     },
     Profilelogo: {
         height: 36,
@@ -266,7 +273,7 @@ const styles = StyleSheet.create({
     },
     medicineTextGrey: {
         fontSize: PixelRatio.getFontScale() * 16,
-        fontFamily:'OpenSans-Regular',
+        fontFamily: 'OpenSans-Regular',
         color: config.primaryColor,
     },
     imageContainer: {

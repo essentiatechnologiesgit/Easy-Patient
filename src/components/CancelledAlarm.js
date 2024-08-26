@@ -4,7 +4,7 @@ import CustomButton from './CustomizedButton';
 import config from '../../config.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
-const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction }) => {
+const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction,Medicine,dosage }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
     const EditTime = () => {
         setTimeBoxes(true);
@@ -134,9 +134,9 @@ const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, 
             {
                 !timeBoxes &&
                 <>
-                    <Text style={styles.textHead}>Did you take your medicine</Text>
-                    <Text style={styles.textMed}>Panadol</Text>
-                    <Text style={styles.textMed}>2</Text>
+                    <Text style={styles.textHead}>Did you take your medicine?</Text>
+                    <Text style={styles.textMed}>{Medicine}</Text>
+                    <Text style={styles.textMed}>{dosage}</Text>
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity

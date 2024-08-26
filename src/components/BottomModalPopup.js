@@ -62,7 +62,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                     {
                         !durationSelect &&
                         <>
-                            <RNPickerSelect
+                            {/* <RNPickerSelect
                                 onValueChange={(value) => setSelectedDuration(value)}
                                 items={durationOptions}
                                 placeholder={{}}
@@ -71,7 +71,15 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                             />
                             <View style={styles.buttonStyle}>
                                 <CustomButton onPress={handleChange} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"OK"} />
-                            </View>
+                            </View> */}
+                                <RNPickerSelect
+      onValueChange={(value) => console.log(value)}
+      items={[
+        { label: 'Football', value: 'football' },
+        { label: 'Baseball', value: 'baseball' },
+        { label: 'Hockey', value: 'hockey' },
+      ]}
+    />
                         </>
                     }
                     {
@@ -79,14 +87,14 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                         <>
                             <View style={styles.freqContainer}>
                                 <Text style={styles.freqText}>Every</Text>
-                                <RNPickerSelect
+                                {/* <RNPickerSelect
                                     onValueChange={(value) => setFrequencyNumber(value)}
                                     items={frequencyOptions}
                                     placeholder={{}}
                                     value={frequencyNumber}
                                     style={pickerSelectStyles}
                                 />
-                                <Text style={styles.freqText}>{selectedDuration}</Text>
+                                <Text style={styles.freqText}>{selectedDuration}</Text> */}
                             </View>
                             <View style={styles.buttonStyle}>
                                 <CustomButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"OK"} />

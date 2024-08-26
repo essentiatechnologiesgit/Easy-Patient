@@ -7,7 +7,7 @@ const config = {
   tertiaryColor: '#fff',
   logo: require('./src/assets/logo.png')  ,
   backgroundImage: require('./src/assets/background-image.png'),
-  // backgroundColorImage: '#EEF6F8',
+  backgroundColorImage: '#EEF6F8',
   backgroundImageType: 'png',
   subLogo: require('./src/assets/sub-logo.png'),
   backgroundColor: '#FFFFFF',

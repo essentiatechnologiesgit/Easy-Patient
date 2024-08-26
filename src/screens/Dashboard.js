@@ -213,6 +213,7 @@ const Dashboard = () => {
                                     time={alarmTime.format('HH:mm')}
                                     medicineId={id}
                                     id={timeId}
+                                    dosage={dosage}
                                     Medicine={medicine}
                                     taken={taken}
                                     reloadFunction={renderTimeComponents}
@@ -452,7 +453,7 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 18,
         color: config.textColorHeadings,
         // fontFamily:config.fontStyle,
-        fontWeight: '500'
+        // fontWeight: '500'
     },
     parentView: {
         marginTop: '6%',

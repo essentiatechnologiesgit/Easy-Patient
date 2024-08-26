@@ -67,7 +67,7 @@ const ProfileImagePopup = ({ visible, onClose, setImage }) => {
             transparent={true}
             visible={visible}
             onRequestClose={onClose}>
-            <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
+            <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 0, 0, 0.6)' }}>
                 <TouchableOpacity
                     activeOpacity={1}
                     style={{ flex: 1, }}

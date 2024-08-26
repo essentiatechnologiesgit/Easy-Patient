@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     },
     bothContainers: {
         backgroundColor: 'white',
-        height: 110,
+        height: 115,
         borderRadius: 8,
         width: '90%',
         alignSelf: 'center',

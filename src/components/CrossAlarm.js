@@ -6,7 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import DeleteModal from './DeleteModal';
-const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) => {
+const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction,dosage }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [deleteModal, setShowDeleteModal] = useState(false);
 
@@ -105,8 +105,10 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction }) =
                 taken={taken}
                 medicineId={medicineId}
                 AlarmId={id}
+                dosage={dosage}
                 modalfor={"CrossAlarm"}
                 reloadFunction={reloadFunction}
+                Medicine={Medicine}
                 onClose={() => setModalVisible(false)}
             />
             <DeleteModal visible={deleteModal} modalfor={"CrossBell"} medicineId={medicineId} AlarmId={id} reloadFunction={reloadFunction} taken={taken} onClose={() => setShowDeleteModal(false)} Medicine={Medicine} time={time} handleDeleteConfirm={handleDeleteConfirm} />

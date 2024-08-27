@@ -143,6 +143,21 @@ const Reminders = () => {
         month:'long',
     });
 
+    const durationConverter = (duration) => {
+        switch(duration) {
+            case 0:
+                return "Hour";
+            case 1:
+                return "Day";
+            case 2:
+                return "Week";
+            default:
+                return "Invalid duration"; // You can customize this to handle unexpected values
+        }
+    }
+    
+
+   
     return (
         <>
             <View style={styles.container}>
@@ -171,7 +186,7 @@ const Reminders = () => {
                                                 <Text style={styles.medicineTextSide}>
                                                     {`Next dose: ${(item.times && item.times.length > 0) ? calculateNextDosageTime(item.times) : currentTime}`}
                                                 </Text>
-                                                <Text style={styles.medicineTextGrey}>After every {item.frequency} hour</Text>
+                                                <Text style={styles.medicineTextGrey}>After every {item.frequency} {item.days_of_the_week} {durationConverter(item.duration)}</Text>
                                                 <Text style={styles.medicineTextGrey}>{item.dosage}</Text>
                                             </View>
                                             <Image source={arrow} style={styles.arrowLogo} />

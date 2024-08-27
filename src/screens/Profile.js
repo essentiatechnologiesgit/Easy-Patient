@@ -223,14 +223,17 @@ const Profile = () => {
                 .then(async (response) => {
                     await handleImageSave();
                     handleShowSnackbar("Profile Updated");
+                    // navigation.navigate('ProfileAndHealth')
                 })
                 .catch((error) => {
                     console.log(error);
                 })
                 .finally(() => {
                     setShowLoader(false);
+                    navigation.goBack()
                 });
         }
+
     }
 
     const getFileExtension = (fileUri) => {

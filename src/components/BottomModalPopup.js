@@ -62,7 +62,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                     {
                         !durationSelect &&
                         <>
-                            {/* <RNPickerSelect
+                            <RNPickerSelect
                                 onValueChange={(value) => setSelectedDuration(value)}
                                 items={durationOptions}
                                 placeholder={{}}
@@ -71,15 +71,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                             />
                             <View style={styles.buttonStyle}>
                                 <CustomButton onPress={handleChange} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"OK"} />
-                            </View> */}
-                                <RNPickerSelect
-      onValueChange={(value) => console.log(value)}
-      items={[
-        { label: 'Football', value: 'football' },
-        { label: 'Baseball', value: 'baseball' },
-        { label: 'Hockey', value: 'hockey' },
-      ]}
-    />
+                            </View>
                         </>
                     }
                     {
@@ -87,14 +79,18 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                         <>
                             <View style={styles.freqContainer}>
                                 <Text style={styles.freqText}>Every</Text>
-                                {/* <RNPickerSelect
+                                <Text style={styles.freqText}>{frequencyNumber}</Text>
+
+
+                                {/* <Text style={styles.freqText}>{frequencyNumber}</Text> */}
+                                <Text style={styles.freqText}>{selectedDuration}</Text>
+                                <RNPickerSelect
                                     onValueChange={(value) => setFrequencyNumber(value)}
                                     items={frequencyOptions}
-                                    placeholder={{}}
+                                    placeholder={{ label: 'Select an option...', value: null }}
                                     value={frequencyNumber}
                                     style={pickerSelectStyles}
                                 />
-                                <Text style={styles.freqText}>{selectedDuration}</Text> */}
                             </View>
                             <View style={styles.buttonStyle}>
                                 <CustomButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"OK"} />
@@ -112,7 +108,7 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         marginLeft: 20,
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
     },
     buttonStyle: {
         backgroundColor: '#edf1f7',
@@ -143,7 +139,7 @@ const styles = StyleSheet.create({
 const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
         paddingVertical: 12,
         paddingHorizontal: 10,
         borderWidth: 1,
@@ -157,7 +153,7 @@ const pickerSelectStyles = StyleSheet.create({
     },
     inputAndroid: {
         fontSize: PixelRatio.getFontScale() * 17,
-        fontFamily:config.fontStyle,
+        fontFamily: config.fontStyle,
         paddingVertical: 8,
         paddingHorizontal: 10,
         borderWidth: 0.5,
@@ -169,6 +165,9 @@ const pickerSelectStyles = StyleSheet.create({
         alignSelf: 'center',
         width: '50%',
     },
+    iconContainer: {
+        display: 'none' // Hides the arrow
+    }
 });
 
 export default BottomModal;

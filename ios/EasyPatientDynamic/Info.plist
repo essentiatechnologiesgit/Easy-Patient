@@ -49,6 +49,10 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>We need your permission to use the camera.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+<string>We need access to Bluetooth to connect to nearby devices.</string>
+<key>NFCReaderUsageDescription</key>
+<string>We need access to NFC to read NFC tags.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Enabling Face ID allows you quick and secure access to your account.</string>
 	<key>NSLocationAlwaysUsageDescription</key>

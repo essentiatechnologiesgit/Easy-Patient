@@ -53,8 +53,7 @@ const CrossBell = ({ remainingTime, dosage, medicineId, time, id, Medicine, take
                     const updatedTimes = alarm.times.filter(timeObj => {
                         const alarmTime = moment(timeObj.time);
                         const isSameTime = alarmTime.isSame(moment(targetDateTime));
-                        console.log(`Checking time - ID: ${timeObj.id}, Time: ${timeObj.time}, Matches: ${isSameTime}`);
-
+                       
                         return !isSameTime;
                     });
                     return { ...alarm, times: updatedTimes };
@@ -159,11 +158,12 @@ const styles = StyleSheet.create({
     text: {
         marginLeft: 8,
         color: 'black',
+        fontSize:15,
     },
     prescriptionText: {
         color: 'black',
         fontWeight: '400',
-        fontSize: 12,
+        fontSize: 13,
     },
     bell: {
         height: 20,

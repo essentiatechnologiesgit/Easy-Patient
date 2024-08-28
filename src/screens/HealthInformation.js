@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         ...Platform.select({
             ios: {
-                top: 40,
+                top: 55,
             },
             android:{
                 top:20,

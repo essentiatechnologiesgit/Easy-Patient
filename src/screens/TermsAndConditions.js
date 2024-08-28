@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, PixelRatio, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, PixelRatio, TouchableWithoutFeedback, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import BackHeader from '../components/backHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -49,9 +49,12 @@ const TermsAndConditions = () => {
                
                 {
                     !isConfigure ? 
-                    <View style={styles.heading}>
+                    <View style={styles.heading}>               
                         <Text style={styles.termsHeading}>Terms and Conditions</Text>
-                        <Text style={styles.subHeading}>By clicking Agree, you are accepting the terms below</Text>
+                        {
+                            Platform.OS === 'android' && 
+                            <Text style={styles.subHeading}>By clicking Agree, you are accepting the terms below</Text>
+                        }
                     </View>
                     :
                     <>
@@ -88,6 +91,11 @@ const styles = StyleSheet.create({
     },
     heading: {
         padding: 8,
+        ...Platform.select({
+            ios: {
+                marginTop: 38,
+            },
+        })
     },
     btnText: {
         color: config.buttonText,
@@ -108,9 +116,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     termsHeading: {
-        fontWeight: '800',
         fontSize: PixelRatio.getFontScale() * 23,
         color: config.textColorHeadings,
+        ...Platform.select({
+            ios: {
+                marginTop: 30,
+                textAlign:'center',
+                marginBottom:20,
+            },
+            android:{
+                fontWeight: '800',
+       
+            }
+        })
     },
     subHeading: {
         color: config.secondaryColor,

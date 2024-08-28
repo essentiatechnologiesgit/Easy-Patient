@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     text: {
         marginLeft: 8,
         color: 'black',
+        fontSize:15,
     },
     circle: {
         width: 20,

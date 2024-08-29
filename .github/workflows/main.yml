@@ -17,7 +17,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -96,7 +95,6 @@ jobs:
               exit(1)
           EOF
 
-
       - name: Fetch Distribution Certificate Details
         if: env.CERTIFICATE_COUNT == '2'
         run: |
@@ -156,15 +154,26 @@ jobs:
               exit(1)
           EOF
 
-      - name: Generate RSA Private Key 
+      - name: Check for Existing RSA Private Key
+        id: check_rsa_key
         run: |
-          openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
-     
+          if [ -f "path/to/your/rsa_private.key" ]; then
+            echo "RSA private key found."
+            echo "RSA_KEY_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "RSA private key not found."
+            echo "RSA_KEY_EXISTS=false" >> $GITHUB_ENV
+
+      - name: Generate RSA Private Key 
+        if: env.RSA_KEY_EXISTS == 'false'
+        run: |
+          openssl genpkey -algorithm RSA -out path/to/your/rsa_private.key -pkeyopt rsa_keygen_bits:2048
+          echo "Generated a new RSA private key."
 
       - name: Generate CSR using Private key
         if: env.CERTIFICATE_COUNT != '2'
         run: |
-          openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
+          openssl req -new -key path/to/your/rsa_private.key -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
 
       - name: Display CSR Contents
         if: env.CERTIFICATE_COUNT != '2'
@@ -236,20 +245,9 @@ jobs:
 
       - name: Convert Certificate to .p12 format
         run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="-----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----"
-          
           CERT_P12_PASSWORD="private_pass"
       
-          echo "$private_key" > private_key.pem
-      
-          openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
+          openssl pkcs12 -export -inkey path/to/your/rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
      
       - name: Upload .p12 file as GitHub Actions artifact
         uses: actions/upload-artifact@v3
@@ -259,8 +257,6 @@ jobs:
       
       - name: Import certificate to keychain
         run: |
-          # Enable command tracing
-          # Enable command tracing
           set -x
           
           KEYCHAIN_NAME="build.keychain"
@@ -300,7 +296,62 @@ jobs:
           security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p
           echo "Certificate found and validated in keychain"
 
-
+      - name: Create Distribution Provisioning Profile
+        run: |
+          echo "Creating Distribution Provisioning Profile..."
+          
+          PROFILE_NAME="MyApp Distribution Profile 9"  
+          BUNDLE_ID="7Y7S27X27N"
+          CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
+          
+          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d @- <<EOF
+          {
+            "data": {
+              "type": "profiles",
+              "attributes": {
+                "name": "$PROFILE_NAME",
+                "profileType": "IOS_APP_STORE"
+              },
+              "relationships": {
+                "bundleId": {
+                  "data": {
+                    "type": "bundleIds",
+                    "id": "$BUNDLE_ID"
+                  }
+                },
+                "certificates": {
+                  "data": [
+                    {
+                      "type": "certificates",
+                      "id": "$CERTIFICATE_ID"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+          EOF
+          )
+      
+          echo "Profile Response: $response"
+          
+          # Save the profile ID or the profile content if needed
+          echo "Profile Response: $response"
+          
+          # Extract the Base64 encoded profile content
+          profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
+          
+          # Log the profile content length
+          echo "Profile content length: $(echo "$profile_content" | wc -c)"
+          
+          # Ensure the directory exists before saving the profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          
+          # Decode the Base64 content and save it as a .mobileprovision file
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
 
 
       - name: Create Distribution Provisioning Profile

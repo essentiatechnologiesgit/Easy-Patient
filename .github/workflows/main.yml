@@ -115,8 +115,8 @@ jobs:
           import os
           import requests
       
-          # Define the URL for the App Store Connect API to fetch team details
-          url = "https://api.appstoreconnect.apple.com/v1/teams"
+          # Define the URL for the App Store Connect API to fetch user details
+          url = "https://api.appstoreconnect.apple.com/v1/users/me"
       
           # Set the headers with the JWT token
           headers = {
@@ -129,14 +129,15 @@ jobs:
       
           # Check if the request was successful
           if response.status_code == 200:
-              team_data = response.json()['data']
+              user_data = response.json()
               
-              # Print the complete record for the team
-              print("Complete Team Record:")
-              print(team_data[0])
+              # Print the complete record for the user
+              print("Complete User Record:")
+              print(user_data)
               
-              # Fetch the Team ID
-              team_id = team_data[0]['id']
+              # Fetch the Team ID (assuming the user is part of a team)
+              # Note: Extract the team ID from the user's team info if available
+              team_id = user_data.get('data', {}).get('relationships', {}).get('teams', {}).get('data', [{}])[0].get('id')
       
               print(f"Team ID: {team_id}")
       
@@ -149,6 +150,7 @@ jobs:
               print(f"Response: {response.json()}")
               exit(1)
           EOF
+
 
 
 

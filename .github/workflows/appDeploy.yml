@@ -3,7 +3,7 @@ name: CI/CD for STAGE
 on:
   push:
     branches:
-      - prod
+      - freeze
 
 jobs:
   build:
@@ -66,93 +66,60 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Create Distribution Provisioning Profile
+
+      - name: Retrieve App ID by Bundle Identifier
+        id: retrieve_app_id
         run: |
-          echo "Creating Distribution Provisioning Profile..."
-          
-          PROFILE_NAME="MyApp Distribution Profile 8"
-          BUNDLE_ID="7Y7S27X27N"
-          CERTIFICATE_ID="SBN7N5SU5Q"
-          
-          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d @- <<EOF
+          bundle_id="com.org.easyPatientTesting3"  # Replace with your actual Bundle Identifier
+          token="${{ env.token }}"  # Use the token generated earlier
+      
+          response=$(curl -X GET "https://api.appstoreconnect.apple.com/v1/apps?filter\[bundleId\]=$bundle_id" \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/json")
+      
+          # Parse the response to get the App ID
+          app_id=$(echo "$response" | jq -r '.data[0].id')
+      
+          if [ -z "$app_id" ]; then
+            echo "Error: App with Bundle ID '$bundle_id' not found."
+            exit 1
+          fi
+      
+          echo "App ID: $app_id"
+          echo "app_id=$app_id" >> $GITHUB_ENV
+
+
+      - name: Update App Metadata
+        run: |
+          app_id="${{ env.app_id }}"  # Use the app ID retrieved in the previous step
+          token="${{ env.token }}"    # Use the token generated earlier
+      
+          metadata=$(cat <<EOF
           {
             "data": {
-              "type": "profiles",
+              "type": "apps",
+              "id": "$app_id",
               "attributes": {
-                "name": "$PROFILE_NAME",
-                "profileType": "IOS_APP_STORE"
-              },
-              "relationships": {
-                "bundleId": {
-                  "data": {
-                    "type": "bundleIds",
-                    "id": "$BUNDLE_ID"
-                  }
-                },
-                "certificates": {
-                  "data": [
-                    {
-                      "type": "certificates",
-                      "id": "$CERTIFICATE_ID"
-                    }
-                  ]
-                }
+                "name": "New App Name",  # Replace with your app's name
+                "primaryCategory": "BUSINESS",  # Replace with your primary category
+                "secondaryCategory": "PRODUCTIVITY",  # Replace with your secondary category
+                "privacyPolicyUrl": "https://example.com/privacy",  # Replace with your privacy policy URL
+                "marketingUrl": "https://example.com/marketing",  # Replace with your marketing URL
+                "supportUrl": "https://example.com/support",  # Replace with your support URL
+                "description": "This is an updated description of the app.",  # Replace with your app description
+                "keywords": "keyword1, keyword2",  # Replace with your app keywords
+                "releaseNotes": "These are the release notes for this version.",  # Replace with your release notes
+                "contentRating": "12+"  # Replace with your app's content rating
               }
             }
           }
           EOF
           )
-          
-          echo "Profile Response: $response"
-          
-          # Extract the Base64 encoded profile content
-          profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
-          
-          # Log the profile content length
-          echo "Profile content length: $(echo "$profile_content" | wc -c)"
-          
-          # Ensure the directory exists before saving the profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          
-          # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_8.mobileprovision
+      
+          curl -X PATCH "https://api.appstoreconnect.apple.com/v1/apps/$app_id" \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/json" \
+            -d "$metadata"
 
-      - name: Install CocoaPods
-        run: gem install cocoapods
 
-      - name: Cache CocoaPods
-        uses: actions/cache@v3
-        with:
-          path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
 
-      - name: Install Node.js dependencies
-        run: npm install --force
-
-      - name: Install Pods
-        run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install
-
-      - name: Install Xcode 15.3
-        run: |
-          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-          xcodebuild -version
-
-      - name: Build Archive
-        run: |
-          xcodebuild clean archive \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
-            -sdk iphoneos \
-            -configuration Release \
-            -derivedDataPath ios/build/DerivedData \
-            -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 8" \
-            CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"

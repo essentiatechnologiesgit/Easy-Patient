@@ -156,20 +156,16 @@ jobs:
               exit(1)
           EOF
 
-
-
-      - name: Checing condition
-        if: env.CERTIFICATE_COUNT != '2'
-        run: |
-          echo "Here"
-
-      - name: Generate RSA Private Key and CSR
-        if: env.CERTIFICATE_COUNT != '2'
+      - name: Generate RSA Private Key 
         run: |
           openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
+     
+
+      - name: Generate CSR using Private key
+        if: env.CERTIFICATE_COUNT != '2'
+        run: |
           openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
 
-          
       - name: Display CSR Contents
         if: env.CERTIFICATE_COUNT != '2'
         id: display_csr

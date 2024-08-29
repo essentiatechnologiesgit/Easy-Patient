@@ -131,15 +131,15 @@ jobs:
               print(f"Certificate Name: {cert_name}")
               print(f"Serial Number: {cert_serial_number}")
               print(f"Expiration Date: {cert_expiration_date}")
-
               
               # Save details to environment variables
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
                   env_file.write(f"CERT_ID={cert_id}\n")
                   env_file.write(f"CERT_SERIAL_NUMBER={cert_serial_number}\n")
                   env_file.write(f"CERT_EXPIRATION_DATE={cert_expiration_date}\n")
-
-              cert_content = cert_data['attributes']['certificateContent']
+      
+              # Fetch the certificate content
+              cert_content = cert['attributes']['certificateContent']
               with open('distribution.cer', 'w') as cert_file:
                   cert_file.write("-----BEGIN CERTIFICATE-----\n")
                   cert_file.write(cert_content + "\n")
@@ -155,6 +155,8 @@ jobs:
               print(f"Response: {response.json()}")
               exit(1)
           EOF
+
+
 
       - name: Checing condition
         if: env.CERTIFICATE_COUNT != '2'

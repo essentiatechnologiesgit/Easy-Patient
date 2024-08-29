@@ -218,6 +218,7 @@ jobs:
           if response.status_code == 201:
               cert_data = response.json()['data']
               cert_id = cert_data['id']
+              cert_name = cert['attributes']['name']
               cert_serial_number = cert_data['attributes']['serialNumber']
               
               print(f"Certificate ID: {cert_id}")

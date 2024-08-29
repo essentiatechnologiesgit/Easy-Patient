@@ -61,18 +61,43 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV    
 
-      - name: List Distribution Certificates
+      - name: Fetch and List Distribution Certificates
         run: |
-          echo "Fetching Distribution Certificates..."
-          response=$(curl -s -X GET "https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DISTRIBUTION" \
-            -H "Authorization: Bearer ${{ env.token }}")
-          echo "$response" > certificates.json
-          echo "CERTIFICATE_COUNT=$(jq '.data | length' certificates.json)" >> $GITHUB_ENV
-          env:
-            JWT_TOKEN: ${{ env.JWT_TOKEN }}
+          python <<EOF
+          import os
+          import requests
+          
+          # Define the URL for the App Store Connect API to fetch distribution certificates
+          url = "https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DISTRIBUTION"
+          
+          # Set the headers with the JWT token
+          headers = {
+              "Authorization": f"Bearer {os.getenv('JWT_TOKEN')}",
+              "Content-Type": "application/json"
+          }
+          
+          # Send the GET request to the API
+          response = requests.get(url, headers=headers)
+          
+          # Check if the request was successful
+          if response.status_code == 200:
+              cert_data = response.json()['data']
+              cert_count = len(cert_data)
+              
+              print(f"Number of Distribution Certificates: {cert_count}")
+              
+              # Save the certificate count to an environment variable
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f"CERTIFICATE_COUNT={cert_count}\n")
+          else:
+              print("Failed to fetch Distribution Certificates")
+              print(f"Status Code: {response.status_code}")
+              print(f"Response: {response.json()}")
+              exit(1)
+          EOF
+        env:
+          JWT_TOKEN: ${{ secrets.JWT_TOKEN }}
   
-      - name: Output Certificate Count
-        run: echo "Number of Distribution Certificates:${{ env.CERTIFICATE_COUNT }}"    
 
       # - name: Generate RSA Private Key and CSR
       #   run: |

@@ -67,33 +67,37 @@ jobs:
           python <<EOF
           import os
           import requests
-          
+      
           # Define the Bundle ID
           bundle_id = "com.org.easypatientdynamic"  # Replace with your actual Bundle Identifier
-          
+      
           # Define the URL for the App Store Connect API to fetch app details
           url = f"https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]={bundle_id}"
-          
+      
           # Set the headers with the JWT token
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",
               "Content-Type": "application/json"
           }
-          
+      
           # Send the GET request to the API
           response = requests.get(url, headers=headers)
-          
+      
           # Check if the request was successful
           if response.status_code == 200:
               app_data = response.json()['data']
               
-              # Fetch the App ID
+              # Print the complete record for the app
+              print("Complete App Record:")
+              print(app_data[0])
+              
+              # Fetch the App ID and Bundle ID
               app_id = app_data[0]['id']
               retrieved_bundle_id = app_data[0]['attributes']['bundleId']
-              
+      
               print(f"App ID: {app_id}")
               print(f"Bundle ID: {retrieved_bundle_id}")
-              
+      
               # Save the App ID and Bundle ID to environment variables
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
                   env_file.write(f"APP_ID={app_id}\n")

@@ -109,6 +109,48 @@ jobs:
               exit(1)
           EOF
 
+      - name: Fetch Team ID
+        run: |
+          python <<EOF
+          import os
+          import requests
+      
+          # Define the URL for the App Store Connect API to fetch team details
+          url = "https://api.appstoreconnect.apple.com/v1/teams"
+      
+          # Set the headers with the JWT token
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+              "Content-Type": "application/json"
+          }
+      
+          # Send the GET request to the API
+          response = requests.get(url, headers=headers)
+      
+          # Check if the request was successful
+          if response.status_code == 200:
+              team_data = response.json()['data']
+              
+              # Print the complete record for the team
+              print("Complete Team Record:")
+              print(team_data[0])
+              
+              # Fetch the Team ID
+              team_id = team_data[0]['id']
+      
+              print(f"Team ID: {team_id}")
+      
+              # Save the Team ID to environment variables
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f"TEAM_ID={team_id}\n")
+          else:
+              print("Failed to fetch Team ID")
+              print(f"Status Code: {response.status_code}")
+              print(f"Response: {response.json()}")
+              exit(1)
+          EOF
+
+
 
       - name: Fetch and List Distribution Certificates
         run: |

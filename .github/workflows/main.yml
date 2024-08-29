@@ -62,7 +62,46 @@ jobs:
           echo "token=$token" >> $GITHUB_ENV
 
 
-  
+      - name: Fetch Team ID and Bundle ID based on Bundle Identifier
+        run: |
+          python <<EOF
+          import os
+          import requests
+      
+          # Define the bundle identifier you want to filter by
+          bundle_identifier = "com.org.easypatientdynamic"  # Update with your bundle identifier
+      
+          # Define the URL for the App Store Connect API to fetch bundle IDs with filtering
+          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[bundleId]={bundle_identifier}"
+      
+          # Set the headers with the JWT token
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+              "Content-Type": "application/json"
+          }
+      
+          # Send the GET request to the API
+          response = requests.get(url, headers=headers)
+      
+          # Check if the request was successful
+          if response.status_code == 200:
+              bundle_data = response.json()['data'][0]  # Assuming there's at least one match
+              team_id = bundle_data['relationships']['bundleIdCapabilities']['links']['self'].split('/')[4]
+              bundle_id = bundle_data['id']
+              
+              print(f"Team ID: {team_id}")
+              print(f"Bundle ID: {bundle_id}")
+              
+              # Save the team ID and bundle ID to environment variables
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f"TEAM_ID={team_id}\n")
+                  env_file.write(f"BUNDLE_ID={bundle_id}\n")
+          else:
+              print("Failed to fetch Bundle IDs")
+              print(f"Status Code: {response.status_code}")
+              print(f"Response: {response.json()}")
+              exit(1)
+          EOF
 
       - name: Fetch and List Distribution Certificates
         run: |
@@ -128,19 +167,16 @@ jobs:
               cert_name = cert['attributes']['name']
               cert_serial_number = cert['attributes']['serialNumber']
               cert_expiration_date = cert['attributes']['expirationDate']
-              team_id = cert['attributes']['teamId']
               
               print(f"Certificate ID: {cert_id}")
               print(f"Certificate Name: {cert_name}")
               print(f"Serial Number: {cert_serial_number}")
               print(f"Expiration Date: {cert_expiration_date}")
-              print(f"Team ID: {team_id}")
               # Save details to environment variables
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
                   env_file.write(f"CERT_ID={cert_id}\n")
                   env_file.write(f"CERT_SERIAL_NUMBER={cert_serial_number}\n")
                   env_file.write(f"CERT_EXPIRATION_DATE={cert_expiration_date}\n")
-                  env_file.write(f"TEAM_ID={team_id}\n")
               # Fetch the certificate content
               cert_content = cert['attributes']['certificateContent']
               with open('distribution.cer', 'w') as cert_file:
@@ -225,11 +261,9 @@ jobs:
               cert_id = cert_data['id']
               cert_name = cert_data['attributes']['name']
               cert_serial_number = cert_data['attributes']['serialNumber']
-              team_id = cert_data['attributes']['teamId']
               
               print(f"Certificate ID: {cert_id}")
               print(f"Serial Number: {cert_serial_number}")
-              print(f"Team ID: {team_id}")
               
               # Save the certificate content to a file
               cert_content = cert_data['attributes']['certificateContent']
@@ -246,8 +280,6 @@ jobs:
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
                   env_file.write(f"CERTIFICATE_NAME={cert_name}\n")   
 
-              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f"TEAM_ID={team_id}\n")
           else:
               print("Failed to create Distribution Certificate")
               print(response.status_code)
@@ -319,7 +351,7 @@ jobs:
           echo "Creating Distribution Provisioning Profile..."
           
           PROFILE_NAME="MyApp Distribution Profile 9"  
-          BUNDLE_ID="7Y7S27X27N"
+          BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
           response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \

@@ -73,7 +73,7 @@ jobs:
           bundle_id="com.org.easyPatientTesting3"  # Replace with your actual Bundle Identifier
           token="${{ env.token }}"  # Use the token generated earlier
       
-          response=$(curl -X GET "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=$bundle_id" \
+          response=$(curl -X GET "https://api.appstoreconnect.apple.com/v1/apps?filter\[bundleId\]=$bundle_id" \
             -H "Authorization: Bearer $token" \
             -H "Content-Type: application/json")
       
@@ -87,5 +87,6 @@ jobs:
       
           echo "App ID: $app_id"
           echo "app_id=$app_id" >> $GITHUB_ENV
+
 
 

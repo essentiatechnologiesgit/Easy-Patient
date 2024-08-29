@@ -171,7 +171,6 @@ jobs:
           openssl genpkey -algorithm RSA -out "$GITHUB_WORKSPACE/rsa_private.key" -pkeyopt rsa_keygen_bits:2048
           echo "Generated a new RSA private key."
 
-
       - name: Generate CSR using Private key
         if: env.CERTIFICATE_COUNT != '2'
         run: |

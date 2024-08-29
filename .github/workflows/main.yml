@@ -28,30 +28,6 @@ jobs:
           gem install jwt
           pip install requests
 
-      - name: Generate RSA Private Key and CSR
-        run: |
-          openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
-          openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
-
-      - name: Display Generated CSR Contents
-        run: |
-          cat csr.certSigningRequest
-
-          
-      - name: Display CSR Contents
-        id: display_csr
-        run: |
-          csr_content=$(cat csr.certSigningRequest)
-          echo "CSR Content: $csr_content"
-          echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
-          echo "$csr_content" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Use CSR Content
-        run: |
-          echo "CSR Content saved in env variable:"
-          echo "$CSR_CONTENT"
-
       - name: Generate JWT
         id: generate_jwt
         run: |
@@ -83,283 +59,284 @@ jobs:
             puts token
           ")
           
-          echo "token=$token" >> $GITHUB_ENV
+          echo "token=$token" >> $GITHUB_ENV    
 
+      - name: List Distribution Certificates
+        run: |
+          echo "Fetching Distribution Certificates..."
+          response=$(curl -s -X GET "https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DISTRIBUTION" \
+            -H "Authorization: Bearer ${{ env.token }}")
+          echo "$response" > certificates.json
+          echo "CERTIFICATE_COUNT=$(jq '.data | length' certificates.json)" >> $GITHUB_ENV
+          env:
+            JWT_TOKEN: ${{ env.JWT_TOKEN }}
+  
+      - name: Output Certificate Count
+        run: echo "Number of Distribution Certificates:${{ env.CERTIFICATE_COUNT }}"    
 
-      # - name: Revoke the hardcoded certificate
+      # - name: Generate RSA Private Key and CSR
       #   run: |
-      #     import requests
+      #     openssl genpkey -algorithm RSA -out rsa_private.key -pkeyopt rsa_keygen_bits:2048
+      #     openssl req -new -key rsa_private.key -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
+
+      # - name: Display Generated CSR Contents
+      #   run: |
+      #     cat csr.certSigningRequest
+
+          
+      # - name: Display CSR Contents
+      #   id: display_csr
+      #   run: |
+      #     csr_content=$(cat csr.certSigningRequest)
+      #     echo "CSR Content: $csr_content"
+      #     echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
+      #     echo "$csr_content" >> $GITHUB_ENV
+      #     echo "EOF" >> $GITHUB_ENV
+
+      # - name: Use CSR Content
+      #   run: |
+      #     echo "CSR Content saved in env variable:"
+      #     echo "$CSR_CONTENT"
+
+
+
+
+
+
+      # - name: Request and Save Distribution Certificate
+      #   run: |
+      #     python <<EOF
       #     import os
-
-      #     # Hardcoded JWT and Certificate ID
-       
-      #     certificate_id = "LDXBV2688Z"
-
-      #     # API URL
-      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
+      #     import requests
+          
+      #     csr_content = os.getenv('CSR_CONTENT')
+          
+      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
       #     headers = {
       #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+      #     data = {
+      #         "data": {
+      #           "type": "certificates",
+      #           "attributes": {
+      #             "certificateType": "DISTRIBUTION",
+      #             "csrContent": csr_content
+      #           }
+      #         }
       #     }
           
-      #     # Making the DELETE request to revoke the certificate
-      #     response = requests.delete(url, headers=headers)
+      #     response = requests.post(url, json=data, headers=headers)
           
-      #     # Print the status and response content
-      #     print(f"Status Code: {response.status_code}")
-      #     if response.status_code == 204:
-      #         print("Certificate revoked successfully.")
+      #     if response.status_code == 201:
+      #         cert_data = response.json()['data']
+      #         cert_id = cert_data['id']
+      #         cert_serial_number = cert_data['attributes']['serialNumber']
+              
+      #         print(f"Certificate ID: {cert_id}")
+      #         print(f"Serial Number: {cert_serial_number}")
+              
+      #         # Save the certificate content to a file
+      #         cert_content = cert_data['attributes']['certificateContent']
+      #         with open('distribution.cer', 'w') as cert_file:
+      #             cert_file.write("-----BEGIN CERTIFICATE-----\n")
+      #             cert_file.write(cert_content + "\n")
+      #             cert_file.write("-----END CERTIFICATE-----\n")
+      #         print("Distribution Certificate created successfully")
+              
+      #         # Save Certificate ID to a file
+      #         with open('certificate_id.txt', 'w') as id_file:
+      #             id_file.write(cert_id)
       #     else:
-      #         print("Failed to revoke certificate.")
-      #         print(response.text)
-      #   shell: python
-
-      - name: Request and Save Distribution Certificate
-        run: |
-          python <<EOF
-          import os
-          import requests
-          
-          csr_content = os.getenv('CSR_CONTENT')
-          
-          url = "https://api.appstoreconnect.apple.com/v1/certificates"
-          headers = {
-              "Authorization": f"Bearer {os.getenv('token')}",
-              "Content-Type": "application/json"
-          }
-          data = {
-              "data": {
-                "type": "certificates",
-                "attributes": {
-                  "certificateType": "DISTRIBUTION",
-                  "csrContent": csr_content
-                }
-              }
-          }
-          
-          response = requests.post(url, json=data, headers=headers)
-          
-          if response.status_code == 201:
-              cert_data = response.json()['data']
-              cert_id = cert_data['id']
-              cert_serial_number = cert_data['attributes']['serialNumber']
-              
-              print(f"Certificate ID: {cert_id}")
-              print(f"Serial Number: {cert_serial_number}")
-              
-              # Save the certificate content to a file
-              cert_content = cert_data['attributes']['certificateContent']
-              with open('distribution.cer', 'w') as cert_file:
-                  cert_file.write("-----BEGIN CERTIFICATE-----\n")
-                  cert_file.write(cert_content + "\n")
-                  cert_file.write("-----END CERTIFICATE-----\n")
-              print("Distribution Certificate created successfully")
-              
-              # Save Certificate ID to a file
-              with open('certificate_id.txt', 'w') as id_file:
-                  id_file.write(cert_id)
-          else:
-              print("Failed to create Distribution Certificate")
-              print(response.status_code)
-              print(response.json())
-              exit(1)
-          EOF
+      #         print("Failed to create Distribution Certificate")
+      #         print(response.status_code)
+      #         print(response.json())
+      #         exit(1)
+      #     EOF
       
-      - name: Set Certificate ID as Environment Variable
-        run: echo "CERTIFICATE_ID=$(cat certificate_id.txt)" >> $GITHUB_ENV
+      # - name: Set Certificate ID as Environment Variable
+      #   run: echo "CERTIFICATE_ID=$(cat certificate_id.txt)" >> $GITHUB_ENV
 
-      - name: Debug - Print Certificate Content
-        run: cat distribution.cer
+      # - name: Debug - Print Certificate Content
+      #   run: cat distribution.cer
 
-      - name: Convert Certificate to .p12 format
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="-----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----"
-          
-          CERT_P12_PASSWORD="private_pass"
-      
-          echo "$private_key" > private_key.pem
-      
-          openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
-     
-      - name: Upload .p12 file as GitHub Actions artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: distribution-certificate
-          path: distribution.p12
-      
-      - name: Import certificate to keychain
-        run: |
-          # Enable command tracing
-          # Enable command tracing
-          set -x
-          
-          KEYCHAIN_NAME="build.keychain"
-          KEYCHAIN_PASSWORD="private_pass"
-          CERT_P12_PASSWORD="private_pass"
-          KEYCHAIN_PATH=~/Library/Keychains/"$KEYCHAIN_NAME"
-          
-          # Create a new keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
-          echo "Keychain created: $KEYCHAIN_NAME"
-          
-          # Set the keychain as the default keychain
-          security default-keychain -s "$KEYCHAIN_PATH"
-          echo "Default keychain set to: $KEYCHAIN_PATH"
-          
-          # Add the keychain to the list of keychains
-          security list-keychains -s "$KEYCHAIN_PATH"
-          echo "Keychain added to the list of keychains: $KEYCHAIN_PATH"
-          
-          # Unlock the keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          echo "Keychain unlocked: $KEYCHAIN_PATH"
-          
-          # Set the keychain timeout to 3600 seconds (1 hour)
-          security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
-          echo "Keychain timeout set to 3600 seconds"
-          
-          # Import the .p12 file into the keychain
-          security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
-          echo "Certificate imported to keychain: $KEYCHAIN_PATH"
-          
-          # Set the key partition list after the certificate is imported
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          echo "Key partition list set for keychain: $KEYCHAIN_PATH"
-          
-          # Validate that the certificate is present in the keychain
-          security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p
-          echo "Certificate found and validated in keychain"
-
-
-      # - name: Retrieve All App IDs
+      # - name: Convert Certificate to .p12 format
       #   run: |
-      #     echo "Retrieving App IDs..."
-      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json")
+      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+      #     KEY_ID="74H4QHFPVP"
+      #     private_key="-----BEGIN PRIVATE KEY-----
+      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+      #     +EG+nw8t
+      #     -----END PRIVATE KEY-----"
           
-      #     echo "$response" > bundle_ids.json
-      #     echo "Bundle IDs Response: $response"
-
-      #     # # Extract and print App IDs
-      #     # bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
-      #     # echo "App IDs: $bundle_ids"
-      #     # echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
-
-      - name: Create Distribution Provisioning Profile
-        run: |
-          echo "Creating Distribution Provisioning Profile..."
-          
-          PROFILE_NAME="MyApp Distribution Profile 9"  
-          # BUNDLE_ID="${{ env.bundle_id }}"  
-          BUNDLE_ID="7Y7S27X27N"
-          CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
-           # CERTIFICATE_ID="5QW8CZ7GNM"
-          
-          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d @- <<EOF
-          {
-            "data": {
-              "type": "profiles",
-              "attributes": {
-                "name": "$PROFILE_NAME",
-                "profileType": "IOS_APP_STORE"
-              },
-              "relationships": {
-                "bundleId": {
-                  "data": {
-                    "type": "bundleIds",
-                    "id": "$BUNDLE_ID"
-                  }
-                },
-                "certificates": {
-                  "data": [
-                    {
-                      "type": "certificates",
-                      "id": "$CERTIFICATE_ID"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-          EOF
-          )
+      #     CERT_P12_PASSWORD="private_pass"
       
-          echo "Profile Response: $response"
+      #     echo "$private_key" > private_key.pem
+      
+      #     openssl pkcs12 -export -inkey rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
+     
+      # - name: Upload .p12 file as GitHub Actions artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: distribution-certificate
+      #     path: distribution.p12
+      
+      # - name: Import certificate to keychain
+      #   run: |
+      #     # Enable command tracing
+      #     # Enable command tracing
+      #     set -x
           
-          # Save the profile ID or the profile content if needed
-          echo "Profile Response: $response"
+      #     KEYCHAIN_NAME="build.keychain"
+      #     KEYCHAIN_PASSWORD="private_pass"
+      #     CERT_P12_PASSWORD="private_pass"
+      #     KEYCHAIN_PATH=~/Library/Keychains/"$KEYCHAIN_NAME"
           
-          # Extract the Base64 encoded profile content
-          profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
+      #     # Create a new keychain
+      #     security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+      #     echo "Keychain created: $KEYCHAIN_NAME"
           
-          # Log the profile content length
-          echo "Profile content length: $(echo "$profile_content" | wc -c)"
+      #     # Set the keychain as the default keychain
+      #     security default-keychain -s "$KEYCHAIN_PATH"
+      #     echo "Default keychain set to: $KEYCHAIN_PATH"
           
-          # Ensure the directory exists before saving the profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #     # Add the keychain to the list of keychains
+      #     security list-keychains -s "$KEYCHAIN_PATH"
+      #     echo "Keychain added to the list of keychains: $KEYCHAIN_PATH"
           
-          # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
+      #     # Unlock the keychain
+      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      #     echo "Keychain unlocked: $KEYCHAIN_PATH"
+          
+      #     # Set the keychain timeout to 3600 seconds (1 hour)
+      #     security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
+      #     echo "Keychain timeout set to 3600 seconds"
+          
+      #     # Import the .p12 file into the keychain
+      #     security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
+      #     echo "Certificate imported to keychain: $KEYCHAIN_PATH"
+          
+      #     # Set the key partition list after the certificate is imported
+      #     security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      #     echo "Key partition list set for keychain: $KEYCHAIN_PATH"
+          
+      #     # Validate that the certificate is present in the keychain
+      #     security find-certificate -a -c "Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA" -p
+      #     echo "Certificate found and validated in keychain"
+
+
+
+
+      # - name: Create Distribution Provisioning Profile
+      #   run: |
+      #     echo "Creating Distribution Provisioning Profile..."
+          
+      #     PROFILE_NAME="MyApp Distribution Profile 9"  
+      #     # BUNDLE_ID="${{ env.bundle_id }}"  
+      #     BUNDLE_ID="7Y7S27X27N"
+      #     CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
+      #      # CERTIFICATE_ID="5QW8CZ7GNM"
+          
+      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d @- <<EOF
+      #     {
+      #       "data": {
+      #         "type": "profiles",
+      #         "attributes": {
+      #           "name": "$PROFILE_NAME",
+      #           "profileType": "IOS_APP_STORE"
+      #         },
+      #         "relationships": {
+      #           "bundleId": {
+      #             "data": {
+      #               "type": "bundleIds",
+      #               "id": "$BUNDLE_ID"
+      #             }
+      #           },
+      #           "certificates": {
+      #             "data": [
+      #               {
+      #                 "type": "certificates",
+      #                 "id": "$CERTIFICATE_ID"
+      #               }
+      #             ]
+      #           }
+      #         }
+      #       }
+      #     }
+      #     EOF
+      #     )
+      
+      #     echo "Profile Response: $response"
+          
+      #     # Save the profile ID or the profile content if needed
+      #     echo "Profile Response: $response"
+          
+      #     # Extract the Base64 encoded profile content
+      #     profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
+          
+      #     # Log the profile content length
+      #     echo "Profile content length: $(echo "$profile_content" | wc -c)"
+          
+      #     # Ensure the directory exists before saving the profile
+      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          
+      #     # Decode the Base64 content and save it as a .mobileprovision file
+      #     echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
   
 
-      - name: Install CocoaPods
-        run: gem install cocoapods
+      # - name: Install CocoaPods
+      #   run: gem install cocoapods
 
-      - name: Cache CocoaPods
-        uses: actions/cache@v3
-        with:
-          path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+      # - name: Cache CocoaPods
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ios/Pods
+      #     key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pods-
 
-      - name: Install Node.js dependencies
-        run: npm install --force
+      # - name: Install Node.js dependencies
+      #   run: npm install --force
 
-      - name: Install Pods
-        run: |
-          cd ios
-          pod deintegrate
-          rm -rf Pods Podfile.lock
-          pod update
-          pod install
+      # - name: Install Pods
+      #   run: |
+      #     cd ios
+      #     pod deintegrate
+      #     rm -rf Pods Podfile.lock
+      #     pod update
+      #     pod install
 
-      - name: Install Xcode 15.3
-        run: |
-          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-          xcodebuild -version
+      # - name: Install Xcode 15.3
+      #   run: |
+      #     sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+      #     xcodebuild -version
 
-      - name: Clean Derived Data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+      # - name: Clean Derived Data
+      #   run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
      
-      - name: Clean Build Folder
-        run: |
-          cd ios
-          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+      # - name: Clean Build Folder
+      #   run: |
+      #     cd ios
+      #     xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-      - name: Build Archive
-        run: |
-          xcodebuild clean archive \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
-            -sdk iphoneos \
-            -destination generic/platform=iOS \
-            -configuration Release \
-            -derivedDataPath ios/build/DerivedData \
-            -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
-            CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
+      # - name: Build Archive
+      #   run: |
+      #     xcodebuild clean archive \
+      #       -workspace ios/EasyPatientDynamic.xcworkspace \
+      #       -scheme EasyPatientDynamic \
+      #       -sdk iphoneos \
+      #       -destination generic/platform=iOS \
+      #       -configuration Release \
+      #       -derivedDataPath ios/build/DerivedData \
+      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
+      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
+      #       CODE_SIGN_IDENTITY="Apple Distribution: KLQ SOLUCOES TECNOLOGICAS LTDA"
 
       # - name: Update App Metadata
       #   run: |
@@ -406,3 +383,45 @@ jobs:
       #         print(response.json())
       #         exit(1)
       #     EOF
+
+            # - name: Revoke the hardcoded certificate
+      #   run: |
+      #     import requests
+      #     import os
+
+      #     # Hardcoded JWT and Certificate ID
+       
+      #     certificate_id = "LDXBV2688Z"
+
+      #     # API URL
+      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #     }
+          
+      #     # Making the DELETE request to revoke the certificate
+      #     response = requests.delete(url, headers=headers)
+          
+      #     # Print the status and response content
+      #     print(f"Status Code: {response.status_code}")
+      #     if response.status_code == 204:
+      #         print("Certificate revoked successfully.")
+      #     else:
+      #         print("Failed to revoke certificate.")
+      #         print(response.text)
+      #   shell: python
+
+            # - name: Retrieve All App IDs
+      #   run: |
+      #     echo "Retrieving App IDs..."
+      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json")
+          
+      #     echo "$response" > bundle_ids.json
+      #     echo "Bundle IDs Response: $response"
+
+      #     # # Extract and print App IDs
+      #     # bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
+      #     # echo "App IDs: $bundle_ids"
+      #     # echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV

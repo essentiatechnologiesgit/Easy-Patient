@@ -119,7 +119,7 @@ jobs:
               cert_data = response.json()['data']
               
               # Fetch the first certificate details
-              cert = cert_data[1]
+              cert = cert_data[0]
               cert_id = cert['id']
               cert_name = cert['attributes']['name']
               cert_serial_number = cert['attributes']['serialNumber']

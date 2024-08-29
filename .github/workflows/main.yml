@@ -122,7 +122,7 @@ jobs:
               
               # Fetch the first certificate details
               cert = cert_data[0]
-              CERTIFICATE_ID = cert['id']
+              cert_id = cert['id']
               cert_name = cert['attributes']['name']
               cert_serial_number = cert['attributes']['serialNumber']
               cert_expiration_date = cert['attributes']['expirationDate']

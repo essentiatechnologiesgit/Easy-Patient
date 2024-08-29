@@ -157,23 +157,24 @@ jobs:
       - name: Check for Existing RSA Private Key
         id: check_rsa_key
         run: |
-          if [ -f "path/to/your/rsa_private.key" ]; then
+          if [ -f "$GITHUB_WORKSPACE/rsa_private.key" ]; then
             echo "RSA private key found."
             echo "RSA_KEY_EXISTS=true" >> $GITHUB_ENV
           else
             echo "RSA private key not found."
             echo "RSA_KEY_EXISTS=false" >> $GITHUB_ENV
-
+      
       - name: Generate RSA Private Key 
         if: env.RSA_KEY_EXISTS == 'false'
         run: |
-          openssl genpkey -algorithm RSA -out path/to/your/rsa_private.key -pkeyopt rsa_keygen_bits:2048
+          openssl genpkey -algorithm RSA -out "$GITHUB_WORKSPACE/rsa_private.key" -pkeyopt rsa_keygen_bits:2048
           echo "Generated a new RSA private key."
+
 
       - name: Generate CSR using Private key
         if: env.CERTIFICATE_COUNT != '2'
         run: |
-          openssl req -new -key path/to/your/rsa_private.key -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
+          openssl req -new -key "$GITHUB_WORKSPACE/rsa_private.key" -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
 
       - name: Display CSR Contents
         if: env.CERTIFICATE_COUNT != '2'
@@ -247,7 +248,7 @@ jobs:
         run: |
           CERT_P12_PASSWORD="private_pass"
       
-          openssl pkcs12 -export -inkey path/to/your/rsa_private.key -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
+          openssl pkcs12 -export -inkey "$GITHUB_WORKSPACE/rsa_private.key" -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
      
       - name: Upload .p12 file as GitHub Actions artifact
         uses: actions/upload-artifact@v3

@@ -72,7 +72,7 @@ jobs:
           
           # Set the headers with the JWT token
           headers = {
-              "Authorization": f"Bearer {os.getenv('JWT_TOKEN')}",
+              "Authorization": f"Bearer {os.getenv('token')}",
               "Content-Type": "application/json"
           }
           

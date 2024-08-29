@@ -119,7 +119,7 @@ jobs:
               cert_data = response.json()['data']
               
               # Fetch the first certificate details
-              cert = cert_data[0]
+              cert = cert_data[1]
               cert_id = cert['id']
               cert_name = cert['attributes']['name']
               cert_serial_number = cert['attributes']['serialNumber']
@@ -355,64 +355,6 @@ jobs:
           echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
 
 
-      - name: Create Distribution Provisioning Profile
-        run: |
-          echo "Creating Distribution Provisioning Profile..."
-          
-          PROFILE_NAME="MyApp Distribution Profile 9"  
-          # BUNDLE_ID="${{ env.bundle_id }}"  
-          BUNDLE_ID="7Y7S27X27N"
-          CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
-           # CERTIFICATE_ID="5QW8CZ7GNM"
-          
-          response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d @- <<EOF
-          {
-            "data": {
-              "type": "profiles",
-              "attributes": {
-                "name": "$PROFILE_NAME",
-                "profileType": "IOS_APP_STORE"
-              },
-              "relationships": {
-                "bundleId": {
-                  "data": {
-                    "type": "bundleIds",
-                    "id": "$BUNDLE_ID"
-                  }
-                },
-                "certificates": {
-                  "data": [
-                    {
-                      "type": "certificates",
-                      "id": "$CERTIFICATE_ID"
-                    }
-                  ]
-                }
-              }
-            }
-          }
-          EOF
-          )
-      
-          echo "Profile Response: $response"
-          
-          # Save the profile ID or the profile content if needed
-          echo "Profile Response: $response"
-          
-          # Extract the Base64 encoded profile content
-          profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
-          
-          # Log the profile content length
-          echo "Profile content length: $(echo "$profile_content" | wc -c)"
-          
-          # Ensure the directory exists before saving the profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          
-          # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
   
 
       # - name: Install CocoaPods

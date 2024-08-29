@@ -148,7 +148,7 @@ jobs:
                   id_file.write(cert_id)
 
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  id_file.write(f"CERTIFICATE_NAME={cert_name}\n")       
+                  env_file.write(f"CERTIFICATE_NAME={cert_name}\n")     
           else:
               print("Failed to fetch Distribution Certificates")
               print(f"Status Code: {response.status_code}")

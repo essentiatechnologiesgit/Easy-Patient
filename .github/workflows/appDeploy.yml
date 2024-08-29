@@ -70,7 +70,7 @@ jobs:
       - name: Retrieve App ID by Bundle Identifier
         id: retrieve_app_id
         run: |
-          bundle_id="com.example.yourapp"  # Replace with your actual Bundle Identifier
+          bundle_id="com.org.easyPatientTesting3"  # Replace with your actual Bundle Identifier
           token="${{ env.token }}"  # Use the token generated earlier
       
           response=$(curl -X GET "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=$bundle_id" \

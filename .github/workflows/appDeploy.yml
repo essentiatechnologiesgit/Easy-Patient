@@ -89,4 +89,37 @@ jobs:
           echo "app_id=$app_id" >> $GITHUB_ENV
 
 
+      - name: Update App Metadata
+        run: |
+          app_id="${{ env.app_id }}"  # Use the app ID retrieved in the previous step
+          token="${{ env.token }}"    # Use the token generated earlier
+      
+          metadata=$(cat <<EOF
+          {
+            "data": {
+              "type": "apps",
+              "id": "$app_id",
+              "attributes": {
+                "name": "New App Name",  # Replace with your app's name
+                "primaryCategory": "BUSINESS",  # Replace with your primary category
+                "secondaryCategory": "PRODUCTIVITY",  # Replace with your secondary category
+                "privacyPolicyUrl": "https://example.com/privacy",  # Replace with your privacy policy URL
+                "marketingUrl": "https://example.com/marketing",  # Replace with your marketing URL
+                "supportUrl": "https://example.com/support",  # Replace with your support URL
+                "description": "This is an updated description of the app.",  # Replace with your app description
+                "keywords": "keyword1, keyword2",  # Replace with your app keywords
+                "releaseNotes": "These are the release notes for this version.",  # Replace with your release notes
+                "contentRating": "12+"  # Replace with your app's content rating
+              }
+            }
+          }
+          EOF
+          )
+      
+          curl -X PATCH "https://api.appstoreconnect.apple.com/v1/apps/$app_id" \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/json" \
+            -d "$metadata"
+
+
 

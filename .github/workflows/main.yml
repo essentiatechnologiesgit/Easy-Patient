@@ -95,9 +95,57 @@ jobs:
               print(f"Response: {response.json()}")
               exit(1)
           EOF
-        env:
-          JWT_TOKEN: ${{ secrets.JWT_TOKEN }}
-  
+
+
+      - name: Fetch Distribution Certificate Details
+        if: env.CERTIFICATE_COUNT == '2'
+        run: |
+          python <<EOF
+          import os
+          import requests
+          
+          # Define the URL for the App Store Connect API to fetch distribution certificates
+          url = "https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DISTRIBUTION"
+          
+          # Set the headers with the JWT token
+          headers = {
+              "Authorization": f"Bearer {os.getenv('token')}",
+              "Content-Type": "application/json"
+          }
+          
+          # Send the GET request to the API
+          response = requests.get(url, headers=headers)
+          
+          # Check if the request was successful
+          if response.status_code == 200:
+              cert_data = response.json()['data']
+              
+              # Fetch the first certificate details
+              cert = cert_data[0]
+              cert_id = cert['id']
+              cert_serial_number = cert['attributes']['serialNumber']
+              cert_expiration_date = cert['attributes']['expirationDate']
+              
+              print(f"Certificate ID: {cert_id}")
+              print(f"Serial Number: {cert_serial_number}")
+              print(f"Expiration Date: {cert_expiration_date}")
+              
+              # Save details to environment variables
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f"CERT_ID={cert_id}\n")
+                  env_file.write(f"CERT_SERIAL_NUMBER={cert_serial_number}\n")
+                  env_file.write(f"CERT_EXPIRATION_DATE={cert_expiration_date}\n")
+          else:
+              print("Failed to fetch Distribution Certificates")
+              print(f"Status Code: {response.status_code}")
+              print(f"Response: {response.json()}")
+              exit(1)
+          EOF
+
+      - name: Checing condition
+        if: env.CERTIFICATE_COUNT != '2'
+        run: |
+          echo "Here"
 
       # - name: Generate RSA Private Key and CSR
       #   run: |

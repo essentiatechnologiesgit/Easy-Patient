@@ -128,7 +128,7 @@ jobs:
                 "attributes": {
                   "description": "here goes your app description...",
                   "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
-                  "marketingUrl": "asd",
+                  "marketingUrl": null,
                   "promotionalText": "We introduce new features and improvements to improve your experience",
                   "supportUrl": "https://easy-health.app/landing-page/index.html"
                 }

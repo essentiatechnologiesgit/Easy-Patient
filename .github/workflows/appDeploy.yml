@@ -29,11 +29,14 @@ jobs:
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID="YOUR_ISSUER_ID"
-          KEY_ID="YOUR_KEY_ID"
+          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+          KEY_ID="74H4QHFPVP"
           private_key="
           -----BEGIN PRIVATE KEY-----
-          YOUR_PRIVATE_KEY
+          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+          +EG+nw8t
           -----END PRIVATE KEY-----
           "
 

@@ -1,22 +1,15 @@
-name: CI/CD for STAGE
-
+name: iOS Screenshot Upload Automation
 on:
   push:
     branches:
-      - freeze
+      - development
 
 jobs:
   build:
     runs-on: macos-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.12.1'
 
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -36,14 +29,11 @@ jobs:
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
+          ISSUER_ID="YOUR_ISSUER_ID"
+          KEY_ID="YOUR_KEY_ID"
           private_key="
           -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
+          YOUR_PRIVATE_KEY
           -----END PRIVATE KEY-----
           "
 
@@ -66,60 +56,83 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-
-      - name: Retrieve App ID by Bundle Identifier
-        id: retrieve_app_id
+      - name: Calculate image checksum
+        id: checksum
         run: |
-          bundle_id="com.org.easyPatientTesting3"  # Replace with your actual Bundle Identifier
-          token="${{ env.token }}"  # Use the token generated earlier
-      
-          response=$(curl -X GET "https://api.appstoreconnect.apple.com/v1/apps?filter\[bundleId\]=$bundle_id" \
-            -H "Authorization: Bearer $token" \
-            -H "Content-Type: application/json")
-      
-          # Parse the response to get the App ID
-          app_id=$(echo "$response" | jq -r '.data[0].id')
-      
-          if [ -z "$app_id" ]; then
-            echo "Error: App with Bundle ID '$bundle_id' not found."
-            exit 1
-          fi
-      
-          echo "App ID: $app_id"
-          echo "app_id=$app_id" >> $GITHUB_ENV
+          file_path="src/assets/Screenshots/04.png"
+          checksum=$(shasum -a 256 "$file_path" | awk '{ print $1 }')
+          echo "checksum=$checksum" >> $GITHUB_ENV
 
-
-      - name: Update App Metadata
+      - name: Create Screenshot Set
+        id: create_screenshot_set
         run: |
-          app_id="${{ env.app_id }}"  # Use the app ID retrieved in the previous step
-          token="${{ env.token }}"    # Use the token generated earlier
-      
-          metadata=$(cat <<EOF
-          {
-            "data": {
-              "type": "apps",
-              "id": "$app_id",
-              "attributes": {
-                "name": "New App Name",  # Replace with your app's name
-                "primaryCategory": "BUSINESS",  # Replace with your primary category
-                "secondaryCategory": "PRODUCTIVITY",  # Replace with your secondary category
-                "privacyPolicyUrl": "https://example.com/privacy",  # Replace with your privacy policy URL
-                "marketingUrl": "https://example.com/marketing",  # Replace with your marketing URL
-                "supportUrl": "https://example.com/support",  # Replace with your support URL
-                "description": "This is an updated description of the app.",  # Replace with your app description
-                "keywords": "keyword1, keyword2",  # Replace with your app keywords
-                "releaseNotes": "These are the release notes for this version.",  # Replace with your release notes
-                "contentRating": "12+"  # Replace with your app's content rating
-              }
-            }
-          }
-          EOF
-          )
-      
-          curl -X PATCH "https://api.appstoreconnect.apple.com/v1/apps/$app_id" \
-            -H "Authorization: Bearer $token" \
+          response=$(curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.token }}" \
             -H "Content-Type: application/json" \
-            -d "$metadata"
+            -d '{
+              "data": {
+                "type": "appScreenshotSets",
+                "attributes": {
+                  "deviceType": "IPHONE_6_5_INCH"
+                },
+                "relationships": {
+                  "appStoreVersion": {
+                    "data": {
+                      "id": "YOUR_APP_STORE_VERSION_ID",
+                      "type": "appStoreVersions"
+                    }
+                  }
+                }
+              }
+            }' \
+            https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
 
+          screenshot_set_id=$(echo $response | jq -r '.data.id')
+          echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
 
+      - name: Upload Screenshot
+        run: |
+          response=$(curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "appScreenshots",
+                "attributes": {
+                  "sourceFileChecksum": "${{ env.checksum }}",
+                  "uploaded": false
+                },
+                "relationships": {
+                  "appScreenshotSet": {
+                    "data": {
+                      "id": "${{ env.screenshot_set_id }}",
+                      "type": "appScreenshotSets"
+                    }
+                  }
+                }
+              }
+            }' \
+            https://api.appstoreconnect.apple.com/v1/appScreenshots)
 
+          upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
+          curl -X PUT \
+            -H "Content-Type: image/png" \
+            --data-binary "@src/assets/Screenshots/04.png" \
+            "$upload_url"
+
+      - name: Finalize Screenshot Upload
+        run: |
+          screenshot_id=$(echo $response | jq -r '.data.id')
+          curl -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "id": "'"$screenshot_id"'",
+                "type": "appScreenshots",
+                "attributes": {
+                  "uploaded": true
+                }
+              }
+            }' \
+            https://api.appstoreconnect.apple.com/v1/appScreenshots/"$screenshot_id"

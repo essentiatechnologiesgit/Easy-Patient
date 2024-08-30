@@ -1,6 +1,5 @@
 name: iOS Certificate Automation
 
-
 on:
   push:
     branches:

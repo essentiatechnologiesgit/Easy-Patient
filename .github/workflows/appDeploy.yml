@@ -120,48 +120,61 @@ jobs:
 
 
 
-      - name: Create Screenshot Set
-        id: create_screenshot_set
+      - name: Check for Existing Screenshot Set
+        id: check_screenshot_set
         run: |
-          response=$(curl -X POST \
+          response=$(curl -X GET \
             -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "appScreenshotSets",
-                "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_65"
-                },
-                "relationships": {
-                  "appStoreVersionLocalization": {
-                    "data": {
-                      "id": "'${{ env.app_store_version_localization_id }}'",
-                      "type": "appStoreVersionLocalizations"
+            "https://api.appstoreconnect.apple.com/v1/appScreenshotSets?filter%5BappStoreVersionLocalization%5D=${{ env.app_store_version_localization_id }}")
+      
+          echo "Check Screenshot Set Response: $response"
+      
+          screenshot_set_id=$(echo $response | jq -r '.data[0].id')
+      
+          if [ "$screenshot_set_id" == "null" ] || [ -z "$screenshot_set_id" ]; then
+            echo "No existing screenshot set found, creating a new one."
+      
+            response=$(curl -X POST \
+              -H "Authorization: Bearer ${{ env.token }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "data": {
+                  "type": "appScreenshotSets",
+                  "attributes": {
+                    "screenshotDisplayType": "APP_IPHONE_65"
+                  },
+                  "relationships": {
+                    "appStoreVersionLocalization": {
+                      "data": {
+                        "id": "'${{ env.app_store_version_localization_id }}'",
+                        "type": "appStoreVersionLocalizations"
+                      }
                     }
                   }
                 }
-              }
-            }' \
-            https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
+              }' \
+              https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
       
-          echo "Create Screenshot Set Response: $response"
+            echo "Create Screenshot Set Response: $response"
       
-          screenshot_set_id=$(echo $response | jq -r '.data.id')
+            screenshot_set_id=$(echo $response | jq -r '.data.id')
       
-          if [ "$screenshot_set_id" == "null" ] || [ -z "$screenshot_set_id" ]; then
-            echo "Failed to create screenshot set or invalid screenshot_set_id."
-            exit 1
+            if [ "$screenshot_set_id" == "null" ] || [ -z "$screenshot_set_id" ]; then
+              echo "Failed to create screenshot set or invalid screenshot_set_id."
+              exit 1
+            fi
+          else
+            echo "Existing screenshot set found."
           fi
       
           echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
-
-
+      
       - name: Upload Screenshot
         run: |
           file_path="src/assets/Screenshots/04.png"
           file_name=$(basename "$file_path")
           file_size=$(stat -f%z "$file_path")
-        
+      
           response=$(curl -X POST \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
@@ -183,24 +196,22 @@ jobs:
               }
             }' \
             https://api.appstoreconnect.apple.com/v1/appScreenshots)
-        
+      
           echo "Create Screenshot Response: $response"
-        
+      
           upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
-        
+      
           if [ "$upload_url" == "null" ] || [ -z "$upload_url" ]; then
             echo "Failed to retrieve upload URL."
             exit 1
           fi
-        
+      
           curl -X PUT \
             -H "Content-Type: image/png" \
             --data-binary "@$file_path" \
             "$upload_url"
-        
+      
           if [ $? -ne 0 ]; then
             echo "Failed to upload screenshot."
             exit 1
           fi
-
-

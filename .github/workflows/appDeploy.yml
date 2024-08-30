@@ -159,8 +159,9 @@ jobs:
       - name: Upload Screenshot
         run: |
           file_path="src/assets/Screenshots/04.png"
-          checksum=$(shasum -a 256 "$file_path" | awk '{ print $1 }')
-      
+          file_name=$(basename "$file_path")
+          file_size=$(stat -f%z "$file_path")
+        
           response=$(curl -X POST \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
@@ -168,8 +169,8 @@ jobs:
               "data": {
                 "type": "appScreenshots",
                 "attributes": {
-                  "sourceFileChecksum": "'$checksum'",
-                  "uploaded": false
+                  "fileName": "'$file_name'",
+                  "fileSize": '$file_size'
                 },
                 "relationships": {
                   "appScreenshotSet": {
@@ -182,13 +183,24 @@ jobs:
               }
             }' \
             https://api.appstoreconnect.apple.com/v1/appScreenshots)
-      
+        
           echo "Create Screenshot Response: $response"
-      
+        
           upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
-      
+        
+          if [ "$upload_url" == "null" ] || [ -z "$upload_url" ]; then
+            echo "Failed to retrieve upload URL."
+            exit 1
+          fi
+        
           curl -X PUT \
             -H "Content-Type: image/png" \
             --data-binary "@$file_path" \
             "$upload_url"
+        
+          if [ $? -ne 0 ]; then
+            echo "Failed to upload screenshot."
+            exit 1
+          fi
+
 

@@ -463,9 +463,15 @@ jobs:
               <string>app-store</string>
               <key>teamID</key>
               <string>${{ env.TEAM_ID }}</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.org.easypatientdynamic</key> <!-- Replace with your actual Bundle Identifier -->
+                  <string>MyApp Distribution Profile 9</string> <!-- Replace with your Provisioning Profile Name -->
+              </dict>
           </dict>
           </plist>
           EOF
+
 
   
 

@@ -110,26 +110,26 @@ jobs:
           python <<EOF
           import os
           import requests
-          
-          # Assuming you've already saved the App ID (or Bundle ID) from the previous steps
-          app_id = os.getenv('APP_ID')  # or replace with your specific App ID
-          
+      
+          # Assuming you've already saved the Bundle ID from the previous steps
+          bundle_id = os.getenv('BUNDLE_ID')  # or replace with your specific Bundle ID
+      
           # Define the URL for fetching bundle ID information
-          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/7Y7S27X27N"
-          
+          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/{bundle_id}"
+      
           # Set the headers with the JWT token
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",
               "Content-Type": "application/json"
           }
-          
+      
           # Send the GET request to the API
           response = requests.get(url, headers=headers)
-          
+      
           # Print the complete response for debugging
           print("Complete Response:")
           print(response.json())
-          
+      
           # Check if the request was successful
           if response.status_code == 200:
               bundle_data = response.json()
@@ -138,10 +138,13 @@ jobs:
               print("Bundle Data:")
               print(bundle_data)
               
-              # Optionally save specific details to environment variables
-              bundle_id = bundle_data['data']['id']
+              # Extract and print the seedId (Team ID)
+              seed_id = bundle_data['data']['attributes']['seedId']
+              print(f"Seed ID (Team ID): {seed_id}")
+              
+              # Save the seedId as TEAM_ID in the environment variables
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f"BUNDLE_ID={bundle_id}\n")
+                  env_file.write(f"TEAM_ID={seed_id}\n")
           else:
               print("Failed to fetch Bundle ID information")
               print(f"Status Code: {response.status_code}")

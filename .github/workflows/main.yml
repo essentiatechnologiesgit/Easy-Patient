@@ -116,7 +116,7 @@ jobs:
           import requests
           
           # Define the URL to get user information with valid roles
-          url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER,ADMIN,APP_MANAGER,DEVELOPER,MARKETING,SALES,ACCESS_TO_REPORTS,CUSTOMER_SUPPORT"
+          url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER"
           
           # Set the headers with the JWT token
           headers = {

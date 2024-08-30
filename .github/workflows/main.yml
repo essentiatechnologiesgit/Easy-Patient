@@ -115,9 +115,9 @@ jobs:
           import os
           import requests
           
-          # Define the URL to get team information
+          # Define the URL to get user information with valid roles
           url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER,ADMIN,APP_MANAGER,DEVELOPER,MARKETING,SALES,ACCESS_TO_REPORTS,CUSTOMER_SUPPORT"
-      
+          
           # Set the headers with the JWT token
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",
@@ -127,20 +127,32 @@ jobs:
           # Send the GET request to the API
           response = requests.get(url, headers=headers)
           
+          # Print the full response to debug
+          print("Full Response:")
+          print(response.json())
+          
           # Check if the request was successful
           if response.status_code == 200:
-              user_data = response.json()['data']
-              
-              # Extract the team ID from the response
-              if len(user_data) > 0:
-                  team_id = user_data[0]['relationships']['visibleApps']['data'][0]['id']
-                  print(f"Team ID: {team_id}")
+              if 'data' in response.json():
+                  user_data = response.json()['data']
                   
-                  # Save the Team ID to an environment variable
-                  with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                      env_file.write(f"TEAM_ID={team_id}\n")
+                  if len(user_data) > 0:
+                      # Attempt to extract team ID (adjust the path based on actual response structure)
+                      try:
+                          team_id = user_data[0]['relationships']['visibleApps']['data'][0]['id']
+                          print(f"Team ID: {team_id}")
+                          
+                          # Save the Team ID to an environment variable
+                          with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                              env_file.write(f"TEAM_ID={team_id}\n")
+                      except KeyError as e:
+                          print(f"KeyError: {e}. Please check the response structure.")
+                          exit(1)
+                  else:
+                      print("No team information found.")
+                      exit(1)
               else:
-                  print("No team information found.")
+                  print("The response did not contain 'data'. Please check the response structure.")
                   exit(1)
           else:
               print("Failed to fetch team information")

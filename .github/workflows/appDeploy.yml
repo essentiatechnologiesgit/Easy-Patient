@@ -60,6 +60,26 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
+      - name: Get App Store Version ID
+        id: get_app_store_version_id
+        run: |
+          app_id="your_app_id"  # Replace with your App ID
+      
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps/$app_id/appStoreVersions")
+      
+          echo "Response: $response"
+      
+          app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
+      
+          if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
+            echo "Failed to retrieve app store version ID."
+            exit 1
+          fi
+      
+          echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+
       - name: Create Screenshot Set
         id: create_screenshot_set
         run: |

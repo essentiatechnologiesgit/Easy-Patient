@@ -62,7 +62,7 @@ jobs:
       - name: Get App ID
         id: get_app_id
         run: |
-          bundle_id="com.org.easypatientdynamic"  # Replace with your app's Bundle ID
+          bundle_id="com.org.easyPatientTesting3"  # Replace with your app's Bundle ID
       
           response=$(curl -X GET \
             -H "Authorization: Bearer ${{ env.token }}" \
@@ -115,10 +115,9 @@ jobs:
       
           echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-      - name: Update App Description
-        id: update_app_description
+      - name: Update App Store Version Localization
+        id: update_app_store_version_localization
         run: |
-          description="here goes your app description..."  # Replace with your actual app description
           response=$(curl -X PATCH \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
@@ -127,13 +126,19 @@ jobs:
                 "id": "'${{ env.app_store_version_localization_id }}'",
                 "type": "appStoreVersionLocalizations",
                 "attributes": {
-                  "description": "'"$description"'"
+                  "description": "here goes your app description...",
+                  "locale": "en-US",
+                  "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
+                  "marketingUrl": null,
+                  "promotionalText": "We introduce new features and improvements to improve your experience",
+                  "supportUrl": "https://easy-health.app/landing-page/index.html"
                 }
               }
             }' \
             "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
-      
-          echo "Update App Description Response: $response"
+          
+          echo "Update App Store Version Localization Response: $response"
+
 
       # - name: Create Screenshot Set
       #   id: create_screenshot_set

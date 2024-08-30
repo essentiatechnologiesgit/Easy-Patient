@@ -67,7 +67,7 @@ jobs:
       
           response=$(curl -X GET \
             -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=$bundle_id")
+            "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
       
           echo "Response: $response"
       
@@ -79,6 +79,7 @@ jobs:
           fi
       
           echo "app_id=$app_id" >> $GITHUB_ENV
+
 
 
       - name: Get App Store Version ID

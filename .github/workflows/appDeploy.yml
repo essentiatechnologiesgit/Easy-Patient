@@ -1,5 +1,4 @@
 name: iOS Screenshot Upload
-
 on:
   push:
     branches:

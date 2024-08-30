@@ -62,7 +62,7 @@ jobs:
           echo "token=$token" >> $GITHUB_ENV
 
 
-      - name: Fetch App ID and Bundle ID
+      - name: Fetch  Bundle ID
         run: |
           python <<EOF
           import os
@@ -114,44 +114,40 @@ jobs:
           python <<EOF
           import os
           import requests
-      
-          # Define the URL for the App Store Connect API to fetch user details
-          url = "https://api.appstoreconnect.apple.com/v1/users/me"
-      
+          
+          # Define the URL to get team information
+          url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER,ADMIN,APP_MANAGER,DEVELOPER,MARKETING,SALES,ACCESS_TO_REPORTS,CUSTOMER_SUPPORT,TECHNICAL"
+          
           # Set the headers with the JWT token
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",
               "Content-Type": "application/json"
           }
-      
+          
           # Send the GET request to the API
           response = requests.get(url, headers=headers)
-      
+          
           # Check if the request was successful
           if response.status_code == 200:
-              user_data = response.json()
+              user_data = response.json()['data']
               
-              # Print the complete record for the user
-              print("Complete User Record:")
-              print(user_data)
-              
-              # Fetch the Team ID (assuming the user is part of a team)
-              # Note: Extract the team ID from the user's team info if available
-              team_id = user_data.get('data', {}).get('relationships', {}).get('teams', {}).get('data', [{}])[0].get('id')
-      
-              print(f"Team ID: {team_id}")
-      
-              # Save the Team ID to environment variables
-              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f"TEAM_ID={team_id}\n")
+              # Extract the team ID from the response
+              if len(user_data) > 0:
+                  team_id = user_data[0]['relationships']['visibleApps']['data'][0]['id']
+                  print(f"Team ID: {team_id}")
+                  
+                  # Save the Team ID to an environment variable
+                  with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                      env_file.write(f"TEAM_ID={team_id}\n")
+              else:
+                  print("No team information found.")
+                  exit(1)
           else:
-              print("Failed to fetch Team ID")
+              print("Failed to fetch team information")
               print(f"Status Code: {response.status_code}")
               print(f"Response: {response.json()}")
               exit(1)
           EOF
-
-
 
 
       - name: Fetch and List Distribution Certificates

@@ -1,11 +1,12 @@
-name: iOS Screenshot Upload Automation
+name: iOS Screenshot Upload
+
 on:
   push:
     branches:
       - development
 
 jobs:
-  build:
+  upload-screenshot:
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -24,19 +25,16 @@ jobs:
       - name: Install dependencies
         run: |
           gem install jwt
-          pip install requests
+          pip install requests jq
 
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
+          ISSUER_ID="your_issuer_id"
+          KEY_ID="your_key_id"
           private_key="
           -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
+          your_private_key_here
           -----END PRIVATE KEY-----
           "
 
@@ -59,15 +57,6 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Calculate image checksum
-        id: checksum
-        run: |
-          file_path="src/assets/Screenshots/04.png"
-          checksum=$(shasum -a 256 "$file_path" | awk '{ print $1 }')
-          echo "checksum=$checksum" >> $GITHUB_ENV
-
-      # Other steps remain the same
-      
       - name: Create Screenshot Set
         id: create_screenshot_set
         run: |
@@ -78,32 +67,34 @@ jobs:
               "data": {
                 "type": "appScreenshotSets",
                 "attributes": {
-                  "deviceType": "IPHONE_6_5_INCH"
+                  "screenshotDisplayType": "APP_IPHONE_65"
                 },
                 "relationships": {
-                  "appStoreVersion": {
+                  "appStoreVersionLocalization": {
                     "data": {
-                      "id": "YOUR_APP_STORE_VERSION_ID",
-                      "type": "appStoreVersions"
+                      "id": "your_app_store_version_localization_id",
+                      "type": "appStoreVersionLocalizations"
                     }
                   }
                 }
               }
             }' \
             https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
-      
+
           echo "Create Screenshot Set Response: $response"
           screenshot_set_id=$(echo $response | jq -r '.data.id')
-      
+
           if [ "$screenshot_set_id" == "null" ] || [ -z "$screenshot_set_id" ]; then
             echo "Failed to create screenshot set or invalid screenshot_set_id."
             exit 1
           fi
-      
+
           echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
-      
+
       - name: Upload Screenshot
         run: |
+          checksum=$(shasum -a 256 src/assets/Screenshots/04.png | awk '{ print $1 }')
+
           response=$(curl -X POST \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
@@ -111,7 +102,7 @@ jobs:
               "data": {
                 "type": "appScreenshots",
                 "attributes": {
-                  "sourceFileChecksum": "${{ env.checksum }}",
+                  "sourceFileChecksum": "'$checksum'",
                   "uploaded": false
                 },
                 "relationships": {
@@ -125,15 +116,15 @@ jobs:
               }
             }' \
             https://api.appstoreconnect.apple.com/v1/appScreenshots)
-      
+
           echo "Upload Screenshot Response: $response"
           upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
-      
+
           if [ -z "$upload_url" ]; then
             echo "Failed to obtain upload URL."
             exit 1
           fi
-      
+
           curl -X PUT \
             -H "Content-Type: image/png" \
             --data-binary "@src/assets/Screenshots/04.png" \

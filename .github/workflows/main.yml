@@ -115,7 +115,7 @@ jobs:
           app_id = os.getenv('APP_ID')  # or replace with your specific App ID
           
           # Define the URL for fetching bundle ID information
-          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/6532601702"
+          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/7Y7S27X27N"
           
           # Set the headers with the JWT token
           headers = {

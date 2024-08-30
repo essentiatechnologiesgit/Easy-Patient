@@ -60,14 +60,33 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Get App Store Version ID
-        id: get_app_store_version_id
+      - name: Get App ID
+        id: get_app_id
         run: |
-          app_id="your_app_id"  # Replace with your App ID
+          bundle_id="com.org.easypatientdynamic"  # Replace with your app's Bundle ID
       
           response=$(curl -X GET \
             -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/apps/$app_id/appStoreVersions")
+            "https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=$bundle_id")
+      
+          echo "Response: $response"
+      
+          app_id=$(echo $response | jq -r '.data[0].id')
+      
+          if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+            echo "Failed to retrieve app ID."
+            exit 1
+          fi
+      
+          echo "app_id=$app_id" >> $GITHUB_ENV
+
+
+      - name: Get App Store Version ID
+        id: get_app_store_version_id
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
       
           echo "Response: $response"
       
@@ -79,6 +98,26 @@ jobs:
           fi
       
           echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+
+      - name: Get App Store Version Localization ID
+        id: get_app_store_version_localization_id
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+      
+          echo "Response: $response"
+      
+          app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
+      
+          if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
+            echo "Failed to retrieve app store version localization ID."
+            exit 1
+          fi
+      
+          echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
+
+
 
       - name: Create Screenshot Set
         id: create_screenshot_set
@@ -95,7 +134,7 @@ jobs:
                 "relationships": {
                   "appStoreVersionLocalization": {
                     "data": {
-                      "id": "your_app_store_version_localization_id",
+                      "id": "'${{ env.app_store_version_localization_id }}'",
                       "type": "appStoreVersionLocalizations"
                     }
                   }
@@ -103,21 +142,24 @@ jobs:
               }
             }' \
             https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
-
+      
           echo "Create Screenshot Set Response: $response"
+      
           screenshot_set_id=$(echo $response | jq -r '.data.id')
-
+      
           if [ "$screenshot_set_id" == "null" ] || [ -z "$screenshot_set_id" ]; then
             echo "Failed to create screenshot set or invalid screenshot_set_id."
             exit 1
           fi
-
+      
           echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+
 
       - name: Upload Screenshot
         run: |
-          checksum=$(shasum -a 256 src/assets/Screenshots/04.png | awk '{ print $1 }')
-
+          file_path="src/assets/Screenshots/04.png"
+          checksum=$(shasum -a 256 "$file_path" | awk '{ print $1 }')
+      
           response=$(curl -X POST \
             -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
@@ -131,7 +173,7 @@ jobs:
                 "relationships": {
                   "appScreenshotSet": {
                     "data": {
-                      "id": "${{ env.screenshot_set_id }}",
+                      "id": "'${{ env.screenshot_set_id }}'",
                       "type": "appScreenshotSets"
                     }
                   }
@@ -139,16 +181,13 @@ jobs:
               }
             }' \
             https://api.appstoreconnect.apple.com/v1/appScreenshots)
-
-          echo "Upload Screenshot Response: $response"
+      
+          echo "Create Screenshot Response: $response"
+      
           upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
-
-          if [ -z "$upload_url" ]; then
-            echo "Failed to obtain upload URL."
-            exit 1
-          fi
-
+      
           curl -X PUT \
             -H "Content-Type: image/png" \
-            --data-binary "@src/assets/Screenshots/04.png" \
+            --data-binary "@$file_path" \
             "$upload_url"
+

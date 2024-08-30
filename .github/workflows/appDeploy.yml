@@ -127,9 +127,8 @@ jobs:
                 "type": "appStoreVersionLocalizations",
                 "attributes": {
                   "description": "here goes your app description...",
-                  "locale": "en-US",
                   "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
-                  "marketingUrl": null,
+                  "marketingUrl": "asd",
                   "promotionalText": "We introduce new features and improvements to improve your experience",
                   "supportUrl": "https://easy-health.app/landing-page/index.html"
                 }

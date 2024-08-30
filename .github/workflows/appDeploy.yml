@@ -79,8 +79,6 @@ jobs:
       
           echo "app_id=$app_id" >> $GITHUB_ENV
 
-
-
       - name: Get App Store Version ID
         id: get_app_store_version_id
         run: |
@@ -117,7 +115,25 @@ jobs:
       
           echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-
+      - name: Update App Description
+        id: update_app_description
+        run: |
+          description="here goes your app description..."  # Replace with your actual app description
+          response=$(curl -X PATCH \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "id": "'${{ env.app_store_version_localization_id }}'",
+                "type": "appStoreVersionLocalizations",
+                "attributes": {
+                  "description": "'"$description"'"
+                }
+              }
+            }' \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+      
+          echo "Update App Description Response: $response"
 
       # - name: Create Screenshot Set
       #   id: create_screenshot_set
@@ -153,50 +169,55 @@ jobs:
       #     fi
 
       #     echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+
+      # - name: Upload Screenshot
+      #   run: |
+      #     file_path="src/assets/Screenshots/04.png"
+      #     file_name=$(basename "$file_path")
+      #     file_size=$(stat -f%z "$file_path")
       
-      - name: Upload Screenshot
-        run: |
-          file_path="src/assets/Screenshots/04.png"
-          file_name=$(basename "$file_path")
-          file_size=$(stat -f%z "$file_path")
+      #     response=$(curl -X POST \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d '{
+      #         "data": {
+      #           "type": "appScreenshots",
+      #           "attributes": {
+      #             "fileName": "'$file_name'",
+      #             "fileSize": '$file_size'
+      #           },
+      #           "relationships": {
+      #             "appScreenshotSet": {
+      #               "data": {
+      #                 "id": "ee94f55b-3af8-49c7-806b-3ef5475a5292",
+      #                 "type": "appScreenshotSets"
+      #               }
+      #             }
+      #           }
+      #         }
+      #       }' \
+      #       https://api.appstoreconnect.apple.com/v1/appScreenshots)
       
-          response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "appScreenshots",
-                "attributes": {
-                  "fileName": "'$file_name'",
-                  "fileSize": '$file_size'
-                },
-                "relationships": {
-                  "appScreenshotSet": {
-                    "data": {
-                      "id": "ee94f55b-3af8-49c7-806b-3ef5475a5292",
-                      "type": "appScreenshotSets"
-                    }
-                  }
-                }
-              }
-            }' \
-            https://api.appstoreconnect.apple.com/v1/appScreenshots)
+      #     echo "Create Screenshot Response: $response"
       
-          echo "Create Screenshot Response: $response"
+      #     upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
       
-          upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
+      #     if [ "$upload_url" == "null" ] || [ -z "$upload_url" ]; then
+      #       echo "Failed to retrieve upload URL."
+      #       exit 1
+      #     fi
       
-          if [ "$upload_url" == "null" ] || [ -z "$upload_url" ]; then
-            echo "Failed to retrieve upload URL."
-            exit 1
-          fi
+      #     curl -X PUT \
+      #       -H "Content-Type: image/png" \
+      #       --data-binary "@$file_path" \
+      #       "$upload_url"
       
-          curl -X PUT \
-            -H "Content-Type: image/png" \
-            --data-binary "@$file_path" \
-            "$upload_url"
+      #     if [ $? -ne 0 ]; then
+      #       echo "Failed to upload screenshot."
+      #       exit 1
+      #     fi
+
+
+
       
-          if [ $? -ne 0 ]; then
-            echo "Failed to upload screenshot."
-            exit 1
-          fi
+

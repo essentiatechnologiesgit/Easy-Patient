@@ -116,8 +116,8 @@ jobs:
           import requests
           
           # Define the URL to get team information
-          url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER,ADMIN,APP_MANAGER,DEVELOPER,MARKETING,SALES,ACCESS_TO_REPORTS,CUSTOMER_SUPPORT,TECHNICAL"
-          
+          url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER,ADMIN,APP_MANAGER,DEVELOPER,MARKETING,SALES,ACCESS_TO_REPORTS,CUSTOMER_SUPPORT"
+      
           # Set the headers with the JWT token
           headers = {
               "Authorization": f"Bearer {os.getenv('token')}",

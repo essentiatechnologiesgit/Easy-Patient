@@ -62,17 +62,17 @@ jobs:
           echo "token=$token" >> $GITHUB_ENV
 
 
-      - name: Fetch  Bundle ID
+      - name: Fetch Bundle ID
         run: |
           python <<EOF
           import os
           import requests
       
-          # Define the Bundle ID
+          # Define the Bundle Identifier
           bundle_id = "com.org.easypatientdynamic"  # Replace with your actual Bundle Identifier
       
-          # Define the URL for the App Store Connect API to fetch app details
-          url = f"https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]={bundle_id}"
+          # Define the URL for the App Store Connect API to fetch bundle details
+          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[identifier]={bundle_id}"
       
           # Set the headers with the JWT token
           headers = {
@@ -85,25 +85,21 @@ jobs:
       
           # Check if the request was successful
           if response.status_code == 200:
-              app_data = response.json()['data']
+              bundle_data = response.json()['data']
               
-              # Print the complete record for the app
-              print("Complete App Record:")
-              print(app_data[0])
-              
-              # Fetch the App ID and Bundle ID
-              app_id = app_data[0]['id']
-              retrieved_bundle_id = app_data[0]['attributes']['bundleId']
-      
-              print(f"App ID: {app_id}")
-              print(f"Bundle ID: {retrieved_bundle_id}")
-      
-              # Save the App ID and Bundle ID to environment variables
-              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f"APP_ID={app_id}\n")
-                  env_file.write(f"BUNDLE_ID={retrieved_bundle_id}\n")
+              if len(bundle_data) > 0:
+                  # Fetch the Bundle ID
+                  bundle_id = bundle_data[0]['id']
+                  print(f"Bundle ID: {bundle_id}")
+                  
+                  # Save the Bundle ID to an environment variable
+                  with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                      env_file.write(f"BUNDLE_ID={bundle_id}\n")
+              else:
+                  print("No bundle ID found for the specified identifier.")
+                  exit(1)
           else:
-              print("Failed to fetch App IDs")
+              print("Failed to fetch Bundle ID")
               print(f"Status Code: {response.status_code}")
               print(f"Response: {response.json()}")
               exit(1)

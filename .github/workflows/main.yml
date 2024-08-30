@@ -116,7 +116,7 @@ jobs:
           import requests
           
           # Assuming you've already saved the App ID (or Bundle ID) from the previous steps
-          app_id = os.getenv('APP_ID')  # or replace with your specific App ID
+          app_id = os.getenv('BUNDLE_ID')  # or replace with your specific App ID
           
           # Define the URL for fetching bundle ID information
           url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/{app_id}"

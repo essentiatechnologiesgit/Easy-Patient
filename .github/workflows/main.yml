@@ -109,14 +109,17 @@ jobs:
               exit(1)
           EOF
 
-      - name: Fetch Team ID
+      - name: Fetch Bundle ID Information
         run: |
           python <<EOF
           import os
           import requests
           
-          # Define the URL to get user information with valid roles
-          url = "https://api.appstoreconnect.apple.com/v1/users?filter[roles]=ACCOUNT_HOLDER"
+          # Assuming you've already saved the App ID (or Bundle ID) from the previous steps
+          app_id = os.getenv('APP_ID')  # or replace with your specific App ID
+          
+          # Define the URL for fetching bundle ID information
+          url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/{app_id}"
           
           # Set the headers with the JWT token
           headers = {
@@ -127,46 +130,26 @@ jobs:
           # Send the GET request to the API
           response = requests.get(url, headers=headers)
           
-          # Print the full response to debug
-          print("Full Response:")
+          # Print the complete response for debugging
+          print("Complete Response:")
           print(response.json())
           
           # Check if the request was successful
           if response.status_code == 200:
-              user_data = response.json().get('data', [])
+              bundle_data = response.json()
               
-              if user_data:
-                  # Extract the first user's visibleApps link
-                  visible_apps_url = user_data[0]['relationships']['visibleApps']['links']['related']
-                  
-                  # Fetch the visible apps to get the team ID
-                  visible_apps_response = requests.get(visible_apps_url, headers=headers)
-                  
-                  if visible_apps_response.status_code == 200:
-                      visible_apps_data = visible_apps_response.json().get('data', [])
-                      
-                      if visible_apps_data:
-                          # Assuming team ID is associated with the visible app, adjust according to actual structure
-                          team_id = visible_apps_data[0]['id']
-                          print(f"Team ID: {team_id}")
-                          
-                          # Save the Team ID to an environment variable
-                          with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                              env_file.write(f"TEAM_ID={team_id}\n")
-                      else:
-                          print("No visible apps found.")
-                          exit(1)
-                  else:
-                      print(f"Failed to fetch visible apps. Status Code: {visible_apps_response.status_code}")
-                      print(visible_apps_response.json())
-                      exit(1)
-              else:
-                  print("No user data found.")
-                  exit(1)
+              # Print the specific details if needed
+              print("Bundle Data:")
+              print(bundle_data)
+              
+              # Optionally save specific details to environment variables
+              bundle_id = bundle_data['data']['id']
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f"BUNDLE_ID={bundle_id}\n")
           else:
-              print("Failed to fetch user information")
+              print("Failed to fetch Bundle ID information")
               print(f"Status Code: {response.status_code}")
-              print(response.json())
+              print(f"Response: {response.json()}")
               exit(1)
           EOF
 

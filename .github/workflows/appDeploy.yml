@@ -72,7 +72,7 @@ jobs:
         id: create_screenshot_set
         run: |
           response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.token }}" \
+            -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
             -d '{
               "data": {
@@ -105,7 +105,7 @@ jobs:
       - name: Upload Screenshot
         run: |
           response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.token }}" \
+            -H "Authorization: Bearer ${{ env.token }}" \
             -H "Content-Type: application/json" \
             -d '{
               "data": {

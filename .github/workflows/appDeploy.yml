@@ -21,122 +21,131 @@ jobs:
         with:
           ruby-version: 3.3
 
-      - name: Install dependencies
+      - name: Extract bundleID from config.js
+        id: extract-bundleid
         run: |
-          gem install jwt
-          pip install requests jq
+          bundleID=$(grep 'bundleID' path/to/your/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          echo "bundleID=$bundleID" >> $GITHUB_ENV
 
-      - name: Generate JWT
-        id: generate_jwt
-        run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
+      - name: Echo extracted bundleID
+        run: echo "Extracted bundleID is ${{ env.bundleID }}"   
 
-          token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
+      # - name: Install dependencies
+      #   run: |
+      #     gem install jwt
+      #     pip install requests jq
+
+      # - name: Generate JWT
+      #   id: generate_jwt
+      #   run: |
+      #     ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
+      #     KEY_ID="74H4QHFPVP"
+      #     private_key="
+      #     -----BEGIN PRIVATE KEY-----
+      #     MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+      #     pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+      #     6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+      #     +EG+nw8t
+      #     -----END PRIVATE KEY-----
+      #     "
+
+      #     token=$(ruby -rjwt -ropenssl -e "
+      #       private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+      #       token = JWT.encode(
+      #         {
+      #           iss: '$ISSUER_ID',
+      #           exp: Time.now.to_i + 20 * 60,
+      #           aud: 'appstoreconnect-v1'
+      #         },
+      #         private_key_obj,
+      #         'ES256',
+      #         header_fields = {
+      #           kid: '$KEY_ID'
+      #         }
+      #       )
+      #       puts token
+      #     ")
           
-          echo "token=$token" >> $GITHUB_ENV
+      #     echo "token=$token" >> $GITHUB_ENV
 
-      - name: Get App ID
-        id: get_app_id
-        run: |
-          bundle_id="com.org.easyPatientTesting3"  # Replace with your app's Bundle ID
+      # - name: Get App ID
+      #   id: get_app_id
+      #   run: |
+      #     bundle_id="com.org.easyPatientTesting3"  # Replace with your app's Bundle ID
       
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
+      #     response=$(curl -X GET \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
       
-          echo "Response: $response"
+      #     echo "Response: $response"
       
-          app_id=$(echo $response | jq -r '.data[0].id')
+      #     app_id=$(echo $response | jq -r '.data[0].id')
       
-          if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
-            echo "Failed to retrieve app ID."
-            exit 1
-          fi
+      #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+      #       echo "Failed to retrieve app ID."
+      #       exit 1
+      #     fi
       
-          echo "app_id=$app_id" >> $GITHUB_ENV
+      #     echo "app_id=$app_id" >> $GITHUB_ENV
 
-      - name: Get App Store Version ID
-        id: get_app_store_version_id
-        run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
+      # - name: Get App Store Version ID
+      #   id: get_app_store_version_id
+      #   run: |
+      #     response=$(curl -X GET \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
       
-          echo "Response: $response"
+      #     echo "Response: $response"
       
-          app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
+      #     app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
       
-          if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
-            echo "Failed to retrieve app store version ID."
-            exit 1
-          fi
+      #     if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
+      #       echo "Failed to retrieve app store version ID."
+      #       exit 1
+      #     fi
       
-          echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+      #     echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
 
-      - name: Get App Store Version Localization ID
-        id: get_app_store_version_localization_id
-        run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+      # - name: Get App Store Version Localization ID
+      #   id: get_app_store_version_localization_id
+      #   run: |
+      #     response=$(curl -X GET \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
       
-          echo "Response: $response"
+      #     echo "Response: $response"
       
-          app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
+      #     app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
       
-          if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
-            echo "Failed to retrieve app store version localization ID."
-            exit 1
-          fi
+      #     if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
+      #       echo "Failed to retrieve app store version localization ID."
+      #       exit 1
+      #     fi
       
-          echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
+      #     echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-      - name: Update App Store Version Localization
-        id: update_app_store_version_localization
-        run: |
-          response=$(curl -X PATCH \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "id": "'${{ env.app_store_version_localization_id }}'",
-                "type": "appStoreVersionLocalizations",
-                "attributes": {
-                  "description": "here goes your app description...",
-                  "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
-                  "marketingUrl": null,
-                  "promotionalText": "We introduce new features and improvements to improve your experience",
-                  "supportUrl": "https://easy-health.app/landing-page/index.html"
-                }
-              }
-            }' \
-            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+      # - name: Update App Store Version Localization
+      #   id: update_app_store_version_localization
+      #   run: |
+      #     response=$(curl -X PATCH \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d '{
+      #         "data": {
+      #           "id": "'${{ env.app_store_version_localization_id }}'",
+      #           "type": "appStoreVersionLocalizations",
+      #           "attributes": {
+      #             "description": "here goes your app description...",
+      #             "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
+      #             "marketingUrl": null,
+      #             "promotionalText": "We introduce new features and improvements to improve your experience",
+      #             "supportUrl": "https://easy-health.app/landing-page/index.html"
+      #           }
+      #         }
+      #       }' \
+      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
           
-          echo "Update App Store Version Localization Response: $response"
+      #     echo "Update App Store Version Localization Response: $response"
 
 
       # - name: Create Screenshot Set

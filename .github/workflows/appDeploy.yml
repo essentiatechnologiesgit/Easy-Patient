@@ -2,8 +2,7 @@ name: iOS Screenshot Upload
 on:
   push:
     branches:
-      - development
-
+      - developments
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -21,14 +20,26 @@ jobs:
         with:
           ruby-version: 3.3
 
-      - name: Extract bundleID from config.js
-        id: extract-bundleid
+      - name: Extract variables from config.js
+        id: extract-variables
         run: |
-          bundleID=$(grep 'BUNDLE_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          echo "bundleID=$bundleID" >> $GITHUB_ENV
+          BUNDLE_ID=$(grep 'BUNDLE_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          ISSUER_ID=$(grep 'ISSUER_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          KEY_ID=$(grep 'KEY_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          private_key=$(grep 'private_key' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          
+          echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
+          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
+          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
+          echo "private_key=$private_key" >> $GITHUB_ENV
 
-      - name: Echo extracted bundleID
-        run: echo "Extracted bundleID is ${{ env.bundleID }}"
+      - name: Echo extracted variables
+        run: |
+          echo "Extracted BUNDLE_ID is ${{ env.BUNDLE_ID }}"
+          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
+          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
+          echo "Extracted private_key is ${{ env.private_key }}"
+          
 
       # - name: Install dependencies
       #   run: |

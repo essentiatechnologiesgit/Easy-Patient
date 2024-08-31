@@ -55,8 +55,8 @@ jobs:
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID="${{ env.ISSUER_ID }}"
-          KEY_ID="${{ env.KEY_ID }}"
+          ISSUER_ID=${{ env.ISSUER_ID }}
+          KEY_ID=${{ env.KEY_ID }}
           private_key="
           -----BEGIN PRIVATE KEY-----
           MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf

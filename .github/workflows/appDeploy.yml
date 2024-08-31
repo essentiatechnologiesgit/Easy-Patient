@@ -24,9 +24,9 @@ jobs:
         id: extract-variables
         run: |
           BUNDLE_ID=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep -E '^  ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          KEY_ID=$(grep -E '^  KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \')
-      
+          ISSUER_ID=$(grep 'ISSUER_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          KEY_ID=$(grep 'KEY_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          
           # Handle the private key separately and save it to a file
           awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
       
@@ -60,14 +60,7 @@ jobs:
         run: |
           ISSUER_ID="${{ env.ISSUER_ID }}"
           KEY_ID="${{ env.KEY_ID }}"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
+          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
           # echo "Private key is:"
           # echo "$private_key"
           token=$(ruby -rjwt -ropenssl -e "

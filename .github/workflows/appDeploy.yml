@@ -23,22 +23,25 @@ jobs:
       - name: Extract variables from config.js
         id: extract-variables
         run: |
-          BUNDLE_ID=$(grep 'BUNDLE_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep 'ISSUER_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          KEY_ID=$(grep 'KEY_ID' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          private_key=$(grep 'private_key' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          BUNDLE_ID=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          ISSUER_ID=$(grep -E '^  ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          KEY_ID=$(grep -E '^  KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \')
           
+          # Extract the private key correctly, considering multi-line keys
+          private_key=$(awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d')
+      
           echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
           echo "private_key=$private_key" >> $GITHUB_ENV
-
+      
       - name: Echo extracted variables
         run: |
           echo "Extracted BUNDLE_ID is ${{ env.BUNDLE_ID }}"
           echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
           echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
           echo "Extracted private_key is ${{ env.private_key }}"
+
           
 
       # - name: Install dependencies

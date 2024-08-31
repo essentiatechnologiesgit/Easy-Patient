@@ -61,7 +61,8 @@ jobs:
           ISSUER_ID="${{ env.ISSUER_ID }}"
           KEY_ID="${{ env.KEY_ID }}"
           private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
-
+          echo "Private key is:"
+          echo "$private_key"
           token=$(ruby -rjwt -ropenssl -e "
             private_key_obj = OpenSSL::PKey::EC.new('$private_key')
             token = JWT.encode(

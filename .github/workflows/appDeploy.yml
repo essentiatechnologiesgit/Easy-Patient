@@ -2,7 +2,7 @@ name: iOS Screenshot Upload
 on:
   push:
     branches:
-      - developments
+      - development
 jobs:
   upload-screenshot:
     runs-on: macos-latest

@@ -24,11 +24,11 @@ jobs:
       - name: Extract bundleID from config.js
         id: extract-bundleid
         run: |
-          bundleID=$(grep 'bundleID' path/to/your/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          bundleID=$(grep 'bundleID' ${{ github.workspace }}/path/to/your/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
           echo "bundleID=$bundleID" >> $GITHUB_ENV
 
       - name: Echo extracted bundleID
-        run: echo "Extracted bundleID is ${{ env.bundleID }}"   
+        run: echo "Extracted bundleID is ${{ env.bundleID }}"
 
       # - name: Install dependencies
       #   run: |

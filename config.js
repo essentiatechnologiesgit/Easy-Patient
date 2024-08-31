@@ -15,7 +15,7 @@ const config = {
   buttonText: '#FFFFFF',
   headerColor: '#FFFFFF',
   fontStyle: 'OpenSans-Regular',
-  BUNDLE_ID: 'com.org.easyPatientTesting6',
+  BUNDLE_ID: 'com.org.easyPatientTesting',
   NAME: 'Easy Patient Testing 6',
   ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
   KEY_ID="74H4QHFPVP"

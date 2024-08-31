@@ -46,23 +46,23 @@ jobs:
       - name: Use Private Key
         run: |
           cat ${{ env.PRIVATE_KEY_PATH }}
-
-
-          
-
+      
       - name: Install dependencies
         run: |
           gem install jwt
           pip install requests jq
-
+      
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID="${{ env.ISSUER_ID }}"
           KEY_ID="${{ env.KEY_ID }}"
           private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+      
+          # If needed, you can uncomment the echo statements below for debugging.
           # echo "Private key is:"
           # echo "$private_key"
+      
           token=$(ruby -rjwt -ropenssl -e "
             private_key_obj = OpenSSL::PKey::EC.new('$private_key')
             token = JWT.encode(

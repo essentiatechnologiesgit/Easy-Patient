@@ -81,23 +81,23 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
-      # - name: Get App ID
-      #   id: get_app_id
-      #   run: |
-      #     bundle_id="com.org.easyPatientTesting3"  # Replace with your app's Bundle ID
+      - name: Get App ID
+        id: get_app_id
+        run: |
+          bundle_id="${{ env.BUNDLE_ID }}"  # Replace with your app's Bundle ID
       
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
       
-      #     echo "Response: $response"
+          echo "Response: $response"
       
-      #     app_id=$(echo $response | jq -r '.data[0].id')
+          app_id=$(echo $response | jq -r '.data[0].id')
       
-      #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
-      #       echo "Failed to retrieve app ID."
-      #       exit 1
-      #     fi
+          if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+            echo "Failed to retrieve app ID."
+            exit 1
+          fi
       
       #     echo "app_id=$app_id" >> $GITHUB_ENV
 

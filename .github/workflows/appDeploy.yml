@@ -30,7 +30,7 @@ jobs:
           # Handle the private key separately and save it to a file
           awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
       
-          echo "BUNDLE_ID=$BUNDLE_IDentifier" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
           echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV

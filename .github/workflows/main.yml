@@ -82,7 +82,7 @@ jobs:
           import requests
       
           # Define the Bundle Identifier
-          bundle_id = ${{ env.BUNDLE_IDentifier }}  # Replace with your actual Bundle Identifier
+          bundle_id = os.getenv("BUNDLE_IDentifier") # Replace with your actual Bundle Identifier
       
           # Define the URL for the App Store Connect API to fetch bundle details
           url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[identifier]={bundle_id}"

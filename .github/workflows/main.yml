@@ -41,6 +41,13 @@ jobs:
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
           echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV    
 
+      - name: Echo extracted variables
+        run: |
+          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
+          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
+          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
+          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+
       - name: Generate JWT
         id: generate_jwt
         run: |

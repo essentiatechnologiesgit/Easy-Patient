@@ -2,7 +2,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - work
+      - development
 
 jobs:
   build:
@@ -26,19 +26,27 @@ jobs:
           gem install jwt
           pip install requests
 
+      - name: Extract variables from config.js
+        id: extract-variables
+        run: |
+          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          ISSUER_ID=$(grep 'ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+          KEY_ID=$(grep 'KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+      
+          # Handle the private key separately and save it to a file
+          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
+      
+          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
+          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
+          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
+          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV    
+
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-          KEY_ID="74H4QHFPVP"
-          private_key="
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          "
+          ISSUER_ID=${{ env.ISSUER_ID }}
+          KEY_ID=${{ env.KEY_ID }}
+          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
 
           token=$(ruby -rjwt -ropenssl -e "
             private_key_obj = OpenSSL::PKey::EC.new('$private_key')
@@ -67,7 +75,7 @@ jobs:
           import requests
       
           # Define the Bundle Identifier
-          bundle_id = "com.org.easypatientdynamic"  # Replace with your actual Bundle Identifier
+          bundle_id = ${{ env.BUNDLE_IDentifier }}  # Replace with your actual Bundle Identifier
       
           # Define the URL for the App Store Connect API to fetch bundle details
           url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[identifier]={bundle_id}"
@@ -480,7 +488,7 @@ jobs:
       - name: Get App ID
         id: get_app_id
         run: |
-          bundle_id="com.org.easyPatientTesting3"  # Replace with your app's Bundle ID
+          bundle_id=${{ env.BUNDLE_IDentifier }}  # Replace with your app's Bundle ID
       
           response=$(curl -X GET \
             -H "Authorization: Bearer ${{ env.token }}" \
@@ -615,18 +623,18 @@ jobs:
 
 
 
-      - name: Export IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath ios/build/archive/TestingArchive.xcarchive \
-            -exportOptionsPlist ios/ExportOptions.plist \
-            -exportPath ios/build/archive/TestingIPA
+      # - name: Export IPA
+      #   run: |
+      #     xcodebuild -exportArchive \
+      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
+      #       -exportOptionsPlist ios/ExportOptions.plist \
+      #       -exportPath ios/build/archive/TestingIPA
       
-      - name: Upload IPA as Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: TestingIPA
-          path: ios/build/archive/TestingIPA/*.ipa
+      # - name: Upload IPA as Artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: TestingIPA
+      #     path: ios/build/archive/TestingIPA/*.ipa
 
 
       # - name: Update App Metadata

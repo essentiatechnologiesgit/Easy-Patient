@@ -15,7 +15,7 @@ jobs:
 
       - name: Run IPA on Simulator and Take Screenshots
         run: |
-          bash ./takeScreenshots.sh
+          bash .github/workflows/takeScreenshots.sh
 
       - name: Upload Screenshots
         uses: actions/upload-artifact@v3

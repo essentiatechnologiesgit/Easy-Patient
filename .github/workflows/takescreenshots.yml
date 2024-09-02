@@ -1,1 +1,24 @@
+name: Build and Test IPA
 
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  run-ipa:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run IPA on Simulator and Take Screenshots
+        run: |
+          bash ./takeScreenshots.sh
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: ./screenshots/

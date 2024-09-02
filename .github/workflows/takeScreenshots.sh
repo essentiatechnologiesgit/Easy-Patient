@@ -7,7 +7,7 @@ set -e
 set -x
 
 # Path to the IPA file in the project directory
-IPA_PATH="ipa/EasyPatientDynamic.ipa"
+IPA_PATH="./ipa/EasyPatientDynamic.ipa"
 
 # Specify the simulator and app bundle identifier
 SIMULATOR="iPhone 14"
@@ -19,6 +19,10 @@ if ! xcrun simctl boot "$SIMULATOR"; then
   echo "Failed to boot the simulator."
   exit 1
 fi
+
+echo "Checking simulator status..."
+# Check simulator status
+xcrun simctl list devices
 
 echo "Installing the IPA..."
 # Install the IPA on the simulator

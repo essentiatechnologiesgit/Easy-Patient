@@ -9,10 +9,10 @@ const app = express();
 const PORT = 4000;
 
 // GitHub API configuration
-const GITHUB_TOKEN = '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'; // Replace with your GitHub Personal Access Token
-const REPO_OWNER = 'essentiatechnologiesgit'; // GitHub username or organization
-const REPO_NAME = 'Easy-Patient'; // Repository name
-const BASE_BRANCH = 'development'; // Base branch for the new branch
+const GITHUB_TOKEN = ''; // Replace with your GitHub Personal Access Token
+const REPO_OWNER = ''; // GitHub username or organization
+const REPO_NAME = ''; // Repository name
+const BASE_BRANCH = ''; // Base branch for the new branch
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage(); // Store files in memory

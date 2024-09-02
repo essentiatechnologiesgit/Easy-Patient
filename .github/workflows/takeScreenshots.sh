@@ -7,7 +7,7 @@ set -e
 set -x
 
 # Path to the IPA file in the project directory
-IPA_PATH="./ipa/EasyPatientDynamic.ipa"
+IPA_PATH="ipa/EasyPatientDynamic.ipa"
 
 # Specify the simulator and app bundle identifier
 SIMULATOR="iPhone 14"

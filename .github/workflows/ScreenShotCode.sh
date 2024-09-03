@@ -21,7 +21,7 @@ if [ ! -d "$APP_PATH" ]; then
 fi
 
 # Boot the simulator
-if ! xcrun simctl boot "$SIMULATOR_UDID"; then
+if ! xcrun simctl boot DF2029AA-B187-4684-8F89-07463EB29305; then
   echo "Failed to boot the simulator."
   exit 1
 fi

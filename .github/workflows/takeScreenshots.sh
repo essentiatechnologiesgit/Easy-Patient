@@ -21,7 +21,7 @@ APP_BUNDLE_ID="com.org.easyPatientTesting3"
 
 echo "Booting the simulator..."
 # Boot the simulator
-if ! xcrun simctl boot "$SIMULATOR"; then
+if ! xcrun simctl boot 801C741D-2AD4-4CE1-9B5B-7016777EAC9F; then
   echo "Failed to boot the simulator."
   exit 1
 fi

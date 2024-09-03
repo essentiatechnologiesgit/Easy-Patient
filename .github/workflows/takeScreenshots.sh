@@ -9,6 +9,11 @@ set -x
 # Path to the IPA file in the project directory
 IPA_PATH="$(pwd)/ipa/EasyPatientDynamic.ipa"
 
+# Check if the IPA file exists
+if [ ! -f "$IPA_PATH" ]; then
+  echo "IPA file not found at $IPA_PATH"
+  exit 1
+fi
 
 # Specify the simulator and app bundle identifier
 SIMULATOR="iPhone 14"
@@ -16,7 +21,7 @@ APP_BUNDLE_ID="com.org.easyPatientTesting3"
 
 echo "Booting the simulator..."
 # Boot the simulator
-if ! xcrun simctl boot "iPhone 14"; then
+if ! xcrun simctl boot "$SIMULATOR"; then
   echo "Failed to boot the simulator."
   exit 1
 fi

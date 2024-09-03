@@ -653,11 +653,12 @@ jobs:
             -derivedDataPath ios/build/DerivedData
 
 
-      - name: Locate .app File
+      - name: Locate and Rename .app File
         id: locate-app
         run: |
           APP_PATH=$(find ios/build/DerivedData -name "*.app" | head -n 1)
-          echo "APP_PATH=${APP_PATH}" >> $GITHUB_ENV
+          mv "$APP_PATH" "${APP_PATH}.bundle"
+          echo "APP_PATH=${APP_PATH}.bundle" >> $GITHUB_ENV
 
       - name: Upload .app as Artifact
         uses: actions/upload-artifact@v3

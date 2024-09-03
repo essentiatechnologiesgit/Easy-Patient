@@ -1,30 +1,21 @@
-
 const config = {
-    splashScreen: require('./src/assets/bellIcon.png'),
-    primaryColor: '#603939',
+    splashScreen: require('./src/assets/splash.jpg'),
+    primaryColor: '#82848D',
     textColorHeadings: '#2A2A31',
-    secondaryColor: '#fcba03',
-    tertiaryColor: '#fcba03',
-    logo: './src/assets/bellIcon.png',
-    backgroundImage: require('./src/assets/blackCapsule.png'),
-    backgroundColorImage: 'undefined',
+    secondaryColor: '#C1AB60',
+    tertiaryColor: '#fff',
+    logo: require('./src/assets/logo.png')  ,
+    backgroundImage: require('./src/assets/background-image.png'),
+    backgroundColorImage: '#EEF6F8',
     backgroundImageType: 'png',
-    subLogo: require('./src/assets/blackScale.png'),
-    backgroundColor: 'undefined',
-    modalColor: '#603939',
-    buttonText: '#fcba03',
-    headerColor: '#603939',
+    subLogo: require('./src/assets/sub-logo.png'),
+    backgroundColor: '#FFFFFF',
+    modalColor: '#FFFFFF',
+    buttonText: '#FFFFFF',
+    headerColor: '#FFFFFF',
     fontStyle: 'OpenSans-Regular',
-    BUNDLE_ID: 'com.org.Sd',
-    Name: 'sd',
-    appIcon: './src/assets/arrow.png',
-    shortDescription: 'sd',
-    fullDescription: 'sd',
-    appCategory: 'sd', 
-    contentRating: 'sd',
-    releaseNotes: 'ds',
-    tags: 'sd',
-    buttonTextColor:'#fcba03' 
-};
-
-module.exports = config;
+    BUNDLE_ID: 'com.org.easyPatientTesting6',
+    NAME: 'Easy Patient Testing 6',
+  };
+  
+  module.exports = config;

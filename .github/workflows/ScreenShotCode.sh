@@ -6,24 +6,15 @@ set -e
 # Enable verbose mode to print each command before execution
 set -x
 
-# Define paths and other variables
-DERIVED_DATA_PATH="$(pwd)/ios/build/DerivedData"
-APP_NAME="EasyPatientDynamic"
-APP_PATH="$DERIVED_DATA_PATH/Build/Products/Debug-iphonesimulator/${APP_NAME}.app"
+# Path to the existing .app file
+APP_PATH="$(pwd)/ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
+
+# Specify the simulator and app bundle identifier
 SIMULATOR_NAME="iPhone 14"
 SIMULATOR_UDID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep -oE "[0-9A-F-]{36}")
 APP_BUNDLE_ID="com.org.easyPatientTesting3"
 
-# Build the app for the simulator
-xcodebuild clean build \
-  -workspace ios/EasyPatientDynamic.xcworkspace \
-  -scheme EasyPatientDynamic \
-  -sdk iphonesimulator \
-  -destination "platform=iOS Simulator,name=$SIMULATOR_NAME,OS=latest" \
-  -configuration Debug \
-  -derivedDataPath "$DERIVED_DATA_PATH"
-
-# Check if the .app file was created successfully
+# Check if the .app file exists
 if [ ! -d "$APP_PATH" ]; then
   echo ".app file not found at $APP_PATH"
   exit 1

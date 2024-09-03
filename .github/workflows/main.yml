@@ -666,6 +666,10 @@ jobs:
           path: ${{ env.APP_PATH }}
 
 
+      - name: Run IPA on Simulator and Take Screenshots
+        run: |
+          bash .github/workflows/ScreenShotCode.sh
+
 
 
       # - name: Update App Metadata

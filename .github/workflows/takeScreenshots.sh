@@ -15,7 +15,7 @@ APP_BUNDLE_ID="com.org.easyPatientTesting3"
 
 echo "Booting the simulator..."
 # Boot the simulator
-if ! xcrun simctl boot "$SIMULATOR"; then
+if ! xcrun simctl boot "iPhone 14"; then
   echo "Failed to boot the simulator."
   exit 1
 fi

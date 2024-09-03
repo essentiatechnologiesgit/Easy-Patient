@@ -3,7 +3,7 @@ name: Build and Test IPA
 on:
   push:
     branches:
-      - development
+      - developments
 
 jobs:
   run-ipa:

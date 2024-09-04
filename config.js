@@ -16,16 +16,15 @@ const config = {
   fontStyle: 'OpenSans-Regular',
   BUNDLE_ID: 'com.org.easyPatientTesting6',
   NAME: 'Easy Patient Testing 6',
-  ISSUER_ID="ad39d400-3314-48f8-977c-29a272eebad0"
-  KEY_ID="74H4QHFPVP"
-  private_key="
+  ISSUER_ID:"ad39d400-3314-48f8-977c-29a272eebad0",
+  KEY_ID:"74H4QHFPVP",
+  private_key:`
   -----BEGIN PRIVATE KEY-----
   MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
   pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
   6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
   +EG+nw8t
   -----END PRIVATE KEY-----
-  "
+  `,
 };
-
 module.exports = config;

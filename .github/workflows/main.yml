@@ -652,20 +652,45 @@ jobs:
             -derivedDataPath ios/build/DerivedData
 
 
-      - name: Build for Simulator
-        run: |
-          xcodebuild clean build \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
-            -configuration Debug \
-            -derivedDataPath ios/build/DerivedData
-      
       - name: List Contents of Build Directory
         run: |
           echo "Listing contents of the Products directory:"
-          ls -R ios/build/DerivedData/Build/Products
+          ls  ios/build/DerivedData/Build/Products
+
+      - name: Boot the iOS Simulator
+        run: |
+          # Boot the simulator
+          xcrun simctl boot DF2029AA-B187-4684-8F89-07463EB29305
+
+      - name: Install .app File on Simulator
+        run: |
+          APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
+          echo "App path: $APP_PATH"
+
+          # Install the .app file on the booted simulator
+          xcrun simctl install DF2029AA-B187-4684-8F89-07463EB29305 "$APP_PATH"
+
+      - name: Launch the App on Simulator
+        run: |
+          APP_BUNDLE_ID="com.org.easyPatientTesting3"
+          echo "App Bundle ID: $APP_BUNDLE_ID"
+
+          # Launch the app
+          xcrun simctl launch DF2029AA-B187-4684-8F89-07463EB29305 "$APP_BUNDLE_ID"
+
+      - name: Take a Screenshot
+        run: |
+          SCREENSHOT_PATH="./screenshots"
+          mkdir -p "$SCREENSHOT_PATH"
+          
+          # Capture a screenshot
+          xcrun simctl io booted screenshot "$SCREENSHOT_PATH/screenshot1.png"
+
+      - name: Upload Screenshots as Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: SimulatorScreenshots
+          path: ./screenshots
 
 
 

@@ -619,7 +619,7 @@ jobs:
           SCREENSHOT_PATH="./screenshots"
           mkdir -p "$SCREENSHOT_PATH"
           
-          sleep 60
+          sleep 120
           
           # Capture a screenshot
           xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot1.png"

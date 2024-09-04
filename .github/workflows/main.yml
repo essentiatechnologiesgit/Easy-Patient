@@ -657,6 +657,10 @@ jobs:
           echo "Listing contents of the Products directory:"
           ls  ios/build/DerivedData/Build/Products
 
+      - name: Start Metro Bundler
+        run: |
+          npx react-native start &
+
       - name: Boot the iOS Simulator
         run: |
           # Boot the simulator
@@ -672,7 +676,7 @@ jobs:
 
       - name: Launch the App on Simulator
         run: |
-          APP_BUNDLE_ID="com.org.easyPatientTesting3"
+          APP_BUNDLE_ID="com.org.easyPatientTesting6"
           echo "App Bundle ID: $APP_BUNDLE_ID"
 
           # Launch the app
@@ -684,7 +688,7 @@ jobs:
           mkdir -p "$SCREENSHOT_PATH"
           
           # Capture a screenshot
-          xcrun simctl io booted screenshot "$SCREENSHOT_PATH/screenshot1.png"
+          xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot1.png"
 
       - name: Upload Screenshots as Artifacts
         uses: actions/upload-artifact@v3

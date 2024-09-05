@@ -510,41 +510,41 @@ jobs:
       # *************************************** Build Start ******************************************************
   
 
-      # - name: Install CocoaPods
-      #   run: gem install cocoapods
+      - name: Install CocoaPods
+        run: gem install cocoapods
 
-      # - name: Cache CocoaPods
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ios/Pods
-      #     key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pods-
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
-      # - name: Install Node.js dependencies
-      #   run: npm install --force
+      - name: Install Node.js dependencies
+        run: npm install --force
 
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod deintegrate
-      #     rm -rf Pods Podfile.lock
-      #     pod update
-      #     pod install
+      - name: Install Pods
+        run: |
+          cd ios
+          pod deintegrate
+          rm -rf Pods Podfile.lock
+          pod update
+          pod install
 
-      # - name: Install Xcode 15.3
-      #   run: |
-      #     sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-      #     xcodebuild -version
+      - name: Install Xcode 15.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+          xcodebuild -version
 
-      # - name: Clean Derived Data
-      #   run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+      - name: Clean Derived Data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
      
-      # - name: Clean Build Folder
-      #   run: |
-      #     cd ios
-      #     xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+      - name: Clean Build Folder
+        run: |
+          cd ios
+          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
       # - name: Build Archive
       #   run: |
@@ -573,25 +573,25 @@ jobs:
       #     path: ios/build/archive/TestingIPA/*.ipa
 
 
-      # - name: Build for Simulator
-      #   run: |
-      #     xcodebuild clean build \
-      #       -workspace ios/EasyPatientDynamic.xcworkspace \
-      #       -scheme EasyPatientDynamic \
-      #       -sdk iphonesimulator \
-      #       -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
-      #       -configuration Debug \
-      #       -derivedDataPath ios/build/DerivedData
+      - name: Build for Simulator
+        run: |
+          xcodebuild clean build \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+            -configuration Debug \
+            -derivedDataPath ios/build/DerivedData
 
 
-      # - name: List Contents of Build Directory
-      #   run: |
-      #     echo "Listing contents of the Products directory:"
-      #     ls ios/build/DerivedData/Build/Products
+      - name: List Contents of Build Directory
+        run: |
+          echo "Listing contents of the Products directory:"
+          ls ios/build/DerivedData/Build/Products
 
-      # - name: Start Metro Bundler
-      #   run: |
-      #     npx react-native start &
+      - name: Start Metro Bundler
+        run: |
+          npx react-native start &
 
 
       - name: Find iOS Simulator UUID
@@ -613,15 +613,15 @@ jobs:
           echo "App path: $APP_PATH"
 
           # Install the .app file on the booted simulator
-          xcrun simctl install ${{ steps.get-uuid.outputs.uuid }} "$APP_PATH"
+          xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
 
       - name: Launch the App on Simulator
         run: |
-          APP_BUNDLE_ID="com.org.easyPatientTesting6"
+          APP_BUNDLE_ID="com.org.easypatientdynamic"
           echo "App Bundle ID: $APP_BUNDLE_ID"
 
           # Launch the app using the dynamic UUID
-          xcrun simctl launch ${{ steps.get-uuid.outputs.uuid }} $APP_BUNDLE_ID
+          xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
 
       - name: Take a Screenshot
         run: |

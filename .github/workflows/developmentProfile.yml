@@ -593,10 +593,19 @@ jobs:
       #   run: |
       #     npx react-native start &
 
+      - name: List Available Simulators
+        run: |
+          echo "Listing available simulators:"
+          xcrun simctl list devices
+
       - name: Get Device UUID
         run: |
+          # List available simulators for debugging
+          echo "Available simulators:"
+          xcrun simctl list devices
+
           # Get the UUID of the iPhone 14 simulator
-          SIMULATOR_UUID=$(xcrun simctl list devices | grep -oE 'iPhone 14 \(.*?OS=latest.*?\) \[(.*?)]' | head -1 | awk '{print $NF}' | tr -d '[]')
+          SIMULATOR_UUID=$(xcrun simctl list devices | grep -oE 'iPhone 14.*? \[(.*?)\]' | grep "Booted" | awk '{print $NF}' | tr -d '[]')
           echo "Simulator UUID: $SIMULATOR_UUID"
 
           # Check if the UUID was found
@@ -607,7 +616,6 @@ jobs:
 
           # Save the UUID to an environment file for later steps
           echo "SIMULATOR_UUID=$SIMULATOR_UUID" >> $GITHUB_ENV
-
 
       - name: Boot the iOS Simulator
         run: |

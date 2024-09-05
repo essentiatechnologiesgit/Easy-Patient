@@ -634,14 +634,14 @@ jobs:
           # Navigate to the Login screen using deep link
                
           # Capture a screenshot of the Login screen
-          xcrun simctl io ${{ steps.get-uuid.outputs.uuid }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
 
           sleep 120
 
           # Navigate to the Dashboard screen using deep link
 
           # Capture a screenshot of the Dashboard screen
-          xcrun simctl io ${{ steps.get-uuid.outputs.uuid }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
+          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
 
       - name: Upload Screenshots as Artifacts
         uses: actions/upload-artifact@v3

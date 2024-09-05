@@ -584,14 +584,14 @@ jobs:
       #       -derivedDataPath ios/build/DerivedData
 
 
-      - name: List Contents of Build Directory
-        run: |
-          echo "Listing contents of the Products directory:"
-          ls ios/build/DerivedData/Build/Products
+      # - name: List Contents of Build Directory
+      #   run: |
+      #     echo "Listing contents of the Products directory:"
+      #     ls ios/build/DerivedData/Build/Products
 
-      - name: Start Metro Bundler
-        run: |
-          npx react-native start &
+      # - name: Start Metro Bundler
+      #   run: |
+      #     npx react-native start &
 
       - name: Get Device UUID
         id: get-uuid

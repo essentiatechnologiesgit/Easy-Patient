@@ -621,8 +621,22 @@ jobs:
           
           sleep 120
           
+          npx uri-scheme open "easypatientdynamic://Login" --ios
+
+          sleep 10
+          
           # Capture a screenshot
-          xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot1.png"
+          xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+
+          sleep 10
+
+          npx uri-scheme open "easypatientdynamic://Dashboard" --ios
+
+          sleep 10
+
+          # Capture a screenshot
+          xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
+
 
       - name: Upload Screenshots as Artifacts
         uses: actions/upload-artifact@v3

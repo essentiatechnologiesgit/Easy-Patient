@@ -641,32 +641,6 @@ jobs:
       #     path: ios/build/archive/TestingIPA/*.ipa
 
 
-      - name: Build for Simulator
-        run: |
-          xcodebuild clean build \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
-            -configuration Debug \
-            -derivedDataPath ios/build/DerivedData
-
-
-      - name: Locate .app File
-        id: locate-app
-        run: |
-          APP_PATH=$(find ios/build/DerivedData -name "*.app" | head -n 1)
-          echo "APP_PATH=${APP_PATH}" >> $GITHUB_ENV
-
-      - name: Upload .app as Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: TestingApp
-          path: ${{ env.APP_PATH }}
-
-
-
-
       # - name: Update App Metadata
       #   run: |
       #     python <<EOF

@@ -1,0 +1,722 @@
+name: iOS Certificate Automation
+on:
+  push:
+    branches:
+      - FixesForiOSBuild
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+
+      - name: Install dependencies
+        run: |
+          gem install jwt
+          pip install requests
+
+      - name: Extract variables from config.js
+        id: extract-variables
+        run: |
+          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          ISSUER_ID=$(grep 'ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+          KEY_ID=$(grep 'KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+      
+          # Handle the private key separately and save it to a file
+          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
+      
+          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
+          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
+          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
+          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV    
+
+      - name: Echo extracted variables
+        run: |
+          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
+          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
+          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
+          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+
+      # - name: Generate JWT
+      #   id: generate_jwt
+      #   run: |
+      #     ISSUER_ID=${{ env.ISSUER_ID }}
+      #     KEY_ID=${{ env.KEY_ID }}
+      #     private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
+
+      #     token=$(ruby -rjwt -ropenssl -e "
+      #       private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+      #       token = JWT.encode(
+      #         {
+      #           iss: '$ISSUER_ID',
+      #           exp: Time.now.to_i + 20 * 60,
+      #           aud: 'appstoreconnect-v1'
+      #         },
+      #         private_key_obj,
+      #         'ES256',
+      #         header_fields = {
+      #           kid: '$KEY_ID'
+      #         }
+      #       )
+      #       puts token
+      #     ")
+          
+      #     echo "token=$token" >> $GITHUB_ENV
+
+
+      # - name: Fetch Bundle ID
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
+      
+      #     # Define the Bundle Identifier
+      #     bundle_id = os.getenv("BUNDLE_IDentifier") # Replace with your actual Bundle Identifier
+      
+      #     # Define the URL for the App Store Connect API to fetch bundle details
+      #     url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[identifier]={bundle_id}"
+      
+      #     # Set the headers with the JWT token
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+      
+      #     # Send the GET request to the API
+      #     response = requests.get(url, headers=headers)
+      
+      #     # Check if the request was successful
+      #     if response.status_code == 200:
+      #         bundle_data = response.json()['data']
+              
+      #         if len(bundle_data) > 0:
+      #             # Fetch the Bundle ID
+      #             bundle_id = bundle_data[0]['id']
+      #             print(f"Bundle ID: {bundle_id}")
+                  
+      #             # Save the Bundle ID to an environment variable
+      #             with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+      #                 env_file.write(f"BUNDLE_ID={bundle_id}\n")
+      #         else:
+      #             print("No bundle ID found for the specified identifier.")
+      #             exit(1)
+      #     else:
+      #         print("Failed to fetch Bundle ID")
+      #         print(f"Status Code: {response.status_code}")
+      #         print(f"Response: {response.json()}")
+      #         exit(1)
+      #     EOF
+
+      # - name: Fetch Bundle ID Information
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
+      
+      #     # Assuming you've already saved the Bundle ID from the previous steps
+      #     bundle_id = os.getenv('BUNDLE_ID')  # or replace with your specific Bundle ID
+      
+      #     # Define the URL for fetching bundle ID information
+      #     url = f"https://api.appstoreconnect.apple.com/v1/bundleIds/{bundle_id}"
+      
+      #     # Set the headers with the JWT token
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+      
+      #     # Send the GET request to the API
+      #     response = requests.get(url, headers=headers)
+      
+      #     # Print the complete response for debugging
+      #     print("Complete Response:")
+      #     print(response.json())
+      
+      #     # Check if the request was successful
+      #     if response.status_code == 200:
+      #         bundle_data = response.json()
+              
+      #         # Print the specific details if needed
+      #         print("Bundle Data:")
+      #         print(bundle_data)
+              
+      #         # Extract and print the seedId (Team ID)
+      #         seed_id = bundle_data['data']['attributes']['seedId']
+      #         print(f"Seed ID (Team ID): {seed_id}")
+              
+      #         # Save the seedId as TEAM_ID in the environment variables
+      #         with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+      #             env_file.write(f"TEAM_ID={seed_id}\n")
+      #     else:
+      #         print("Failed to fetch Bundle ID information")
+      #         print(f"Status Code: {response.status_code}")
+      #         print(f"Response: {response.json()}")
+      #         exit(1)
+      #     EOF
+
+
+
+      # - name: Fetch and List development Certificates
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
+          
+      #     # Define the URL for the App Store Connect API to fetch distribution certificates
+      #     url = "https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DEVELOPMENT"
+          
+      #     # Set the headers with the JWT token
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+          
+      #     # Send the GET request to the API
+      #     response = requests.get(url, headers=headers)
+          
+      #     # Check if the request was successful
+      #     if response.status_code == 200:
+      #         cert_data = response.json()['data']
+      #         cert_count = len(cert_data)
+              
+      #         print(f"Number of Distribution Certificates: {cert_count}")
+              
+      #         # Save the certificate count to an environment variable
+      #         with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+      #             env_file.write(f"CERTIFICATE_COUNT={cert_count}\n")
+      #     else:
+      #         print("Failed to fetch Distribution Certificates")
+      #         print(f"Status Code: {response.status_code}")
+      #         print(f"Response: {response.json()}")
+      #         exit(1)
+      #     EOF
+
+
+      # - name: Check for Existing RSA Private Key
+      #   id: check_rsa_key
+      #   run: |
+      #     if [ -f "$GITHUB_WORKSPACE/rsa_private.key" ]; then
+      #       echo "RSA private key found."
+      #       echo "RSA_KEY_EXISTS=true" >> $GITHUB_ENV
+      #     else
+      #       echo "RSA private key not found."
+      #       echo "RSA_KEY_EXISTS=false" >> $GITHUB_ENV
+      #     fi
+
+      # - name: Generate CSR using Private key
+      #   run: |
+      #     openssl req -new -key "$GITHUB_WORKSPACE/rsa_private.key" -out csr.certSigningRequest -subj "/CN=suporte@easy-health.app, C=US"
+
+      # - name: Display CSR Contents
+      #   id: display_csr
+      #   run: |
+      #     csr_content=$(cat csr.certSigningRequest)
+      #     echo "CSR Content: $csr_content"
+      #     echo "CSR_CONTENT<<EOF" >> $GITHUB_ENV
+      #     echo "$csr_content" >> $GITHUB_ENV
+      #     echo "EOF" >> $GITHUB_ENV
+
+      # - name: Request and Save Development Certificate
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
+          
+      #     csr_content = os.getenv('CSR_CONTENT')
+          
+      #     url = "https://api.appstoreconnect.apple.com/v1/certificates"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #         "Content-Type": "application/json"
+      #     }
+      #     data = {
+      #         "data": {
+      #           "type": "certificates",
+      #           "attributes": {
+      #             "certificateType": "DEVELOPMENT",
+      #             "csrContent": csr_content
+      #           }
+      #         }
+      #     }
+          
+      #     response = requests.post(url, json=data, headers=headers)
+          
+      #     if response.status_code == 201:
+      #         cert_data = response.json()['data']
+      #         cert_id = cert_data['id']
+      #         cert_name = cert_data['attributes']['name']
+      #         cert_serial_number = cert_data['attributes']['serialNumber']
+              
+      #         print(f"Certificate ID: {cert_id}")
+      #         print(f"Serial Number: {cert_serial_number}")
+              
+      #         # Save the certificate content to a file
+      #         cert_content = cert_data['attributes']['certificateContent']
+      #         with open('distribution.cer', 'w') as cert_file:
+      #             cert_file.write("-----BEGIN CERTIFICATE-----\n")
+      #             cert_file.write(cert_content + "\n")
+      #             cert_file.write("-----END CERTIFICATE-----\n")
+      #         print("Distribution Certificate created successfully")
+              
+      #         # Save Certificate ID to a file
+      #         with open('certificate_id.txt', 'w') as id_file:
+      #             id_file.write(cert_id)
+
+      #         with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+      #             env_file.write(f"CERTIFICATE_NAME={cert_name}\n")   
+
+      #     else:
+      #         print("Failed to create Distribution Certificate")
+      #         print(response.status_code)
+      #         print(response.json())
+      #         exit(1)
+      #     EOF
+      
+      # - name: Set Certificate ID as Environment Variable
+      #   run: echo "CERTIFICATE_ID=$(cat certificate_id.txt)" >> $GITHUB_ENV
+
+      # - name: Debug - Print Certificate Content
+      #   run: cat distribution.cer
+
+      # - name: Convert Certificate to .p12 format
+      #   run: |
+      #     CERT_P12_PASSWORD="private_pass"
+      
+      #     openssl pkcs12 -export -inkey "$GITHUB_WORKSPACE/rsa_private.key" -in distribution.cer -out distribution.p12 -password pass:$CERT_P12_PASSWORD
+     
+      # - name: Upload .p12 file as GitHub Actions artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: distribution-certificate
+      #     path: distribution.p12
+      
+      # - name: Import certificate to keychain
+      #   run: |
+      #     set -x
+          
+      #     KEYCHAIN_NAME="build.keychain"
+      #     KEYCHAIN_PASSWORD="private_pass"
+      #     CERT_P12_PASSWORD="private_pass"
+      #     KEYCHAIN_PATH=~/Library/Keychains/"$KEYCHAIN_NAME"
+          
+      #     # Create a new keychain
+      #     security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+      #     echo "Keychain created: $KEYCHAIN_NAME"
+          
+      #     # Set the keychain as the default keychain
+      #     security default-keychain -s "$KEYCHAIN_PATH"
+      #     echo "Default keychain set to: $KEYCHAIN_PATH"
+          
+      #     # Add the keychain to the list of keychains
+      #     security list-keychains -s "$KEYCHAIN_PATH"
+      #     echo "Keychain added to the list of keychains: $KEYCHAIN_PATH"
+          
+      #     # Unlock the keychain
+      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      #     echo "Keychain unlocked: $KEYCHAIN_PATH"
+          
+      #     # Set the keychain timeout to 3600 seconds (1 hour)
+      #     security set-keychain-settings -t 3600 -u "$KEYCHAIN_PATH"
+      #     echo "Keychain timeout set to 3600 seconds"
+          
+      #     # Import the .p12 file into the keychain
+      #     security import distribution.p12 -k "$KEYCHAIN_PATH" -P "$CERT_P12_PASSWORD" -T /usr/bin/codesign
+      #     echo "Certificate imported to keychain: $KEYCHAIN_PATH"
+          
+      #     # Set the key partition list after the certificate is imported
+      #     security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      #     echo "Key partition list set for keychain: $KEYCHAIN_PATH"
+          
+      #     # Validate that the certificate is present in the keychain
+      #     security find-certificate -a -c "${CERTIFICATE_NAME}" -p
+      #     echo "Certificate found and validated in keychain"
+
+      # - name: Create DEVELOPMENT Provisioning Profile
+      #   run: |
+      #     echo "Creating Distribution Provisioning Profile..."
+          
+      #     PROFILE_NAME="MyApp Distribution Profile 9"  
+      #     BUNDLE_ID="${BUNDLE_ID}"
+      #     CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
+          
+      #     response=$(curl -X POST https://api.appstoreconnect.apple.com/v1/profiles \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d @- <<EOF
+      #     {
+      #       "data": {
+      #         "type": "profiles",
+      #         "attributes": {
+      #           "name": "$PROFILE_NAME",
+      #           "profileType": "Development"
+      #         },
+      #         "relationships": {
+      #           "bundleId": {
+      #             "data": {
+      #               "type": "bundleIds",
+      #               "id": "$BUNDLE_ID"
+      #             }
+      #           },
+      #           "certificates": {
+      #             "data": [
+      #               {
+      #                 "type": "certificates",
+      #                 "id": "$CERTIFICATE_ID"
+      #               }
+      #             ]
+      #           }
+      #         }
+      #       }
+      #     }
+      #     EOF
+      #     )
+      
+      #     echo "Profile Response: $response"
+          
+      #     # Save the profile ID or the profile content if needed
+      #     echo "Profile Response: $response"
+          
+      #     # Extract the Base64 encoded profile content
+      #     profile_content=$(echo "$response" | jq -r '.data.attributes.profileContent')
+          
+      #     # Log the profile content length
+      #     echo "Profile content length: $(echo "$profile_content" | wc -c)"
+          
+      #     # Ensure the directory exists before saving the profile
+      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          
+      #     # Decode the Base64 content and save it as a .mobileprovision file
+      #     echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
+
+      # - name: Create ExportOptions.plist
+      #   run: |
+      #     cat <<EOF > ios/ExportOptions.plist
+      #     <?xml version="1.0" encoding="UTF-8"?>
+      #     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      #     <plist version="1.0">
+      #     <dict>
+      #         <key>method</key>
+      #         <string>app-store</string>
+      #         <key>teamID</key>
+      #         <string>${{ env.TEAM_ID }}</string>
+      #         <key>provisioningProfiles</key>
+      #         <dict>
+      #             <key>com.org.easypatientdynamic</key> <!-- Replace with your actual Bundle Identifier -->
+      #             <string>MyApp Distribution Profile 9</string> <!-- Replace with your Provisioning Profile Name -->
+      #         </dict>
+      #     </dict>
+      #     </plist>
+      #     EOF
+
+        # *************************************** Prerequisetries End ********************************************
+
+
+      # ******************************************* Uploading Meta Data **************************************
+
+      # - name: Get App ID
+      #   id: get_app_id
+      #   run: |
+      #     bundle_id=${{ env.BUNDLE_IDentifier }}  # Replace with your app's Bundle ID
+      
+      #     response=$(curl -X GET \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
+      
+      #     echo "Response: $response"
+      
+      #     app_id=$(echo $response | jq -r '.data[0].id')
+      
+      #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+      #       echo "Failed to retrieve app ID."
+      #       exit 1
+      #     fi
+      
+      #     echo "app_id=$app_id" >> $GITHUB_ENV
+
+      # - name: Get App Store Version ID
+      #   id: get_app_store_version_id
+      #   run: |
+      #     response=$(curl -X GET \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
+      
+      #     echo "Response: $response"
+      
+      #     app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
+      
+      #     if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
+      #       echo "Failed to retrieve app store version ID."
+      #       exit 1
+      #     fi
+      
+      #     echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+
+      # - name: Get App Store Version Localization ID
+      #   id: get_app_store_version_localization_id
+      #   run: |
+      #     response=$(curl -X GET \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+      
+      #     echo "Response: $response"
+      
+      #     app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
+      
+      #     if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
+      #       echo "Failed to retrieve app store version localization ID."
+      #       exit 1
+      #     fi
+      
+      #     echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
+
+      # - name: Update App Store Version Localization
+      #   id: update_app_store_version_localization
+      #   run: |
+      #     response=$(curl -X PATCH \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d '{
+      #         "data": {
+      #           "id": "'${{ env.app_store_version_localization_id }}'",
+      #           "type": "appStoreVersionLocalizations",
+      #           "attributes": {
+      #             "description": "here goes your app description...",
+      #             "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
+      #             "marketingUrl": null,
+      #             "promotionalText": "We introduce new features and improvements to improve your experience",
+      #             "supportUrl": "https://easy-health.app/landing-page/index.html"
+      #           }
+      #         }
+      #       }' \
+      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+          
+      #     echo "Update App Store Version Localization Response: $response"
+
+
+       # ******************************************* Uploading Meta Data END **************************************
+
+
+      # *************************************** Build Start ******************************************************
+  
+
+      - name: Install CocoaPods
+        run: gem install cocoapods
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Install Node.js dependencies
+        run: npm install --force
+
+      - name: Install Pods
+        run: |
+          cd ios
+          pod deintegrate
+          rm -rf Pods Podfile.lock
+          pod update
+          pod install
+
+      - name: Install Xcode 15.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Clean Derived Data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
+     
+      - name: Clean Build Folder
+        run: |
+          cd ios
+          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+
+      # - name: Build Archive
+      #   run: |
+      #     xcodebuild clean archive \
+      #       -workspace ios/EasyPatientDynamic.xcworkspace \
+      #       -scheme EasyPatientDynamic \
+      #       -sdk iphoneos \
+      #       -destination generic/platform=iOS \
+      #       -configuration Release \
+      #       -derivedDataPath ios/build/DerivedData \
+      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
+      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
+      #       CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
+
+      # - name: Export IPA
+      #   run: |
+      #     xcodebuild -exportArchive \
+      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
+      #       -exportOptionsPlist ios/ExportOptions.plist \
+      #       -exportPath ios/build/archive/TestingIPA
+      
+      # - name: Upload IPA as Artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: TestingIPA
+      #     path: ios/build/archive/TestingIPA/*.ipa
+
+
+      - name: Build for Simulator
+        run: |
+          xcodebuild clean build \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+            -configuration Debug \
+            -derivedDataPath ios/build/DerivedData
+
+
+      - name: List Contents of Build Directory
+        run: |
+          echo "Listing contents of the Products directory:"
+          ls  ios/build/DerivedData/Build/Products
+
+      - name: Start Metro Bundler
+        run: |
+          npx react-native start &
+
+      - name: Boot the iOS Simulator
+        run: |
+          # Boot the simulator
+          xcrun simctl boot DF2029AA-B187-4684-8F89-07463EB29305
+
+      - name: Install .app File on Simulator
+        run: |
+          APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
+          echo "App path: $APP_PATH"
+
+          # Install the .app file on the booted simulator
+          xcrun simctl install DF2029AA-B187-4684-8F89-07463EB29305 "$APP_PATH"
+
+      - name: Launch the App on Simulator
+        run: |
+          APP_BUNDLE_ID="com.org.easyPatientTesting6"
+          echo "App Bundle ID: $APP_BUNDLE_ID"
+
+          # Launch the app
+          xcrun simctl launch DF2029AA-B187-4684-8F89-07463EB29305 com.org.easypatientdynamic
+
+      - name: Take a Screenshot
+        run: |
+          SCREENSHOT_PATH="./screenshots"
+          mkdir -p "$SCREENSHOT_PATH"
+          
+          sleep 120
+          
+          # Capture a screenshot
+          xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot1.png"
+
+      - name: Upload Screenshots as Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: SimulatorScreenshots
+          path: ./screenshots
+
+
+
+
+      # - name: Update App Metadata
+      #   run: |
+      #     python <<EOF
+      #     import os
+      #     import requests
+          
+      #     app_id = "36FLSCQT6V"  # The ID of the app you want to update
+      #     token = os.getenv('token')  # Your JWT token for authorization
+      
+      #     # Define the metadata you want to update
+      #     metadata = {
+      #         "data": {
+      #             "type": "apps",
+      #             "id": app_id,
+      #             "attributes": {
+      #                 "name": "Health App",
+      #                 "subtitle": "New Subtitle",
+      #                 "description": "Updated app description.",
+      #                 "keywords": "keyword1, keyword2",
+      #                 "supportUrl": "https://support.example.com",
+      #                 "marketingUrl": "https://marketing.example.com",
+      #                 "privacyPolicyUrl": "https://privacy.example.com",
+      #                 "primaryCategory": "6021",  # Example category ID for "Business"
+      #                 "secondaryCategory": "6011",  # Example category ID for "Productivity"
+      #                 "ageRating": "12+"  
+      #             }
+      #         }
+      #     }
+      
+      #     url = f"https://api.appstoreconnect.apple.com/v1/apps/{app_id}"
+      #     headers = {
+      #         "Authorization": f"Bearer {token}",
+      #         "Content-Type": "application/json"
+      #     }
+      
+      #     response = requests.patch(url, json=metadata, headers=headers)
+      
+      #     if response.status_code == 200:
+      #         print("App metadata updated successfully")
+      #     else:
+      #         print("Failed to update app metadata")
+      #         print(response.status_code)
+      #         print(response.json())
+      #         exit(1)
+      #     EOF
+
+            # - name: Revoke the hardcoded certificate
+      #   run: |
+      #     import requests
+      #     import os
+
+      #     # Hardcoded JWT and Certificate ID
+       
+      #     certificate_id = "LDXBV2688Z"
+
+      #     # API URL
+      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
+      #     headers = {
+      #         "Authorization": f"Bearer {os.getenv('token')}",
+      #     }
+          
+      #     # Making the DELETE request to revoke the certificate
+      #     response = requests.delete(url, headers=headers)
+          
+      #     # Print the status and response content
+      #     print(f"Status Code: {response.status_code}")
+      #     if response.status_code == 204:
+      #         print("Certificate revoked successfully.")
+      #     else:
+      #         print("Failed to revoke certificate.")
+      #         print(response.text)
+      #   shell: python
+
+            # - name: Retrieve All App IDs
+      #   run: |
+      #     echo "Retrieving App IDs..."
+      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json")
+          
+      #     echo "$response" > bundle_ids.json
+      #     echo "Bundle IDs Response: $response"
+
+      #     # # Extract and print App IDs
+      #     # bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
+      #     # echo "App IDs: $bundle_ids"
+      #     # echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV

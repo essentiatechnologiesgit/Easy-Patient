@@ -37,7 +37,7 @@ const Dashboard = () => {
        setTimeout(() => {
         console.log("Yes");
           navigation.navigate('Login');
-        }, 5000); 
+       }, 125000); 
     
       }, []);
 

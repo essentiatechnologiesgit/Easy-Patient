@@ -32,6 +32,14 @@ const Dashboard = () => {
     const [snackbarKey, setSnackbarKey] = useState(0);
     const [userId, setUserId] = useState(0);
 
+    useEffect(() => {
+       
+       setTimeout(() => {
+        console.log("Yes");
+          navigation.navigate('Login');
+        }, 5000); 
+    
+      }, []);
 
     useEffect(() => {
 

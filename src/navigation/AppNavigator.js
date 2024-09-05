@@ -56,9 +56,20 @@ import PasswordError from '../screens/PasswordError.js';
 import PatternAuth from '../screens/PatternAuth.js';
 const Stack = createStackNavigator();
 
+const linking = {
+  prefixes: ['easypatientdynamic://'],
+  config: {
+    screens: {
+      Login: 'Login',
+      Dashboard: 'Dashboard',
+    },
+  },
+};
+
+
 const AppNavigator = () => {
   return (
-    <NavigationContainer style={styles.container}>
+    <NavigationContainer linking={linking} style={styles.container}>
       <Stack.Navigator style={styles.container}
         screenOptions={{
           headerShown: false,

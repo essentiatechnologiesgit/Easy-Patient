@@ -587,16 +587,25 @@ jobs:
       - name: List Contents of Build Directory
         run: |
           echo "Listing contents of the Products directory:"
-          ls  ios/build/DerivedData/Build/Products
+          ls ios/build/DerivedData/Build/Products
 
       - name: Start Metro Bundler
         run: |
           npx react-native start &
 
-      - name: Boot the iOS Simulator
+
+      - name: Find iOS Simulator UUID
+        id: find_simulator
         run: |
-          # Boot the simulator
-          xcrun simctl boot DF2029AA-B187-4684-8F89-07463EB29305
+          SIMULATOR_NAME="iPhone 15" # Change to the desired simulator name
+          UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
+          echo "Simulator UUID: $UUID"
+          echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
+
+      - name: Boot iOS Simulator
+        run: |
+          xcrun simctl boot ${{ env.SIMULATOR_UUID }}
+        
 
       - name: Install .app File on Simulator
         run: |
@@ -604,25 +613,41 @@ jobs:
           echo "App path: $APP_PATH"
 
           # Install the .app file on the booted simulator
-          xcrun simctl install DF2029AA-B187-4684-8F89-07463EB29305 "$APP_PATH"
+          xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
 
       - name: Launch the App on Simulator
         run: |
-          APP_BUNDLE_ID="com.org.easyPatientTesting6"
+          APP_BUNDLE_ID="com.org.easypatientdynamic"
           echo "App Bundle ID: $APP_BUNDLE_ID"
 
-          # Launch the app
-          xcrun simctl launch DF2029AA-B187-4684-8F89-07463EB29305 com.org.easypatientdynamic
+          # Launch the app using the dynamic UUID
+          xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
 
       - name: Take a Screenshot
         run: |
           SCREENSHOT_PATH="./screenshots"
           mkdir -p "$SCREENSHOT_PATH"
-          
+
+          # Wait for the app to load
           sleep 120
           
-          # Capture a screenshot
-          xcrun simctl io DF2029AA-B187-4684-8F89-07463EB29305 screenshot "$SCREENSHOT_PATH/screenshot1.png"
+          # Navigate to the Login screen using deep link
+          npx uri-scheme open "easypatientdynamic://Login" --ios
+
+          sleep 10
+          
+          # Capture a screenshot of the Login screen
+          xcrun simctl io ${{ steps.get-uuid.outputs.uuid }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+
+          sleep 10
+
+          # Navigate to the Dashboard screen using deep link
+          npx uri-scheme open "easypatientdynamic://Dashboard" --ios
+
+          sleep 10
+
+          # Capture a screenshot of the Dashboard screen
+          xcrun simctl io ${{ steps.get-uuid.outputs.uuid }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
 
       - name: Upload Screenshots as Artifacts
         uses: actions/upload-artifact@v3

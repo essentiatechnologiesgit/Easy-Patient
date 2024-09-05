@@ -16,6 +16,7 @@ import ImageLogo from '../components/ImageLogo'
 import { CircularProgressBase } from 'react-native-circular-progress-indicator';
 import Snackbar from '../components/Snackbar';
 import Medications from '../components/Medications';
+import { Button } from 'react-native-share';
 const Dashboard = () => {
     const navigation = useNavigation();
     const [backPressed, setBackPressed] = useState(false);
@@ -279,7 +280,6 @@ const Dashboard = () => {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
             >
                 <View style={styles.headerContainer}>
-
                     <Image source={config.logo} style={styles.logo} />
                     {
                         image &&
@@ -307,9 +307,8 @@ const Dashboard = () => {
                 </View>
                 <View style={styles.nameContainer}>
                     <Text style={styles.nameHeading}>Hello {name}!</Text>
-                    <Text style={styles.nameSideHeading}>Welcome to Easy Patient</Text>
+                    <Text style={styles.nameSideHeading}>Welcome to Easy Patient.</Text>
                 </View>
-
 
                 <View style={styles.parentView}>
                     {/* <Text style={styles.heading}>Notifications</Text>
@@ -348,6 +347,8 @@ const Dashboard = () => {
 
     return (
         <>
+
+      
             {
                 (config.backgroundColorImage) ?
                     <View style={styles.container}>

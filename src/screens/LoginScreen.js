@@ -252,10 +252,9 @@ const LoginScreen = () => {
     navigation.navigate('ForgotPassword')
   }
 
-  return (
+  const content = (
     <>
-      <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-        <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
+           <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
         {showLoader && <ModalLoader />}
         {showFingerAuth && <FingerPrint setShowFingerAuth={setShowFingerAuth} />}
         <View style={styles.container}>
@@ -277,8 +276,6 @@ const LoginScreen = () => {
               />
             </View>
           </View>
-
-
           <View style={{ width: '100%', right: 30, bottom: 0 }}>
             {usernameError && !username && (
               <>
@@ -322,7 +319,6 @@ const LoginScreen = () => {
               </View>
             </>
           }
-
           {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
           <TouchableOpacity style={{ width: '100%', marginTop: 50 }}>
             <CustomButton onPress={() => handleLogin()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Next"} />
@@ -333,7 +329,6 @@ const LoginScreen = () => {
               <CustomButton onPress={() => handleAuth()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Authenticate Connect"} title={"authorization"} />
             </View>
           }
-
           <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
             <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
           </TouchableOpacity>
@@ -341,20 +336,25 @@ const LoginScreen = () => {
             <Text style={styles.register}>Register</Text>
           </TouchableOpacity>
         </View>
+    </>
+  )
 
-        {/* <View style={styles.container}>
-      
-      </View>  */}
-        {/* <View style={styles.container}></View> */}
-
-        {/* {
-        IOSError && 
-         */}
-        {/* } */}
+  return (
+    <>
+      {/* <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
  
-        
-      </ImageBackground>
+      </ImageBackground> */}
 
+      {
+                (config.backgroundColorImage) ?
+                    <View style={styles.cont}>
+                        {content}
+                    </View>
+                    :
+                    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+                        {content}
+                    </ImageBackground>
+            }
 
     </>
   );
@@ -376,6 +376,10 @@ const styles = StyleSheet.create({
         justifyContent: 'top',
       },
     })
+  },
+  cont:{
+    backgroundColor:config.backgroundColorImage,
+    flex:1,
   },
   title: {
     fontSize: 24,

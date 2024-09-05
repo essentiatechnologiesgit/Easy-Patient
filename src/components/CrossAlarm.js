@@ -70,7 +70,7 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction,dosa
         <>
             {taken ? (
                 <View style={styles.container}>
-                    <View style={{ position: 'absolute', width: '100%', flexDirection: 'row', padding: 10 }}>
+                    <View style={{ position: 'absolute', width: '100%', flexDirection: 'row', padding: 14 }}>
                         <Svg width="23" height="22" viewBox="0 0 24 24">
                             <Path fill="#50B76C" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" />
                         </Svg>
@@ -123,8 +123,14 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        paddingVertical: 1,
+        paddingVertical: 5,
         alignSelf: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.15,
+        shadowRadius: 1.55,
+        // Android Shadow
+        elevation: 2,
     },
     cont: {
         flexDirection: 'row',

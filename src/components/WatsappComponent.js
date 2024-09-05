@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         height: 25,
         width: 25,
         position:'absolute',
-        left:8,
+        left:10,
         top:8,
     },
     clinicText: {

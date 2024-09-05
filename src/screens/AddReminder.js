@@ -625,7 +625,7 @@ const AddReminder = ({ route }) => {
                                 ref={(ref) => (errorRefs.current[5] = ref)}
                                 style={{ ...styles.floatingLabelH, borderBottomWidth: 0.5, borderBottomColor: config.secondaryColor }}>
                                 <FloatingLabelInput
-                                    label={'Number of Days'}
+                                    label={'Treatment Duration'}
                                     inputStyles={styles.inputStyles}
                                     labelStyles={{ paddingHorizontal: 0 }}
                                     customLabelStyles={!daysError ? styles.customLabelStyles : styles.customLabelStylesEmpty}

@@ -112,8 +112,14 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        paddingVertical: 1,
+        paddingVertical: 5,
         alignSelf: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.15,
+        shadowRadius: 1.55,
+        // Android Shadow
+        elevation: 2,
     },
     emptyView: {
         backgroundColor: 'transparent',
@@ -142,7 +148,7 @@ const styles = StyleSheet.create({
     },
     child: {
         flexDirection: 'row',
-        padding: 8,
+        padding: 14,
     },
     deleteButtonText: {
         color: 'white',

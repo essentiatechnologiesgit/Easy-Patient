@@ -91,16 +91,19 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         flexDirection: 'row',
         padding: 10,
-        // justifyContent: 'space-between',
+        justifyContent: 'center',
     },
     clinicText: {
         color: config.secondaryColor,
-        marginLeft: '30%',
+        // marginLeft: '30%',
         fontSize: PixelRatio.getFontScale() * 17,
     },
     carIcon: {
         height: 23,
         width: 26,
+        position:'absolute',
+        left:10,
+        top:8,
     },
     firstContainer: {
         padding: 20,

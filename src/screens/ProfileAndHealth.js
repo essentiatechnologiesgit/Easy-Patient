@@ -64,7 +64,6 @@ const ProfileAndHealth = ({ route }) => {
                     <View style={styles.profileParent}>
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={styles.FHeading}>Basic Information</Text>
-                            {/* <Text style={styles.arrow}>&gt;</Text> */}
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
                             <View style={styles.greenCircle}></View>
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     profileParent: {
-
+        gap:4
     },
     percent: {
         fontSize: PixelRatio.getFontScale() * 12,
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     THeading: {
-        fontSize: PixelRatio.getFontScale() * 16,
+        fontSize: PixelRatio.getFontScale() * 14,
         color: config.primaryColor,
         width: '60%',
     },
@@ -221,9 +220,10 @@ const styles = StyleSheet.create({
         top: 5,
     },
     userIcon: {
-        height: 20.6,
-        width: 20,
+        height: 21,
+        width: 21.5,
         top: 6,
+        resizeMode: 'contain',
     },
     name: {
         fontSize: PixelRatio.getFontScale() * 19,

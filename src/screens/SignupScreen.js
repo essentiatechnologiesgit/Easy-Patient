@@ -14,7 +14,6 @@ import ValidationMessageError from '../components/ValidationMessageError';
 import Snackbar from '../components/Snackbar';
 import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
-import Svg, { Path } from 'react-native-svg';
 import AlertIcon from '../components/AlertIcon';
 import OtpInput from '../components/OTPInput';
 const SignupScreen = () => {
@@ -450,9 +449,7 @@ const SignupScreen = () => {
       });
   }
   return (
-    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-      {/* <View style={styles.container}></View> */}
-
+    <View style={styles.cont}>
       <View style={styles.container}>
         {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
         <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
@@ -807,9 +804,8 @@ const SignupScreen = () => {
         {showLoader && <ModalLoader />}
 
       </View>
+      </View>
 
-
-    </ImageBackground >
   );
 };
 
@@ -817,6 +813,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+
     padding: 20,
     ...Platform.select({
       ios: {
@@ -853,6 +850,10 @@ const styles = StyleSheet.create({
     width: '80%',
     marginTop: 40,
     
+  },
+  cont:{
+    backgroundColor:config.backgroundColorImage,
+    flex:1,
   },
   TextContainerText: {
     fontSize: PixelRatio.getFontScale() * 17,
@@ -981,7 +982,7 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    resizeMode: 'stretch',
+    backgroundColor:config.backgroundColorImage,
     width: '100%',
   },
   logo: {

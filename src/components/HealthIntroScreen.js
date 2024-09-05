@@ -32,6 +32,12 @@ const styles = StyleSheet.create({
         width: '60%',
         textAlign: 'center',
         marginTop: -40,
+        ...Platform.select({
+            ios: {
+              marginTop:20,
+            },
+          }),
+
     },
     image: {
         // marginTop:100,

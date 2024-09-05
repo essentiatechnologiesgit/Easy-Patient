@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
         fontFamily:config.fontStyle,
-        fontWeight: '900',
+        fontWeight: 'bold',
     },
     hideContainer: {
         flexDirection: 'row',

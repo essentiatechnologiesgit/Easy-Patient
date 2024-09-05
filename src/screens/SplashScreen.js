@@ -56,15 +56,15 @@ const SplashScreen = () => {
 
         navigation.navigate('Dashboard');
       } else {
-        const location = await checkLocationPermission();
-        const camera = await checkCameraPermission();
-        const storage = await checkStoragePermission();
-        if (location === "granted" && camera === "granted" && storage === "limited" ||  storage === "granted") {
-          navigation.navigate('Login');
-        }
-         else {
+        // const location = await checkLocationPermission();
+        // const camera = await checkCameraPermission();
+        // const storage = await checkStoragePermission();
+        // if (location === "granted" && camera === "granted" && storage === "limited" ||  storage === "granted") {
+        //   navigation.navigate('Login');
+        // }
+        //  else {
           navigation.navigate('IntroScreens');
-        }
+        // }
       }
     } catch (error) {
       console.error('Error retrieving login response:', error);

@@ -66,6 +66,8 @@ const AddReminder = ({ route }) => {
     const [duration, setDuration] = useState('');
     const [freNumberError, setFreNumberError] = useState('');
     const [imagePath, setImagePath] = useState('');
+    const [isFocused, setIsFocused] = useState(false);
+   
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
     };
@@ -493,7 +495,6 @@ const AddReminder = ({ route }) => {
     };
     // console.log(image);
 
-
     return (
         <>
             <View style={styles.container}>
@@ -515,10 +516,11 @@ const AddReminder = ({ route }) => {
                             <FloatingLabelInput
                                 label={'Name of Medicine/Supplement'}
                                 inputStyles={styles.inputStyles}
-                                labelStyles={{ paddingHorizontal: 0 }}
                                 customLabelStyles={!medicineError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
                                 value={MedicineName}
                                 onChangeText={value => setMedicineName(value)}
+                                onFocus={() => setIsFocused(true)}  
+                                onBlur={() => setIsFocused(false)}  
                                 containerStyles={!medicineError ? styles.containerStyles : styles.containerStylesEmpty}
                             />
                             {medicineError && Platform.OS === 'android' && (
@@ -551,7 +553,7 @@ const AddReminder = ({ route }) => {
                             <TouchableOpacity onPress={handlePressDatePicker}>
                                 <View style={!dateError ? styles.containerStyles : styles.containerStylesEmpty}>
                                     {date ? (
-                                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Start Date and Time</Text>
+                                        <Text style={{ marginBottom: 8, color: config.primaryColor }}>Start Date and Time</Text>
                                     ) : (
                                         <TextInput
                                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
@@ -623,7 +625,7 @@ const AddReminder = ({ route }) => {
                         <View style={{ flexDirection: 'row', width: '90%', }}>
                             <View
                                 ref={(ref) => (errorRefs.current[5] = ref)}
-                                style={{ ...styles.floatingLabelH, borderBottomWidth: 0.5, borderBottomColor: config.secondaryColor }}>
+                                style={{ ...styles.floatingLabelH, borderBottomWidth: 0.5, borderBottomColor: config.primaryColor }}>
                                 <FloatingLabelInput
                                     label={'Treatment Duration'}
                                     inputStyles={styles.inputStyles}
@@ -646,7 +648,7 @@ const AddReminder = ({ route }) => {
                                     <>
                                         <View
                                             ref={(ref) => (errorRefs.current[3] = ref)}
-                                            style={{ ...styles.floatingLabelNN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
+                                            style={{ ...styles.floatingLabelNN, borderBottomWidth: 1.5, borderBottomColor: config.primaryColor, zIndex: 999, marginTop: 0 }}>
 
                                             <RNPickerSelect
                                                 onValueChange={(value) => console.log(value)}
@@ -671,51 +673,14 @@ const AddReminder = ({ route }) => {
                                     <View
                                         ref={(ref) => (errorRefs.current[3] = ref)}
                                         style={{ ...styles.floatingLabelN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
-                                        <Animated.Text
-                                            style={[
-                                                styles.placeholderLabel,
-                                                {
-                                                    transform: [
-                                                        {
-                                                            translateY: placeholderLabelAnim.interpolate({
-                                                                inputRange: [0, 1.2],
-                                                                outputRange: [0, -25],
-                                                            }),
-                                                        },
-                                                        {
-                                                            scale: placeholderLabelAnim.interpolate({
-                                                                inputRange: [0, 1],
-                                                                outputRange: [0.95, 0.9],
-                                                            }),
-                                                        },
-                                                    ],
-                                                    // Apply margin left conditionally
-                                                    marginLeft: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1.5],
-                                                        outputRange: [0, -5],
-                                                    }),
-                                                    // Interpolate font size
-                                                    fontSize: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1.5],
-                                                        outputRange: [PixelRatio.getFontScale() * 18, PixelRatio.getFontScale() * 16],
-                                                    }),
-                                                    color: placeholderLabelAnim.interpolate({
-                                                        inputRange: [0, 1.5],
-                                                        outputRange: [config.primaryColor, config.secondaryColor],
-                                                    }),
-                                                },
-                                            ]}
-                                        >
-                                            Days
-                                        </Animated.Text>
-
+                                  
                                         <DropDownPicker
                                             items={DaysArray}
                                             value={selectedDays}
                                             onSelectItem={handleSelect}
                                             placeholder=""
                                             open={isOpen}
-                                            showArrowIcon={false}
+                                            showArrowIcon={true}
                                             onOpen={handleOpen}
                                             onClose={handleOpen}
                                             listMode="SCROLLVIEW"
@@ -730,10 +695,13 @@ const AddReminder = ({ route }) => {
                                             textStyle={{
                                                 fontSize: PixelRatio.getFontScale() * 18,
                                                 fontFamily: config.fontStyle,
+                                                color:config.primaryColor,
                                             }}
                                             dropDownContainerStyle={{
                                                 backgroundColor: 'white', 
                                                 zIndex:999,
+                                                borderColor:'white',
+                                                elevation:5,
                                             }}
                                         />
 
@@ -1224,7 +1192,7 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
         paddingHorizontal: 0,
         borderBottomWidth: 1,
-        borderColor: config.secondaryColor,
+        borderColor: config.primaryColor,
     },
     containerStylesEmpty: {
         fontSize: PixelRatio.getFontScale() * 17,
@@ -1237,7 +1205,7 @@ const styles = StyleSheet.create({
     },
 
     customLabelStyles: {
-        colorFocused: config.secondaryColor,
+        colorFocused: config.primaryColor,
         colorBlurred: config.primaryColor,
         fontSizeFocused: PixelRatio.getFontScale() * 14,
         fontSizeBlurred: PixelRatio.getFontScale() * 17,
@@ -1259,7 +1227,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 0,
         paddingTop: 30,
-        color: config.textColorHeadings
+        color: config.primaryColor
 
     }
 

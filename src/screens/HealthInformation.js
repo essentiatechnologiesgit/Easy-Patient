@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: PixelRatio.getFontScale() * 19,
-        color: config.textColorHeadings,
+        color: config.primaryColor,
         fontWeight: 'bold',
     },
     msg: {
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     },
     complete: {
         fontSize: PixelRatio.getFontScale() * 16,
-        color: config.textColorHeadings,
+        color: config.primaryColor,
         fontWeight: 'bold',
     },
     formContainer: {
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         borderWidth: 0,
         borderBottomWidth: 1,
-        borderBottomColor: config.secondaryColor,
+        borderBottomColor: config.primaryColor,
     },
     dropdownTextStyle: {
         color: config.primaryColor,
@@ -800,7 +800,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         fontSize: PixelRatio.getFontScale() * 17,
-        borderBottomColor: config.secondaryColor,
+        borderBottomColor: config.primaryColor,
         borderBottomWidth: 2,
         width: '90%',
     },
@@ -813,7 +813,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
         width: '90%',
         fontSize: PixelRatio.getFontScale() * 17,
-        borderBottomColor: config.secondaryColor,
+        borderBottomColor: config.primaryColor,
     },
     backgroundImage: {
         flex: 1,
@@ -917,10 +917,10 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
         paddingHorizontal: 0,
         borderBottomWidth: 1,
-        borderColor: config.secondaryColor
+        borderColor: config.primaryColor
     },
     customLabelStyles: {
-        colorFocused: config.secondaryColor,
+        colorFocused: config.primaryColor,
         colorBlurred: config.primaryColor,
         fontSizeFocused: PixelRatio.getFontScale() * 14,
         fontSizeBlurred: PixelRatio.getFontScale() * 17,

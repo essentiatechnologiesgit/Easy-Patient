@@ -387,7 +387,7 @@ const Profile = () => {
                                 <TouchableOpacity onPress={handlePressDatePicker}>
                                     <View style={{ ...styles.containerStyles }}>
                                         {date ? (
-                                            <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Date Of Birth</Text>
+                                            <Text style={{ marginBottom: 8, color: config.primaryColor }}>Date Of Birth</Text>
                                         ) : (
                                             <TextInput
                                                 style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
@@ -441,7 +441,7 @@ const Profile = () => {
                             )}
                             <View
                                 ref={(ref) => (errorRefs.current[3] = ref)}
-                                style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.secondaryColor, zIndex: 998, marginTop: 5 }}>
+                                style={{ ...styles.floatingLabel, borderBottomWidth: 0.96, borderBottomColor: config.primaryColor, zIndex: 998, marginTop: 5 }}>
                                 <Animated.Text
                                     style={[
                                         styles.placeholderLabel,
@@ -472,7 +472,7 @@ const Profile = () => {
                                             }),
                                             color: placeholderLabelAnim.interpolate({
                                                 inputRange: [0, 1.5],
-                                                outputRange: ['gray', config.secondaryColor], // Change font color after animation
+                                                outputRange: [config.primaryColor, config.primaryColor], // Change font color after animation
                                             }),
                                         },
                                     ]}
@@ -486,10 +486,11 @@ const Profile = () => {
                                     onSelectItem={handleSelect}
                                     placeholder=""
                                     open={isOpen}
-                                    showArrowIcon={false}
+                                    showArrowIcon={true}
                                     onOpen={handleOpen}
                                     onClose={handleOpen}
                                     listMode="SCROLLVIEW"
+                                    dropDownContainerStyle={{borderColor:'white',elevation:6}}
                                     style={{
                                         backgroundColor: styles.primaryColor,
                                         borderWidth: 0,
@@ -499,7 +500,7 @@ const Profile = () => {
                                     }}
                                     textStyle={{
                                         fontSize: PixelRatio.getFontScale() * 17,
-                                        color: config.textColorHeadings,
+                                        color: config.primaryColor,
                                     }}
                                 />
                                 {genderError && !selectedGender && (
@@ -624,7 +625,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         borderWidth: 0,
         borderBottomWidth: 1,
-        borderBottomColor: config.secondaryColor,
+        borderBottomColor: config.primaryColor,
     },
     dropdownTextStyle: {
         color: config.primaryColor,
@@ -802,10 +803,10 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
         paddingHorizontal: 0,
         borderBottomWidth: 1,
-        borderColor: config.secondaryColor
+        borderColor: config.primaryColor
     },
     customLabelStyles: {
-        colorFocused: config.secondaryColor,
+        colorFocused: config.primaryColor,
         colorBlurred: config.primaryColor,
         fontSizeFocused: PixelRatio.getFontScale() * 14,
         fontSizeBlurred: PixelRatio.getFontScale() * 17,
@@ -819,7 +820,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 0,
         paddingTop: 30,
-        color: config.textColorHeadings
+        color: config.primaryColor
     }
 });
 

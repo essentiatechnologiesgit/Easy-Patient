@@ -653,10 +653,10 @@ const UpdateReminder = ({ route }) => {
                             <TouchableOpacity onPress={handlePressDatePicker}>
                                 <View style={!dateError ? styles.containerStyles : styles.containerStylesEmpty}>
                                     {fetchDateFormat && !formattedDate && (
-                                        <Text style={{ marginBottom: -10, color: config.secondaryColor }}>Start Date and Time</Text>
+                                        <Text style={{ marginBottom: -10, color: config.primaryColor }}>Start Date and Time</Text>
                                     )}
                                     {date ? (
-                                        <Text style={{ marginBottom: 8, color: config.secondaryColor }}>Start Date and Time</Text>
+                                        <Text style={{ marginBottom: 8, color: config.primaryColor }}>Start Date and Time</Text>
                                     ) : (
                                         <TextInput
                                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
@@ -757,7 +757,7 @@ const UpdateReminder = ({ route }) => {
                                     onSelectItem={handleSelect}
                                     placeholder="Days"
                                     open={isOpen}
-                                    showArrowIcon={false}
+                                    showArrowIcon={true}
                                     onOpen={handleOpen}
                                     onClose={handleOpen}
                                     listMode="SCROLLVIEW"
@@ -768,9 +768,17 @@ const UpdateReminder = ({ route }) => {
                                         top: 22,
                                         color: config.primaryColor,
                                         zIndex: 99,
+                                        
                                     }}
                                     textStyle={{
                                         fontSize: PixelRatio.getFontScale() * 18,
+                                        color:config.primaryColor
+                                    }}
+                                    dropDownContainerStyle={{
+                                        backgroundColor: 'white', 
+                                        zIndex:999,
+                                        borderColor:'white',
+                                        elevation:5,
                                     }}
                                 />
                             </View>
@@ -1226,7 +1234,7 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
         paddingHorizontal: 0,
         borderBottomWidth: 1,
-        borderColor: config.secondaryColor,
+        borderColor: config.primaryColor,
     },
     containerStylesEmpty: {
         fontSize: PixelRatio.getFontScale() * 17,
@@ -1239,7 +1247,7 @@ const styles = StyleSheet.create({
     },
 
     customLabelStyles: {
-        colorFocused: config.secondaryColor,
+        colorFocused: config.primaryColor,
         colorBlurred: config.primaryColor,
         fontSizeFocused: PixelRatio.getFontScale() * 14,
         fontSizeBlurred: PixelRatio.getFontScale() * 17,
@@ -1261,7 +1269,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 0,
         paddingTop: 30,
-        color: config.textColorHeadings
+        color: config.primaryColor
 
     }
 

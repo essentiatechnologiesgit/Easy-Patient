@@ -348,7 +348,7 @@ jobs:
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "'${{ env.screenshot_set_id }}'",
+                        "id": "'3e02c17c-a305-48f8-b9d0-38f6ab5816bd'",
                         "type": "appScreenshotSets"
                       }
                     }

@@ -59,7 +59,7 @@ jobs:
           cd ios
           xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-            - name: Build for Simulator
+      - name: Build for Simulator
         run: |
           xcodebuild clean build \
             -workspace ios/EasyPatientDynamic.xcworkspace \
@@ -310,7 +310,7 @@ jobs:
           echo "Update App Store Version Localization Response: $response"
 
 
-     - name: Create Screenshot Set
+      - name: Create Screenshot Set
         id: create_screenshot_set
         run: |
           response=$(curl -X POST \

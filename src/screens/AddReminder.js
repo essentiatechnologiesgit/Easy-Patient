@@ -519,8 +519,6 @@ const AddReminder = ({ route }) => {
                                 customLabelStyles={!medicineError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
                                 value={MedicineName}
                                 onChangeText={value => setMedicineName(value)}
-                                onFocus={() => setIsFocused(true)}  
-                                onBlur={() => setIsFocused(false)}  
                                 containerStyles={!medicineError ? styles.containerStyles : styles.containerStylesEmpty}
                             />
                             {medicineError && Platform.OS === 'android' && (
@@ -678,7 +676,7 @@ const AddReminder = ({ route }) => {
                                             items={DaysArray}
                                             value={selectedDays}
                                             onSelectItem={handleSelect}
-                                            placeholder=""
+                                            placeholder="Days"
                                             open={isOpen}
                                             showArrowIcon={true}
                                             onOpen={handleOpen}
@@ -688,7 +686,7 @@ const AddReminder = ({ route }) => {
                                                 backgroundColor: styles.primaryColor,
                                                 borderWidth: 0,
                                                 left: -7,
-                                                top: 22,
+                                                top: 15,
                                                 color: config.primaryColor,
                                                 zIndex: 999,
                                             }}

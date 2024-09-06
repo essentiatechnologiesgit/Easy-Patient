@@ -2,7 +2,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - FixesForiOSBuild
+      - ScreenshotBuild
 
 jobs:
   build:
@@ -632,22 +632,16 @@ jobs:
           sleep 120
           
           # Navigate to the Login screen using deep link
-          npx uri-scheme open "easypatientdynamic://Login" --ios
-
-          sleep 10
-          
+               
           # Capture a screenshot of the Login screen
-          xcrun simctl io ${{ steps.get-uuid.outputs.uuid }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
 
-          sleep 10
+          sleep 120
 
           # Navigate to the Dashboard screen using deep link
-          npx uri-scheme open "easypatientdynamic://Dashboard" --ios
-
-          sleep 10
 
           # Capture a screenshot of the Dashboard screen
-          xcrun simctl io ${{ steps.get-uuid.outputs.uuid }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
+          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
 
       - name: Upload Screenshots as Artifacts
         uses: actions/upload-artifact@v3

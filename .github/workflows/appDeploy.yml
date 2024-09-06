@@ -334,8 +334,7 @@ jobs:
       - name: Upload Screenshots to App Store Connect
         run: |
           for screenshot in downloaded_screenshots/*.png; do
-            fileSize=$(stat -f%z "$screenshot") # Get the file size in bytes
-      
+            # Step 1: Create the screenshot entity
             response=$(curl -X POST \
               -H "Authorization: Bearer ${{ env.token }}" \
               -H "Content-Type: application/json" \
@@ -344,12 +343,12 @@ jobs:
                   "type": "appScreenshots",
                   "attributes": {
                     "fileName": "'"$(basename "$screenshot")"'",
-                    "fileSize": '"$fileSize"'
+                    "fileSize": '"$(stat -f%z "$screenshot")"'
                   },
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "''3e02c17c-a305-48f8-b9d0-38f6ab5816bd''",
+                        "id": "'${{ env.screenshot_set_id }}'",
                         "type": "appScreenshotSets"
                       }
                     }
@@ -357,6 +356,17 @@ jobs:
                 }
               }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
       
-            echo "Upload Screenshot Response: $response"
+            # Parse the upload URL and other details from the response
+            uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
+            contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
+      
+            # Step 2: Upload the screenshot file to the provided URL
+            curl -X PUT \
+              -H "Content-Type: $contentType" \
+              --upload-file "$screenshot" \
+              "$uploadUrl"
+      
+            echo "Uploaded screenshot $(basename "$screenshot")"
           done
+
       

@@ -28,7 +28,7 @@ jobs:
           KEY_ID=$(grep -E '^  KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
       
           # Handle the private key separately and save it to a file
-          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
+          awk '/^  private_key:/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key://g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
       
           echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
@@ -41,30 +41,28 @@ jobs:
           echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
           echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
           echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
-      
-      # Example of using the private key
+
       - name: Use Private Key
         run: |
           cat ${{ env.PRIVATE_KEY_PATH }}
-      
+
       - name: Install dependencies
         run: |
           gem install jwt
           pip install requests jq
-      
+
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
-      
-          # If needed, you can uncomment the echo statements below for debugging.
-          # echo "Private key is:"
-          # echo "$private_key"
-      
+          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+
+          # Properly escape and format the private key to avoid issues with newlines
+          private_key_formatted=$(echo "$private_key" | sed ':a;N;$!ba;s/\n/\\n/g')
+
           token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key_formatted')
             token = JWT.encode(
               {
                 iss: '$ISSUER_ID',
@@ -81,6 +79,7 @@ jobs:
           ")
           
           echo "token=$token" >> $GITHUB_ENV
+
 
       - name: Get App ID
         id: get_app_id

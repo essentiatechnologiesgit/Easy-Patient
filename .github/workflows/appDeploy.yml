@@ -314,7 +314,7 @@ jobs:
               "data": {
                 "type": "appScreenshotSets",
                 "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_65"
+                  "screenshotDisplayType": "APP_IPHONE_67"
                 },
                 "relationships": {
                   "appStoreVersionLocalization": {

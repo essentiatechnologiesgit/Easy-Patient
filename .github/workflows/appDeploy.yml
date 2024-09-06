@@ -334,6 +334,8 @@ jobs:
       - name: Upload Screenshots to App Store Connect
         run: |
           for screenshot in downloaded_screenshots/*.png; do
+            fileSize=$(stat -f%z "$screenshot") # Get the file size in bytes
+      
             response=$(curl -X POST \
               -H "Authorization: Bearer ${{ env.token }}" \
               -H "Content-Type: application/json" \
@@ -342,18 +344,19 @@ jobs:
                   "type": "appScreenshots",
                   "attributes": {
                     "fileName": "'"$(basename "$screenshot")"'",
-                    "sourceFileChecksum": "'"$(shasum -a 256 "$screenshot" | awk '{print $1}')"'" 
+                    "fileSize": '"$fileSize"'
                   },
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "'${{ env.screenshot_set_id }}'",
+                        "id": "''3e02c17c-a305-48f8-b9d0-38f6ab5816bd''",
                         "type": "appScreenshotSets"
                       }
                     }
                   }
                 }
               }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
-
+      
             echo "Upload Screenshot Response: $response"
           done
+      

@@ -19,6 +19,7 @@ import redDrink from '../assets/redDrink.png';
 import blueDrink from '../assets/blueDrink.png';
 import blackDrink from '../assets/blackDrink.png';
 import yellowMed from '../assets/yellowMed.png';
+import CustomLabelInput from '../components/CustomLabelInput.js'
 import blueMed from '../assets/blueMed.png';
 import redMed from '../assets/redMed.png';
 import blackMed from '../assets/blackMed.png';
@@ -30,6 +31,8 @@ import blackCapsule from '../assets/blackCapsule.png';
 import moment from "moment";
 import axios from 'axios';
 import BottomModalPopup from '../components/BottomModalPopup';
+import BottomModalPopupAndroid from '../components/BottomModalPopupAndroid';
+
 import ModalLoader from '../components/ModalLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
@@ -67,7 +70,7 @@ const AddReminder = ({ route }) => {
     const [freNumberError, setFreNumberError] = useState('');
     const [imagePath, setImagePath] = useState('');
     const [isFocused, setIsFocused] = useState(false);
-   
+
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
     };
@@ -441,10 +444,6 @@ const AddReminder = ({ route }) => {
     };
 
 
-
-
-
-
     const handleCounter = () => {
         setModalVisible(true);
     }
@@ -500,7 +499,24 @@ const AddReminder = ({ route }) => {
             <View style={styles.container}>
                 <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
                 {showLoader && <ModalLoader />}
-                <BottomModalPopup visible={modalVisible} setFreNumber={setFreNumber} setDuration={setDuration} onClose={() => setModalVisible(false)} />
+                {
+                    Platform.OS === 'ios' ? (
+                        <BottomModalPopup
+                            visible={modalVisible}
+                            setFreNumber={setFreNumber}
+                            setDuration={setDuration}
+                            onClose={() => setModalVisible(false)}
+                        />
+                    ) : (
+                        <BottomModalPopupAndroid
+                            visible={modalVisible}
+                            setFreNumber={setFreNumber}
+                            setDuration={setDuration}
+                            onClose={() => setModalVisible(false)}
+                        />
+                    )
+                }
+
                 <BackHeader name={"Add Reminder"} />
                 <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })} style={styles.medicineContiner}>
                     {renderImage()}
@@ -518,6 +534,7 @@ const AddReminder = ({ route }) => {
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={!medicineError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
                                 value={MedicineName}
+                                placeholder={'df'}
                                 onChangeText={value => setMedicineName(value)}
                                 containerStyles={!medicineError ? styles.containerStyles : styles.containerStylesEmpty}
                             />
@@ -527,23 +544,11 @@ const AddReminder = ({ route }) => {
                                 </>
                             )}
                         </View>
-
                         <View
-                            ref={(ref) => (errorRefs.current[1] = ref)}
+                            ref={(ref) => (errorRefs.current[2] = ref)}
                             style={styles.floatingLabel}>
-                            <FloatingLabelInput
-                                label={'Dose'}
-                                inputStyles={styles.inputStyles}
-                                customLabelStyles={!doseError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
-                                value={dose}
-                                onChangeText={value => setDose(value)}
-                                containerStyles={!doseError ? styles.containerStyles : styles.containerStylesEmpty}
-                            />
-                            {doseError && Platform.OS === 'android' && (
-                                <>
-                                    <View><Text style={styles.ErrorText}>{errorMessage}</Text></View>
-                                </>
-                            )}
+
+                            <CustomLabelInput  value={dose} onChangeText={setDose} doseError={doseError} />
                         </View>
                         <View
                             ref={(ref) => (errorRefs.current[2] = ref)}
@@ -671,7 +676,7 @@ const AddReminder = ({ route }) => {
                                     <View
                                         ref={(ref) => (errorRefs.current[3] = ref)}
                                         style={{ ...styles.floatingLabelN, borderBottomWidth: 1.5, borderBottomColor: config.secondaryColor, zIndex: 999, marginTop: 0 }}>
-                                  
+
                                         <DropDownPicker
                                             items={DaysArray}
                                             value={selectedDays}
@@ -693,13 +698,14 @@ const AddReminder = ({ route }) => {
                                             textStyle={{
                                                 fontSize: PixelRatio.getFontScale() * 18,
                                                 fontFamily: config.fontStyle,
-                                                color:config.primaryColor,
+                                                color: config.primaryColor,
                                             }}
                                             dropDownContainerStyle={{
-                                                backgroundColor: 'white', 
-                                                zIndex:999,
-                                                borderColor:'white',
-                                                elevation:5,
+                                                backgroundColor: 'white',
+                                                zIndex: 999,
+                                                borderColor: 'white',
+                                                elevation: 5,
+                                                top:65,
                                             }}
                                         />
 

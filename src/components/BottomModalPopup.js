@@ -82,8 +82,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                                 <Text style={styles.freqText}>{frequencyNumber}</Text>
 
 
-                                {/* <Text style={styles.freqText}>{frequencyNumber}</Text> */}
-                                <Text style={styles.freqText}>{selectedDuration}</Text>
+                                 <Text style={styles.freqText}>{selectedDuration}</Text>
                                 <RNPickerSelect
                                     onValueChange={(value) => setFrequencyNumber(value)}
                                     items={frequencyOptions}

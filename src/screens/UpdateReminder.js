@@ -11,6 +11,7 @@ import deleteIcon from '../assets/delete.png';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ValidationError from '../components/ValidationError';
 import moment from "moment";
+import CustomLabelInput from '../components/CustomLabelInput.js';
 import axios from 'axios';
 import redDrop from '../assets/redDrop.png';
 import blackDrop from '../assets/blackDrop.png';
@@ -631,21 +632,10 @@ const UpdateReminder = ({ route }) => {
                             )}
                         </View>
                         <View
-                            ref={(ref) => (errorRefs.current[1] = ref)}
+                            ref={(ref) => (errorRefs.current[2] = ref)}
                             style={styles.floatingLabel}>
-                            <FloatingLabelInput
-                                label={'Dose'}
-                                inputStyles={styles.inputStyles}
-                                customLabelStyles={!doseError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
-                                value={dose}
-                                onChangeText={value => setDose(value)}
-                                containerStyles={!doseError ? styles.containerStyles : styles.containerStylesEmpty}
-                            />
-                            {doseError && (
-                                <>
-                                    <View><Text style={styles.ErrorText}>{errorMessage}</Text></View>
-                                </>
-                            )}
+
+                            <CustomLabelInput  value={dose} onChangeText={setDose} doseError={doseError} />
                         </View>
                         <View
                             ref={(ref) => (errorRefs.current[2] = ref)}
@@ -779,6 +769,7 @@ const UpdateReminder = ({ route }) => {
                                         zIndex:999,
                                         borderColor:'white',
                                         elevation:5,
+                                        top:65,
                                     }}
                                 />
                             </View>

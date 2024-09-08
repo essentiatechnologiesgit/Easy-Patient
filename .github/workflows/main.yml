@@ -414,7 +414,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 9"  
+          PROFILE_NAME="MyApp Distribution Profile 10"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -481,7 +481,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>com.org.easypatientdynamic</key> <!-- Replace with your actual Bundle Identifier -->
-                  <string>MyApp Distribution Profile 9</string> <!-- Replace with your Provisioning Profile Name -->
+                  <string>MyApp Distribution Profile 10</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>
           </plist>
@@ -624,7 +624,7 @@ jobs:
       #       -configuration Release \
       #       -derivedDataPath ios/build/DerivedData \
       #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
+      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 10" \
       #       CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
 
       # - name: Export IPA

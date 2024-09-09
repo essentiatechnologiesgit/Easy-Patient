@@ -363,7 +363,10 @@ jobs:
             # Parse the upload URL and other details from the response
             uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
             contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
-      
+            screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
+  
+            # Set the screenshot ID as a GitHub Actions environment variable
+            echo "SCREENSHOT_ID=$screenshotId" >> $GITHUB_ENV
             # Step 2: Upload the screenshot file to the provided URL
             curl -X PUT \
               -H "Content-Type: $contentType" \

@@ -2,7 +2,7 @@ name: iOS Screenshot Upload
 on:
   push:
     branches:
-      - ScreenshotBuilds
+      - ScreenshotBuild
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -284,28 +284,7 @@ jobs:
       
           echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-      - name: Update App Store Version Localization
-        id: update_app_store_version_localization
-        run: |
-          response=$(curl -X PATCH \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "id": "'${{ env.app_store_version_localization_id }}'",
-                "type": "appStoreVersionLocalizations",
-                "attributes": {
-                  "description": "here goes your app description...",
-                  "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
-                  "marketingUrl": null,
-                  "promotionalText": "We introduce new features and improvements to improve your experience",
-                  "supportUrl": "https://easy-health.app/landing-page/index.html"
-                }
-              }
-            }' \
-            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
-          
-          echo "Update App Store Version Localization Response: $response"
+
 
 
       - name: Create Screenshot Set
@@ -355,7 +334,7 @@ jobs:
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "'3e02c17c-a305-48f8-b9d0-38f6ab5816bd'",
+                        "id": "'${{ env.screenshot_set_id }}'",
                         "type": "appScreenshotSets"
                       }
                     }

@@ -337,6 +337,9 @@ jobs:
 
       - name: Upload Screenshots to App Store Connect
         run: |
+          # Array to hold screenshot IDs
+          screenshot_ids=()
+      
           for screenshot in downloaded_screenshots/*.png; do
             # Step 1: Create the screenshot entity
             response=$(curl -X POST \
@@ -364,9 +367,13 @@ jobs:
             uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
             contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
             screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
-  
+      
+            # Add screenshot ID to array
+            screenshot_ids+=("$screenshotId")
+      
             # Set the screenshot ID as a GitHub Actions environment variable
             echo "SCREENSHOT_ID=$screenshotId" >> $GITHUB_ENV
+      
             # Step 2: Upload the screenshot file to the provided URL
             curl -X PUT \
               -H "Content-Type: $contentType" \
@@ -375,6 +382,11 @@ jobs:
       
             echo "Uploaded screenshot $(basename "$screenshot")"
           done
+      
+          # Export screenshot IDs to GitHub Actions environment
+          echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+
+          
 
         
 

@@ -4,11 +4,11 @@ const fs = require('fs');
 const path = require('path');
 
 // Retrieve environment variables
-const token = process.env.token; // Ensure the token is set correctly in the GitHub Actions environment
-const screenshotId = process.env.SCREENSHOT_ID; // Replace with the correct environment variable for screenshot ID
+const token = process.env.token;
+const screenshotIds = (process.env.SCREENSHOT_IDS || '').split(' ');
 
-// Path to your screenshot file
-const screenshotPath = path.join(__dirname, 'downloaded_screenshots/screenshot_dashboard.png');
+// Update screenshot path to match the artifacts directory
+const screenshotDir = path.join(__dirname, 'downloaded_screenshots');
 
 // Function to calculate the MD5 checksum of the file
 function calculateMD5Checksum(filePath) {
@@ -19,7 +19,8 @@ function calculateMD5Checksum(filePath) {
 }
 
 // Function to commit the asset reservation
-async function commitReservation() {
+async function commitReservation(screenshotId) {
+  const screenshotPath = path.join(screenshotDir, `screenshot_${screenshotId}.png`);
   const checksum = calculateMD5Checksum(screenshotPath);
 
   const requestBody = {
@@ -50,5 +51,5 @@ async function commitReservation() {
   }
 }
 
-// Call the function to commit the reservation
-commitReservation();
+// Call the function to commit each reservation
+screenshotIds.forEach(commitReservation);

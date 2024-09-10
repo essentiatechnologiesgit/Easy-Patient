@@ -2,7 +2,7 @@ name: iOS Screenshot Upload
 on:
   push:
     branches:
-      - ScreenshotBuild
+      - ScreenshotBuilds
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -318,6 +318,8 @@ jobs:
         run: |
           # Array to hold screenshot IDs
           screenshot_ids=()
+          # Create a mapping file
+          touch screenshot_mapping.txt
       
           for screenshot in downloaded_screenshots/*.png; do
             # Step 1: Create the screenshot entity
@@ -350,8 +352,8 @@ jobs:
             # Add screenshot ID to array
             screenshot_ids+=("$screenshotId")
       
-            # Set the screenshot ID as a GitHub Actions environment variable
-            echo "SCREENSHOT_ID=$screenshotId" >> $GITHUB_ENV
+            # Save the mapping between screenshotId and filename
+            echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
       
             # Step 2: Upload the screenshot file to the provided URL
             curl -X PUT \
@@ -364,6 +366,19 @@ jobs:
       
           # Export screenshot IDs to GitHub Actions environment
           echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+
+          - name: Set up Node.js
+            uses: actions/setup-node@v3
+            with:
+              node-version: '16'
+          
+          - name: Install Node.js Dependencies
+            run: npm install axios
+          
+          - name: Commit Uploaded Screenshots
+            run: node commit_screenshots.js
+
+
 
           
 

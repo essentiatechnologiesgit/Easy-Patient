@@ -10,6 +10,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Node.js Dependencies
+        run: npm install axios --force
+
       - name: Use custom DNS
         run: |
           echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
@@ -373,8 +376,7 @@ jobs:
           node-version: '16'
           
        
-      - name: Install Node.js Dependencies
-        run: npm install axios
+
           
       - name: Commit Uploaded Screenshots
         run: node comittingSS.js

@@ -378,8 +378,16 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const token = '${{ env.token }}';  // Using the extracted token
-            const screenshotIds = process.env.SCREENSHOT_IDS.split(' '); // Fetching screenshot IDs from the environment variable
+            const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
+            const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
             
+            // Parse the screenshot mappings
+            const mappings = {};
+            screenshotMappings.forEach(line => {
+              const [screenshotId, fileName] = line.split(':');
+              mappings[screenshotId] = fileName;
+            });
+      
             async function commitReservation(screenshotId, screenshotPath) {
               const calculateMD5Checksum = (filePath) => {
                 const fileBuffer = fs.readFileSync(filePath);
@@ -417,24 +425,11 @@ jobs:
               }
             }
       
-            // Loop through each screenshot ID and commit reservation
+            // Loop through each screenshot ID from the mappings and commit reservation
             (async () => {
-              for (const screenshotId of screenshotIds) {
-                // Adjust path to the directory where screenshots are downloaded
-                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', screenshotId + '.png');
+              for (const [screenshotId, fileName] of Object.entries(mappings)) {
+                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
                 await commitReservation(screenshotId, screenshotPath);
               }
             })();
           "
-
-
-
-
-
-          
-
-        
-
-
-
-      

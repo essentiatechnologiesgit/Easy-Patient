@@ -367,16 +367,17 @@ jobs:
           # Export screenshot IDs to GitHub Actions environment
           echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
 
-          - name: Set up Node.js
-            uses: actions/setup-node@v3
-            with:
-              node-version: '16'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
           
-          - name: Install Node.js Dependencies
-            run: npm install axios
+       
+      - name: Install Node.js Dependencies
+        run: npm install axios
           
-          - name: Commit Uploaded Screenshots
-            run: node comittingSS.js
+      - name: Commit Uploaded Screenshots
+        run: node comittingSS.js
 
 
 

@@ -2,7 +2,7 @@ name: iOS Screenshot Upload
 on:
   push:
     branches:
-      - ScreenshotBuilds
+      - ScreenshotBuild
 jobs:
   upload-screenshot:
     runs-on: macos-latest

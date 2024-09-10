@@ -1,0 +1,157 @@
+name: iOS Screenshot Upload
+on:
+  push:
+    branches:
+      - ScreenshotBuild
+jobs:
+  upload-screenshot:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Install Node.js Dependencies
+        run: npm install axios
+
+      - name: Extract variables from config.js
+        id: extract-variables
+        run: |
+          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          ISSUER_ID=$(grep 'ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+          KEY_ID=$(grep 'KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
+          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
+          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
+          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
+          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
+
+      - name: Echo extracted variables
+        run: |
+          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
+          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
+          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
+          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+
+      - name: Install dependencies
+        run: |
+          gem install jwt
+          pip install requests jq
+
+      - name: Generate JWT
+        id: generate_jwt
+        run: |
+          ISSUER_ID=${{ env.ISSUER_ID }}
+          KEY_ID=${{ env.KEY_ID }}
+          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+          token=$(ruby -rjwt -ropenssl -e "
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            token = JWT.encode(
+              {
+                iss: '$ISSUER_ID',
+                exp: Time.now.to_i + 20 * 60,
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              header_fields = {
+                kid: '$KEY_ID'
+              }
+            )
+            puts token
+          ")
+          echo "token=$token" >> $GITHUB_ENV
+
+      - name: Upload Screenshot
+        id: upload_screenshot
+        run: |
+          file_path="src/assets/Screenshots/04.png"
+          file_name=$(basename "$file_path")
+          file_size=$(stat -f%z "$file_path")
+          response=$(curl -X POST \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "appScreenshots",
+                "attributes": {
+                  "fileName": "'$file_name'",
+                  "fileSize": '$file_size'
+                },
+                "relationships": {
+                  "appScreenshotSet": {
+                    "data": {
+                      "id": "a04ec743-111f-4a5b-ab37-f2b309fecfe0",
+                      "type": "appScreenshotSets"
+                    }
+                  }
+                }
+              }
+            }' \
+            https://api.appstoreconnect.apple.com/v1/appScreenshots)
+          upload_url=$(echo $response | jq -r '.data.attributes.uploadOperations[0].url')
+          screenshot_id=$(echo $response | jq -r '.data.id')
+          curl -X PUT -H "Content-Type: image/png" --data-binary "@$file_path" "$upload_url"
+          echo "Upload completed."
+          echo "screenshot_id=$screenshot_id" >> $GITHUB_ENV
+
+      - name: Commit Screenshot Reservation
+        run: |
+          node -e "
+            const axios = require('axios');
+            const crypto = require('crypto');
+            const fs = require('fs');
+            const path = require('path');
+            const token = '${{ env.token }}';  // Using the extracted token
+            const screenshotId = process.env.screenshot_id; // Fetching screenshot ID from the environment variable
+            const screenshotPath = path.join(__dirname, 'src/assets/Screenshots/04.png');
+            function calculateMD5Checksum(filePath) {
+              const fileBuffer = fs.readFileSync(filePath);
+              const hashSum = crypto.createHash('md5');
+              hashSum.update(fileBuffer);
+              return hashSum.digest('hex');
+            }
+            async function commitReservation() {
+              const checksum = calculateMD5Checksum(screenshotPath);
+              const requestBody = {
+                data: {
+                  type: 'appScreenshots',
+                  id: screenshotId,
+                  attributes: {
+                    uploaded: true,
+                    sourceFileChecksum: checksum,
+                  },
+                },
+              };
+              try {
+                const response = await axios.patch(
+                  \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
+                  requestBody,
+                  {
+                    headers: {
+                      Authorization: \`Bearer \${token}\`,
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
+                console.log('Commit successful:', response.data);
+              } catch (error) {
+                console.error('Error committing reservation:', error.response ? error.response.data : error.message);
+              }
+            }
+            commitReservation();
+          "

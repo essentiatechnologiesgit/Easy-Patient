@@ -379,6 +379,7 @@ jobs:
             const path = require('path');
             const token = '${{ env.token }}';  // Using the extracted token
             const screenshotIds = process.env.SCREENSHOT_IDS.split(' '); // Fetching screenshot IDs from the environment variable
+            
             async function commitReservation(screenshotId, screenshotPath) {
               const calculateMD5Checksum = (filePath) => {
                 const fileBuffer = fs.readFileSync(filePath);
@@ -386,6 +387,7 @@ jobs:
                 hashSum.update(fileBuffer);
                 return hashSum.digest('hex');
               };
+      
               const checksum = calculateMD5Checksum(screenshotPath);
               const requestBody = {
                 data: {
@@ -397,6 +399,7 @@ jobs:
                   },
                 },
               };
+      
               try {
                 const response = await axios.patch(
                   \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
@@ -413,14 +416,17 @@ jobs:
                 console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
               }
             }
+      
             // Loop through each screenshot ID and commit reservation
             (async () => {
               for (const screenshotId of screenshotIds) {
-                const screenshotPath = path.join(__dirname, 'src/assets/Screenshots/screenshot_' + screenshotId + '.png'); // Adjust path as needed
+                // Adjust path to the directory where screenshots are downloaded
+                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', screenshotId + '.png');
                 await commitReservation(screenshotId, screenshotPath);
               }
             })();
           "
+
 
 
 

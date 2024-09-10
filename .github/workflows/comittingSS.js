@@ -10,6 +10,16 @@ const screenshotIds = (process.env.SCREENSHOT_IDS || '').split(' ');
 // Update screenshot path to match the artifacts directory
 const screenshotDir = path.join(__dirname, 'downloaded_screenshots');
 
+// Read the screenshot mapping
+const mappingContent = fs.readFileSync('screenshot_mapping.txt', 'utf8');
+const mappingLines = mappingContent.split('\n').filter(Boolean);
+
+const screenshotMap = {};
+mappingLines.forEach(line => {
+  const [id, filename] = line.split(':');
+  screenshotMap[id] = filename;
+});
+
 // Function to calculate the MD5 checksum of the file
 function calculateMD5Checksum(filePath) {
   const fileBuffer = fs.readFileSync(filePath);
@@ -20,7 +30,12 @@ function calculateMD5Checksum(filePath) {
 
 // Function to commit the asset reservation
 async function commitReservation(screenshotId) {
-  const screenshotPath = path.join(screenshotDir, `screenshot_${screenshotId}.png`);
+  const filename = screenshotMap[screenshotId];
+  if (!filename) {
+    console.error(`Filename not found for screenshotId ${screenshotId}`);
+    return;
+  }
+  const screenshotPath = path.join(screenshotDir, filename);
   const checksum = calculateMD5Checksum(screenshotPath);
 
   const requestBody = {
@@ -45,9 +60,9 @@ async function commitReservation(screenshotId) {
         },
       }
     );
-    console.log('Commit successful:', response.data);
+    console.log(`Commit successful for screenshotId ${screenshotId}:`, response.data);
   } catch (error) {
-    console.error('Error committing reservation:', error.response ? error.response.data : error.message);
+    console.error(`Error committing reservation for screenshotId ${screenshotId}:`, error.response ? error.response.data : error.message);
   }
 }
 

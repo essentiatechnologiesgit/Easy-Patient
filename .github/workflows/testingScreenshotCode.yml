@@ -7,18 +7,34 @@ jobs:
   build:
     runs-on: macos-13
     steps:
-      - name: Find iOS Simulator UUID
-        id: find_simulator2
+      - name: Checkout code
+        uses: actions/checkout@v3
+  
+      - name: Set up Xcode
+        uses: apple-actions/setup-xcode@v3
+        with:
+          xcode-version: 'latest'
+  
+      - name: Create iPhone 8 Plus Simulator
         run: |
-          SIMULATOR_NAME="iPhone 8 Plus" # Changed to the desired simulator name
-          UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
-          echo "Simulator UUID: $UUID"
-          echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
-
-      - name: Boot iOS Simulator
-        run: |
-          xcrun simctl boot ${{ env.SIMULATOR_UUID }}
-
+          # Set variables
+          SIMULATOR_NAME="My iPhone 8 Plus"
+          DEVICE_TYPE_IDENTIFIER="com.apple.CoreSimulator.SimDeviceType.iPhone-8-Plus"
+  
+          # Create the simulator
+          xcrun simctl create "$SIMULATOR_NAME" "$DEVICE_TYPE_IDENTIFIER"
+  
+          # List devices and extract UDID of the iPhone 8 Plus
+          DEVICE_UDID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep -oE '[A-F0-9\-]{36}')
+  
+          # Check if the UDID was found
+          if [ -z "$DEVICE_UDID" ]; then
+            echo "Error: Could not find the UDID for $SIMULATOR_NAME"
+            exit 1
+          fi
+  
+          # Boot the simulator
+          xcrun simctl boot "$DEVICE_UDID"
 
 
 

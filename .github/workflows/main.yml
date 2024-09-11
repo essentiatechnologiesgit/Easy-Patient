@@ -614,31 +614,97 @@ jobs:
           cd ios
           xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-      # - name: Build Archive
-      #   run: |
-      #     xcodebuild clean archive \
-      #       -workspace ios/EasyPatientDynamic.xcworkspace \
-      #       -scheme EasyPatientDynamic \
-      #       -sdk iphoneos \
-      #       -destination generic/platform=iOS \
-      #       -configuration Release \
-      #       -derivedDataPath ios/build/DerivedData \
-      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 10" \
-      #       CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
+      - name: Build Archive
+        run: |
+          xcodebuild clean archive \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            -configuration Release \
+            -derivedDataPath ios/build/DerivedData \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 10" \
+            CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
 
-      # - name: Export IPA
-      #   run: |
-      #     xcodebuild -exportArchive \
-      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       -exportOptionsPlist ios/ExportOptions.plist \
-      #       -exportPath ios/build/archive/TestingIPA
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath ios/build/archive/TestingIPA
       
-      # - name: Upload IPA as Artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: TestingIPA
-      #     path: ios/build/archive/TestingIPA/*.ipa
+      - name: Upload IPA as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestingIPA
+          path: ios/build/archive/TestingIPA/*.ipa
+
+
+      - name: Get Upload Operation
+        id: get_upload_operation
+        run: |
+          response=$(curl -X POST \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "builds",
+                "attributes": {
+                  "buildType": "APP_STORE"
+                },
+                "relationships": {
+                  "app": {
+                    "data": {
+                      "type": "apps",
+                      "id": "'${{ env.APP_ID }}'"
+                    }
+                  }
+                }
+              }
+            }' \
+            "https://api.appstoreconnect.apple.com/v1/builds")
+      
+          echo "Response: $response"
+          
+          upload_id=$(echo $response | jq -r '.data.id')
+          upload_url=$(echo $response | jq -r '.data.attributes.uploadURL')
+          
+          if [ "$upload_id" == "null" ] || [ -z "$upload_id" ]; then
+            echo "Failed to retrieve upload ID."
+            exit 1
+          fi
+          
+          echo "upload_id=$upload_id" >> $GITHUB_ENV
+          echo "upload_url=$upload_url" >> $GITHUB_ENV
+
+
+      - name: Upload IPA File
+        run: |
+          curl -T "ios/build/archive/TestingArchive.xcarchive" "${{ env.upload_url }}" \
+            -H "Content-Type: application/octet-stream" \
+            --progress-bar
+
+      - name: Mark Upload as Completed
+        run: |
+          response=$(curl -X PATCH \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "builds",
+                "id": "'${{ env.upload_id }}'",
+                "attributes": {
+                  "uploaded": true
+                }
+              }
+            }' \
+            "https://api.appstoreconnect.apple.com/v1/builds/${{ env.upload_id }}")
+            
+          echo "Response: $response"
+    
+
+
 
 
      

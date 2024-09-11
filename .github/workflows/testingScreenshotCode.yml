@@ -7,23 +7,8 @@ jobs:
   build:
     runs-on: macos-13
     steps:
-      - name: Create iPhone 8 Plus Simulator
+      - name: List available runtimes
         run: |
-          echo "Creating iPhone 8 Plus Simulator..."
-          DEVICE_ID=$(xcrun simctl create "iPhone 8 Plus" com.apple.CoreSimulator.SimDeviceType.iPhone-8-Plus com.apple.CoreSimulator.SimRuntime.iOS-17-0)
-          echo "Simulator created with device ID: $DEVICE_ID"
-      
-          # Boot the simulator
-          echo "Booting iPhone 8 Plus Simulator..."
-          xcrun simctl boot "$DEVICE_ID"
-      
-          # Check if the simulator is booted
-          BOOT_STATUS=$(xcrun simctl list | grep "$DEVICE_ID" | grep -o "(Booted)")
-          if [ "$BOOT_STATUS" == "(Booted)" ]; then
-            echo "iPhone 8 Plus Simulator successfully booted!"
-          else
-            echo "Failed to boot iPhone 8 Plus Simulator."
-            exit 1
-          fi
+          xcrun simctl list runtimes
 
 

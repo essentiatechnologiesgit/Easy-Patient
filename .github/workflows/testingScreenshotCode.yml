@@ -5,7 +5,7 @@ on:
       - ScreenshotBuild
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - name: Create iPhone 8 Plus Simulator
         run: |

@@ -7,32 +7,18 @@ jobs:
   build:
     runs-on: macos-13
     steps:
-      - name: List available runtimes
+      - name: Find iOS Simulator UUID
+        id: find_simulator2
         run: |
-          xcrun simctl list runtimes
+          SIMULATOR_NAME="iPhone 8 Plus" # Changed to the desired simulator name
+          UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
+          echo "Simulator UUID: $UUID"
+          echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
 
-      - name: Fetching devices
+      - name: Boot iOS Simulator
         run: |
-          xcrun simctl list devicetypes
+          xcrun simctl boot ${{ env.SIMULATOR_UUID }}
 
-
-      - name: Create iPhone 8 Simulator
-        run: |
-          echo "Creating iPhone 8 Simulator..."
-          xcrun simctl create "iPhone 8" com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-17-0
-          
-          echo "Booting iPhone 8 Simulator..."
-          xcrun simctl boot "iPhone 8"
-
-          echo "Verifying boot status..."
-          BOOT_STATUS=$(xcrun simctl list | grep -A 1 "iPhone 8" | grep "(Booted)")
-          
-          if [ -z "$BOOT_STATUS" ]; then
-            echo "iPhone 8 Simulator failed to boot."
-            exit 1
-          else
-            echo "iPhone 8 Simulator booted successfully."
-          fi
 
 
 

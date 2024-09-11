@@ -480,7 +480,7 @@ jobs:
               <string>${{ env.TEAM_ID }}</string>
               <key>provisioningProfiles</key>
               <dict>
-                  <key>com.org.easypatientdynamic</key> <!-- Replace with your actual Bundle Identifier -->
+                  <key>${{ env.BUNDLE_IDentifier }}</key> <!-- Replace with your actual Bundle Identifier -->
                   <string>MyApp Distribution Profile 10</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>

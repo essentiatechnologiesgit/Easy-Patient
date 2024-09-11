@@ -11,4 +11,8 @@ jobs:
         run: |
           xcrun simctl list runtimes
 
+      - name: Fetching devices
+        run: |
+          xcrun simctl list devices
+
 

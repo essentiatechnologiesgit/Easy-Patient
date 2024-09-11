@@ -7,6 +7,10 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
+      - name: List available runtimes
+        run: |
+          xcrun simctl list runtimes
+
       - name: Create iPhone 8 Simulator
         run: |
           echo "Creating iPhone 8 Simulator..."

@@ -7,20 +7,16 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: List available runtimes
-        run: |
-          xcrun simctl list runtimes
-
       - name: Create iPhone 8 Simulator
         run: |
           echo "Creating iPhone 8 Simulator..."
-          DEVICE_ID=$(xcrun simctl create "iPhone 8" com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-16-0)
+          DEVICE_ID=$(xcrun simctl create "iPhone 8" com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-17-0)
           echo "Simulator created with device ID: $DEVICE_ID"
-
+      
           # Boot the simulator
           echo "Booting iPhone 8 Simulator..."
           xcrun simctl boot "$DEVICE_ID"
-
+      
           # Check if the simulator is booted
           BOOT_STATUS=$(xcrun simctl list | grep "$DEVICE_ID" | grep -o "(Booted)")
           if [ "$BOOT_STATUS" == "(Booted)" ]; then
@@ -30,7 +26,3 @@ jobs:
             exit 1
           fi
 
-      - name: List Booted Simulators (Debug)
-        run: |
-          echo "Listing all booted simulators for verification:"
-          xcrun simctl list devices | grep "(Booted)"

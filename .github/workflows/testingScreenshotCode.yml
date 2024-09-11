@@ -13,7 +13,8 @@ jobs:
 
       - name: Fetching devices
         run: |
-          xcrun simctl list devices
+          xcrun simctl list devicetypes
+
 
       - name: Create iPhone 8 Simulator
         run: |

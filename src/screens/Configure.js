@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     },
     mainText: {
         color: config.textColorHeadings,
-        width: '90%',
+        width: '85%',
         ...Platform.select({
             ios: {
                 marginLeft: 5,

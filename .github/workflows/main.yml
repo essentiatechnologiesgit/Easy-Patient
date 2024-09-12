@@ -425,7 +425,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 16"  
+          PROFILE_NAME="MyApp Distribution Profile 17"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -476,7 +476,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_16.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_17.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
@@ -492,7 +492,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>${{ env.BUNDLE_IDentifier }}</key> <!-- Replace with your actual Bundle Identifier -->
-                  <string>MyApp Distribution Profile 16</string> <!-- Replace with your Provisioning Profile Name -->
+                  <string>MyApp Distribution Profile 17</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>
           </plist>
@@ -635,9 +635,10 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 16" \
-            CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
-            DEVELOPMENT_TEAM="${{ env.TEAM_ID }}"
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 17" \
+            CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}" \
+            DEVELOPMENT_TEAM="${{ env.TEAM_ID }}" \
+            PRODUCT_BUNDLE_IDENTIFIER="${{ env.BUNDLE_IDENTIFIER }}"
 
       - name: Export IPA
         run: |
@@ -654,55 +655,20 @@ jobs:
 
 
 
-      - name: Find IPA file
-        id: find_ipa
-        run: |
-          ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
-          echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
+      # - name: Find IPA file
+      #   id: find_ipa
+      #   run: |
+      #     ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
+      #     echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
       
-      - name: Upload IPA to App Store Connect
-        run: |
-          xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
-            -t ios \
-            --apiKey ${{ env.KEY_ID }} \
-            --apiIssuer ${{ env.ISSUER_ID }}
+      # - name: Upload IPA to App Store Connect
+      #   run: |
+      #     xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
+      #       -t ios \
+      #       --apiKey ${{ env.KEY_ID }} \
+      #       --apiIssuer ${{ env.ISSUER_ID }}
 
-      # Step 5: Wait for Upload Completion
-      - name: Wait for Upload Completion
-        run: |
-          echo "Waiting for the upload to be processed..."
-      
-          # You can introduce a delay to wait for processing
-          sleep 60  # Adjust this delay as needed
-      
-      # Step 6: Mark Upload as Completed
-      - name: Mark Upload as Completed
-        run: |
-          response=$(curl -X PATCH \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "builds",
-                "id": "'${{ env.upload_id }}'",
-                "attributes": {
-                  "uploaded": true
-                }
-              }
-            }' \
-            "https://api.appstoreconnect.apple.com/v1/builds/${{ env.upload_id }}")
-            
-          echo "Response: $response"
-      
-      # Step 7: Confirm Build Status
-      - name: Confirm Build Status
-        run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            "https://api.appstoreconnect.apple.com/v1/builds/${{ env.upload_id }}")
-            
-          echo "Build Status Response: $response"    
+ 
 
 
 

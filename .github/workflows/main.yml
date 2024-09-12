@@ -74,6 +74,17 @@ jobs:
           
           echo "token=$token" >> $GITHUB_ENV
 
+      - name: Save private key to default location
+        run: |
+          mkdir -p ~/.private_keys
+          cp ${{ env.PRIVATE_KEY_PATH }} ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+          chmod 600 ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+      
+      - name: Print private key contents (debugging, remove in production)
+        run: |
+          cat ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+
+
 
       - name: Fetch Bundle ID
         run: |
@@ -414,7 +425,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 15"  
+          PROFILE_NAME="MyApp Distribution Profile 16"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -465,7 +476,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_15.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_16.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
@@ -481,7 +492,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>${{ env.BUNDLE_IDentifier }}</key> <!-- Replace with your actual Bundle Identifier -->
-                  <string>MyApp Distribution Profile 15</string> <!-- Replace with your Provisioning Profile Name -->
+                  <string>MyApp Distribution Profile 16</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>
           </plist>
@@ -624,7 +635,7 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 15" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 16" \
             CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
             DEVELOPMENT_TEAM="${{ env.TEAM_ID }}"
 

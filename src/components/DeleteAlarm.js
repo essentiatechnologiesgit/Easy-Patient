@@ -2,28 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { View, Modal, TouchableOpacity, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import CustomButton from './CustomizedButton';
 import config from '../../config.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 const DeleteAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction, Medicine,handleDeleteConfirm }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
-
-
+    const { t } = useTranslation();
     return (
         <>
                     <Text style={styles.textHead}>{timeUpdate}-{Medicine}</Text>
-                    <Text style={styles.textMed}>Do you really want to delete this reminder?</Text>
+                    <Text style={styles.textMed}>{t('DoMedicine')}?</Text>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.buttonA}
                             onPress={()=>{onCloseModal()}}
                         >
-                            <Text style={styles.textA}>No</Text>
+                            <Text style={styles.textA}>{t('No')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.buttonA}
                             onPress={() => { handleDeleteConfirm(); onCloseModal(); }}
                         >
-                            <Text style={styles.textA}>Yes</Text>
+                            <Text style={styles.textA}>{t('Yes')}</Text>
                         </TouchableOpacity>
                     </View>
                 </>

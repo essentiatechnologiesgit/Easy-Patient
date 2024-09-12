@@ -5,38 +5,31 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import { Linking, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import notifee, { AndroidImportance, AndroidBadgeIconType } from '@notifee/react-native';
+import i18next, { languageResources } from '../../services/i18next.js';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import 'dayjs/locale/en'; // Import locales you need
+import 'dayjs/locale/pt';
 
+dayjs.extend(advancedFormat);
 const Configure = () => {
     const route = useRoute();
     const navigation = useNavigation();
-
     const [switch1, setSwitch1] = useState(true);
     const [switch2, setSwitch2] = useState(false);
     const [switch3, setSwitch3] = useState(true);
     const [switch4, setSwitch4] = useState(true);
     const [switch5, setSwitch5] = useState(false);
+    const [switch6, setSwitch6] = useState(false);
 
+    const { t } = useTranslation();
     const openBatteryOptimizationSettings = () => {
-        // let settingsURL;
-
-        // if (Platform.OS === 'android') {
-        //     settingsURL = 'battery optimization settings URL for Android';
-        // } else if (Platform.OS === 'ios') {
-        //     settingsURL = 'app-settings:';
-        // }
-
-        // if (settingsURL) {
-        //     Linking.openSettings();
-        // } else {
-        //     console.error('Battery optimization settings URL not supported on this platform');
-        // }
-
         Alert.alert(
             'Restrictions Detected',
             'To ensure notifications are delivered, please disable battery optimization for the app.',
             [
-                // 3. launch intent to navigate the user to the appropriate screen
                 {
                     text: 'OK, open settings',
                     onPress: async () => await notifee.openBatteryOptimizationSettings(),
@@ -143,6 +136,26 @@ const Configure = () => {
         navigation.navigate("DeleteAccount", { email })
     }
 
+
+
+    const toggleLanguage = () => {
+        let newSwitchState = !switch6; // Toggle the current switch state
+        setSwitch6(newSwitchState);
+    
+        // Change language based on the new state of the switch
+        if (newSwitchState) {
+            changeLng("pt"); // Switch is on, set language to Portuguese
+        } else {
+            changeLng("en"); // Switch is off, set language to English
+        }
+    }
+    
+    const changeLng = lng => {
+        console.log(lng);
+        i18next.changeLanguage(lng); // Change the language using i18next
+        dayjs.locale(lng);
+    };
+
     return (
         <>
             <View style={styles.container}>
@@ -155,7 +168,7 @@ const Configure = () => {
                         onValueChange={() => { toggleSwitch(1) }}
                         value={switch1}
                     />
-                    <Text style={styles.mainText}>Notify the time to take the medicine</Text>
+                    <Text style={styles.mainText}>{t('NotifyText')}</Text>
                 </View>
                 {
                     Platform.OS === 'android' &&
@@ -167,7 +180,7 @@ const Configure = () => {
                             onValueChange={() => { toggleSwitch(2) }}
                             value={switch2}
                         />
-                        <Text style={styles.mainText}>Open this app together with the medicine reminder</Text>
+                        <Text style={styles.mainText}>{t('MedicineReminder')}</Text>
                     </View>
                 }
 
@@ -179,10 +192,10 @@ const Configure = () => {
                         onValueChange={() => { toggleSwitch(3) }}
                         value={switch3}
                     />
-                    <Text style={styles.mainText}>Notify appointment dates</Text>
+                    <Text style={styles.mainText}>{t('NotifyAppointmentText')}</Text>
                 </View>
                 <View style={styles.configureSideContainer}>
-                    <Text style={styles.sideText}>You will be notified twice : 24 hours in advance, and 2 hours before the schedule time</Text>
+                    <Text style={styles.sideText}>{t('notifiedText')}</Text>
                 </View>
                 <View style={styles.configureContainer}>
                     <Switch
@@ -192,11 +205,9 @@ const Configure = () => {
                         onValueChange={() => { toggleSwitch(4) }}
                         value={switch4}
                     />
-                    <Text style={styles.mainText}>Allow the app to run in the background</Text>
+                    <Text style={styles.mainText}>{t('AllowAppText')}</Text>
                 </View>
-                <View style={styles.configureSideContainer}>
-                    <Text style={styles.sideText}>To receive notification on time , enable the permission</Text>
-                </View>
+
                 {
                     Platform.OS === 'android' &&
                     <View style={styles.configureContainer}>
@@ -207,12 +218,22 @@ const Configure = () => {
                             onValueChange={() => { toggleSwitch(5) }}
                             value={switch5}
                         />
-                        <Text style={styles.mainText}>Allow the app to enable FaceID/Fingerprint Authentication</Text>
+                        <Text style={styles.mainText}>{t('AllowFaceID')}</Text>
                     </View>
                 }
+                <View style={styles.configureContainer}>
+                    <Switch
+                        trackColor={{ false: '#EEEFF1', true: '#D3ECDB' }}
+                        thumbColor={switch6 ? '#4CB56A' : '#EEEFF1'}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => { toggleLanguage() }}
+                        value={switch6}
+                    />
+                    <Text style={styles.mainText}>Enable Portuguese Language</Text>
 
-                <TouchableOpacity onPress={() => { navigation.navigate("TermsAndConditions", { isConfigure: true }) }} style={styles.terms}><Text style={styles.termsText}>Terms & Conditions</Text></TouchableOpacity>
-                <TouchableOpacity onPress={() => { deletAccount() }} style={styles.delete}><Text style={styles.deleteText}>Delete Account</Text></TouchableOpacity>
+                </View>
+                <TouchableOpacity onPress={() => { navigation.navigate("TermsAndConditions", { isConfigure: true }) }} style={styles.terms}><Text style={styles.termsText}>{t('Terms&Conditions')}</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => { deletAccount() }} style={styles.delete}><Text style={styles.deleteText}>{t('DeleteAccount')}</Text></TouchableOpacity>
             </View>
         </>
     );

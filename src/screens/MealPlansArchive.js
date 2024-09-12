@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import archive from '../assets/archive.png';
 import BackHeader from '../components/backHeader';
 import MealArchiveContainer from '../components/MealArchiveContainer';
-import { touch } from 'react-native-fs';
+import { useTranslation } from 'react-i18next';
 import config from '../../config.js';
 import MealGolden from '../assets/mealGolden.png';
 import ModalLoader from '../components/ModalLoader';
@@ -15,7 +15,7 @@ import MealContainer from '../components/MealContainer';
 const MealPlansArchive = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const scrollViewRef = useRef();
+    const { t } = useTranslation();
     const [mealPlansData, setMealPlansData] = useState([]);
     const [showLoader, setShowLoader] = useState(true);
     const isShow = route?.params?.isShow ?? false;

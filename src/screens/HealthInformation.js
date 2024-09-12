@@ -7,7 +7,7 @@ import axios from 'axios';
 import GoogleFit, { Scopes } from 'react-native-google-fit';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import ModalLoader from '../components/ModalLoader';
-import user from '../assets/user.png';
+import { useTranslation } from 'react-i18next';
 import goodHealth from '../assets/good-health.png';
 import profileSync from '../assets/profile-sync.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,6 +23,7 @@ const HealthInformation = () => {
     const route = useRoute();
     const isChanged = route.params?.isChanged;
     const navigation = useNavigation();
+    const { t } = useTranslation();
     const scrollViewRef = useRef();
     const [name, setFullName] = useState('');
     const errorRefs = useRef([]);
@@ -48,33 +49,33 @@ const HealthInformation = () => {
     const [newHeight, setNewHeight] = useState('');
 
 
-    useEffect(() => {
+    // useEffect(() => {
 
 
-        const getScopes = async () => {
-            GoogleSignin.configure({
-                scopes: [
-                    Scopes.FITNESS_ACTIVITY_READ,
-                    Scopes.FITNESS_ACTIVITY_WRITE,
-                    Scopes.FITNESS_BODY_READ,
-                    Scopes.FITNESS_BODY_WRITE,
-                    Scopes.FITNESS_BLOOD_PRESSURE_READ,
-                    Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
-                    Scopes.FITNESS_BLOOD_GLUCOSE_READ,
-                    Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
-                    Scopes.FITNESS_NUTRITION_WRITE,
-                    Scopes.FITNESS_SLEEP_READ,
-                ],
-                webClientId: WEB_CLIENT_ID,
-                iosClientId: IOS_CLIENT_ID,
-                offlineAccess: true,
-            });
-            await googleLogin();
+    //     const getScopes = async () => {
+    //         GoogleSignin.configure({
+    //             scopes: [
+    //                 Scopes.FITNESS_ACTIVITY_READ,
+    //                 Scopes.FITNESS_ACTIVITY_WRITE,
+    //                 Scopes.FITNESS_BODY_READ,
+    //                 Scopes.FITNESS_BODY_WRITE,
+    //                 Scopes.FITNESS_BLOOD_PRESSURE_READ,
+    //                 Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
+    //                 Scopes.FITNESS_BLOOD_GLUCOSE_READ,
+    //                 Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
+    //                 Scopes.FITNESS_NUTRITION_WRITE,
+    //                 Scopes.FITNESS_SLEEP_READ,
+    //             ],
+    //             webClientId: WEB_CLIENT_ID,
+    //             iosClientId: IOS_CLIENT_ID,
+    //             offlineAccess: true,
+    //         });
+    //         await googleLogin();
 
-        }
+    //     }
 
-        getScopes();
-    }, []);
+    //     getScopes();
+    // }, []);
 
     const saveData = async () => {
         // const opt = {
@@ -105,13 +106,7 @@ const HealthInformation = () => {
         //   }
         //   console.log(res);
         // });
-
-
-
     }
-
-
-
 
     const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -377,18 +372,18 @@ const HealthInformation = () => {
     }
 
     const content = (<>
-                    <BackHeader name={"Health Information"} />
+                    <BackHeader name={t('HealthInformation')} />
                 <TouchableOpacity onPress={() => handleSync()} style={styles.SyncButton}>
                     <Image source={profileSync} style={styles.Profilelogo} />
                 </TouchableOpacity>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
-                        <Text style={styles.requiredText}>Required fields</Text>
+                        <Text style={styles.requiredText}>{t('RequiredFeilds')}</Text>
                         <View
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Height (centimeter)'}
+                                label={t('Height(c)')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={emptyHeight ? styles.customLabelStylesEmpty : styles.customLabelStyles}
                                 value={height}
@@ -397,7 +392,7 @@ const HealthInformation = () => {
                             />
                             {emptyHeight && !height && (
                                 <>
-                                    <Text style={styles.error}>Required fields</Text>
+                                    <Text style={styles.error}>{t('RequiredFeilds')}</Text>
                                 </>
                             )}
                         </View>
@@ -405,7 +400,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Weight (kilogram)'}
+                                label={t('Weight(c)')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={emptyWeight ? styles.customLabelStylesEmpty : styles.customLabelStyles}
                                 value={weight}
@@ -414,16 +409,16 @@ const HealthInformation = () => {
                             />
                             {emptyWeight && !weight && (
                                 <>
-                                    <Text style={styles.error}>Required fields</Text>
+                                    <Text style={styles.error}>{t('RequiredFeilds')}</Text>
                                 </>
                             )}
                         </View>
-                        <Text style={styles.otherText}>Other fields</Text>
+                        <Text style={styles.otherText}>{t('OtherFeilds')}</Text>
                         <View
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Steps (count)'}
+                                label={t('Steps(c)')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={steps}
@@ -435,7 +430,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Heart rate (bpm)'}
+                                label={t('HeartRate(b)')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={heartRate}
@@ -447,7 +442,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Movement Time'}
+                                label={t('MovementT')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={MovementTime}
@@ -459,7 +454,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Waiting hours'}
+                                label={t('WaitingHours')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={waiting}
@@ -471,7 +466,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Exercise time (minute)'}
+                                label={t('ExerciseTime(m)')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={exercise}
@@ -483,7 +478,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Active energy (calories)'}
+                                label={t('ActiveEnergy')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={energy}
@@ -495,7 +490,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Resting Energy (calories)'}
+                                label={t('RestingEnergy(c)')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={resting}
@@ -507,7 +502,7 @@ const HealthInformation = () => {
                             ref={(ref) => (errorRefs.current[1] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Blood Pressure'}
+                                label={t('BloodPressure')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={styles.customLabelStyles}
                                 value={bloodPressure}
@@ -516,7 +511,7 @@ const HealthInformation = () => {
                             />
                         </View>
                         <View style={{ width: '100%', marginTop: 40, marginBottom: 50 }}>
-                            <CustomButton onPress={() => handleDataSave()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                            <CustomButton onPress={() => handleDataSave()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={t('Confirm2')} />
                         </View>
                     </View>
                 </ScrollView>
@@ -941,7 +936,7 @@ const styles = StyleSheet.create({
         fontSize: PixelRatio.getFontScale() * 17,
         paddingBottom: 0,
         paddingHorizontal: 0,
-        paddingTop: 20,
+        paddingTop: 30,
         color: config.textColorHeadings,
     }
 });

@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackHeader from '../components/backHeader';
 import PrescriptionContainer from '../components/PrescriptionContainer';
 import archive from '../assets/archive.png';
+import { useTranslation } from 'react-i18next';
 import GoldenCapsule from '../assets/goldenCapsule.png';
 
 const Prescriptions = () => {
@@ -19,6 +20,7 @@ const Prescriptions = () => {
     const scrollViewRef = useRef();
     const [prescriptionsData, setPrescriptionsData] = useState([]);
     const isFocused = useIsFocused();
+    const { t } = useTranslation();
     const [showLoader , setShowLoader ] = useState(true);
     useEffect(() => {
         getData();

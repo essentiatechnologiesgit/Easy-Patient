@@ -7,11 +7,12 @@ import axios from 'axios';
 import ModalLoader from '../components/ModalLoader';
 import user from '../assets/user.png';
 import goodHealth from '../assets/good-health.png';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import BackHeader from '../components/backHeader';
 import { CircularProgressBase } from 'react-native-circular-progress-indicator';
 const ProfileAndHealth = ({ route }) => {
     const { imageURI, name, healthInfo } = route.params;
+    const { t } = useTranslation();
     const navigation = useNavigation();
     const props = {
         activeStrokeWidth: 12,
@@ -21,7 +22,7 @@ const ProfileAndHealth = ({ route }) => {
 
     const content = (
         <>
-            <BackHeader name={"Profile"} />
+            <BackHeader name={t('Profile')} />
             <View style={styles.formContainer}>
                 <View style={{ top: -2, left: -12 }}>
                     <CircularProgressBase
@@ -47,12 +48,12 @@ const ProfileAndHealth = ({ route }) => {
                         {
                             healthInfo === false ?
                                 <>
-                                    <Text style={styles.msg}>Edit your details and complete your registration</Text>
+                                    <Text style={styles.msg}>{t('EditYourDetails')}</Text>
                                     <Text style={styles.complete}>Complete profile at 30%</Text>
                                 </>
                                 :
                                 <>
-                                    <Text style={styles.complete}>Profile Complete 100%</Text>
+                                    <Text style={styles.complete}>{t('ProfileComplete')}</Text>
                                 </>
                         }
                     </View>
@@ -63,13 +64,14 @@ const ProfileAndHealth = ({ route }) => {
                     <Image source={user} style={styles.userIcon} />
                     <View style={styles.profileParent}>
                         <View style={{ flexDirection: 'row' }}>
-                            <Text style={styles.FHeading}>Basic Information</Text>
+                            <Text style={styles.FHeading}>{t('BasicInformation')}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, }}>
                             <View style={styles.greenCircle}></View>
-                            <Text style={styles.SHeading}>Complete stage</Text>
+                            <Text style={styles.SHeading}>{t('CompleteStage')}</Text>
                         </View>
-                        <Text style={styles.THeading}>Edit your profile photo, name , email , date of birth and gender</Text>
+                        <Text style={styles.THeading}>{t('EditYourProfile')}</Text>
+
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { navigation.navigate("HealthInformation") }} style={styles.bothContainers}>
@@ -88,11 +90,11 @@ const ProfileAndHealth = ({ route }) => {
                                     :
                                     <>
                                         <View style={styles.greenCircle}></View>
-                                        <Text style={styles.SHeading}>Complete Stage</Text>
+                                        <Text style={styles.SHeading}>{t('CompleteStage')}</Text>
                                     </>
                             }
                         </View>
-                        <Text style={styles.TLHeading}>Describe your health status and sync your data with health apps you already use.</Text>
+                        <Text style={styles.TLHeading}>{t('DescribeYourHealth')}.</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -124,7 +126,8 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     profileParent: {
-        gap:4
+        gap:4,
+        overflow:'scroll',
     },
     percent: {
         fontSize: PixelRatio.getFontScale() * 12,
@@ -166,12 +169,12 @@ const styles = StyleSheet.create({
     THeading: {
         fontSize: PixelRatio.getFontScale() * 14,
         color: config.primaryColor,
-        width: '60%',
+        // backgroundColor:'red'
     },
     TLHeading: {
         fontSize: PixelRatio.getFontScale() * 14,
         color: config.primaryColor,
-        width: '50%',
+        // width: '90%',
     },
     bothContainers: {
         backgroundColor: 'white',

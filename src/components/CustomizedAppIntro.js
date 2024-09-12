@@ -2,23 +2,19 @@ import React, { useEffect } from 'react';
 import { Image, View, StyleSheet, ImageBackground, Text, PixelRatio } from 'react-native';
 import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import SelfieMan from '../assets/selfieMan.png';
-import CustomButton from './CustomizedButton';
-
-
+import { useTranslation } from 'react-i18next';
 const CustomizedAppIntro = () => {
     const navigation = useNavigation();
-
+    const { t } = useTranslation();
     return (
         <View style={styles.parentContainer}>
-            <Text style={styles.heading}>Customize your app</Text>
+            <Text style={styles.heading}>{t('CustomizeAppHeading')}</Text>
             <Image source={SelfieMan} style={styles.image} />
-            <Text style={styles.text}>Provide access to your camera services and image files for a personalized experience</Text>
+            <Text style={styles.text}>{t('CustomizeAppPara')}</Text>
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     parentContainer: {
         flex: 1,
@@ -36,6 +32,11 @@ const styles = StyleSheet.create({
         width: '60%',
         textAlign: 'center',
         marginTop: -40,
+        ...Platform.select({
+            ios: {
+              marginTop:20,
+            },
+          }),
     },
     image: {
         // marginTop:100,

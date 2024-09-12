@@ -11,7 +11,7 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction,dosa
     const [deleteModal, setShowDeleteModal] = useState(false);
 
     const renderRightActions = (progress, dragX, swipeableRef) => (
-        <TouchableOpacity onPress={(e) => handleDeletePress(e, swipeableRef)}>
+        <TouchableOpacity onPress={(e) => handleDeletePress(e, swipeableRef)} >
             <View style={styles.deleteButton}>
                 <Image
                     source={require('../assets/deleteWhite.png')}
@@ -84,7 +84,7 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction,dosa
             ) : (
                 <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
                     <View style={styles.container}>
-                        <View style={{ position: 'absolute', width: '100%', flexDirection: 'row', padding: 10 }}>
+                        <View style={{ position: 'absolute', width: '100%', flexDirection: 'row', padding: 14 ,alignItems:'center'}}>
                             <View style={styles.circle}>
                                 <View style={[styles.line, styles.lineDiagonal]} />
                                 <View style={[styles.line, styles.lineDiagonal, styles.lineRotated]} />
@@ -92,7 +92,7 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction,dosa
                             <Text style={styles.text}>{time} - {Medicine}</Text>
                         </View>
                         <Swipeable renderRightActions={renderRightActions}>
-                            <View style={styles.emptyView2}>
+                            <View style={styles.emptyView}>
                             </View>
                         </Swipeable>
                     </View>
@@ -119,11 +119,10 @@ const CrossAlarm = ({ medicineId, time, id, Medicine, taken, reloadFunction,dosa
 
 const styles = StyleSheet.create({
     container: {
-
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        paddingVertical: 5,
+        paddingVertical: 0,
         alignSelf: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -184,9 +183,9 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
-    emptyView2: {
+    emptyView: {
         backgroundColor: 'transparent',
-        height: 40,
+        height: 45,
         // bottom: 50,
     },
 });

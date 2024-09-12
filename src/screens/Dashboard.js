@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, RefreshControl, ScrollView, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, BackHandler } from 'react-native';
+import { View, Text, RefreshControl, ScrollView, SafeAreaView, Modal, FlatList, StyleSheet, ImageBackground, Image, PixelRatio, TouchableOpacity, BackHandler } from 'react-native';
 import config from '../../config.js';
 import profileIcon from '../assets/profile.png';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -16,7 +16,9 @@ import ImageLogo from '../components/ImageLogo'
 import { CircularProgressBase } from 'react-native-circular-progress-indicator';
 import Snackbar from '../components/Snackbar';
 import Medications from '../components/Medications';
-import { Button } from 'react-native-share';
+import i18next, { languageResources } from '../../services/i18next.js';
+import { useTranslation } from 'react-i18next';
+import languagesList from '../../services/LanguagesList.json';
 const Dashboard = () => {
     const navigation = useNavigation();
     const [backPressed, setBackPressed] = useState(false);
@@ -31,6 +33,8 @@ const Dashboard = () => {
     const isFocused = useIsFocused();
     const [snackbarKey, setSnackbarKey] = useState(0);
     const [userId, setUserId] = useState(0);
+    const [visible, setVisible] = useState(false);
+    const { t } = useTranslation();
 
 
     useEffect(() => {
@@ -306,10 +310,9 @@ const Dashboard = () => {
                     }
                 </View>
                 <View style={styles.nameContainer}>
-                    <Text style={styles.nameHeading}>Hello {name}!</Text>
-                    <Text style={styles.nameSideHeading}>Welcome to Easy Patient.</Text>
+                    <Text style={styles.nameHeading}>{t('Hello')} {name}!</Text>
+                    <Text style={styles.nameSideHeading}>{t('Welcome')}.</Text>
                 </View>
-
                 <View style={styles.parentView}>
                     {/* <Text style={styles.heading}>Notifications</Text>
                     <View style={styles.NotificationContainer}>
@@ -319,7 +322,7 @@ const Dashboard = () => {
                     <View style={styles.sliderContainer}>
                         <FolderSlider />
                     </View>
-                    <Text style={styles.heading}>Todays Medications</Text>
+                    <Text style={styles.heading}>{t('TodaysMedications')}</Text>
                     {
                         !alarmComponents.length > 0 &&
                         <View style={styles.component}>
@@ -348,7 +351,7 @@ const Dashboard = () => {
     return (
         <>
 
-      
+
             {
                 (config.backgroundColorImage) ?
                     <View style={styles.container}>

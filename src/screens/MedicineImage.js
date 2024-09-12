@@ -7,7 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { FloatingLabelInput } from 'react-native-floating-label-input';
 import axios from 'axios';
 import CustomButton from '../components/CustomizedButton';
-import Snackbar from '../components/Snackbar';
+import { useTranslation } from 'react-i18next';
 import { launchCamera } from 'react-native-image-picker';
 import camera from '../assets/camera.png';
 import yellowDrop from '../assets/yellowDrop.png';
@@ -39,6 +39,7 @@ const MedicineImage = ({ route }) => {
     const navigation = useNavigation();
     const [image, setImage] = useState(imageD ? imageD : '');
     const [selectedImage, setSelectedImage] = useState(selectedImageD ? selectedImageD : '');
+    const { t } = useTranslation();
     const openGallery = () => {
         ImagePicker.openPicker({
             width: 300,
@@ -140,21 +141,21 @@ const MedicineImage = ({ route }) => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Medicine Image"} />
+                <BackHeader name={t('Reminder Image')} />
                 <View style={styles.iconsContainer}>
                     <TouchableOpacity style={styles.cont} onPress={openGallery}>
                         <Image source={gallery} style={styles.cameraIcon} />
-                        <Text style={styles.iconText}>Gallery</Text>
+                        <Text style={styles.iconText}>{t('Gallery')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.cont} onPress={handleCameraLaunch}>
                         <Image source={camera} style={styles.galleryIcon} />
-                        <Text style={styles.iconText}>Camera</Text>
+                        <Text style={styles.iconText}>{t('Camera2')}</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.medicineImage}>
                     {renderImage()}
                 </View>
-                <Text style={styles.Add}>Add</Text>
+                <Text style={styles.Add}></Text>
                 <View style={styles.medicines}>
                     <TouchableWithoutFeedback onPress={() => { handleImageSelect(1) }}>
                         <View style={selectedImage === 1 ? styles.yellowCircle : styles.blackCircle}>
@@ -244,7 +245,7 @@ const MedicineImage = ({ route }) => {
                     </TouchableWithoutFeedback>
                 </View>
                 <View style={{ width: '95%', position: 'absolute', marginBottom: 40, bottom: 0, }}>
-                    <CustomButton onPress={() => handleConfirm()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                    <CustomButton onPress={() => handleConfirm()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={t('Confirm2')} />
                 </View>
 
             </View>

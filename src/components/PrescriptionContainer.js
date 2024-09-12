@@ -5,12 +5,13 @@ import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
 import { TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import showIcon from '../assets/showIcon.png';
 const PrescriptionContainer = ({ record, isArchived,isHide ,isShow,record_id,getData}) => {
     const navigation = useNavigation();
-
+    const { t } = useTranslation();
     useEffect(()=>{
         if(isHide)
         {
@@ -74,7 +75,6 @@ const PrescriptionContainer = ({ record, isArchived,isHide ,isShow,record_id,get
             .catch((error) => {
                 console.log(error);
             });
-
     }
 
     return (
@@ -82,25 +82,25 @@ const PrescriptionContainer = ({ record, isArchived,isHide ,isShow,record_id,get
             <TouchableWithoutFeedback onPress={() => navigation.navigate('PrescriptionsView', { record: record, isArchived,isArchived })}>
                 <View style={styles.container}>
                     <Text style={styles.headings}>{record.type}</Text>
-                    <Text style={styles.subHeadings}>Received {record.title}</Text>
+                    <Text style={styles.subHeadings}>{t('Received')} {record.title}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
                     <Text style={styles.text}>Dr(a). {record.specialist}</Text>
                     {
                         !isArchived ?
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
                                 <Image source={archiveGold} style={styles.archiveIcon} />
-                                <Text style={styles.hide}>hide</Text>
+                                <Text style={styles.hide}>{t('hide')}</Text>
                             </TouchableOpacity> :
 
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleShow()}>
                                 <Image source={showIcon} style={styles.showIcon} />
-                                <Text style={styles.hide}>Show</Text>
+                                <Text style={styles.hide}>{t('Show')}</Text>
                             </TouchableOpacity>
                     }
                     {
                         record.is_new &&
                         <View style={styles.NewContainer}>
-                            <Text style={styles.New}>New</Text>
+                            <Text style={styles.New}>{t('New')}</Text>
                         </View>
                     }
                     <Image source={arrow} style={styles.arrowLogo} />
@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 12,
         fontFamily:config.fontStyle,
+        
     },
     New: {
         color: '#146229',
@@ -152,8 +153,9 @@ const styles = StyleSheet.create({
         right: 0, // Position the arrow to the right
     },
     archiveIcon: {
-        height: 15.5,
+        height: 16,
         width: 13,
+        bottom:1,
     },
     headings: {
         color: config.textColorHeadings,
@@ -167,16 +169,11 @@ const styles = StyleSheet.create({
         borderColor: config.secondaryColor,
         height: 25,
         gap: 5,
-        width: 60,
+        width: 80,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,
         marginTop: 3,
-    },
-    hide: {
-        color: config.secondaryColor,
-        fontSize: PixelRatio.getFontScale() * 12,
-        fontFamily:config.fontStyle,
     },
     subHeadings: {
         color: config.textColorHeadings,

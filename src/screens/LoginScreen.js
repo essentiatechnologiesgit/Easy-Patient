@@ -11,10 +11,11 @@ import axios from 'axios';
 import ValidationMessageError from '../components/ValidationMessageError';
 import CustomButton from '../components/CustomizedButton';
 import FingerPrint from '../components/FingerAuth';
-import Dialog from "react-native-dialog";
+import { useTranslation } from 'react-i18next';
 import qs from 'qs';
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPasswordInput, setShowPasswordInput] = useState(false)
@@ -32,7 +33,7 @@ const LoginScreen = () => {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [IOSError, setIOSError] = useState(false);
-  const [ noEmail, setNoEmail  ] = useState(false);
+  const [noEmail, setNoEmail] = useState(false);
   const handleLogin = () => {
     setUsernameError(false);
     setPasswordError(false);
@@ -105,9 +106,9 @@ const LoginScreen = () => {
       setPassword('');
     } catch (error) {
       setShowLoader(false);
-      if(Platform.OS === 'android'){
+      if (Platform.OS === 'android') {
         handleShowSnackbar("Invalid username or password");
-      }else{
+      } else {
         navigation.navigate('PasswordError')
       }
       console.log(error);
@@ -221,16 +222,14 @@ const LoginScreen = () => {
   const checkEmail = async () => {
     try {
       setShowLoader(true);
-      console.log('Checking email for:', username);
       const response = await axios.get(`https://api-patient-dev.easy-health.app/patient/${username}`);
-      console.log('Response data:', response.data);
 
       if (response.data.registered === true) {
         setEmailExist(false);
         setButtonText('Login');
         setShowPasswordInput(true);
       } else {
-          handleShowSnackbar('Incorrect Username/E-mail');
+        handleShowSnackbar('Incorrect Username/E-mail');
       }
       setShowLoader(false);
     } catch (error) {
@@ -254,107 +253,103 @@ const LoginScreen = () => {
 
   const content = (
     <>
-           <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
-        {showLoader && <ModalLoader />}
-        {showFingerAuth && <FingerPrint setShowFingerAuth={setShowFingerAuth} />}
-        <View style={styles.container}>
-          <Image source={config.logo} style={styles.logo}></Image>
-          <Image source={config.subLogo} style={styles.subLogo}></Image>
-          <Text style={styles.login}>Login</Text>
-          <View style={styles.FormContainer}>
-            <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
-              <TextInput
-                style={styles.inputEmail}
-                placeholder="E-mail"
-                value={username}
-                onChangeText={(text) => setUsername(text.trim())}
-                onFocus={handleEmailFocus}
-                onBlur={handleEmailBlur}
-                placeholderTextColor={config.primaryColor}
-                color="black"
-                autoCapitalize="none"
-              />
-            </View>
+      <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
+      {showLoader && <ModalLoader />}
+      {showFingerAuth && <FingerPrint setShowFingerAuth={setShowFingerAuth} />}
+      <View style={styles.container}>
+        <Image source={config.logo} style={styles.logo}></Image>
+        <Image source={config.subLogo} style={styles.subLogo}></Image>
+        <Text style={styles.login}>Login</Text>
+        <View style={styles.FormContainer}>
+          <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
+            <TextInput
+              style={styles.inputEmail}
+              placeholder="E-mail"
+              value={username}
+              onChangeText={(text) => setUsername(text.trim())}
+              onFocus={handleEmailFocus}
+              onBlur={handleEmailBlur}
+              placeholderTextColor={config.primaryColor}
+              color="black"
+              autoCapitalize="none"
+            />
           </View>
-          <View style={{ width: '100%', right: 30, bottom: 0 }}>
-            {usernameError && !username && (
-              <>
-                <AlertIcon />
-                <ValidationError errorMessage={errorMessage} />
-              </>
-            )}
-          </View>
-          <View style={{ width: '100%', right: 30, bottom: 0 }}>
-            {invalidEmail && (
-              <>
-                <AlertIcon />
-                <ValidationError errorMessage={errorMessage} />
-              </>
-            )}
-          </View>
-          {showPasswordInput &&
-            <>
-              <View style={[styles.FormContainer, { marginTop: 10 }]}>
-                <View style={[styles.inputContainer, isPasswordFocused && styles.focusedInput]}>
-                  <TextInput
-                    style={styles.inputPassword}
-                    placeholder="Password"
-                    value={password}
-                    secureTextEntry={true}
-                    onChangeText={setPassword}
-                    onFocus={handlePasswordFocus}
-                    onBlur={handlePasswordBlur}
-                    placeholderTextColor={config.primaryColor}
-                    color="black"
-                  />
-                </View>
-              </View>
-              <View style={{ width: '100%', right: 30, bottom: 0 }}>
-                {passwordError && !password && (
-                  <>
-                    <AlertIcon />
-                    <ValidationError errorMessage={errorMessage} />
-                  </>
-                )}
-              </View>
-            </>
-          }
-          {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
-          <TouchableOpacity style={{ width: '100%', marginTop: 50 }}>
-            <CustomButton onPress={() => handleLogin()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Next"} />
-          </TouchableOpacity>
-          {
-            showAuth &&
-            <View style={{ width: '100%', marginTop: 15 }}>
-              <CustomButton onPress={() => handleAuth()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Authenticate Connect"} title={"authorization"} />
-            </View>
-          }
-          <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text style={styles.register}>Register</Text>
-          </TouchableOpacity>
         </View>
+        <View style={{ width: '100%', right: 30, bottom: 0 }}>
+          {usernameError && !username && (
+            <>
+              <AlertIcon />
+              <ValidationError errorMessage={errorMessage} />
+            </>
+          )}
+        </View>
+        <View style={{ width: '100%', right: 30, bottom: 0 }}>
+          {invalidEmail && (
+            <>
+              <AlertIcon />
+              <ValidationError errorMessage={errorMessage} />
+            </>
+          )}
+        </View>
+        {showPasswordInput &&
+          <>
+            <View style={[styles.FormContainer, { marginTop: 10 }]}>
+              <View style={[styles.inputContainer, isPasswordFocused && styles.focusedInput]}>
+                <TextInput
+                  style={styles.inputPassword}
+                  placeholder={t('Password')}
+                  value={password}
+                  secureTextEntry={true}
+                  onChangeText={setPassword}
+                  onFocus={handlePasswordFocus}
+                  onBlur={handlePasswordBlur}
+                  placeholderTextColor={config.primaryColor}
+                  color="black"
+                />
+              </View>
+            </View>
+            <View style={{ width: '100%', right: 30, bottom: 0 }}>
+              {passwordError && !password && (
+                <>
+                  <AlertIcon />
+                  <ValidationError errorMessage={errorMessage} />
+                </>
+              )}
+            </View>
+          </>
+        }
+        {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
+        <TouchableOpacity style={{ width: '100%', marginTop: 50 }}>
+          <CustomButton onPress={() => handleLogin()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={t('Next')} />
+        </TouchableOpacity>
+        {
+          showAuth &&
+          <View style={{ width: '100%', marginTop: 15 }}>
+            <CustomButton onPress={() => handleAuth()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Authenticate Connect"} title={"authorization"} />
+          </View>
+        }
+        <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+          <Text style={styles.forgotPasswordText}>{t('ForgotPassword')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleRegister}>
+          <Text style={styles.register}>{t('Register')}</Text>
+        </TouchableOpacity>
+      </View>
     </>
   )
 
   return (
     <>
-      {/* <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
- 
-      </ImageBackground> */}
-
       {
-                (config.backgroundColorImage) ?
-                    <View style={styles.cont}>
-                        {content}
-                    </View>
-                    :
-                    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
-                        {content}
-                    </ImageBackground>
-            }
+        (config.backgroundColorImage) ?
+          <View style={styles.cont}>
+            {content}
+          </View>
+          :
+          <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+            {content}
+          </ImageBackground>
+      }
 
     </>
   );
@@ -377,9 +372,9 @@ const styles = StyleSheet.create({
       },
     })
   },
-  cont:{
-    backgroundColor:config.backgroundColorImage,
-    flex:1,
+  cont: {
+    backgroundColor: config.backgroundColorImage,
+    flex: 1,
   },
   title: {
     fontSize: 24,

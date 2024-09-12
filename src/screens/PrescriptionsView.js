@@ -5,13 +5,14 @@ import { WebView } from 'react-native-webview';
 import config from '../../config.js';
 import BackHeader from '../components/backHeader';
 import PrescriptionDropDown from '../components/PrescriptionDropDown';
-import downArrow from '../assets/downArrow.png';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import Pdf from 'react-native-pdf';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const PrescriptionsView = () => {
     const route = useRoute();
     const { record, isArchived } = route.params;
+    const { t } = useTranslation();
     const [showDropDown, setShowDropDown] = useState(false);
     const ToggleDropDown = () => {
         setShowDropDown(!showDropDown);

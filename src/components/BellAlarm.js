@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         backgroundColor: 'white',
         width: '92%',
-        paddingVertical: 5,
+        paddingVertical: 0,
         alignSelf: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     },
     emptyView: {
         backgroundColor: 'transparent',
-        height: 35,
+        height: 45,
         // bottom: 50,
     },
     text: {
@@ -144,11 +144,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
-        padding: 8,
+        height: 50,
+        // top: -50,
     },
     child: {
         flexDirection: 'row',
-        padding: 14,
+        marginBottom: 50,
+        margin: 12,
     },
     deleteButtonText: {
         color: 'white',

@@ -4,8 +4,10 @@ import arrow from '../assets/arrow.png';
 import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 const AppointmentScheduling = ({date,responsible,local,query}) => {
     const navigation = useNavigation();
+    const { t } = useTranslation();
     const dateTime = moment(date);
     const formattedTime = dateTime.format('HH:mm');
     const formattedDate = dateTime.format('ddd, MMMM Do y');
@@ -14,16 +16,16 @@ const AppointmentScheduling = ({date,responsible,local,query}) => {
         <>
                 <View style={styles.firstContainer}>
                     <View style={styles.head}>
-                        <Text style={styles.status}>Scheduling Data</Text>
+                        <Text style={styles.status}>{t('SchedulingData')}</Text>
                     </View>
                     <View style={styles.line}></View>
                     <View style={styles.timeContainer}>
                         <View style={styles.list}>
-                            <Text style={styles.bodyHead}>Time</Text>
-                            <Text style={styles.bodyHead}>Date</Text>
-                            <Text style={styles.bodyHead}>local</Text>
-                            <Text style={styles.bodyHead}>Responsible</Text>
-                            <Text style={styles.bodyHead}>Query Type</Text>
+                            <Text style={styles.bodyHead}>{t('Time')}</Text>
+                            <Text style={styles.bodyHead}>{t('Date')}</Text>
+                            <Text style={styles.bodyHead}>{t('local')}</Text>
+                            <Text style={styles.bodyHead}>{t('Responsible')}</Text>
+                            <Text style={styles.bodyHead}>{t('QueryType')}</Text>
                         </View>
                         <View style={styles.list}>
                             <Text style={styles.bodyText}>{formattedTime}</Text>

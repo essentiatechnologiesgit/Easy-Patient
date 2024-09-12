@@ -2,19 +2,15 @@ import React, { useEffect } from 'react';
 import { Image, View, StyleSheet, ImageBackground, Text, PixelRatio } from 'react-native';
 import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import IntroBell from '../assets/IntroBell.png';
-import CustomButton from './CustomizedButton';
-
-
+import { useTranslation } from 'react-i18next';
 const BellIntro = () => {
-    const navigation = useNavigation();
-
+    const { t } = useTranslation();
     return (
         <View style={styles.parentContainer}>
-            <Text style={styles.heading}>Dont miss a notification</Text>
+            <Text style={styles.heading}>{t('NotifyIntroHeading')}</Text>
             <Image source={IntroBell} style={styles.image} />
-            <Text style={styles.text}>Provide access to your notification services for notifications for medications and appointments</Text>
+            <Text style={styles.text}>{t('NotifyIntroParagraph')}</Text>
         </View>
     );
 };
@@ -36,6 +32,11 @@ const styles = StyleSheet.create({
         width: '60%',
         textAlign: 'center',
         marginTop: -40,
+        ...Platform.select({
+            ios: {
+              marginTop:20,
+            },
+          }),
     },
     image: {
         // marginTop:100,

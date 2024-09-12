@@ -4,16 +4,17 @@ import arrow from '../assets/arrow.png';
 import config from '../../config.js';
 import EmailComponent from './EmailComponent';
 import GoldEmailIcon from '../assets/goldEmailIcon.png';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import CallComponent from './CallComponent';
 import WhatsappComponent from './WatsappComponent';
 const AppointmentContact = ({ watsappNo, phone, email }) => {
+    const { t } = useTranslation();
     return (
         <>
             <View style={styles.firstContainer}>
                 {(phone || watsappNo || email) && (
                     <View style={styles.head}>
-                        <Text style={styles.status}>Contacts</Text>
+                        <Text style={styles.status}>{t('Contact')}</Text>
                     </View>
                 )}
 

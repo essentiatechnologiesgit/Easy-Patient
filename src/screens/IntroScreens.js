@@ -10,15 +10,14 @@ import CustomizedAppIntro from '../components/CustomizedAppIntro';
 import BellIntro from '../components/BellIntro';
 import MapsAccess from '../components/MapsAccess';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import { Permission } from 'react-native-permissions';
+import { useTranslation } from 'react-i18next';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 const IntroScreens = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const navigation = useNavigation();
     const scrollViewRef = useRef(null);  // Create a reference to the ScrollView
     const [locationPermission, setLocationPermission] = useState(false);
-
-
+    const { t } = useTranslation();
 
     const handleScroll = (event) => {
         const { contentOffset, layoutMeasurement } = event.nativeEvent;
@@ -171,7 +170,7 @@ const IntroScreens = () => {
                     buttonColor={config.secondaryColor}
                     borderColor={config.secondaryColor}
                     textColor={"white"}
-                    text={currentPage !== 3 ? "Advance" : "Agree"}
+                    text={currentPage !== 3 ? t('Advance') : t('Agree')}
                 />
             </View>
             <View style={styles.dots}>
@@ -185,7 +184,7 @@ const IntroScreens = () => {
                         />
                         :
                         <TouchableWithoutFeedback onPress={() => navigation.navigate("Login")}>
-                            <Text style={styles.missTrade}>Miss trade</Text>
+                            <Text style={styles.missTrade}>{t('Misstrade')}</Text>
                         </TouchableWithoutFeedback>
                 }
             </View>

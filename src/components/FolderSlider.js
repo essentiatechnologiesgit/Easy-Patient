@@ -13,7 +13,7 @@ import config from "../../config.js";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Guidelines from "../screens/Guidelines";
+import { useTranslation } from 'react-i18next';
 
 const FolderSlider = () => {
     const scrollViewRef = useRef(null);
@@ -29,8 +29,7 @@ const FolderSlider = () => {
     const [attestations, setAttestations] = useState(0);
     const [orientations, setOrientations] = useState(0);
     const [meal, setMeal] = useState(0);
-
-
+    const { t } = useTranslation();
     useEffect(() => {
         const getAccessToken = async () => {
             const loginResponse = await AsyncStorage.getItem('loginResponse');
@@ -204,7 +203,7 @@ const FolderSlider = () => {
 
     return (
         <>
-            <Text style={styles.heading}>My Files</Text>
+            <Text style={styles.heading}>{t('MyFiles')}</Text>
             <ScrollView
                 ref={scrollViewRef}
                 horizontal
@@ -218,8 +217,8 @@ const FolderSlider = () => {
                         </View>
                         <Image source={fileCapsule} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
-                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Prescriptions</Text>
-                            <Text style={styles.files}>{prescription}  files</Text>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">{t('Prescriptions')}</Text>
+                            <Text style={styles.files}>{prescription}  {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("MealPlans", { setMeal })} style={styles.FolderContainer}>
@@ -227,8 +226,8 @@ const FolderSlider = () => {
                         </View>
                         <Image source={fork} style={styles.logo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -3 }}>
-                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Meal Plans</Text>
-                            <Text style={styles.files}>{meal}  files</Text>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">{t('Meal Plans')}</Text>
+                            <Text style={styles.files}>{meal}  {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("ExamRequest", { setExam })} style={styles.FolderContainer}>
@@ -237,9 +236,9 @@ const FolderSlider = () => {
                         <Image source={heartBeat} style={styles.zipBlack}></Image>
                         <View style={{ marginLeft: 10, marginTop: 2 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                                Exam Requests
+                            {t('Exam Requests')}
                             </Text>
-                            <Text style={styles.files}>{Exam}  files</Text>
+                            <Text style={styles.files}>{Exam}  {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Guidelines", { setGuidelines })} style={styles.FolderContainer}>
@@ -247,32 +246,19 @@ const FolderSlider = () => {
                         </View>
                         <Image source={fileAdd} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
-                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">Guidelines</Text>
-                            <Text style={styles.files}>{Guidelines}  files</Text>
+                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">{t('Guidelines')}</Text>
+                            <Text style={styles.files}>{Guidelines}  {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
-
-
-                    {/* <TouchableOpacity onPress={() => navigation.navigate("HealthRecommendation")} style={styles.FolderContainer}>
-                        <View style={styles.smallContainer}>
-                        </View>
-                        <Image source={fileEdit} style={styles.fileEdit}></Image>
-                        <View style={{ marginLeft: 10, marginTop: -5 }}>
-                            <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                                Health Recommendations
-                            </Text>
-                            <Text style={styles.files}>0  files</Text>
-                        </View>
-                    </TouchableOpacity> */}
                     <TouchableOpacity onPress={() => navigation.navigate("BodyAssessments", { setAssessment })} style={styles.FolderContainer}>
                         <View style={styles.smallContainer}>
                         </View>
                         <Image source={Scale} style={styles.Scale}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                                Body Assessments
+                            {t('Body Assessments')}
                             </Text>
-                            <Text style={styles.files}>{assessment}  files</Text>
+                            <Text style={styles.files}>{assessment}  {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Reports", { setReports })} style={styles.FolderContainer}>
@@ -281,9 +267,9 @@ const FolderSlider = () => {
                         <Image source={fileLife} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                                Reports
+                            {t('Reports')}
                             </Text>
-                            <Text style={styles.files}>{reports}  files</Text>
+                            <Text style={styles.files}>{reports}  {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate("Attestations", { setAttestations })} style={styles.FolderContainer}>
@@ -292,9 +278,9 @@ const FolderSlider = () => {
                         <Image source={fileEdit} style={styles.filelogo}></Image>
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.folderHeading} numberOfLines={1} ellipsizeMode="tail">
-                                Attestations/Declarations
+                            {t('Attestations/Declarations')}  
                             </Text>
-                            <Text style={styles.files}>{attestations} files</Text>
+                            <Text style={styles.files}>{attestations} {t('files')}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>

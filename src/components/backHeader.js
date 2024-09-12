@@ -3,9 +3,10 @@ import { PixelRatio, StyleSheet, Text, Image, View, TouchableOpacity, Platform }
 import { useNavigation } from '@react-navigation/native';
 import leftArrow from '../assets/leftArrow.png';
 import config from '../../config.js';
-import CircleButton from '../components/CircleButton';
+import { useTranslation } from 'react-i18next';
 const BackHeader = ({ name }) => {
     const navigation = useNavigation();
+    const { t } = useTranslation();
     const handleBackPress = () => {
         if (name == "Profile") {
             navigation.navigate('Dashboard', {
@@ -30,7 +31,7 @@ const BackHeader = ({ name }) => {
                         <Image source={leftArrow} style={styles.arrow}></Image>
                     </TouchableOpacity>
                 }
-                <Text style={styles.head} numberOfLines={1} ellipsizeMode="tail">{name}</Text>
+                <Text style={styles.head} numberOfLines={1} ellipsizeMode="tail">{t(name)}</Text>
             </View>
         </>
     );

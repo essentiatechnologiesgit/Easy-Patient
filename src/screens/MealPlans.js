@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import archive from '../assets/archive.png';
 import BackHeader from '../components/backHeader';
 import MealContainer from '../components/MealContainer';
-import { touch } from 'react-native-fs';
+import { useTranslation } from 'react-i18next';
 import ModalLoader from '../components/ModalLoader';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,7 +16,7 @@ const MealPlans = () => {
     const isHide = route?.params?.isHide ?? false;
     const record_id = route?.params?.record_id ?? 0;
     const navigation = useNavigation();
-    const scrollViewRef = useRef();
+    const { t } = useTranslation();
     const [mealData, setMealData] = useState([]);
     const isFocused = useIsFocused();
     const [showLoader, setShowLoader] = useState(true);

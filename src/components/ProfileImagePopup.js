@@ -8,9 +8,9 @@ import deleteIcon from '../assets/delete.png';
 import ImagePicker from 'react-native-image-crop-picker';
 import cameraIcon from '../assets/camera2.png';
 import galleryIcon from '../assets/gallery2.png';
-import CancelledAlarm from './CancelledAlarm';
+import { useTranslation } from 'react-i18next';
 const ProfileImagePopup = ({ visible, onClose, setImage }) => {
-
+    const { t } = useTranslation();
     useEffect(() => {
     }, [onClose])
 
@@ -77,7 +77,7 @@ const ProfileImagePopup = ({ visible, onClose, setImage }) => {
                     <TouchableWithoutFeedback onPress={()=>openGallery()}>
                         <View style={styles.cont}>
                             <Text style={styles.text}>
-                                Gallery
+                            {t('Gallery')}
                             </Text>
                             <Image source={galleryIcon} style={styles.imageIcon} />
                         </View>
@@ -86,7 +86,7 @@ const ProfileImagePopup = ({ visible, onClose, setImage }) => {
                     <TouchableWithoutFeedback onPress={()=>handleCameraLaunch()}>
                         <View style={styles.cont}>
                             <Text style={styles.text}>
-                                Camera
+                            {t('Camera')}
                             </Text>
                             <Image source={cameraIcon} style={styles.imageIcon} />
                         </View>
@@ -95,7 +95,7 @@ const ProfileImagePopup = ({ visible, onClose, setImage }) => {
                     <TouchableWithoutFeedback onPress={()=>handleImageRemove()}>
                         <View style={styles.cont}>
                             <Text style={styles.delete}>
-                                Delete
+                            {t('Delete')}
                             </Text>
                             <Image source={deleteIcon} style={styles.imageIcon} />
                         </View>
@@ -106,7 +106,7 @@ const ProfileImagePopup = ({ visible, onClose, setImage }) => {
                     <TouchableWithoutFeedback onPress={()=>handleCloseModal()}>
                         <View style={styles.container}>
                             <Text style={styles.Canceltext}>
-                                Cancel
+                            {t('Cancel')}
                             </Text>
                         </View>
                     </TouchableWithoutFeedback>

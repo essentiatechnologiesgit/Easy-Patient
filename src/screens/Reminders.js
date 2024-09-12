@@ -16,6 +16,7 @@ import yellowDrink from '../assets/yellowDrink.png';
 import redDrink from '../assets/redDrink.png';
 import blueDrink from '../assets/blueDrink.png';
 import blackDrink from '../assets/blackDrink.png';
+import { useTranslation } from 'react-i18next';
 import yellowMed from '../assets/yellowMed.png';
 import blueMed from '../assets/blueMed.png';
 import redMed from '../assets/redMed.png';
@@ -32,6 +33,7 @@ const Reminders = () => {
     const navigation = useNavigation();
     const [image, setImage] = useState('');
     const isFocused = useIsFocused();
+    const { t } = useTranslation();
     useEffect(() => {
         async function fetchData() {
             const { accessToken, userId } = await getUsersData();
@@ -184,9 +186,9 @@ const Reminders = () => {
                                             <View style={styles.textContainer}>
                                                 <Text style={styles.medicineTextHeading}>{item.medicine}</Text>
                                                 <Text style={styles.medicineTextSide}>
-                                                    {`Next dose: ${(item.times && item.times.length > 0) ? calculateNextDosageTime(item.times) : currentTime}`}
+                                                {`${t('Next dose')}: ${(item.times && item.times.length > 0) ? calculateNextDosageTime(item.times) : currentTime}`}
                                                 </Text>
-                                                <Text style={styles.medicineTextGrey}>After every {item.frequency} {item.days_of_the_week} {durationConverter(item.duration)}</Text>
+                                                <Text style={styles.medicineTextGrey}>{} {item.frequency} {t(`${durationConverter(item.duration)}`)} </Text>
                                                 <Text style={styles.medicineTextGrey}>{item.dosage}</Text>
                                             </View>
                                             <Image source={arrow} style={styles.arrowLogo} />
@@ -194,13 +196,14 @@ const Reminders = () => {
                                     </TouchableWithoutFeedback>
                                 ))
                             }
+                            
                         </ScrollView>
                         :
                         <>
                             <View style={styles.Empty}>
                                 <Image source={medicineWhite} style={styles.medicineWhite} />
-                                <Text style={styles.emptyText}>You do not have any medications or Supplement reminder</Text>
-                                <Text style={styles.emptyText}>Add now</Text>
+                                <Text style={styles.emptyText}>{t('YouDontHaveMedicine')}</Text>
+                                <Text style={styles.emptyText}>{t('AddNow')}</Text>
                                 <View style={styles.button}>
                                     <CircleButton title={"AddReminder"} />
                                 </View>

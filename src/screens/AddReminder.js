@@ -11,7 +11,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import redDrop from '../assets/redDrop.png';
 import blackDrop from '../assets/blackDrop.png';
 import blueDrop from '../assets/blueDrop.png';
-import { readFile } from 'react-native-fs';
+import { useTranslation } from 'react-i18next';
 import ValidationMessageError from '../components/ValidationMessageError';
 import yellowDrink from '../assets/yellowDrink.png';
 import yellowDrop from '../assets/yellowDrop.png';
@@ -59,7 +59,7 @@ const AddReminder = ({ route }) => {
     const [IOSError, setIOSError] = useState(false);
     const [dateError, setDateError] = useState(false);
     const [daysError, setDaysError] = useState('');
-    const [frequencyError, setFrequencyError] = useState('');
+    const { t } = useTranslation();
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [isNotify, setIsNotify] = useState(true);
@@ -113,9 +113,9 @@ const AddReminder = ({ route }) => {
     }
 
     const DaysArray = [
-        { label: 'Days', value: '1' },
-        { label: 'Weeks', value: '2' },
-        { label: 'Months', value: '3' },
+        { label: t('Days'), value: '1' },
+        { label: t('Weeks'), value: '2' },
+        { label: t('Months'), value: '3' },
     ];
     const handleOpen = () => setIsOpen(!isOpen);
 
@@ -517,12 +517,12 @@ const AddReminder = ({ route }) => {
                     )
                 }
 
-                <BackHeader name={"Add Reminder"} />
+                <BackHeader name={t('Add Reminder')} />
                 <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })} style={styles.medicineContiner}>
                     {renderImage()}
                 </TouchableOpacity>
                 <TouchableWithoutFeedback onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image })}>
-                    <Text style={styles.addImage}>Add Image</Text>
+                    <Text style={styles.addImage}>{t('Edit')}</Text>
                 </TouchableWithoutFeedback>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
@@ -530,11 +530,10 @@ const AddReminder = ({ route }) => {
                             ref={(ref) => (errorRefs.current[0] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Name of Medicine/Supplement'}
+                                label={t('Name of Medicine/Supplement')}
                                 inputStyles={styles.inputStyles}
                                 customLabelStyles={!medicineError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
                                 value={MedicineName}
-                                placeholder={'df'}
                                 onChangeText={value => setMedicineName(value)}
                                 containerStyles={!medicineError ? styles.containerStyles : styles.containerStylesEmpty}
                             />
@@ -556,11 +555,11 @@ const AddReminder = ({ route }) => {
                             <TouchableOpacity onPress={handlePressDatePicker}>
                                 <View style={!dateError ? styles.containerStyles : styles.containerStylesEmpty}>
                                     {date ? (
-                                        <Text style={{ marginBottom: 8, color: config.primaryColor }}>Start Date and Time</Text>
+                                        <Text style={{ marginBottom: 8, color: config.primaryColor }}>{t('Date/Time')}</Text>
                                     ) : (
                                         <TextInput
                                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
-                                            placeholder="Start Date and Time"
+                                            placeholder={t('Date/Time')}
                                             placeholderTextColor={!dateError ? config.primaryColor : 'red'}
                                             editable={false}
                                             value={date ? formattedDate : ""}
@@ -599,7 +598,7 @@ const AddReminder = ({ route }) => {
                                             value={time}
                                             mode="time"
                                             onChange={onChangeTime}
-
+                                            ass
                                         />
                                     )}
                                 </>
@@ -630,7 +629,7 @@ const AddReminder = ({ route }) => {
                                 ref={(ref) => (errorRefs.current[5] = ref)}
                                 style={{ ...styles.floatingLabelH, borderBottomWidth: 0.5, borderBottomColor: config.primaryColor }}>
                                 <FloatingLabelInput
-                                    label={'Treatment Duration'}
+                                    label={t('NoDays')}
                                     inputStyles={styles.inputStyles}
                                     labelStyles={{ paddingHorizontal: 0 }}
                                     customLabelStyles={!daysError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
@@ -661,11 +660,11 @@ const AddReminder = ({ route }) => {
                                                     placeholder: styles.placeholder,
                                                     iconContainer: styles.iconContainer,
                                                 }}
-                                                placeholder={{ label: "Select an item", value: null, color: 'gray' }}
+                                                placeholder={{ label: t('SelectItem'), value: null, color: 'gray' }}
                                                 items={[
-                                                    { label: 'Days', value: '1' },
-                                                    { label: 'Weeks', value: '2' },
-                                                    { label: 'Months', value: '3' },
+                                                    { label: t('Days'), value: '1' },
+                                                    { label: t('Weeks'), value: '2' },
+                                                    { label: t('Months'), value: '3' },
                                                 ]}
                                                 useNativeAndroidPickerStyle={false} // This is important to apply custom styles on Android
                                                 itemStyle={styles.itemStyle} // This is for styling picker items
@@ -681,7 +680,7 @@ const AddReminder = ({ route }) => {
                                             items={DaysArray}
                                             value={selectedDays}
                                             onSelectItem={handleSelect}
-                                            placeholder="Days"
+                                            placeholder={t('Days')}
                                             open={isOpen}
                                             showArrowIcon={true}
                                             onOpen={handleOpen}
@@ -696,9 +695,9 @@ const AddReminder = ({ route }) => {
                                                 zIndex: 999,
                                             }}
                                             textStyle={{
-                                                fontSize: PixelRatio.getFontScale() * 18,
+                                                fontSize: PixelRatio.getFontScale() * 16,
                                                 fontFamily: config.fontStyle,
-                                                color: config.primaryColor,
+                                                color: config.textColorHeadings,
                                             }}
                                             dropDownContainerStyle={{
                                                 backgroundColor: 'white',
@@ -726,10 +725,10 @@ const AddReminder = ({ route }) => {
                                         <>
                                             <View style={{ marginTop: 10 }}></View>
                                             <FloatingLabelInput
-                                                label={'Frequency'}
+                                                label={t('Frequency')}
                                                 inputStyles={styles.inputStyles}
                                                 customLabelStyles={styles.customLabelStyles}
-                                                value={`Every ${freNumber} ${duration}`}
+                                                value={`${t('Every')} ${freNumber} ${t(duration)}`}
                                                 onChangeText={value => setFrequency(value)}
                                                 containerStyles={styles.containerStyles}
                                                 onPressOut={() => handleCounter()}
@@ -753,7 +752,7 @@ const AddReminder = ({ route }) => {
                                                     }
                                             }
                                             editable={false}
-                                            placeholder="Frequency"
+                                            placeholder={t('Frequency')}
                                             placeholderTextColor={!freNumberError ? config.primaryColor : 'red'}
                                             onChangeText={value => setFrequency(value)} // You can remove this line
                                             pointerEvents="none"
@@ -780,7 +779,7 @@ const AddReminder = ({ route }) => {
                                 onValueChange={toggleNotifySwitch}
                                 value={isNotify}
                             />
-                            <Text style={styles.NotifyText}>Notifications</Text>
+                            <Text style={styles.NotifyText}>{t('Notifications')}</Text>
                         </View>
                         <View style={styles.switchContainer}>
                             <Switch
@@ -791,14 +790,14 @@ const AddReminder = ({ route }) => {
                                 value={priority}
                             />
                             <View>
-                                <Text style={styles.NotifyText}>High priority</Text>
+                                <Text style={styles.NotifyText}>{t('HighPriority')}</Text>
                             </View>
                         </View>
                         <View style={styles.notifyContainer}>
-                            <Text style={styles.NotifyMsg}>Allow Easy Patient to make sound notifications even when you cell phone is in silent mode.</Text>
+                            <Text style={styles.NotifyMsg}>{t('AllowEasyPatients')}.</Text>
                         </View>
                         <View style={{ width: '95%', marginTop: 35, marginBottom: 60 }}>
-                            <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
+                            <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={t('Confirm2')} />
                         </View>
                     </View>
                 </ScrollView>
@@ -1231,7 +1230,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 0,
         paddingTop: 30,
-        color: config.primaryColor
+        color: config.textColorHeadings
 
     }
 

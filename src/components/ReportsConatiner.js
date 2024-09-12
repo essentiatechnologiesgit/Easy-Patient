@@ -6,11 +6,12 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
 import { TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import showIcon from '../assets/showIcon.png';
 const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id ,getData }) => {
     const navigation = useNavigation();
-
+    const { t } = useTranslation();
     useEffect(() => {
         if (isHide)
             handleHide();
@@ -72,25 +73,25 @@ const ReportsContainer = ({ record, isArchived, isHide, isShow, record_id ,getDa
         <>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('ReportsView', { record: record, isArchived, isArchived })}>
                 <View style={styles.container}>
-                    <Text style={styles.subHeadings}>Received {record.title}</Text>
+                    <Text style={styles.subHeadings}>{t('Received')} {record.title}</Text>
                     <Text style={styles.text}>{record.specialist}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
                     {
                         !isArchived ?
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
                                 <Image source={archiveGold} style={styles.archiveIcon} />
-                                <Text style={styles.hide}>hide</Text>
+                                <Text style={styles.hide}>{t('hide')}</Text>
                             </TouchableOpacity> :
 
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleShow()}>
                                 <Image source={showIcon} style={styles.showIcon} />
-                                <Text style={styles.hide}>Show</Text>
+                                <Text style={styles.hide}>{t('Show')}</Text>
                             </TouchableOpacity>
                     }
                     {
                         record.is_new &&
                         <View style={styles.NewContainer}>
-                            <Text style={styles.New}>New</Text>
+                            <Text style={styles.New}>{t('New')}</Text>
                         </View>
                     }
                     <Image source={arrow} style={styles.arrowLogo} />
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         width: '93%',
         alignSelf: 'center',
-        gap:3,
+        gap:5,
     },
     showIcon: {
         height: 16,
@@ -124,43 +125,33 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#B8E0C3',
     },
-    hideContainer: {
-        flexDirection: 'row',
-        borderWidth: 1,
-        borderColor: config.secondaryColor,
-        height: 25,
-        width: 62,
-        gap: 3,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 14,
-        marginTop: 5,
-    },
     hide: {
         color: config.secondaryColor,
         fontSize: PixelRatio.getFontScale() * 12,
+        fontFamily:config.fontStyle,
         
     },
     New: {
         color: '#146229',
         fontSize: PixelRatio.getFontScale() * 12,
-        
+        fontFamily:config.fontStyle,
     },
     arrowLogo: {
         position: 'absolute', // Position the arrow absolutely
         height: 20,
         width: 13,
-        top: 40, // Adjust this value as needed
+        top: 55, // Adjust this value as needed
         right: 0, // Position the arrow to the right
     },
     archiveIcon: {
-        height: 15.5,
+        height: 16,
         width: 13,
+        bottom:1,
     },
     headings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 18,
-        
+        fontFamily:config.fontStyle,
         fontWeight: 'bold',
     },
     hideContainer: {
@@ -168,28 +159,23 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: config.secondaryColor,
         height: 25,
-        gap: 3,
-        width: 55,
+        gap: 5,
+        width: 80,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,
         marginTop: 3,
     },
-    hide: {
-        color: config.secondaryColor,
-        fontSize: PixelRatio.getFontScale() * 12,
-        
-    },
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        
-        fontWeight: '600',
+        fontWeight: 'bold',
+        fontFamily:config.fontStyle,
     },
     text: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
-        
+        fontFamily:config.fontStyle,
     },
 });
 

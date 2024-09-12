@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, PixelRatio, PermissionsAndroid, TouchableOpacity, Linking } from 'react-native';
 import config from '../../config.js';
 import CarIcon from '../assets/CarIcon.png';
-import MapView, { Marker } from 'react-native-maps';
-
+import { useTranslation } from 'react-i18next';
 const AppointmentRoutes = ({ clinicName, address, longitude, latitude }) => {
     const [locationPermission, setLocationPermission] = useState(false);
-
+    const { t } = useTranslation();
     useEffect(() => {
         requestLocationPermission();
     }, []);
@@ -43,7 +42,7 @@ const AppointmentRoutes = ({ clinicName, address, longitude, latitude }) => {
         <>
             <View style={styles.firstContainer}>
                 <View style={styles.head}>
-                    <Text style={styles.status}>Routes</Text>
+                    <Text style={styles.status}>{t('Routes')}</Text>
                 </View>
                 <View style={styles.line}></View>
                 <Text style={styles.routeHead}>{clinicName}</Text>
@@ -54,7 +53,7 @@ const AppointmentRoutes = ({ clinicName, address, longitude, latitude }) => {
                     longitude && latitude &&
                     <TouchableOpacity onPress={openGoogleMaps} style={styles.carContainer}>
                         <Image source={CarIcon} style={styles.carIcon} />
-                        <Text style={styles.clinicText}>Go to the Clinic</Text>
+                        <Text style={styles.clinicText}>{t('GoToTheClinic')}</Text>
                     </TouchableOpacity>
                 }
 

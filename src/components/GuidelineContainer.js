@@ -6,11 +6,12 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import archiveGold from '../assets/archiveGold.png';
 import showIcon from '../assets/showIcon.png';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native';
 const GuidelineContainer = ({ record, isArchived, isHide, isShow, record_id,getData }) => {
     const navigation = useNavigation();
-
+    const { t } = useTranslation();
     useEffect(() => {
         if (isHide)
             handleHide();
@@ -76,25 +77,25 @@ const GuidelineContainer = ({ record, isArchived, isHide, isShow, record_id,getD
         <>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('GuidelinesView', { record: record, isArchived, isArchived })}>
                 <View style={styles.container}>
-                    <Text style={styles.subHeadings}>Received {record.title}</Text>
+                    <Text style={styles.subHeadings}>{t('Received')} {record.title}</Text>
                     <Text style={styles.text}>{record.clinic_name}</Text>
                     <Text style={styles.text2}>Dr. {record.specialist}</Text>
                     {
                         !isArchived ?
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleHide()}>
                                 <Image source={archiveGold} style={styles.archiveIcon} />
-                                <Text style={styles.hide}>hide</Text>
+                                <Text style={styles.hide}>{t('hide')}</Text>
                             </TouchableOpacity> :
 
                             <TouchableOpacity style={styles.hideContainer} onPress={() => handleShow()}>
                                 <Image source={showIcon} style={styles.showIcon} />
-                                <Text style={styles.hide}>Show</Text>
+                                <Text style={styles.hide}>{t('Show')}</Text>
                             </TouchableOpacity>
                     }
                     {
                         record.is_new &&
                         <View style={styles.NewContainer}>
-                            <Text style={styles.New}>New</Text>
+                            <Text style={styles.New}>{t('New')}</Text>
                         </View>
                     }
                     <Image source={arrow} style={styles.arrowLogo} />
@@ -109,9 +110,9 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomColor: 'grey',
         borderBottomWidth: 1,
-        width: '90%',
+        width: '93%',
         alignSelf: 'center',
-        gap:3,
+        gap:5,
     },
     showIcon: {
         height: 16,
@@ -128,61 +129,57 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#B8E0C3',
     },
-    archiveIcon: {
-        height: 15.5,
-        width: 13,
+    hide: {
+        color: config.secondaryColor,
+        fontSize: PixelRatio.getFontScale() * 12,
+        fontFamily:config.fontStyle,
+        
     },
     New: {
         color: '#146229',
         fontSize: PixelRatio.getFontScale() * 12,
-        
+        fontFamily:config.fontStyle,
     },
     arrowLogo: {
         position: 'absolute', // Position the arrow absolutely
         height: 20,
         width: 13,
-        top: 50, // Adjust this value as needed
+        top: 55, // Adjust this value as needed
         right: 0, // Position the arrow to the right
+    },
+    archiveIcon: {
+        height: 16,
+        width: 13,
+        bottom:1,
     },
     headings: {
         color: config.textColorHeadings,
-        
         fontSize: PixelRatio.getFontScale() * 18,
-        fontWeight: '600',
+        fontFamily:config.fontStyle,
+        fontWeight: 'bold',
     },
     hideContainer: {
         flexDirection: 'row',
         borderWidth: 1,
         borderColor: config.secondaryColor,
         height: 25,
-        width: 62,
-        gap: 3,
+        gap: 5,
+        width: 80,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14,
-        marginTop: 5,
-    },
-    hide: {
-        color: config.secondaryColor,
-        fontSize: PixelRatio.getFontScale() * 12,
-        
+        marginTop: 3,
     },
     subHeadings: {
         color: config.textColorHeadings,
         fontSize: PixelRatio.getFontScale() * 17,
-        
         fontWeight: 'bold',
+        fontFamily:config.fontStyle,
     },
     text: {
-        color: config.textColorHeadings,
-        fontSize: PixelRatio.getFontScale() * 17,
-        
-    },
-    text2: {
         color: config.primaryColor,
         fontSize: PixelRatio.getFontScale() * 17,
-        
-    },
-});
+        fontFamily:config.fontStyle,
+    },});
 
 export default GuidelineContainer;

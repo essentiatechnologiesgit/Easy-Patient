@@ -8,7 +8,7 @@ import { FloatingLabelInput } from 'react-native-floating-label-input';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CustomizedButton from '../components/CustomizedButton';
-import ImagePicker from 'react-native-image-crop-picker';
+import { useTranslation } from 'react-i18next';
 import ValidationMessageError from '../components/ValidationMessageError';
 import ValidationError from '../components/ValidationError';
 import axios from 'axios';
@@ -48,6 +48,7 @@ const Profile = () => {
     const [accessToken, setAccessToken] = useState('');
     const [image, setImage] = useState('');
     const [newDate , setNewDate ] = useState(new Date());
+    const { t } = useTranslation();
     const genders = [
         { label: 'Male', value: 'm' },
         { label: 'Female', value: 'f' },
@@ -326,13 +327,13 @@ const Profile = () => {
             <ScrollView style={styles.container}>
                 <ProfileImagePopup visible={modalVisible} onClose={() => setModalVisible(false)} setImage={setImage} />
                 <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
-                <BackHeader name={"Profile"} />
+                <BackHeader name={t('Profile')} />
                 <View style={styles.formContainer}>
                     <TouchableOpacity onPress={() => handlePhotoNavigation()}>
                         <Image source={image ? { uri: image } : profileIcon} style={styles.Profilelogo} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { handleEdit() }}>
-                        <Text style={styles.edit}>Edit</Text>
+                        <Text style={styles.edit}>{t('Edit')}</Text>
                     </TouchableOpacity>
                     <ScrollView ref={scrollViewRef} style={{ width: '94%', alignSelf: 'center' }} contentContainerStyle={{ alignItems: 'center', marginTop: 45, }}>
                         <View style={styles.signupFormContainer}>
@@ -340,7 +341,7 @@ const Profile = () => {
                                 ref={(ref) => (errorRefs.current[1] = ref)}
                                 style={styles.floatingLabel}>
                                 <FloatingLabelInput
-                                    label={'Full Name'}
+                                    label={t('Full Name')}
                                     inputStyles={styles.inputStyles}
                                     customLabelStyles={styles.customLabelStyles}
                                     value={fullName}
@@ -387,11 +388,11 @@ const Profile = () => {
                                 <TouchableOpacity onPress={handlePressDatePicker}>
                                     <View style={{ ...styles.containerStyles }}>
                                         {date ? (
-                                            <Text style={{ marginBottom: 8, color: config.primaryColor }}>Date Of Birth</Text>
+                                            <Text style={{ marginBottom: 8, color: config.primaryColor }}>{t('Date Of Birth')}</Text>
                                         ) : (
                                             <TextInput
                                                 style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
-                                                placeholder="Date Of Birth"
+                                                placeholder={t('Date Of Birth')}
                                                 placeholderTextColor={config.primaryColor}
                                                 editable={false}
                                                 value={date}
@@ -477,9 +478,8 @@ const Profile = () => {
                                         },
                                     ]}
                                 >
-                                    Select Gender
+                                    {t('Gender')}
                                 </Animated.Text>
-
                                 <DropDownPicker
                                     items={genders}
                                     value={selectedGender}
@@ -500,7 +500,7 @@ const Profile = () => {
                                     }}
                                     textStyle={{
                                         fontSize: PixelRatio.getFontScale() * 17,
-                                        color: config.primaryColor,
+                                        color: config.textColorHeadings,
                                     }}
                                 />
                                 {genderError && !selectedGender && (
@@ -510,15 +510,12 @@ const Profile = () => {
                                     </>
                                 )}
                             </View>
-
                             <TouchableOpacity onPress={handlePassword}>
-                                <Text style={styles.register}>Change Password</Text>
+                                <Text style={styles.register}>{t('ChangePassword')}</Text>
                             </TouchableOpacity>
-
                             <View style={{ width: '100%', marginTop: 40 }}>
-                                <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                                <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={t('Confirm2')} />
                             </View>
-
                         </View>
                         {snackbarMessage !== '' && <Snackbar message={snackbarMessage} keyProp={snackbarKey} />}
                     </ScrollView>
@@ -820,7 +817,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 0,
         paddingTop: 30,
-        color: config.primaryColor
+        color: config.textColorHeadings
     }
 });
 

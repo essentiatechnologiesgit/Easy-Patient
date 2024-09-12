@@ -3,22 +3,23 @@ import { View, Image, ActivityIndicator, StyleSheet, PixelRatio, TouchableWithou
 import arrow from '../assets/arrow.png';
 import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 const AppointmentStatus = ({scheduleStatusId,scheduleStatusName}) => {
-
+    const { t } = useTranslation();
     const statusMapping = {
-        1: 'Waiting',
-        2: 'Confirmed',
-        3: 'Cancelled'
+        1: t('Waiting'),
+        2: t('Confirmed'),
+        3: t('Cancelled'),
     };
     const navigation = useNavigation();
     const statusName = statusMapping[scheduleStatusId] || 'null';
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Waiting':
+            case t('Waiting'):
                 return styles.waiting;
-            case 'Confirmed':
+            case t('Confirmed'):
                 return styles.confirmed;
-            case 'Cancelled':
+            case t('Cancelled'):
                 return styles.cancelled;
             default:
                 return styles.defaultStatus;
@@ -32,8 +33,7 @@ const AppointmentStatus = ({scheduleStatusId,scheduleStatusName}) => {
                     <Text style={[ getStatusStyle(statusName)]}>{statusName}</Text>
                 </View>
                 <View style={styles.line}></View>
-                <Text style={styles.bodyHead}>This consultation has already taken place</Text>
-                {/* <Text style={styles.bodyText}>Consult , change or cancel your appointment , contact the clinic using the contact details below</Text> */}
+                <Text style={styles.bodyHead}>{t('ThisConsultation')}</Text>
             </View>
         </>
     );

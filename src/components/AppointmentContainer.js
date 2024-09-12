@@ -4,31 +4,35 @@ import arrow from '../assets/arrow.png';
 import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import { useTranslation } from 'react-i18next';
+
+dayjs.extend(advancedFormat);
 const AppointmentContainer = ({ record, isArchived, isHide, isShow, record_id }) => {
     const navigation = useNavigation();
+    const { t } = useTranslation();
     const statusMapping = {
-        1: 'Waiting',
-        2: 'Confirmed',
-        3: 'Cancelled'
+        1: t('Waiting'),
+        2: t('Confirmed'),
+        3: t('Cancelled'),
     };
     const statusName = statusMapping[record.schedule_status_id] || 'null';
     const dateTime = moment(record.date);
     const formattedTime = dateTime.format('HH:mm');
-    const formattedDate = dateTime.format('ddd, MMMM Do y');
+    const formattedDate = dayjs().format('ddd, MMMM Do YYYY');
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Waiting':
+            case t('Waiting'):
                 return styles.waiting;
-            case 'Confirmed':
+            case t('Confirmed'):
                 return styles.confirmed;
-            case 'Cancelled':
+            case t('Cancelled'):
                 return styles.cancelled;
             default:
                 return styles.defaultStatus;
         }
     };
-
-    console.log(record);
     return (
         <>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('AppointmentsDetails', { record: record, isArchived,isArchived })}>

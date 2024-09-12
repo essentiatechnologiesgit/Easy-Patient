@@ -7,7 +7,7 @@ import axios from 'axios';
 import ModalLoader from '../components/ModalLoader';
 import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import CustomButton from '../components/CustomizedButton';
+import { useTranslation } from 'react-i18next';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 const TermsAndConditions = () => {
     const navigation = useNavigation();
@@ -15,7 +15,7 @@ const TermsAndConditions = () => {
     const { setTermsAccepted = null, isConfigure } = route.params || {};
     const [htmlContent, setHtmlContent] = useState('');
     const [showLoader, setShowLoader] = useState(true);
-
+    const { t } = useTranslation();
     useEffect(() => {
         getTerms();
     }, []);
@@ -50,7 +50,7 @@ const TermsAndConditions = () => {
                 {
                     !isConfigure ? 
                     <View style={styles.heading}>               
-                        <Text style={styles.termsHeading}>Terms and Conditions</Text>
+                        <Text style={styles.termsHeading}>{t('Terms&Conditions')}</Text>
                         {
                             Platform.OS === 'android' && 
                             <Text style={styles.subHeading}>By clicking Agree, you are accepting the terms below</Text>
@@ -70,10 +70,10 @@ const TermsAndConditions = () => {
                     !isConfigure &&
                     <View style={styles.footerContainer}>
                         <TouchableOpacity style={styles.btn} onPress={() => { setTermsAccepted(true), navigation.navigate('Signup') }} >
-                            <Text style={styles.btnText}>Agree</Text>
+                            <Text style={styles.btnText}>{t('Agree')}</Text>
                         </TouchableOpacity>
                         <TouchableWithoutFeedback onPress={() => { navigation.navigate('Signup') }} >
-                            <Text style={styles.btnCancel}>Cancel</Text>
+                            <Text style={styles.btnCancel}>{t('Cancel')}</Text>
                         </TouchableWithoutFeedback>
                     </View>
                 }
@@ -109,8 +109,7 @@ const styles = StyleSheet.create({
     },
     btn: {
         backgroundColor: config.secondaryColor,
-        height: 30,
-        width: 70,
+        padding:5,
         borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',

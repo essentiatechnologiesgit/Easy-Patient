@@ -3,12 +3,13 @@ import { View, Text, Dimensions, Image, StyleSheet, PixelRatio, ScrollView } fro
 import Modal from "react-native-modal";
 import config from "../../config.js";
 import CircleButton from "./CircleButton";
+import { useTranslation } from 'react-i18next';
 const Medications = () => {
-  
+    const { t } = useTranslation();
     return (
         <>
             <View style={styles.container}>
-                <Text style={styles.emptyText}>You don't have any medication or supplement reminders</Text>
+                <Text style={styles.emptyText}>{t('YouDont')}</Text>
                 <CircleButton title={"AddReminder"}/>
             </View>
         </>

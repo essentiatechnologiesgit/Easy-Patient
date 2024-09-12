@@ -16,9 +16,11 @@ import ModalLoader from '../components/ModalLoader';
 import qs from 'qs';
 import AlertIcon from '../components/AlertIcon';
 import OtpInput from '../components/OTPInput';
+import { useTranslation } from 'react-i18next';
 const SignupScreen = () => {
   const route = useRoute();
   const { params } = route.params || {};
+  const { t } = useTranslation();
   const scrollViewRef = useRef();
   const navigation = useNavigation();
   const [placeholderLabelAnim] = useState(new Animated.Value(selectedGender ? 1 : 0));
@@ -455,7 +457,7 @@ const SignupScreen = () => {
         <ValidationMessageError visible={IOSError} msg={errorMessage} setVisible={setIOSError} />
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
-        <Text style={styles.signup}>Signup</Text>
+        <Text style={styles.signup}>{t('Signup')}</Text>
         {!showForm && !verifyOTP && <View style={styles.signupContainer} >
           <View style={[styles.inputContainer, isEmailFocused && styles.focusedInput]}>
             <TextInput
@@ -501,11 +503,11 @@ const SignupScreen = () => {
               onTintColor={config.secondaryColor}
             />
 
-            <Text style={styles.textt}>I accept the </Text><Text onPress={() => {
+            <Text style={styles.textt}>{t('accept')}</Text><Text onPress={() => {
               navigation.navigate('TermsAndConditions', {
                 setTermsAccepted: setTermsAccepted,
               });
-            }} style={[{ textDecorationLine: 'underline' }, styles.text]}>Terms & Conditions</Text>
+            }} style={[{ textDecorationLine: 'underline' }, styles.text]}>{t('Terms&Conditions')}</Text>
           </View>
           <TouchableOpacity
             style={[termsAccepted ? { backgroundColor: config.secondaryColor } : { backgroundColor: 'rgba(0,0,0,0)' },
@@ -519,7 +521,7 @@ const SignupScreen = () => {
 
           <TouchableOpacity onPress={handleLogin}>
 
-            <Text style={styles.login}>I already have an account</Text>
+            <Text style={styles.login}>{t('alreadyAccount')}</Text>
           </TouchableOpacity>
 
         </View>
@@ -560,7 +562,7 @@ const SignupScreen = () => {
                   ref={(ref) => (errorRefs.current[1] = ref)}
                   style={styles.floatingLabel}>
                   <FloatingLabelInput
-                    label={'Full Name'}
+                    label={t('Full Name')}
                     inputStyles={styles.inputStyles}
                     customLabelStyles={styles.customLabelStyles}
                     value={fullName}
@@ -586,7 +588,7 @@ const SignupScreen = () => {
                         <>
                           <TextInput
                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
-                            placeholder="Date Of Birth"
+                            placeholder={t('Date Of Birth')}
                             placeholderTextColor={config.primaryColor}
                             editable={false}
                             value={date ? formattedDate : ""}
@@ -674,7 +676,7 @@ const SignupScreen = () => {
                       },
                     ]}
                   >
-                    Select Gender
+                    {t('Gender')}
                   </Animated.Text>
 
                   <DropDownPicker
@@ -709,7 +711,7 @@ const SignupScreen = () => {
                   ref={(ref) => (errorRefs.current[5] = ref)}
                   style={styles.floatingLabel}>
                   <FloatingLabelInput
-                    label={'Password'}
+                    label={t('Password')}
                     inputStyles={styles.inputStyles}
                     labelStyles={{ paddingHorizontal: 0 }}
                     customLabelStyles={styles.customLabelStyles}
@@ -739,7 +741,7 @@ const SignupScreen = () => {
                   ref={(ref) => (errorRefs.current[5] = ref)}
                   style={styles.floatingLabel}>
                   <FloatingLabelInput
-                    label={'Confirm Password'}
+                    label={t('CPassword')}
                     inputStyles={styles.inputStyles}
                     customLabelStyles={styles.customLabelStyles}
                     value={confirmPassword}
@@ -770,9 +772,9 @@ const SignupScreen = () => {
                   )}
                 </View>
                 <View style={{ width: '100%', marginTop: 40 }}>
-                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
+                  <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={t('Confirm')} />
                 </View>
-                <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>I already have an account</Text></TouchableOpacity>
+                <TouchableOpacity onPress={handleLogin}><Text style={styles.backLink}>{t('alreadyAccount')}</Text></TouchableOpacity>
               </View>
             </ScrollView>
 

@@ -5,15 +5,17 @@ import CustomButton from './CustomizedButton';
 import {
     WheelPicker,
 } from "react-native-wheel-picker-android";
+import { useTranslation } from 'react-i18next';
 const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
     const [selectedDuration, setSelectedDuration] = useState('Day');
     const [durationSelect, setDurationSelect] = useState(false);
     const [frequencyNumber, setFrequencyNumber] = useState('1');
+    const [heading , setHeading] = useState("")
     const handleCloseModal = () => {
         setDurationSelect(false);
         onClose();
     };
-
+    const { t } = useTranslation();
 
     const [selectedItem, setSelectedItem] = useState(0);
 
@@ -80,7 +82,7 @@ const BottomModal = ({ visible, onClose, setDuration, setFreNumber }) => {
                             <WheelPicker
                                 style={styles.picker}
                                 selectedItem={selectedItem}
-                                data={["Hour", "Day", "Week"]}
+                                data={[t('Hour'), t('Day'), t('Week')]}
                                 onItemSelected={handleItemSelected}
                                 selectedItemTextSize={28}
                                 itemTextColor={config.primaryColor}

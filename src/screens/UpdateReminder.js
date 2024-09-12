@@ -9,7 +9,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import CustomizedButton from '../components/CustomizedButton';
 import deleteIcon from '../assets/delete.png';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import ValidationError from '../components/ValidationError';
+import { useTranslation } from 'react-i18next';
 import moment from "moment";
 import CustomLabelInput from '../components/CustomLabelInput.js';
 import axios from 'axios';
@@ -79,7 +79,7 @@ const UpdateReminder = ({ route }) => {
     const [accessToken, setAccessToken] = useState('');
     const [MedImage, setMedImage] = useState('');
     const [default_icon, setDefaultIcon] = useState('');
-    const [newIcon, setNewIcon] = useState(false);
+    const { t } = useTranslation();
 
     const toggleNotifySwitch = () => {
         setIsNotify(previousState => !previousState);
@@ -111,9 +111,9 @@ const UpdateReminder = ({ route }) => {
     };
 
     const DaysArray = [
-        { label: 'Days', value: '1' },
-        { label: 'Weeks', value: '2' },
-        { label: 'Months', value: '3' },
+        { label: t('Days'), value: '1' },
+        { label: t('Weeks'), value: '2' },
+        { label: t('Months'), value: '3' },
     ];
     const handleOpen = () => setIsOpen(!isOpen);
 
@@ -609,7 +609,7 @@ const UpdateReminder = ({ route }) => {
 
                 </TouchableOpacity>
                 <TouchableWithoutFeedback onPress={() => navigation.navigate('MedicineImage', { selectedImageD: selectedImage, imageD: image, isUpdate: true, MedicineId: MedicineId })}>
-                    <Text style={styles.EditImage}>Edit Image</Text>
+                    <Text style={styles.EditImage}>{t('Edit')}</Text>
                 </TouchableWithoutFeedback>
                 <ScrollView ref={scrollViewRef} style={{ width: '100%', height: '100%' }} contentContainerStyle={{ alignItems: 'center' }}>
                     <View style={styles.signupFormContainer}>
@@ -617,7 +617,7 @@ const UpdateReminder = ({ route }) => {
                             ref={(ref) => (errorRefs.current[0] = ref)}
                             style={styles.floatingLabel}>
                             <FloatingLabelInput
-                                label={'Name of Medicine/Supplement'}
+                                label={t('Name of Medicine/Supplement')}
                                 inputStyles={styles.inputStyles}
                                 labelStyles={{ paddingHorizontal: 0 }}
                                 customLabelStyles={!medicineError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
@@ -643,14 +643,14 @@ const UpdateReminder = ({ route }) => {
                             <TouchableOpacity onPress={handlePressDatePicker}>
                                 <View style={!dateError ? styles.containerStyles : styles.containerStylesEmpty}>
                                     {fetchDateFormat && !formattedDate && (
-                                        <Text style={{ marginBottom: -10, color: config.primaryColor }}>Start Date and Time</Text>
+                                        <Text style={{ marginBottom: -10, color: config.primaryColor }}>{t('Date/Time')}</Text>
                                     )}
                                     {date ? (
-                                        <Text style={{ marginBottom: 8, color: config.primaryColor }}>Start Date and Time</Text>
+                                        <Text style={{ marginBottom: 8, color: config.primaryColor }}>{t('Date/Time')}</Text>
                                     ) : (
                                         <TextInput
                                             style={{ ...styles.inputStyles, marginTop: -16, marginBottom: 10, left: 5 }}
-                                            placeholder="Start Date and Time"
+                                            placeholder={t('Date/Time')}
                                             placeholderTextColor={!dateError ? config.primaryColor : 'red'}
                                             editable={false}
                                             value={date ? formattedDate : fetchDateFormat}
@@ -719,7 +719,7 @@ const UpdateReminder = ({ route }) => {
                                 ref={(ref) => (errorRefs.current[5] = ref)}
                                 style={{ ...styles.floatingLabelH, borderBottomWidth: 0.5, borderBottomColor: config.secondaryColor }}>
                                 <FloatingLabelInput
-                                    label={'Treatment Duration'}
+                                    label={t('NoDays')}
                                     inputStyles={styles.inputStyles}
                                     labelStyles={{ paddingHorizontal: 0 }}
                                     customLabelStyles={!daysError ? styles.customLabelStyles : styles.customLabelStylesEmpty}
@@ -745,7 +745,7 @@ const UpdateReminder = ({ route }) => {
                                     items={DaysArray}
                                     value={selectedDays}
                                     onSelectItem={handleSelect}
-                                    placeholder="Days"
+                                    placeholder={t('Days')}
                                     open={isOpen}
                                     showArrowIcon={true}
                                     onOpen={handleOpen}
@@ -761,8 +761,8 @@ const UpdateReminder = ({ route }) => {
                                         
                                     }}
                                     textStyle={{
-                                        fontSize: PixelRatio.getFontScale() * 18,
-                                        color:config.primaryColor
+                                        fontSize: PixelRatio.getFontScale() * 16,
+                                        color:config.textColorHeadings
                                     }}
                                     dropDownContainerStyle={{
                                         backgroundColor: 'white', 
@@ -785,10 +785,10 @@ const UpdateReminder = ({ route }) => {
                                 <>
                                     <View style={{ marginTop: 10, }}></View>
                                     <FloatingLabelInput
-                                        label={'Frequency'}
+                                        label={t('Frequency')}
                                         inputStyles={styles.inputStyles}
                                         customLabelStyles={styles.customLabelStyles}
-                                        value={`Every ${freNumber} ${duration}`}
+                                        value={`${t('Every')} ${freNumber} ${t(duration)}`}
                                         onChangeText={value => setFrequency(value)}
                                         containerStyles={styles.containerStyles}
                                         onPressOut={() => handleCounter()}
@@ -815,7 +815,7 @@ const UpdateReminder = ({ route }) => {
 
                                     }
                                     editable={false}
-                                    placeholder="Frequency"
+                                    placeholder={t('Frequency')}
                                     placeholderTextColor={!freNumberError ? 'gray' : 'red'}
                                     onChangeText={value => setFrequency(value)} // You can remove this line
                                 />
@@ -842,7 +842,7 @@ const UpdateReminder = ({ route }) => {
                                 onValueChange={toggleNotifySwitch}
                                 value={isNotify}
                             />
-                            <Text style={styles.NotifyText}>Notifications</Text>
+                            <Text style={styles.NotifyText}>{t('Notifications')}</Text>
                         </View>
                         <View style={styles.switchContainer}>
                             <Switch
@@ -853,18 +853,18 @@ const UpdateReminder = ({ route }) => {
                                 value={priority}
                             />
                             <View>
-                                <Text style={styles.NotifyText}>High priority</Text>
+                                <Text style={styles.NotifyText}>{t('HighPriority')}</Text>
                             </View>
                         </View>
                         <View style={styles.notifyContainer}>
-                            <Text style={styles.NotifyMsg}>Allow Easy Patient to make sound notifications even when you cell phone is in silent mode.</Text>
+                            <Text style={styles.NotifyMsg}>{t('AllowEasyPatients')}.</Text>
                         </View>
                         <View style={{ width: '95%', marginTop: 35 }}>
-                            <CustomizedButton onPress={() => handleConfirm()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={"Confirm"} />
+                            <CustomizedButton onPress={() => handleConfirm()} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={"white"} text={t('Confirm2')} />
                         </View>
                         <View style={{ width: '95%', marginTop: 25, marginBottom: 50, }}>
                             <Image source={deleteIcon} style={styles.deleteIcon} />
-                            <CustomizedButton onPress={() => handleDelete()} buttonColor={"white"} borderColor={"#a70000"} textColor={"#a70000"} text={"Delete"} />
+                            <CustomizedButton onPress={() => handleDelete()} buttonColor={"white"} borderColor={"#a70000"} textColor={"#a70000"} text={t('Delete')} />
                         </View>
                     </View>
                 </ScrollView>
@@ -1260,7 +1260,7 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 0,
         paddingTop: 30,
-        color: config.primaryColor
+        color: config.textColorHeadings
 
     }
 

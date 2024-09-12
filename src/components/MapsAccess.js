@@ -2,21 +2,16 @@ import React, { useEffect } from 'react';
 import { Image, View, StyleSheet, ImageBackground, Text, PixelRatio } from 'react-native';
 import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import handMap from '../assets/handMap.png';
-import CustomButton from './CustomizedButton';
-
-
+import { useTranslation } from 'react-i18next';
 const MapsAccess = () => {
     const navigation = useNavigation();
-
-    
-
+    const { t } = useTranslation();
     return (
         <View style={styles.parentContainer}>
-            <Text style={styles.heading}>Find the best route to your clinic</Text>
+            <Text style={styles.heading}>{t('routeHeading')}</Text>
             <Image source={handMap} style={styles.image} />
-            <Text style={styles.text}>Provide access to your location services to find the best routes to your clinics</Text>
+            <Text style={styles.text}>{t('routeParagraph')}</Text>
         </View>
     );
 };
@@ -38,6 +33,11 @@ const styles = StyleSheet.create({
         width: '60%',
         textAlign: 'center',
         marginTop: -40,
+        ...Platform.select({
+            ios: {
+              marginTop:20,
+            },
+          }),
     },
     image: {
         // marginTop:100,

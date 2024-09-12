@@ -7,9 +7,11 @@ import config from '../../config.js';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Share from 'react-native-share';
 import RNFetchBlob from 'react-native-blob-util';
+import { useTranslation } from 'react-i18next';
 import { PermissionsAndroid } from 'react-native';
 const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, title, record_id }) => {
     const navigation = useNavigation();
+    const { t } = useTranslation();
     const handleClick = () => {
         setShowDropDown(!showDropDown)
     }
@@ -66,7 +68,7 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
             }
     
             const options = {
-                fileCache: true,
+                // fileCache: true,
                 addAndroidDownloads: Platform.OS === 'android' ? {
                     useDownloadManager: true,
                     notification: true,
@@ -99,7 +101,7 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
                 <TouchableWithoutFeedback onPress={() => handleShare()}>
                     <View style={styles.lineContainer}>
                         <Image source={shareBlack} style={styles.share}></Image>
-                        <Text style={styles.text}>Share</Text>
+                        <Text style={styles.text}>{t('Share')}</Text>
                     </View>
                 </TouchableWithoutFeedback>
                 {
@@ -107,14 +109,14 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
                         <TouchableWithoutFeedback onPress={() => handleHide()}>
                             <View style={styles.lineContainer}>
                                 <Image source={archiveBlack} style={styles.archive}></Image>
-                                <Text style={styles.text}>Hide</Text>
+                                <Text style={styles.text}>{t('Hide')}</Text>
                             </View>
                         </TouchableWithoutFeedback>
                         :
                         <TouchableWithoutFeedback onPress={() => handleShow()}>
                             <View style={styles.lineContainer}>
                                 <Image source={archiveBlack} style={styles.archive}></Image>
-                                <Text style={styles.text}>Show</Text>
+                                <Text style={styles.text}>{t('Show')}</Text>
                             </View>
                         </TouchableWithoutFeedback>
                 }
@@ -122,7 +124,7 @@ const PrescriptionDropDown = ({ showDropDown, setShowDropDown, pdf, isArchived, 
                 <TouchableWithoutFeedback onPress={() => handleDownload()}>
                     <View style={styles.lineContainer}>
                         <Image source={downArrow} style={styles.arrow}></Image>
-                        <Text style={styles.text2}>Download</Text>
+                        <Text style={styles.text2}>{t('Download')}</Text>
                     </View>
                 </TouchableWithoutFeedback>
             </View>

@@ -2,15 +2,15 @@ import React from 'react';
 import { Image, View, StyleSheet, Text, PixelRatio } from 'react-native';
 import config from '../../config.js';
 import HealthInfo from '../assets/healthInfo.png';
-
+import { useTranslation } from 'react-i18next';
 const HealthIntroScreen = () => {
+    const { t } = useTranslation();
     return (
         <View style={styles.parentContainer}>
-            <Text style={styles.heading}>Control your Health</Text>
+            <Text style={styles.heading}>{t('HealthControlIntro')}</Text>
             <Image source={HealthInfo} style={styles.image} />
             <Text style={styles.text}>
-                Provide access to your health and physical activity data so your doctor can better understand your routine.
-            </Text>
+            {t('HealthIntroParagraph')} </Text>
         </View>
     );
 };

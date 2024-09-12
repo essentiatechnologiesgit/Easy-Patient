@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Modal, TouchableOpacity, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import CustomButton from './CustomizedButton';
+import { useTranslation } from 'react-i18next';
 import config from '../../config.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, reloadFunction,Medicine,dosage }) => {
     const [timeBoxes, setTimeBoxes] = useState(false);
+    const { t } = useTranslation();
     const EditTime = () => {
         setTimeBoxes(true);
     }
@@ -134,7 +135,7 @@ const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, 
             {
                 !timeBoxes &&
                 <>
-                    <Text style={styles.textHead}>Did you take your medicine?</Text>
+                    <Text style={styles.textHead}>{t('DidMedicine')}</Text>
                     <Text style={styles.textMed}>{Medicine}</Text>
                     <Text style={styles.textMed}>{dosage}</Text>
 
@@ -143,13 +144,13 @@ const CancelledAlarm = ({ AlarmId, medicineId, taken, timeUpdate, onCloseModal, 
                             style={styles.buttonA}
                             onPress={EditTime}
                         >
-                            <Text style={styles.textA}>Snooze</Text>
+                            <Text style={styles.textA}>{t('Snooze')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.button}
                             onPress={() => setTakenTrue()}
                         >
-                            <Text style={styles.text}>Yes</Text>
+                            <Text style={styles.text}>{t('Yes')}</Text>
                         </TouchableOpacity>
                     </View>
                 </>

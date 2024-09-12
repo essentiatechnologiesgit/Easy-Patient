@@ -12,9 +12,11 @@ import Snackbar from '../components/Snackbar';
 import Svg, { Path } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ValidationMessageError from '../components/ValidationMessageError';
+import { useTranslation } from 'react-i18next';
 import qs from 'qs';
 const ForgotPassword = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isConfirmPassFocused, setIsConfirmPassFocused] = useState(false);
@@ -346,7 +348,7 @@ const ForgotPassword = () => {
         <Image source={config.logo} style={styles.logo}></Image>
         <Image source={config.subLogo} style={styles.subLogo}></Image>
         {!showPassword &&
-          <Text style={styles.signup}>Forgot Password</Text>
+          <Text style={styles.signup}>{t('ForgotPassword')}</Text>
         }
         {!OTPbox && !showPassword &&
           <>
@@ -461,16 +463,16 @@ const ForgotPassword = () => {
 
 
         <View style={{ width: '100%', marginTop: 40 }}>
-          <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={"Confirm"} />
+          <CustomizedButton onPress={handleConfirm} buttonColor={config.secondaryColor} borderColor={config.secondaryColor} textColor={config.buttonText} text={t('Confirm')} />
         </View>
         {!OTPbox && !showPassword &&
           <>
             <TouchableOpacity onPress={handleRegister}>
-              <Text style={styles.login}>Register</Text>
+              <Text style={styles.login}>{t('Register')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleLogin}>
-              <Text style={styles.login}>I already have an account</Text>
+              <Text style={styles.login}>{t('alreadyAccount')}</Text>
             </TouchableOpacity>
           </>
         }

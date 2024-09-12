@@ -4,7 +4,7 @@ import config from '../../config.js';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import profileIcon from '../assets/profile.png';
 import { ScrollView } from 'react-native-gesture-handler';
-import arrow from '../assets/arrow.png';
+import { useTranslation } from 'react-i18next';
 import archive from '../assets/archive.png';
 import BackHeader from '../components/backHeader';
 import calendarGold from '../assets/calendarGold.png';
@@ -17,6 +17,7 @@ const Appointments = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const scrollViewRef = useRef();
+    const { t } = useTranslation();
     const isFocused = useIsFocused();
     const [showLoader, setShowLoader] = useState(true);
     const [appointmentsData, setAppointmentsData] = useState([]);
@@ -57,7 +58,7 @@ const Appointments = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"Appointments"} />
+                <BackHeader name={t('Appointments')} />
                 {
                     appointmentsData && appointmentsData.length > 0 ?
                         <ScrollView style={styles.scroll}>

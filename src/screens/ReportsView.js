@@ -64,7 +64,7 @@ const ReportsView = () => {
     return (
         <>
             <View style={styles.container}>
-                <BackHeader name={"View Reprots"} />
+                <BackHeader name={"View Reports"} />
                 <TouchableOpacity onPress={ToggleDropDown} style={styles.dotsContainer}>
                     <View style={styles.dot}></View>
                     <View style={styles.dot}></View>

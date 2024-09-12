@@ -9,15 +9,14 @@ import calendarDark from '../assets/calendarDark.png';
 import home from '../assets/homeLight.png';
 import jar from '../assets/jar.png';
 import jarLight from '../assets/jarLight.png';
-
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import config from "../../config.js";
 const Footer = (props) => {
     const navigation = useNavigation();
     const [indicatorPosition, setIndicatorPosition] = useState(0);
     const indicatorX = useRef(new Animated.Value(0)).current;
     const [activeTab, setActiveTab] = useState(0);
-
+    const { t } = useTranslation();
     useEffect(() => {
         setActiveTab(props.prop);
     }, [props.prop]);
@@ -43,7 +42,7 @@ const Footer = (props) => {
                     </Image>
                     {activeTab === 0 && <View style={styles.borderHome} />}
 
-                    <Text style={activeTab === 0 ? styles.textDark : styles.text}>Home</Text>
+                    <Text style={activeTab === 0 ? styles.textDark : styles.text}>{t('Home')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.touchable}
@@ -60,7 +59,7 @@ const Footer = (props) => {
                     <Text
                         style={activeTab === 1 ? styles.textDark : styles.text}
                     >
-                        Reminders
+                        {t('Reminders')}
                     </Text>
                 </TouchableOpacity>
 
@@ -75,14 +74,14 @@ const Footer = (props) => {
                     {activeTab === 2 && <View style={styles.border} />}
 
                     <Image source={activeTab === 2 ? calendarDark : calendar} style={styles.iconA}></Image>
-                    <Text style={activeTab === 2 ? styles.textDark : styles.text}>Appointments</Text>
+                    <Text style={activeTab === 2 ? styles.textDark : styles.text}>{t('Appointments')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.touchable}
                     onPress={() => navigateSidebar()}
                 >
                     <Image source={more} style={styles.iconM}></Image>
-                    <Text style={styles.text}>More</Text>
+                    <Text style={styles.text}>{t('More')}</Text>
                 </TouchableOpacity>
 
             </View >

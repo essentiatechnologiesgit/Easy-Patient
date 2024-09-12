@@ -414,7 +414,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 10"  
+          PROFILE_NAME="MyApp Distribution Profile 11"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -465,7 +465,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_11.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
@@ -481,7 +481,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>${{ env.BUNDLE_IDentifier }}</key> <!-- Replace with your actual Bundle Identifier -->
-                  <string>MyApp Distribution Profile 10</string> <!-- Replace with your Provisioning Profile Name -->
+                  <string>MyApp Distribution Profile 11</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>
           </plist>
@@ -624,8 +624,9 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 10" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 11" \
             CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
+            DEVELOPMENT_TEAM="${{ env.TEAM_ID }}"
 
       - name: Export IPA
         run: |
@@ -641,50 +642,27 @@ jobs:
           path: ios/build/archive/TestingIPA/*.ipa
 
 
-      - name: Get Upload Operation
-        id: get_upload_operation
+
+      # Step 4: Upload IPA to App Store Connect
+      - name: Upload IPA to App Store Connect
         run: |
-          response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "builds",
-                "attributes": {
-                  "buildType": "APP_STORE"
-                },
-                "relationships": {
-                  "app": {
-                    "data": {
-                      "type": "apps",
-                      "id": "'${{ env.APP_ID }}'"
-                    }
-                  }
-                }
-              }
-            }' \
-            "https://api.appstoreconnect.apple.com/v1/builds")
+          xcrun altool --upload-app \
+            -f ios/build/archive/TestingIPA/*.ipa \
+            -t ios \
+            --apiKey ${{ env.KEY_ID }} \
+            --apiIssuer ${{ env.ISSUER_ID }} \
+            --apiKeyPath ${{ env.PRIVATE_KEY_PATH }} \
+            --verbose
+
+      # Step 5: Wait for Upload Completion
+      - name: Wait for Upload Completion
+        run: |
+          echo "Waiting for the upload to be processed..."
       
-          echo "Response: $response"
-          
-          upload_id=$(echo $response | jq -r '.data.id')
-          upload_url=$(echo $response | jq -r '.data.attributes.uploadURL')
-          
-          if [ "$upload_id" == "null" ] || [ -z "$upload_id" ]; then
-            echo "Failed to retrieve upload ID."
-            exit 1
-          fi
-          
-          echo "upload_id=$upload_id" >> $GITHUB_ENV
-          echo "upload_url=$upload_url" >> $GITHUB_ENV
-
-
-      - name: Upload IPA File
-        run: |
-          curl -T "ios/build/archive/TestingArchive.xcarchive" "${{ env.upload_url }}" \
-            -H "Content-Type: application/octet-stream" \
-            --progress-bar
-
+          # You can introduce a delay to wait for processing
+          sleep 60  # Adjust this delay as needed
+      
+      # Step 6: Mark Upload as Completed
       - name: Mark Upload as Completed
         run: |
           response=$(curl -X PATCH \
@@ -702,7 +680,16 @@ jobs:
             "https://api.appstoreconnect.apple.com/v1/builds/${{ env.upload_id }}")
             
           echo "Response: $response"
-    
+      
+      # Step 7: Confirm Build Status
+      - name: Confirm Build Status
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            "https://api.appstoreconnect.apple.com/v1/builds/${{ env.upload_id }}")
+            
+          echo "Build Status Response: $response"    
 
 
 

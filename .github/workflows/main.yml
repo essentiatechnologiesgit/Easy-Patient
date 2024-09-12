@@ -638,7 +638,7 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 17" \
             CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}" \
             DEVELOPMENT_TEAM="${{ env.TEAM_ID }}" \
-            PRODUCT_BUNDLE_IDENTIFIER="${{ env.BUNDLE_IDENTIFIER }}"
+            PRODUCT_BUNDLE_IDENTIFIER="com.org.easyPatientTesting6"
 
       - name: Export IPA
         run: |

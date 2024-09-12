@@ -414,7 +414,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 12"  
+          PROFILE_NAME="MyApp Distribution Profile 13"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -465,7 +465,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_12.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_13.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
@@ -624,7 +624,7 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 12" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 13" \
             CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
             DEVELOPMENT_TEAM="${{ env.TEAM_ID }}"
 
@@ -643,10 +643,16 @@ jobs:
 
 
 
-      # Step 4: Upload IPA to App Store Connect
+      - name: Find IPA file
+        id: find_ipa
+        run: |
+          ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
+          echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
+      
       - name: Upload IPA to App Store Connect
         run: |
-          xcrun altool --upload-app -f ios/build/archive/TestingIPA/EasyPatientDynamic.ipa \
+          xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
+            -t ios \
             --apiKey ${{ secrets.KEY_ID }} \
             --apiIssuer ${{ secrets.ISSUER_ID }}
 

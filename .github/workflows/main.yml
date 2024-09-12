@@ -414,7 +414,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 11"  
+          PROFILE_NAME="MyApp Distribution Profile 12"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -465,7 +465,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_11.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_12.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
@@ -481,7 +481,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>${{ env.BUNDLE_IDentifier }}</key> <!-- Replace with your actual Bundle Identifier -->
-                  <string>MyApp Distribution Profile 11</string> <!-- Replace with your Provisioning Profile Name -->
+                  <string>MyApp Distribution Profile 12</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>
           </plist>
@@ -624,7 +624,7 @@ jobs:
             -configuration Release \
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
-            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 11" \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 12" \
             CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
             DEVELOPMENT_TEAM="${{ env.TEAM_ID }}"
 
@@ -646,13 +646,9 @@ jobs:
       # Step 4: Upload IPA to App Store Connect
       - name: Upload IPA to App Store Connect
         run: |
-          xcrun altool --upload-app \
-            -f ios/build/archive/TestingIPA/*.ipa \
-            -t ios \
-            --apiKey ${{ env.KEY_ID }} \
-            --apiIssuer ${{ env.ISSUER_ID }} \
-            --apiKeyPath ${{ env.PRIVATE_KEY_PATH }} \
-            --verbose
+          xcrun altool --upload-app -f ios/build/archive/TestingIPA/EasyPatientDynamic.ipa \
+            --apiKey ${{ secrets.KEY_ID }} \
+            --apiIssuer ${{ secrets.ISSUER_ID }}
 
       # Step 5: Wait for Upload Completion
       - name: Wait for Upload Completion

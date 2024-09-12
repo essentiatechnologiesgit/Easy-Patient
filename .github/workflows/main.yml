@@ -627,6 +627,7 @@ jobs:
 
       - name: Build Archive
         run: |
+          echo "PRODUCT_BUNDLE_IDENTIFIER is: ${{ env.BUNDLE_IDentifier }}"
           xcodebuild clean archive \
             -workspace ios/EasyPatientDynamic.xcworkspace \
             -scheme EasyPatientDynamic \
@@ -636,9 +637,10 @@ jobs:
             -derivedDataPath ios/build/DerivedData \
             -archivePath ios/build/archive/TestingArchive.xcarchive \
             PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 17" \
-            CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}" \
+            CODE_SIGN_IDENTITY="${{ env.CERTIFICATE_NAME }}" \
             DEVELOPMENT_TEAM="${{ env.TEAM_ID }}" \
-            PRODUCT_BUNDLE_IDENTIFIER="com.org.easyPatientTesting6"
+            PRODUCT_BUNDLE_IDENTIFIER="${{ env.BUNDLE_IDentifier }}"
+
 
       - name: Export IPA
         run: |

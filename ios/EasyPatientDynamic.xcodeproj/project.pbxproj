@@ -500,7 +500,7 @@
 					"$(inherited)",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.org.easypatientdynamic;
+				PRODUCT_BUNDLE_IDENTIFIER = com.org.easyPatientTesting3;
 				PRODUCT_NAME = EasyPatientDynamic;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Easy Patient Dynamic";
@@ -532,7 +532,7 @@
 					"$(inherited)",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.org.easypatientdynamic;
+				PRODUCT_BUNDLE_IDENTIFIER = com.org.easyPatientTesting3;
 				PRODUCT_NAME = EasyPatientDynamic;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Easy Patient Dynamic";

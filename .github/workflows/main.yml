@@ -2,7 +2,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - development
+      - FixesForiOSBuild
 
 jobs:
   build:
@@ -30,16 +30,16 @@ jobs:
         id: extract-variables
         run: |
           BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep 'ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
-          KEY_ID=$(grep 'KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
+          ISSUER_ID=$(grep -E '^  ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          KEY_ID=$(grep -E '^  KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
       
           # Handle the private key separately and save it to a file
-          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
+          awk '/^  private_key:/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key://g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
       
           echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV    
+          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV 
 
       - name: Echo extracted variables
         run: |
@@ -73,6 +73,17 @@ jobs:
           ")
           
           echo "token=$token" >> $GITHUB_ENV
+
+      - name: Save private key to default location
+        run: |
+          mkdir -p ~/.private_keys
+          cp ${{ env.PRIVATE_KEY_PATH }} ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+          chmod 600 ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+      
+      - name: Print private key contents (debugging, remove in production)
+        run: |
+          cat ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+
 
 
       - name: Fetch Bundle ID
@@ -414,7 +425,7 @@ jobs:
         run: |
           echo "Creating Distribution Provisioning Profile..."
           
-          PROFILE_NAME="MyApp Distribution Profile 9"  
+          PROFILE_NAME="MyApp Distribution Profile 17"  
           BUNDLE_ID="${BUNDLE_ID}"
           CERTIFICATE_ID="${{ env.CERTIFICATE_ID }}"  
           
@@ -465,7 +476,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
           # Decode the Base64 content and save it as a .mobileprovision file
-          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_9.mobileprovision
+          echo "$profile_content" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/MyApp_Distribution_Profile_17.mobileprovision
 
       - name: Create ExportOptions.plist
         run: |
@@ -480,8 +491,8 @@ jobs:
               <string>${{ env.TEAM_ID }}</string>
               <key>provisioningProfiles</key>
               <dict>
-                  <key>com.org.easypatientdynamic</key> <!-- Replace with your actual Bundle Identifier -->
-                  <string>MyApp Distribution Profile 9</string> <!-- Replace with your Provisioning Profile Name -->
+                  <key>${{ env.BUNDLE_IDentifier }}</key> <!-- Replace with your actual Bundle Identifier -->
+                  <string>MyApp Distribution Profile 17</string> <!-- Replace with your Provisioning Profile Name -->
               </dict>
           </dict>
           </plist>
@@ -614,117 +625,54 @@ jobs:
           cd ios
           xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-      # - name: Build Archive
-      #   run: |
-      #     xcodebuild clean archive \
-      #       -workspace ios/EasyPatientDynamic.xcworkspace \
-      #       -scheme EasyPatientDynamic \
-      #       -sdk iphoneos \
-      #       -destination generic/platform=iOS \
-      #       -configuration Release \
-      #       -derivedDataPath ios/build/DerivedData \
-      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 9" \
-      #       CODE_SIGN_IDENTITY="${CERTIFICATE_NAME}"
+      - name: Build Archive
+        run: |
+          echo "PRODUCT_BUNDLE_IDENTIFIER is: ${{ env.BUNDLE_IDentifier }}"
+          xcodebuild clean archive \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            -configuration Release \
+            -derivedDataPath ios/build/DerivedData \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 17" \
+            CODE_SIGN_IDENTITY="${{ env.CERTIFICATE_NAME }}" \
+            DEVELOPMENT_TEAM="${{ env.TEAM_ID }}" \
+            PRODUCT_BUNDLE_IDENTIFIER="${{ env.BUNDLE_IDentifier }}"
 
-      # - name: Export IPA
-      #   run: |
-      #     xcodebuild -exportArchive \
-      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       -exportOptionsPlist ios/ExportOptions.plist \
-      #       -exportPath ios/build/archive/TestingIPA
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath ios/build/archive/TestingIPA
       
-      # - name: Upload IPA as Artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: TestingIPA
-      #     path: ios/build/archive/TestingIPA/*.ipa
+      - name: Upload IPA as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestingIPA
+          path: ios/build/archive/TestingIPA/*.ipa
 
 
-      # - name: Update App Metadata
+
+      # - name: Find IPA file
+      #   id: find_ipa
       #   run: |
-      #     python <<EOF
-      #     import os
-      #     import requests
-          
-      #     app_id = "36FLSCQT6V"  # The ID of the app you want to update
-      #     token = os.getenv('token')  # Your JWT token for authorization
+      #     ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
+      #     echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
       
-      #     # Define the metadata you want to update
-      #     metadata = {
-      #         "data": {
-      #             "type": "apps",
-      #             "id": app_id,
-      #             "attributes": {
-      #                 "name": "Health App",
-      #                 "subtitle": "New Subtitle",
-      #                 "description": "Updated app description.",
-      #                 "keywords": "keyword1, keyword2",
-      #                 "supportUrl": "https://support.example.com",
-      #                 "marketingUrl": "https://marketing.example.com",
-      #                 "privacyPolicyUrl": "https://privacy.example.com",
-      #                 "primaryCategory": "6021",  # Example category ID for "Business"
-      #                 "secondaryCategory": "6011",  # Example category ID for "Productivity"
-      #                 "ageRating": "12+"  
-      #             }
-      #         }
-      #     }
-      
-      #     url = f"https://api.appstoreconnect.apple.com/v1/apps/{app_id}"
-      #     headers = {
-      #         "Authorization": f"Bearer {token}",
-      #         "Content-Type": "application/json"
-      #     }
-      
-      #     response = requests.patch(url, json=metadata, headers=headers)
-      
-      #     if response.status_code == 200:
-      #         print("App metadata updated successfully")
-      #     else:
-      #         print("Failed to update app metadata")
-      #         print(response.status_code)
-      #         print(response.json())
-      #         exit(1)
-      #     EOF
-
-            # - name: Revoke the hardcoded certificate
+      # - name: Upload IPA to App Store Connect
       #   run: |
-      #     import requests
-      #     import os
+      #     xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
+      #       -t ios \
+      #       --apiKey ${{ env.KEY_ID }} \
+      #       --apiIssuer ${{ env.ISSUER_ID }}
 
-      #     # Hardcoded JWT and Certificate ID
-       
-      #     certificate_id = "LDXBV2688Z"
+ 
 
-      #     # API URL
-      #     url = f"https://api.appstoreconnect.apple.com/v1/certificates/{certificate_id}"
-      #     headers = {
-      #         "Authorization": f"Bearer {os.getenv('token')}",
-      #     }
-          
-      #     # Making the DELETE request to revoke the certificate
-      #     response = requests.delete(url, headers=headers)
-          
-      #     # Print the status and response content
-      #     print(f"Status Code: {response.status_code}")
-      #     if response.status_code == 204:
-      #         print("Certificate revoked successfully.")
-      #     else:
-      #         print("Failed to revoke certificate.")
-      #         print(response.text)
-      #   shell: python
 
-            # - name: Retrieve All App IDs
-      #   run: |
-      #     echo "Retrieving App IDs..."
-      #     response=$(curl -s -X GET https://api.appstoreconnect.apple.com/v1/bundleIds \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json")
-          
-      #     echo "$response" > bundle_ids.json
-      #     echo "Bundle IDs Response: $response"
 
-      #     # # Extract and print App IDs
-      #     # bundle_ids=$(jq -r '.data[].id' bundle_ids.json)
-      #     # echo "App IDs: $bundle_ids"
-      #     # echo "bundle_ids=$bundle_ids" >> $GITHUB_ENV
+
+     

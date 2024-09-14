@@ -1,30 +1,30 @@
-const config = {
-  splashScreen: require('./src/assets/splash.jpg'),
-  primaryColor: '#82848D',
-  textColorHeadings: '#2A2A31',
-  secondaryColor: '#C1AB60',
-  tertiaryColor: '#fff',
-  logo: require('./src/assets/logo.png')  ,
-  backgroundImage: require('./src/assets/background-image.png'),
-  backgroundColorImage: '#EEF6F8',
-  backgroundImageType: 'png',
-  subLogo: require('./src/assets/sub-logo.png'),
-  backgroundColor: '#FFFFFF',
-  modalColor: '#FFFFFF',
-  buttonText: '#FFFFFF',
-  headerColor: '#FFFFFF',
-  fontStyle: 'OpenSans-Regular',
-  BUNDLE_ID: 'com.org.easyPatientTesting6',
-  NAME: 'Easy Patient Testing 6',
-  ISSUER_ID:"ad39d400-3314-48f8-977c-29a272eebad0",
-  KEY_ID:"74H4QHFPVP",
-  private_key:`
-  -----BEGIN PRIVATE KEY-----
-  MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-  pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-  6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-  +EG+nw8t
-  -----END PRIVATE KEY-----
-  `,
-};
-module.exports = config;
+
+    const config = {
+      splashScreen: require('src/assets/screenshot_dashboard.png'),
+      primaryColor: '#795252',
+      secondaryColor: '#473535',
+      tertiaryColor: '#5c2929',
+      logo: require('src/assets/pic2.drawio.png'),
+      backgroundImage: require('src/assets/screenshot_dashboard.png'),
+      backgroundColorImage: '',
+      backgroundImageType: 'png',
+      subLogo: require('src/assets/WhatsApp Image 2024-03-21 at 4.08.18 PM (1).jpeg'),
+      backgroundColor: '',
+      modalColor: '#8a5252',
+      buttonText: '#aa5c5c',
+      headerColor: '#361010',
+      fontStyle: 'OpenSans-Regular',
+      BUNDLE_ID: 'com.org.Asd',
+      Name: 'asd',
+      appIcon: 'src/assets/screenshot_dashboard.png',
+      shortDescription: 'ads',
+      fullDescription: 'ads',
+      appCategory: 'ads',
+      contentRating: 'asd',
+      releaseNotes: 'asd',
+      tags: 'asd',
+      buttonTextColor: '#aa5c5c'
+    };
+    
+    module.exports = config;
+    

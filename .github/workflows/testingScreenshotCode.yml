@@ -1,0 +1,36 @@
+name: iOS Screenshot Upload
+on:
+  push:
+    branches:
+      - ScreenshotBuild
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+  
+  
+      - name: Create iPhone 8 Plus Simulator
+        run: |
+          # Set variables
+          SIMULATOR_NAME="My iPhone 8 Plus"
+          DEVICE_TYPE_IDENTIFIER="com.apple.CoreSimulator.SimDeviceType.iPhone-8-Plus"
+  
+          # Create the simulator
+          xcrun simctl create "$SIMULATOR_NAME" "$DEVICE_TYPE_IDENTIFIER"
+  
+          # List devices and extract UDID of the iPhone 8 Plus
+          DEVICE_UDID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep -oE '[A-F0-9\-]{36}')
+  
+          # Check if the UDID was found
+          if [ -z "$DEVICE_UDID" ]; then
+            echo "Error: Could not find the UDID for $SIMULATOR_NAME"
+            exit 1
+          fi
+  
+          # Boot the simulator
+          xcrun simctl boot "$DEVICE_UDID"
+
+
+

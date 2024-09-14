@@ -4,7 +4,8 @@ import Header from './src/components/Header';
 import AppNavigator from './src/navigation/AppNavigator';
 import config from './config.js';
 import BackgroundService from './src/components/BackgroundService';
-
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
 const App: React.FC = () => {
   useEffect(() => {
 

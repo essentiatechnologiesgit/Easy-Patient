@@ -11,19 +11,19 @@
       subLogo: require(''),
       backgroundColor: '',
       modalColor: '#8a5252',
-      buttonText: '#702d2d',
-      headerColor: '#865a5a',
+      buttonText: '#490101',
+      headerColor: '#813636',
       fontStyle: 'OpenSans-Regular',
-      BUNDLE_ID: 'com.org.E',
-      Name: 'e',
+      BUNDLE_ID: 'com.org.J',
+      Name: 'j',
       appIcon: '',
-      shortDescription: 'j',
-      fullDescription: 'k',
-      appCategory: 'k',
-      contentRating: 'k',
-      releaseNotes: 'k',
-      tags: 'k',
-      buttonTextColor: '#702d2d'
+      shortDescription: 'i',
+      fullDescription: 'i',
+      appCategory: 'i',
+      contentRating: 'i',
+      releaseNotes: 'i',
+      tags: 'i',
+      buttonTextColor: '#490101'
     };
     
     module.exports = config;

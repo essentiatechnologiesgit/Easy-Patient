@@ -44,5 +44,5 @@ jobs:
       - name: Deploy Android app to Google Play
         run: |
           cd android
-          bundle install
+          sudo bundle install
           bundle exec fastlane android deploy

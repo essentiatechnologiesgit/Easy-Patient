@@ -14,13 +14,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set Up JDK
-        uses: actions/setup-java@v2 
+        uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'  
+          distribution: 'temurin'
 
       - name: Install Dependencies
         run: npm install --force
+
+      - name: Ensure gradlew is executable
+        run: chmod +x android/gradlew
 
       - name: Build Project
         run: |

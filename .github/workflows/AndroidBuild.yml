@@ -25,16 +25,13 @@ jobs:
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
-      # - name: Build Project
-      #   run: |
-      #     cd android
-      #     ./gradlew assembleRelease
-
-      - name: Install Fastlane
+      - name: Install Fastlane and Bundler
         run: |
+          sudo gem install bundler
           sudo gem install fastlane
 
       - name: Deploy Android app to Google Play
         run: |
           cd android
+          bundle install
           bundle exec fastlane android deploy

@@ -34,6 +34,7 @@ jobs:
         run: |
           sudo gem install fastlane
 
-      - name: Run Fastlane Deploy
+      - name: Deploy Android app to Google Play
         run: |
-          fastlane android deploy
+          cd android
+          bundle exec fastlane android deploy

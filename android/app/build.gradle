@@ -92,7 +92,7 @@ android {
         release {
             keyAlias 'new-key-alias' 
             keyPassword 'easypatient'
-            storeFile file("${rootProject.projectDir}/android/app/new-release-key.jks") // Path to your keystore file
+            storeFile file("${rootProject.projectDir}/app/new-release-key.jks") // Path to your keystore file
             storePassword 'easypatient'
         }
     }

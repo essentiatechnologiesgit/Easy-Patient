@@ -1,9 +1,10 @@
-name: Android Build
+name: Android Build and Deploy
 
 on:
   push:
     branches:
       - FixesForiOSBuild
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,3 +29,11 @@ jobs:
         run: |
           cd android
           ./gradlew assembleRelease
+
+      - name: Install Fastlane
+        run: |
+          sudo gem install fastlane
+
+      - name: Run Fastlane Deploy
+        run: |
+          fastlane android deploy

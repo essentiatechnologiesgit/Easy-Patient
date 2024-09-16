@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - FixesForiOSBuild
-
 jobs:
   build:
     runs-on: ubuntu-latest

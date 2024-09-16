@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@notifee/react-native": "^7.8.2",
+    "@octokit/rest": "^21.0.2",
     "@react-native-async-storage/async-storage": "^1.22.3",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "^7.6.3",
@@ -28,6 +29,7 @@
     "expo-crypto": "^12.8.1",
     "express": "^4.19.2",
     "firebase": "^10.10.0",
+    "fs-extra": "^11.2.0",
     "i18next": "^23.15.1",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^2.6.1",

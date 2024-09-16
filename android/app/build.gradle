@@ -89,6 +89,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            keyAlias 'new-key-alias' 
+            keyPassword 'easypatient'
+            storeFile file('C:/Users/Qavi Technologies/Documents/reactnative/android/app/new-release-key.jks') // Path to your keystore file
+            storePassword 'easypatient'
+        }
     }
     buildTypes {
         debug {
@@ -97,8 +103,8 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
+            signingConfig signingConfigs.release
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }

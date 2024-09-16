@@ -10,26 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Set up JDK version 17 using Temurin distribution
       - name: Set Up JDK
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin'
 
+      # Install Node.js and NPM dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # or any preferred Node.js version
+
       - name: Install Dependencies
         run: npm install --force
 
+      # Ensure that gradlew has execution permissions
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
+      # Set up Fastlane and Bundler for deployment
       - name: Install Fastlane and Bundler
         run: |
           sudo gem install bundler
           sudo gem install fastlane
 
+      # Deploy Android app to Google Play Store using Fastlane
       - name: Deploy Android app to Google Play
         run: |
           cd android

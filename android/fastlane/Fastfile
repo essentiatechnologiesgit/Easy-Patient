@@ -16,16 +16,17 @@
 default_platform(:android)
 
 platform :android do
-  desc "Deploy Android app to Google Play"
-  lane :deploy do
-    gradle(
-      task: "assemble",
-      build_type: "release"
-    )
-    supply(
-      apk: "./app/build/outputs/apk/release/app-release.apk", # Path to your APK
-      track: "internal",  # You can set this to 'alpha', 'beta', 'production'
-      json_key: "fastlane/easy-patient-a6d4e-60ad241e00ca.json"  # Path to your Google Play service account JSON
-    )
-  end
+    # LANE 1
+    desc "Publish a new version to the Google Play (INTERNAL)"
+    lane :internal do
+
+        # Generate AAB file
+        gradle(
+        task: "bundle",
+        build_type: "Release"
+        )
+
+        # Upload the AAB to play store (internal track)
+        upload_to_play_store(track: 'internal')
+    end
 end

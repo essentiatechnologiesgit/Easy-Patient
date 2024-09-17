@@ -28,7 +28,7 @@ platform :android do
 
         # Upload AAB to Play Store (first-time deployment)
         supply(
-          aab: "./android/app/build/outputs/bundle/release/app-release.aab", # Path to your AAB
+          aab: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build/outputs/bundle/release/app-release.aab",
           track: "internal",  # Set this to 'internal', 'alpha', 'beta', 'production'
           skip_upload_metadata: true, # Skip metadata upload for the first time (optional)
           skip_upload_images: true,   # Skip image upload for now (optional)

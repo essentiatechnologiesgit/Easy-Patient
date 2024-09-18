@@ -29,17 +29,18 @@ jobs:
       - name: Extract variables from config.js
         id: extract-variables
         run: |
-          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep -E '^  ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          KEY_ID=$(grep -E '^  KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-      
-          # Handle the private key separately and save it to a file
-          awk '/^  private_key:/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key://g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
-      
+          BUNDLE_IDentifier=$(grep -E '^ *BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          ISSUER_ID=$(grep -E '^ *ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          KEY_ID=$(grep -E '^ *KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          
+          # Extracting the private key block correctly
+          awk '/private_key: `/,/^ *`/' ${{ github.workspace }}/config.js | sed -e 's/private_key: //g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
+          
           echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV 
+          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
+ 
 
       - name: Echo extracted variables
         run: |

@@ -32,14 +32,19 @@ jobs:
           BUNDLE_IDentifier=$(grep -E '^ *BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
           ISSUER_ID=$(grep -E '^ *ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
           KEY_ID=$(grep -E '^ *KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          
+          # Extract the private key block correctly
+          awk '/private_key: /,/\n *`/' ${{ github.workspace }}/config.js | sed -e 's/private_key: //g' -e 's/^ *//g' -e 's/`//g' -e '/^$/d' > private_key.pem
       
-          # Extract the private key block correctly and handle multiline content
-          awk '/private_key: `/,/^ *`/' ${{ github.workspace }}/config.js | sed -e 's/private_key: //g' -e 's/^ *//g' -e '/^$/d' -e 's/\\n/\n/g' > private_key.pem
+          # Print private key for verification (remove or comment this in production)
+          echo "Private key content:"
+          cat private_key.pem
       
           echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
           echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
+
       
       - name: Echo extracted variables
         run: |

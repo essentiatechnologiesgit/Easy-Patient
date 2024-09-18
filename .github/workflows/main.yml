@@ -47,6 +47,11 @@ jobs:
           echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
           echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
           echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+
+      - name: Print private key
+        run: |
+          echo "Private key content:"
+          cat ${{ env.PRIVATE_KEY_PATH }}
       
       - name: Generate JWT
         id: generate_jwt

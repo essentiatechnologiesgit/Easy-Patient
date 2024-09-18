@@ -32,32 +32,36 @@ jobs:
           BUNDLE_IDentifier=$(grep -E '^ *BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
           ISSUER_ID=$(grep -E '^ *ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
           KEY_ID=$(grep -E '^ *KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          
-          # Extracting the private key block correctly
-          awk '/private_key: `/,/^ *`/' ${{ github.workspace }}/config.js | sed -e 's/private_key: //g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
-          
+      
+          # Extract the private key block correctly and handle multiline content
+          awk '/private_key: `/,/^ *`/' ${{ github.workspace }}/config.js | sed -e 's/private_key: //g' -e 's/^ *//g' -e '/^$/d' -e 's/\\n/\n/g' > private_key.pem
+      
           echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
           echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
           echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
- 
-
+      
       - name: Echo extracted variables
         run: |
           echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
           echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
           echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
           echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
-
+      
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
-
+          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+      
           token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            require 'openssl'
+            require 'jwt'
+            private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
+            $private_key
+            KEY
+            )
             token = JWT.encode(
               {
                 iss: '$ISSUER_ID',
@@ -72,7 +76,7 @@ jobs:
             )
             puts token
           ")
-          
+      
           echo "token=$token" >> $GITHUB_ENV
 
       - name: Save private key to default location

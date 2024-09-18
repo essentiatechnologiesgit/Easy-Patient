@@ -16,8 +16,8 @@
       headerColor: '#865a5a',
       BUNDLE_ID: 'com.org.easypatient',
       Name: 'asd',
-      ISSUER_ID: "asd",
-      KEY_ID: "asd",
+      ISSUER_ID: "ad39d400-3314-48f8-977c-29a272eebad0",
+      KEY_ID: "74H4QHFPVP",
       private_key: '
         -----BEGIN PRIVATE KEY-----
   MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf

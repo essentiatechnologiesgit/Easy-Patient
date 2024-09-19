@@ -3,7 +3,7 @@ name: Android Build and Deploy
 on:
   push:
     branches:
-      - FixesForiOSBuild
+      - FixesForiOSBuilds
 
 jobs:
   build:
@@ -33,20 +33,41 @@ jobs:
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
-      - name: Build Project
+      # Build Project to generate .aab file
+      - name: Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      # Build Project to generate .apk file
+      - name: Build APK
         run: |
           cd android
           ./gradlew assembleRelease
 
+      # Upload the .aab file as an artifact
+      - name: Upload AAB file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+      # Upload the .apk file as an artifact
+      - name: Upload APK file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
       # Set up Fastlane and Bundler for deployment
-      - name: Install Fastlane and Bundler
-        run: |
-          sudo gem install bundler
-          sudo gem install fastlane
+      # - name: Install Fastlane and Bundler
+      #   run: |
+      #     sudo gem install bundler
+      #     sudo gem install fastlane
 
       # Deploy Android app to Google Play Store using Fastlane
-      - name: Deploy Android app to Google Play
-        run: |
-          cd android
-          sudo bundle install
-          bundle exec fastlane internal
+      # - name: Deploy Android app to Google Play
+      #   run: |
+      #     cd android
+      #     sudo bundle install
+      #     bundle exec fastlane internal

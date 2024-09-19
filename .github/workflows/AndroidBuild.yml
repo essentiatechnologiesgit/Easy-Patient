@@ -3,7 +3,7 @@ name: Android Build and Deploy
 on:
   push:
     branches:
-      - FixesForiOSBuilds
+      - FixesForiOSBuild
 
 jobs:
   build:

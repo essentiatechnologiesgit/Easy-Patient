@@ -8,7 +8,7 @@ const app = express();
 const PORT = 4000;
 
 // GitHub API configuration
-const GITHUB_TOKEN = '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'; // Replace with your GitHub Personal Access Token
+const GITHUB_TOKEN = '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'; // Replace with your GitHub Personal Access Token
 const REPO_OWNER = 'essentiatechnologiesgit'; // GitHub username or organization
 const REPO_NAME = 'Easy-Patient'; // Repository name
 const BASE_BRANCH = 'FixesForiOSBuild'; // Base branch for the new branch
@@ -70,10 +70,10 @@ app.post('/update-config', upload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'backgroundImage', maxCount: 1 },
   { name: 'subLogo', maxCount: 1 },
-  { name: 'appIcon', maxCount: 1 }
+ 
 ]), async (req, res) => {
   const newConfig = req.body;
-  const fileFields = ['splashScreen', 'logo', 'backgroundImage', 'subLogo', 'appIcon'];
+  const fileFields = ['splashScreen', 'logo', 'backgroundImage', 'subLogo'];
   const filePaths = {};
   const branchName = `update-config-${Date.now()}`;
 
@@ -97,10 +97,41 @@ app.post('/update-config', upload.fields([
     console.log('Created new branch:', branchName);
 
     // Step 3: Prepare config.js content
+    // const configContent = `
+    // const config = {
+    // splashScreen: require('./src/assets/${req.files['splashScreen'] ? req.files['splashScreen'][0].originalname : ''}'),
+    //   primaryColor: '${newConfig.primaryColor}',
+    //   secondaryColor: '${newConfig.secondaryColor}',
+    //   tertiaryColor: '${newConfig.tertiaryColor}',
+    //   logo: require('./src/assets/${req.files['logo'] ? req.files['logo'][0].originalname : ''}'),
+    //   backgroundImage: require('./src/assets/${req.files['backgroundImage'] ? req.files['backgroundImage'][0].originalname : ''}'),
+    //   backgroundColorImage: '${newConfig.backgroundColorImage || ''}',
+    //   backgroundImageType: 'png',
+    //   subLogo: require('./src/assets/${req.files['subLogo'] ? req.files['subLogo'][0].originalname : ''}'),
+    //   backgroundColor: '${newConfig.backgroundColor || ''}',
+    //   modalColor: '${newConfig.modalColor}',
+    //   buttonText: '${newConfig.buttonTextColor}',
+    //   headerColor: '${newConfig.headerColor}',
+    //   fontStyle: 'OpenSans-Regular',
+    //   BUNDLE_ID: 'com.org.${formatAppName(newConfig.appName)}',
+    //   Name: '${newConfig.appName}',
+    //   appIcon: require('./src/assets/${req.files['appIcon'] ? req.files['appIcon'][0].originalname : ''}'),
+    //   shortDescription: '${newConfig.shortDescription}',
+    //   fullDescription: '${newConfig.fullDescription}',
+    //   appCategory: '${newConfig.appCategory}',
+    //   contentRating: '${newConfig.contentRating}',
+    //   releaseNotes: '${newConfig.releaseNotes}',
+    //   tags: '${newConfig.tags}',
+    //   buttonTextColor: '${newConfig.buttonTextColor}'
+    // };
+
+    // module.exports = config;
+    // `;
     const configContent = `
     const config = {
-    splashScreen: require('./src/assets/${req.files['splashScreen'] ? req.files['splashScreen'][0].originalname : ''}'),
+      splashScreen: require('./src/assets/${req.files['splashScreen'] ? req.files['splashScreen'][0].originalname : ''}'),
       primaryColor: '${newConfig.primaryColor}',
+      textColorHeadings: '#2A2A31',
       secondaryColor: '${newConfig.secondaryColor}',
       tertiaryColor: '${newConfig.tertiaryColor}',
       logo: require('./src/assets/${req.files['logo'] ? req.files['logo'][0].originalname : ''}'),
@@ -108,31 +139,25 @@ app.post('/update-config', upload.fields([
       backgroundColorImage: '${newConfig.backgroundColorImage || ''}',
       backgroundImageType: 'png',
       subLogo: require('./src/assets/${req.files['subLogo'] ? req.files['subLogo'][0].originalname : ''}'),
-      backgroundColor: '${newConfig.backgroundColor || ''}',
+      backgroundColor: '#FFFFFF',
       modalColor: '${newConfig.modalColor}',
       buttonText: '${newConfig.buttonTextColor}',
       headerColor: '${newConfig.headerColor}',
-      fontStyle: 'OpenSans-Regular',
-      BUNDLE_ID: 'com.org.${formatAppName(newConfig.appName)}',
+      BUNDLE_ID: '${newConfig.BUNDLE_ID}',
       Name: '${newConfig.appName}',
-      appIcon: require('./src/assets/${req.files['appIcon'] ? req.files['appIcon'][0].originalname : ''}'),
-      shortDescription: '${newConfig.shortDescription}',
-      fullDescription: '${newConfig.fullDescription}',
-      appCategory: '${newConfig.appCategory}',
-      contentRating: '${newConfig.contentRating}',
-      releaseNotes: '${newConfig.releaseNotes}',
-      tags: '${newConfig.tags}',
-      buttonTextColor: '${newConfig.buttonTextColor}'
+      ISSUER_ID: '${newConfig.ISSUER_ID}',
+      KEY_ID: '${newConfig.KEY_ID}',
+      private_key: \`
+    ${newConfig.private_key}
+      \`,
     };
     
     module.exports = config;
     `;
-    function formatAppName(appName) {
-      return appName
-        .replace(/\s+/g, '')
-        .replace(/[^a-zA-Z0-9]/g, '')
-        .replace(/^[a-z]/, char => char.toUpperCase());
-    }
+    
+    
+
+    console.log(configContent);
 
     // Step 4: Create the tree and commit for config.js update
     const treeDataConfig = [
@@ -149,7 +174,7 @@ app.post('/update-config', upload.fields([
       base_tree: baseBranchSHA,
     }, {
       headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Authorization': `token ${ GITHUB_TOKEN } `,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
       }
@@ -163,7 +188,7 @@ app.post('/update-config', upload.fields([
       parents: [baseBranchSHA],
     }, {
       headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Authorization': `token ${ GITHUB_TOKEN } `,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
       }
@@ -172,78 +197,78 @@ app.post('/update-config', upload.fields([
     // Step 5: Update the branch to point to the second commit
     await axios.patch(
       `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/${branchName}`,
-      { sha: commitRes.data.sha }, // FIX: Extract the commit SHA here
-      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
+    { sha: commitRes.data.sha }, // FIX: Extract the commit SHA here
+    { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
     );
 
-    console.log("Here");
+console.log("Here");
 
-    // Step 2: Upload files (images)
-    for (const field of fileFields) {
-      if (req.files[field]) {
-        const fileName = req.files[field][0].originalname;
-        const fileContent = req.files[field][0].buffer.toString('base64');
-        await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, branchName);
-        filePaths[field] = `src/assets/${fileName}`;
-      }
-    }
-
-    // Now work for existing branch "ScreenshotBuild"
-    // Get SHA of the existing branch `ScreenshotBuild`
-    const existingBranchUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/${EXISTING_BRANCH}`;
-    const existingBranchRes = await axios.get(existingBranchUrl, { headers: { Authorization: `token ${GITHUB_TOKEN}` } });
-    const existingBranchSHA = existingBranchRes.data.object.sha;
-
-    // Step 1: Create a new tree for the existing branch with the config update
-    const existingTreeRes = await axios.post(createTreeUrl, {
-      tree: treeDataConfig,
-      base_tree: existingBranchSHA,
-    }, {
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-      }
-    });
-
-    const newExistingTreeSHA = existingTreeRes.data.sha;
-
-    // Step 2: Commit the changes to the existing branch
-    const existingCommitRes = await axios.post(createCommitUrl, {
-      message: commitMessage,
-      tree: newExistingTreeSHA,
-      parents: [existingBranchSHA],
-    }, {
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-      }
-    });
-
-    // Step 3: Update the existing branch to point to the new commit
-    await axios.patch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/${EXISTING_BRANCH}`,
-      { sha: existingCommitRes.data.sha },
-      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
-    );
-
-    for (const field of fileFields) {
-      if (req.files[field]) {
-        const fileName = req.files[field][0].originalname;
-        const fileContent = req.files[field][0].buffer.toString('base64');
-        await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, EXISTING_BRANCH);
-        filePaths[field] = `src/assets/${fileName}`;
-      }
-    }
-
-    console.log(`Updated existing branch: ${EXISTING_BRANCH}`);
-
-    res.status(200).send('Config and files uploaded successfully!');
-  } catch (error) {
-    console.error('Error updating branch:', error.message);
-    res.status(500).send('Error updating the branch');
+// Step 2: Upload files (images)
+for (const field of fileFields) {
+  if (req.files[field]) {
+    const fileName = req.files[field][0].originalname;
+    const fileContent = req.files[field][0].buffer.toString('base64');
+    await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, branchName);
+    filePaths[field] = `src/assets/${fileName}`;
   }
+}
+
+// Now work for existing branch "ScreenshotBuild"
+// Get SHA of the existing branch `ScreenshotBuild`
+const existingBranchUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/${EXISTING_BRANCH}`;
+const existingBranchRes = await axios.get(existingBranchUrl, { headers: { Authorization: `token ${GITHUB_TOKEN}` } });
+const existingBranchSHA = existingBranchRes.data.object.sha;
+
+// Step 1: Create a new tree for the existing branch with the config update
+const existingTreeRes = await axios.post(createTreeUrl, {
+  tree: treeDataConfig,
+  base_tree: existingBranchSHA,
+}, {
+  headers: {
+    'Authorization': `token ${GITHUB_TOKEN}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json',
+  }
+});
+
+const newExistingTreeSHA = existingTreeRes.data.sha;
+
+// Step 2: Commit the changes to the existing branch
+const existingCommitRes = await axios.post(createCommitUrl, {
+  message: commitMessage,
+  tree: newExistingTreeSHA,
+  parents: [existingBranchSHA],
+}, {
+  headers: {
+    'Authorization': `token ${GITHUB_TOKEN}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json',
+  }
+});
+
+// Step 3: Update the existing branch to point to the new commit
+await axios.patch(
+  `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/refs/heads/${EXISTING_BRANCH}`,
+  { sha: existingCommitRes.data.sha },
+  { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
+);
+
+for (const field of fileFields) {
+  if (req.files[field]) {
+    const fileName = req.files[field][0].originalname;
+    const fileContent = req.files[field][0].buffer.toString('base64');
+    await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, EXISTING_BRANCH);
+    filePaths[field] = `src/assets/${fileName}`;
+  }
+}
+
+console.log(`Updated existing branch: ${EXISTING_BRANCH}`);
+
+res.status(200).send('Config and files uploaded successfully!');
+  } catch (error) {
+  console.error('Error updating branch:', error.message);
+  res.status(500).send('Error updating the branch');
+}
 });
 
 // Start the server

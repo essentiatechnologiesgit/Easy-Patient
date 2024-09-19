@@ -4,7 +4,7 @@ on:
     branches:
       - 'update-config*'   # Matches branches starting with "BuildBranches"
     paths:
-      - 'config.js'
+      - 'config.jss'
 
 jobs:
   build:

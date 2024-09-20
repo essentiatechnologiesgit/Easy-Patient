@@ -28,14 +28,28 @@ platform :android do
 
         # Upload AAB to Google Play Store's internal track
         supply(
-          aab: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build/outputs/bundle/release/app-release.aab",
-          track: "internal",  # Set this to 'internal', 'alpha', 'beta', 'production'
-          skip_upload_metadata: true, # Skip metadata upload for the first time (optional)
-          skip_upload_images: true,   # Skip image upload for now (optional)
-          skip_upload_screenshots: true, # Skip screenshots upload for now (optional)
+         
+          # Use environment variables for metadata
+          metadata: {
+            title: ENV['APP_TITLE'],
+            short_description: ENV['APP_SHORT_DESCRIPTION'],
+            full_description: ENV['APP_FULL_DESCRIPTION'],
+            contact_email: ENV['APP_CONTACT_EMAIL'],
+            privacy_policy_url: ENV['APP_PRIVACY_POLICY_URL']
+          },
+          
+          skip_upload_metadata: false,  # Enable metadata upload
+          skip_upload_images: true,     # Skip image upload (optional)
+          skip_upload_screenshots: true, # Skip screenshots upload (optional)
+          
           json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
-          package_name: "com.easypatientdynamic" # Your app's package name
+          package_name: "com.easypatientdynamic",  # Your app's package name
+        
+          version_code: ENV['APP_VERSION_CODE'],   # App version code
+          version_name: ENV['APP_VERSION_NAME'],   # App version name
+          language: ENV['APP_LANGUAGE']            # App language
         )
+
     end
 end
 

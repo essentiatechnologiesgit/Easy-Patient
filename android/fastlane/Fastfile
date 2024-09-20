@@ -21,11 +21,7 @@ platform :android do
     lane :internal do
 
          # Build the AAB file using Gradle
-        gradle(
-            task: "bundle",
-            build_type: "Release"
-        )
-
+    
         # Upload AAB to Google Play Store's internal track
         supply(
          

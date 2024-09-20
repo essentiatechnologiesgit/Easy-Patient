@@ -30,34 +30,33 @@ jobs:
         run: npm install --force
 
       # Ensure that gradlew has execution permissions
-      - name: Ensure gradlew is executable
-        run: chmod +x android/gradlew
+      # - name: Ensure gradlew is executable
+      #   run: chmod +x android/gradlew
 
-      # Build Project to generate .aab file
-      - name: Build AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease
-
-      # Build Project to generate .apk file
-      # - name: Build APK
+      # # Build Project to generate .aab file
+      # - name: Build AAB
       #   run: |
       #     cd android
-      #     ./gradlew assembleRelease
+      #     ./gradlew bundleRelease
 
-      # Upload the .aab file as an artifact
-      - name: Upload AAB file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release.aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
-
-      # Upload the .apk file as an artifact
-      # - name: Upload APK file as artifact
+      # # Upload the .aab file as an artifact
+      # - name: Upload AAB file as artifact
       #   uses: actions/upload-artifact@v3
       #   with:
-      #     name: app-release.apk
-      #     path: android/app/build/outputs/apk/release/app-release.apk
+      #     name: app-release.aab
+      #     path: android/app/build/outputs/bundle/release/app-release.aab
+
+      # Declare metadata variables and save them in the environment
+      - name: Set metadata variables
+        run: |
+          echo "APP_TITLE='Your App Title'" >> $GITHUB_ENV
+          echo "APP_SHORT_DESCRIPTION='Your short description goes here.'" >> $GITHUB_ENV
+          echo "APP_FULL_DESCRIPTION='Your full app description goes here. Provide detailed information about the app.'" >> $GITHUB_ENV
+          echo "APP_LANGUAGE='en-US'" >> $GITHUB_ENV
+          echo "APP_VERSION_CODE='2'" >> $GITHUB_ENV
+          echo "APP_VERSION_NAME='1.1.0'" >> $GITHUB_ENV
+          echo "APP_CONTACT_EMAIL='support@example.com'" >> $GITHUB_ENV
+          echo "APP_PRIVACY_POLICY_URL='https://your-privacy-policy-url.com'" >> $GITHUB_ENV
 
       # Set up Fastlane and Bundler for deployment
       - name: Install Fastlane and Bundler

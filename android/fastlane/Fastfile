@@ -16,29 +16,19 @@
 default_platform(:android)
 
 platform :android do
-  # LANE 1
-  desc "Publish a new version to the Google Play (INTERNAL)"
-  lane :internal do
-
-    # Build the AAB file using Gradle
-    gradle(
-      task: "bundle",
-      build_type: "Release"
-    )
-
-    # Upload AAB to Google Play Store's internal track
+  desc "Upload screenshots to Google Play"
+  lane :upload_screenshots do
     supply(
-      aab: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build/outputs/bundle/release/app-release.aab",
-      track: "internal",  # Set this to 'internal', 'alpha', 'beta', 'production'
-      skip_upload_metadata: true,  # Skip metadata for now (optional)
+      skip_upload_apk: true,  # Skip APK upload
+      skip_upload_aab: true,  # Skip AAB upload
+      skip_upload_metadata: true,  # Skip metadata if not required
+      skip_upload_changelogs: true,  # Skip changelogs since we're not updating them
       skip_upload_images: false,   # Ensure images are uploaded
       skip_upload_screenshots: false, # Ensure screenshots are uploaded
-      skip_upload_changelogs: true, # Ensure screenshots are uploaded
       json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
       package_name: "com.easypatientdynamic",  # Your app's package name
-      version_code: 3  
+      version_code: 3,  # Ensure this matches your app's version code
     )
-
   end
 end
 

@@ -58,4 +58,4 @@ jobs:
         run: |
           cd android
           sudo bundle install
-          bundle exec fastlane supply --skip_upload_apk --skip_upload_metadata --skip_upload_images
+          fastlane android upload_screenshots

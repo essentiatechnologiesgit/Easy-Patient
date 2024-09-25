@@ -6,7 +6,7 @@ on:
       - FixesForiOSBuilds
 
 jobs:
-  build:
+  upload_screenshots:
     runs-on: ubuntu-latest
     steps:
       # Checkout code from the repository
@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: '18'
 
+      # Install Dependencies
       - name: Install Dependencies
         run: npm install --force
 
@@ -33,21 +34,18 @@ jobs:
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
-      # # Build Project to generate .aab file
-      - name: Build AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease
+      # # Commented Out Build Project to generate .aab file
+      # - name: Build AAB
+      #   run: |
+      #     cd android
+      #     ./gradlew bundleRelease
 
-      # # Upload the .aab file as an artifact
-      - name: Upload AAB file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release.aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
-
-      # Declare metadata variables and save them in the environment
-
+      # # Commented Out Upload the .aab file as an artifact
+      # - name: Upload AAB file as artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-release.aab
+      #     path: android/app/build/outputs/bundle/release/app-release.aab
 
       # Set up Fastlane and Bundler for deployment
       - name: Install Fastlane and Bundler
@@ -55,9 +53,9 @@ jobs:
           sudo gem install bundler
           sudo gem install fastlane
 
-      # Deploy Android app to Google Play Store using Fastlane
-      - name: Deploy Android app to Google Play
+      # Upload Android app screenshots to Google Play using Fastlane
+      - name: Upload Screenshots to Google Play
         run: |
           cd android
           sudo bundle install
-          bundle exec fastlane internal
+          bundle exec fastlane supply --skip_upload_apk --skip_upload_metadata --skip_upload_images

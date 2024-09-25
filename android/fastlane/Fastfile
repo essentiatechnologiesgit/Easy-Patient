@@ -16,18 +16,17 @@
 default_platform(:android)
 
 platform :android do
-  desc "Upload screenshots to Google Play"
+  desc "Upload only screenshots to Google Play"
   lane :upload_screenshots do
     supply(
       skip_upload_apk: true,  # Skip APK upload
       skip_upload_aab: true,  # Skip AAB upload
-      skip_upload_metadata: true,  # Skip metadata if not required
-      skip_upload_changelogs: true,  # Skip changelogs since we're not updating them
+      skip_upload_metadata: true,  # Skip metadata upload
       skip_upload_images: false,   # Ensure images are uploaded
       skip_upload_screenshots: false, # Ensure screenshots are uploaded
+      skip_upload_changelogs: true,  # Skip changelog upload
       json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
-      package_name: "com.easypatientdynamic",  # Your app's package name
-      version_code: 3,  # Ensure this matches your app's version code
+      package_name: "com.easypatientdynamic"  # Your app's package name
     )
   end
 end

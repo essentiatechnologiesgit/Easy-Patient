@@ -58,4 +58,4 @@ jobs:
         run: |
           cd android
           sudo bundle install
-          fastlane android upload_screenshots
+          fastlane android upload_metadata

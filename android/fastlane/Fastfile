@@ -35,6 +35,7 @@ platform :android do
       skip_upload_screenshots: false, # Ensure screenshots are uploaded
       json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
       package_name: "com.easypatientdynamic",  # Your app's package name
+      version_code: 3  
     )
 
   end

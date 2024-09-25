@@ -58,7 +58,5 @@ jobs:
         run: |
           cd android
           sudo bundle install
-          bundle exec fastlane upload_metadata  # Upload metadata
           bundle exec fastlane production         # Publish AAB to internal track
-          bundle exec fastlane upload_screenshots  # Upload screenshots
-
+       

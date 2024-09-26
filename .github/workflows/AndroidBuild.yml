@@ -54,9 +54,9 @@ jobs:
           sudo gem install fastlane
 
       # Change directory to Android before running Fastlane
-      - name: Upload Metadata and Screenshots to Google Play
+      - name: Upload Metadata and Build to Google Play
         run: |
           cd android
           sudo bundle install
           bundle exec fastlane production         # Publish AAB to internal track
-       
+          bundle exec fastlane upload_metadata

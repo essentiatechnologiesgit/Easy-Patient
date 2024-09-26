@@ -143,7 +143,7 @@ jobs:
       - name: Move Screenshots to Fastlane Directories
         run: |
           # Define the base directory for easier reference
-          BASE_DIR="/home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images"
+          BASE_DIR="${{ github.workspace }}/android/fastlane/metadata/android/en-US/images"
       
           # Check if the base directory exists
           if [ ! -d "$BASE_DIR" ]; then
@@ -155,6 +155,9 @@ jobs:
           mkdir -p "$BASE_DIR/phoneScreenshots"
           mkdir -p "$BASE_DIR/sevenInchScreenshots"
           mkdir -p "$BASE_DIR/tenInchScreenshots"
+      
+          # Define the screenshot path
+          SCREENSHOT_PATH="./screenshots"
       
           # Check if the screenshot directory exists
           if [ ! -d "$SCREENSHOT_PATH" ]; then

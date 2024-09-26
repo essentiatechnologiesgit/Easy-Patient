@@ -71,7 +71,7 @@ jobs:
 
       # Step 11: Upload screenshots as artifacts
       - name: Upload Screenshots
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: screenshots
           path: screenshots/

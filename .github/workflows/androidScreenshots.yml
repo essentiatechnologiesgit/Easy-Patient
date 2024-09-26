@@ -140,38 +140,14 @@ jobs:
       #     path: ./downloaded_screenshots
 
 
-      - name: Move Screenshots to Fastlane Directories
-        run: |
-          # Define the base directory for easier reference
-          BASE_DIR="${{ github.workspace }}/android/fastlane/metadata/android/en-US/images"
-      
-          # Check if the base directory exists
-          if [ ! -d "$BASE_DIR" ]; then
-            echo "Base directory does not exist: $BASE_DIR"
-            exit 1
-          fi
-      
-          # Create directories if they don't exist
-          mkdir -p "$BASE_DIR/phoneScreenshots"
-          mkdir -p "$BASE_DIR/sevenInchScreenshots"
-          mkdir -p "$BASE_DIR/tenInchScreenshots"
-      
-          # Define the screenshot path
-          SCREENSHOT_PATH="./screenshots"
-      
-          # Check if the screenshot directory exists
-          if [ ! -d "$SCREENSHOT_PATH" ]; then
-            echo "Screenshot path does not exist: $SCREENSHOT_PATH"
-            exit 1
-          fi
 
 
       - name: Move Screenshots to Fastlane Directories
         run: |
           # Create directories if they don't exist
-          mkdir -p /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/phoneScreenshots
-          mkdir -p /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots
-          mkdir -p /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
+          mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots
+          mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots
+          mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
 
           # Move screenshots to the specified directories
           mv "$SCREENSHOT_PATH/screenshot_login.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png

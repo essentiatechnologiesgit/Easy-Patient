@@ -1,0 +1,33 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+
+  desc "Upload only screenshots to Google Play"
+  lane :upload_screenshots do
+    supply(
+      skip_upload_apk: true,           # Skip APK upload
+      skip_upload_aab: true,            # Skip AAB upload
+      skip_upload_metadata: true,       # Skip metadata upload
+      skip_upload_images: false,        # Ensure images are uploaded
+      skip_upload_screenshots: false,   # Ensure screenshots are uploaded
+      skip_upload_changelogs: true,     # Skip changelog upload
+      json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
+      package_name: "com.easypatientdynamic"  # Your app's package name
+    )
+  end
+end

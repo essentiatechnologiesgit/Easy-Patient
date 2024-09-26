@@ -23,6 +23,12 @@ jobs:
       # Step 3: Set up Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
+        with:
+          api-level: 30   # Specify the API level of the Android emulator
+          target: default
+          arch: x86_64
+          profile: default
+          ndk: 21.1.6352462
 
 
       # Step 4: Grant execution permissions for Gradle wrapper

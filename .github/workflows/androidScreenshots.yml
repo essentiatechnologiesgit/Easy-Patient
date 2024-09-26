@@ -36,6 +36,11 @@ jobs:
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
+
+            # Step 4: Install required system images (this ensures the right emulator is available)
+      - name: Install System Image for Emulator
+        run: sdkmanager "system-images;android-30;google_apis;x86_64"
+
       # Step 5: Build the APK using Gradle
       # - name: Build APK
       #   run: ./gradlew assembleRelease
@@ -43,7 +48,7 @@ jobs:
       # Step 6: Start the Android Emulator
       - name: Start emulator
         run: |
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;default;x86_64"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64"
           nohup $ANDROID_HOME/emulator/emulator -avd test -no-snapshot -no-window -no-audio -gpu swiftshader_indirect &
 
       # Step 7: Wait for the Emulator to boot

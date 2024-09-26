@@ -76,7 +76,6 @@ jobs:
         run: |
           npx react-native start &
 
-
       - name: Find iOS Simulator UUID
         id: find_simulator
         run: |
@@ -140,23 +139,25 @@ jobs:
           path: ./downloaded_screenshots
 
 
+
+
       - name: Move Screenshots to Fastlane Directories
         run: |
           # Create directories if they don't exist
-          mkdir -p android/fastlane/metadata/android/en-US/images/phoneScreenshots
-          mkdir -p android/fastlane/metadata/android/en-US/images/sevenInchScreenshots
-          mkdir -p android/fastlane/metadata/android/en-US/images/tenInchScreenshots
+          mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots
+          mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots
+          mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
 
           # Move screenshots to the specified directories
-          mv "$SCREENSHOT_PATH/screenshot_login.png" android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
-          mv "$SCREENSHOT_PATH/screenshot_dashboard.png" android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_dashboard.png
-
+          mv "$SCREENSHOT_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
+          mv "$SCREENSHOT_PATH/screenshot_dashboard.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_dashboard.png
+                                                                                                    
           # You can copy the same screenshots to other directories if needed
-          cp "$SCREENSHOT_PATH/screenshot_login.png" android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
-          cp "$SCREENSHOT_PATH/screenshot_dashboard.png" android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_dashboard.png
+          cp "$SCREENSHOT_PATH/screenshot_login.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
+          cp "$SCREENSHOT_PATH/screenshot_dashboard.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_dashboard.png
 
-          cp "$SCREENSHOT_PATH/screenshot_login.png" android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_login.png
-          cp "$SCREENSHOT_PATH/screenshot_dashboard.png" android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_dashboard.png
+          cp "$SCREENSHOT_PATH/screenshot_login.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_login.png
+          cp "$SCREENSHOT_PATH/screenshot_dashboard.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_dashboard.png
 
 
       # Set up Fastlane and Bundler for deployment

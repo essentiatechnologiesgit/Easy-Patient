@@ -32,17 +32,25 @@ platform :android do
 
 desc "Publish a new version to the Google Play (PRODUCTION)"
 lane :production do
-  # Step 1: Manually update the version code
-  version_code = get_version_code(
-    gradle_file_path: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle"
-  )
+  # Step 1: Manually update the version code in build.gradle
+  gradle_file = "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle"
 
-  new_version_code = version_code.to_i + 1
+  # Read the build.gradle file and extract the current versionCode
+  current_version_code = nil
+  new_version_code = nil
+  gradle_content = File.read(gradle_file)
+  
+  # Use a regular expression to find the versionCode and increment it
+  gradle_content.gsub!(/versionCode (\d+)/) do |match|
+    current_version_code = $1.to_i
+    new_version_code = current_version_code + 1
+    "versionCode #{new_version_code}"
+  end
 
-  update_version_code(
-    gradle_file_path: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle",
-    version_code: new_version_code
-  )
+  # Write the updated versionCode back to the build.gradle file
+  File.write(gradle_file, gradle_content)
+
+  UI.message("Updated versionCode from #{current_version_code} to #{new_version_code}")
 
   # Step 2: Build the AAB file using Gradle
   gradle(
@@ -61,6 +69,7 @@ lane :production do
     package_name: "com.easypatientdynamic"  # Your app's package name (ensure this is correct)
   )
 end
+
 
 
   desc "Upload only screenshots to Google Play"

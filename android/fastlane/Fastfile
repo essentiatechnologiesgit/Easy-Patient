@@ -32,9 +32,16 @@ platform :android do
 
 desc "Publish a new version to the Google Play (PRODUCTION)"
 lane :production do
-  # Step 1: Increment the version code in your build.gradle file
-  increment_version_code(
-    gradle_file_path: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle"  # Ensure the path is correct relative to your Fastfile
+  # Step 1: Manually update the version code
+  version_code = get_version_code(
+    gradle_file_path: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle"
+  )
+
+  new_version_code = version_code.to_i + 1
+
+  update_version_code(
+    gradle_file_path: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle",
+    version_code: new_version_code
   )
 
   # Step 2: Build the AAB file using Gradle
@@ -54,6 +61,7 @@ lane :production do
     package_name: "com.easypatientdynamic"  # Your app's package name (ensure this is correct)
   )
 end
+
 
   desc "Upload only screenshots to Google Play"
   lane :upload_screenshots do

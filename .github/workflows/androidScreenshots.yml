@@ -62,15 +62,15 @@ jobs:
           cd ios
           xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-      # - name: Build for Simulator
-      #   run: |
-      #     xcodebuild clean build \
-      #       -workspace ios/EasyPatientDynamic.xcworkspace \
-      #       -scheme EasyPatientDynamic \
-      #       -sdk iphonesimulator \
-      #       -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
-      #       -configuration Debug \
-      #       -derivedDataPath ios/build/DerivedData
+      - name: Build for Simulator
+        run: |
+          xcodebuild clean build \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+            -configuration Debug \
+            -derivedDataPath ios/build/DerivedData
 
       - name: Start Metro Bundler
         run: |

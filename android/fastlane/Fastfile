@@ -16,19 +16,56 @@
 default_platform(:android)
 
 platform :android do
+  desc "Upload metadata to Google Play"
+  lane :upload_metadata do
+    supply(
+      skip_upload_apk: true,         # Skip APK upload
+      skip_upload_aab: true,         # Skip AAB upload
+      skip_upload_images: true,       # Skip images
+      skip_upload_screenshots: true,  # Skip screenshots
+      skip_upload_changelogs: true,   # Skip changelog upload
+      skip_upload_metadata: false,     # Ensure metadata is uploaded
+      json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json",  # Path to your JSON key file
+      package_name: "com.easypatientdynamic"  # Your app's package name
+    )
+  end
+
+desc "Publish a new version to the Google Play (PRODUCTION)"
+lane :production do
+  # Step 1: Increment the version code in your build.gradle file
+  increment_version_code(
+    gradle_file_path: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build.gradle"  # Ensure the path is correct relative to your Fastfile
+  )
+
+  # Step 2: Build the AAB file using Gradle
+  gradle(
+    task: "bundle",
+    build_type: "Release"
+  )
+
+  # Step 3: Upload the AAB to Google Play using Supply
+  supply(
+    aab: "/home/runner/work/Easy-Patient/Easy-Patient/android/app/build/outputs/bundle/release/app-release.aab",  # Path to the AAB file
+    track: "production",   # Use 'production' for releasing to production track
+    skip_upload_metadata: true,  # Skip metadata upload if not updating
+    skip_upload_images: true,     # Skip image upload if not updating
+    skip_upload_screenshots: true, # Skip screenshots upload if not updating
+    json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file for authentication
+    package_name: "com.easypatientdynamic"  # Your app's package name (ensure this is correct)
+  )
+end
+
   desc "Upload only screenshots to Google Play"
   lane :upload_screenshots do
     supply(
-      skip_upload_apk: true,  # Skip APK upload
-      skip_upload_aab: true,  # Skip AAB upload
-      skip_upload_metadata: true,  # Skip metadata upload
-      skip_upload_images: false,   # Ensure images are uploaded
-      skip_upload_screenshots: false, # Ensure screenshots are uploaded
-      skip_upload_changelogs: true,  # Skip changelog upload
+      skip_upload_apk: true,           # Skip APK upload
+      skip_upload_aab: true,            # Skip AAB upload
+      skip_upload_metadata: true,       # Skip metadata upload
+      skip_upload_images: false,        # Ensure images are uploaded
+      skip_upload_screenshots: false,   # Ensure screenshots are uploaded
+      skip_upload_changelogs: true,     # Skip changelog upload
       json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
       package_name: "com.easypatientdynamic"  # Your app's package name
     )
   end
 end
-
-

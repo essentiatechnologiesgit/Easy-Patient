@@ -34,18 +34,18 @@ jobs:
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
-      # # Commented Out Build Project to generate .aab file
-      # - name: Build AAB
-      #   run: |
-      #     cd android
-      #     ./gradlew bundleRelease
+      # Build the AAB file
+      - name: Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
 
-      # # Commented Out Upload the .aab file as an artifact
-      # - name: Upload AAB file as artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: app-release.aab
-      #     path: android/app/build/outputs/bundle/release/app-release.aab
+      # Upload the AAB file as artifact
+      - name: Upload AAB file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
 
       # Set up Fastlane and Bundler for deployment
       - name: Install Fastlane and Bundler
@@ -53,9 +53,10 @@ jobs:
           sudo gem install bundler
           sudo gem install fastlane
 
-      # Upload Android app screenshots to Google Play using Fastlane
-      - name: Upload Screenshots to Google Play
+      # Change directory to Android before running Fastlane
+      - name: Upload Metadata and Screenshots to Google Play
         run: |
           cd android
           sudo bundle install
-          fastlane android upload_screenshots
+          bundle exec fastlane production         # Publish AAB to internal track
+       

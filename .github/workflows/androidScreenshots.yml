@@ -150,7 +150,6 @@ jobs:
           mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
 
           # Move screenshots to the specified directories
-          mv "$SCREENSHOT_PATH/screenshot_login.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
           mv "$SCREENSHOT_PATH/screenshot_dashboard.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_dashboard.png
 
           # You can copy the same screenshots to other directories if needed

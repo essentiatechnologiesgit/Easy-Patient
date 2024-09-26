@@ -147,17 +147,17 @@ jobs:
           mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots
           mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots
           mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
-
-          # Move screenshots to the specified directories
-          mv "$SCREENSHOT_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
-          mv "$SCREENSHOT_PATH/screenshot_dashboard.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_dashboard.png
-                                                                                                    
-          # You can copy the same screenshots to other directories if needed
-          cp "$SCREENSHOT_PATH/screenshot_login.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
-          cp "$SCREENSHOT_PATH/screenshot_dashboard.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_dashboard.png
-
-          cp "$SCREENSHOT_PATH/screenshot_login.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_login.png
-          cp "$SCREENSHOT_PATH/screenshot_dashboard.png" /home/runner/work/Easy-Patient/Easy-Patient/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_dashboard.png
+      
+          # Move screenshots from downloaded_screenshots directory to the specified directories
+          mv ./downloaded_screenshots/screenshot_login.png ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
+          mv ./downloaded_screenshots/screenshot_dashboard.png ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_dashboard.png
+                                                                                                      
+          # Copy the same screenshots to other directories if needed
+          cp ./downloaded_screenshots/screenshot_login.png ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
+          cp ./downloaded_screenshots/screenshot_dashboard.png ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_dashboard.png
+      
+          cp ./downloaded_screenshots/screenshot_login.png ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_login.png
+          cp ./downloaded_screenshots/screenshot_dashboard.png ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_dashboard.png
 
 
       # Set up Fastlane and Bundler for deployment

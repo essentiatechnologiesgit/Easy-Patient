@@ -37,7 +37,35 @@ async function getFileSHA(fileName, branchName) {
 }
 
 // Function to upload files to GitHub using their API
-async function uploadFileToGitHub(token, content, fileName, branchName) {
+async function uploadFileToGitHub(token, content, fileName, branchName,path) {
+  const sha = await getFileSHA(fileName, branchName); // Get the SHA if the file exists
+
+  const data = JSON.stringify({
+    message: `Upload ${fileName}`,
+    content: content,
+    branch: branchName,
+    ...(sha && { sha }), // Include SHA if the file exists
+  });
+  const config = {
+    method: 'put',
+    url: `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}/${fileName}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    data: data,
+  };
+
+  try {
+    const response = await axios(config);
+    console.log(`Uploaded ${fileName}: `, response.data);
+  } catch (error) {
+    console.error(`Error uploading ${fileName}: `, error.response ? error.response.data : error.message);
+  }
+}
+
+
+async function uploadJsonFileToGitHub(token, content, fileName, branchName,path) {
   const sha = await getFileSHA(fileName, branchName); // Get the SHA if the file exists
 
   const data = JSON.stringify({
@@ -49,7 +77,7 @@ async function uploadFileToGitHub(token, content, fileName, branchName) {
 
   const config = {
     method: 'put',
-    url: `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/src/assets/${fileName}`,
+    url: `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}/${fileName}`,
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -71,6 +99,7 @@ app.post('/update-config', upload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'backgroundImage', maxCount: 1 },
   { name: 'subLogo', maxCount: 1 },
+  { name: 'jsonFile', maxCount: 1 }
 
 ]), async (req, res) => {
   const newConfig = req.body;
@@ -128,7 +157,6 @@ app.post('/update-config', upload.fields([
 
     // module.exports = config;
     // `;
-    console.log(newConfig);
     const configContent = `
     const config = {
       splashScreen: require('./src/assets/${req.files['splashScreen'] ? req.files['splashScreen'][0].originalname : ''}'),
@@ -158,22 +186,11 @@ app.post('/update-config', upload.fields([
     module.exports = config;
     `;
 
-    const jsonFilePath = path.join(__dirname, 'easy-patient-a6d4e-8bff30fb735c.json');
-    console.log("Path erer",jsonFilePath);
-    const jsonFileContent = fs.readFileSync(jsonFilePath, 'utf8');
-    console.log("Path erer",jsonFileContent);
-    const treeDataJsonFile = [
-      {
-        path: 'android/fastlane/easy-patient-a6d4e-8bff30fb735c.json', // Include directory and filename
-        mode: '100644',
-        type: 'blob',
-        content: jsonFileContent
-      }
-    ];
-    /// Sample json key content
-    console.log("Here");
 
-    //// working for android 
+
+
+
+    // working for android 
     const appName = `${newConfig.appName}`;
     const shortDescription = `${newConfig.description}`;
     const longDescription = `${newConfig.description}`;
@@ -187,7 +204,7 @@ app.post('/update-config', upload.fields([
       }
     ];
 
- 
+
     const treeDataAppName = [
       {
         path: 'android/fastlane/metadata/android/en-US/title.txt',
@@ -221,10 +238,10 @@ app.post('/update-config', upload.fields([
       ...treeDataAppName,
       ...treeDataSDescription,
       ...treeDataLDescription,
-      ...treeDataJsonFile 
- 
-    ];
 
+
+    ];
+    // console.log(combinedTreeData);
     // Step 4: Create a new tree with all the files
     const createTreeRes = await axios.post(createTreeUrl, {
       tree: combinedTreeData,
@@ -261,11 +278,22 @@ app.post('/update-config', upload.fields([
     );
 
 
+        /// Testing File upload
+    const jsonFileBuffer = req.files.jsonFile[0].buffer;
+    const jsonFileContent = jsonFileBuffer.toString('utf8');
+    const Jsonfile = 'easy-patient-a6d4e-8bff30fb735c.json';
+    // Base64 encode the content
+    const base64Content = Buffer.from(jsonFileContent).toString('base64');
+    const path ='android/fastlane';
+    await uploadFileToGitHub(GITHUB_TOKEN, base64Content, Jsonfile, branchName, path);
+    // Till here 
+
+    const ImagesPath = 'src/assets'; 
     for (const field of fileFields) {
       if (req.files[field]) {
         const fileName = req.files[field][0].originalname;
         const fileContent = req.files[field][0].buffer.toString('base64');
-        await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, branchName);
+        await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, branchName,ImagesPath);
         filePaths[field] = `src/assets/${fileName}`;
       }
     }

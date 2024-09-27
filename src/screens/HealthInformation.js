@@ -49,33 +49,33 @@ const HealthInformation = () => {
     const [newHeight, setNewHeight] = useState('');
 
 
-    // useEffect(() => {
+    useEffect(() => {
 
 
-    //     const getScopes = async () => {
-    //         GoogleSignin.configure({
-    //             scopes: [
-    //                 Scopes.FITNESS_ACTIVITY_READ,
-    //                 Scopes.FITNESS_ACTIVITY_WRITE,
-    //                 Scopes.FITNESS_BODY_READ,
-    //                 Scopes.FITNESS_BODY_WRITE,
-    //                 Scopes.FITNESS_BLOOD_PRESSURE_READ,
-    //                 Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
-    //                 Scopes.FITNESS_BLOOD_GLUCOSE_READ,
-    //                 Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
-    //                 Scopes.FITNESS_NUTRITION_WRITE,
-    //                 Scopes.FITNESS_SLEEP_READ,
-    //             ],
-    //             webClientId: WEB_CLIENT_ID,
-    //             iosClientId: IOS_CLIENT_ID,
-    //             offlineAccess: true,
-    //         });
-    //         await googleLogin();
+        const getScopes = async () => {
+            GoogleSignin.configure({
+                scopes: [
+                    Scopes.FITNESS_ACTIVITY_READ,
+                    Scopes.FITNESS_ACTIVITY_WRITE,
+                    Scopes.FITNESS_BODY_READ,
+                    Scopes.FITNESS_BODY_WRITE,
+                    Scopes.FITNESS_BLOOD_PRESSURE_READ,
+                    Scopes.FITNESS_BLOOD_PRESSURE_WRITE,
+                    Scopes.FITNESS_BLOOD_GLUCOSE_READ,
+                    Scopes.FITNESS_BLOOD_GLUCOSE_WRITE,
+                    Scopes.FITNESS_NUTRITION_WRITE,
+                    Scopes.FITNESS_SLEEP_READ,
+                ],
+                webClientId: WEB_CLIENT_ID,
+                iosClientId: IOS_CLIENT_ID,
+                offlineAccess: true,
+            });
+            await googleLogin();
 
-    //     }
+        }
 
-    //     getScopes();
-    // }, []);
+        getScopes();
+    }, []);
 
     const saveData = async () => {
         // const opt = {
@@ -129,15 +129,19 @@ const HealthInformation = () => {
         } catch (error) {
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
                 console.log("Sign in cancelled");
+                fetchData();
             } else if (error.code === statusCodes.IN_PROGRESS) {
                 console.log("Sign in is in progress already");
             } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
                 console.log("Play services not available or outdated");
+                fetchData();
             } else {
                 console.log("Error occurred during sign in", error);
+                fetchData();
             }
         }
-    };
+     
+    }
 
     const handleDataSave = () => {
         setEmptyHeight(false);
@@ -263,20 +267,26 @@ const HealthInformation = () => {
 
     }
 
+    const fetchData = async () => {
+        const access_token = await getAccessToken();
+        console.log("Here");
+        await getData(access_token);
+    };
+
 
     const handleSync = async () => {
         await GoogleSignin.signOut();
-        googleLogin();
+        try {
+            await googleLogin();
+            console.log("Here"); // This should now always log
+        } catch (error) {
+            console.log("Error during Google login process", error); // Handle any error if needed
+        }
+    
 
+    
 
-        const fetchData = async () => {
-            const access_token = await getAccessToken();
-
-            await getData(access_token);
-        };
-
-        fetchData();
-    }
+    };
 
     const getWeights = async () => {
         const opt = {

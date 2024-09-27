@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - ScreenshotBuild
+      
 jobs:
   upload-screenshot:
     runs-on: macos-latest

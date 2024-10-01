@@ -158,7 +158,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
           
           # Move screenshots from the full download path to the specified directories
-          for screenshot in downloaded_screenshots/*.png; do
+          for screenshot in "$DOWNLOAD_PATH"/*.png; do
             if [[ $screenshot == *screenshot_login.png ]]; then
               mv "$screenshot" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
               mv "$screenshot" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png

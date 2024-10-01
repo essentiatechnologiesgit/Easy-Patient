@@ -37,7 +37,7 @@ async function getFileSHA(fileName, branchName) {
 }
 
 // Function to upload files to GitHub using their API
-async function uploadFileToGitHub(token, content, fileName, branchName,path) {
+async function uploadFileToGitHub(token, content, fileName, branchName, path) {
   const sha = await getFileSHA(fileName, branchName); // Get the SHA if the file exists
 
   const data = JSON.stringify({
@@ -65,7 +65,7 @@ async function uploadFileToGitHub(token, content, fileName, branchName,path) {
 }
 
 
-async function uploadJsonFileToGitHub(token, content, fileName, branchName,path) {
+async function uploadJsonFileToGitHub(token, content, fileName, branchName, path) {
   const sha = await getFileSHA(fileName, branchName); // Get the SHA if the file exists
 
   const data = JSON.stringify({
@@ -175,7 +175,8 @@ app.post('/update-config', upload.fields([
       headerColor: '${newConfig.headerColor}',
       description:'${newConfig.description}',
       BUNDLE_ID: '${newConfig.BUNDLE_ID}',
-      Name: '${newConfig.appName}',
+      Name: '${newConfig.iOSAppName}',
+      description:'${newConfig.description}',
       ISSUER_ID: '${newConfig.ISSUER_ID}',
       KEY_ID: '${newConfig.KEY_ID}',
       private_key: \`
@@ -191,9 +192,9 @@ app.post('/update-config', upload.fields([
 
 
     // working for android 
-    const appName = `${newConfig.appName}`;
-    const shortDescription = `${newConfig.description}`;
-    const longDescription = `${newConfig.description}`;
+    const appName = `${newConfig.androidAppName}`;
+    const shortDescription = `${newConfig.short_description}`;
+    const longDescription = `${newConfig.long_description}`;
 
     const treeDataConfig = [
       {
@@ -238,8 +239,6 @@ app.post('/update-config', upload.fields([
       ...treeDataAppName,
       ...treeDataSDescription,
       ...treeDataLDescription,
-
-
     ];
     // console.log(combinedTreeData);
     // Step 4: Create a new tree with all the files
@@ -277,23 +276,28 @@ app.post('/update-config', upload.fields([
       { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
     );
 
+    console.log("Not Here")
+    /// Testing File upload
+    if (req.files.jsonFile) {
+      console.log("Here")
+      const jsonFileBuffer = req.files.jsonFile[0].buffer;
+      const jsonFileContent = jsonFileBuffer.toString('utf8');
+      const Jsonfile = 'easy-patient-a6d4e-8bff30fb735c.json';
+      // Base64 encode the content
+      const base64Content = Buffer.from(jsonFileContent).toString('base64');
+      const path = 'android/fastlane';
+      await uploadFileToGitHub(GITHUB_TOKEN, base64Content, Jsonfile, branchName, path);
+    }
 
-        /// Testing File upload
-    const jsonFileBuffer = req.files.jsonFile[0].buffer;
-    const jsonFileContent = jsonFileBuffer.toString('utf8');
-    const Jsonfile = 'easy-patient-a6d4e-8bff30fb735c.json';
-    // Base64 encode the content
-    const base64Content = Buffer.from(jsonFileContent).toString('base64');
-    const path ='android/fastlane';
-    await uploadFileToGitHub(GITHUB_TOKEN, base64Content, Jsonfile, branchName, path);
     // Till here 
-
-    const ImagesPath = 'src/assets'; 
+    console.log("Then Here")
+    
+    const ImagesPath = 'src/assets';
     for (const field of fileFields) {
       if (req.files[field]) {
         const fileName = req.files[field][0].originalname;
         const fileContent = req.files[field][0].buffer.toString('base64');
-        await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, branchName,ImagesPath);
+        await uploadFileToGitHub(GITHUB_TOKEN, fileContent, fileName, branchName, ImagesPath);
         filePaths[field] = `src/assets/${fileName}`;
       }
     }

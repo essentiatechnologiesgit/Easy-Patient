@@ -2,7 +2,7 @@ name: iOS Screenshot Upload
 on:
   push:
     branches:
-      - ScreenshotBuild
+      - ScreenshotBuilds
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -36,7 +36,6 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
-
       - name: Install Node.js dependencies
         run: npm install --force
 
@@ -47,12 +46,10 @@ jobs:
           rm -rf Pods Podfile.lock
           pod update
           pod install
-
       - name: Install Xcode 15.3
         run: |
           sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
           xcodebuild -version
-
       - name: Clean Derived Data
         run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
@@ -61,7 +58,6 @@ jobs:
         run: |
           cd ios
           xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
-
       - name: Build for Simulator
         run: |
           xcodebuild clean build \
@@ -71,11 +67,9 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
             -configuration Debug \
             -derivedDataPath ios/build/DerivedData
-
       - name: Start Metro Bundler
         run: |
           npx react-native start &
-
       - name: Find iOS Simulator UUID
         id: find_simulator
         run: |
@@ -83,33 +77,26 @@ jobs:
           UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
           echo "Simulator UUID: $UUID"
           echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
-
       - name: Boot iOS Simulator
         run: |
           xcrun simctl boot ${{ env.SIMULATOR_UUID }}
         
-
       - name: Install .app File on Simulator
         run: |
           APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
           echo "App path: $APP_PATH"
-
           # Install the .app file on the booted simulator
           xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
-
       - name: Launch the App on Simulator
         run: |
           APP_BUNDLE_ID="com.org.easypatientdynamic"
           echo "App Bundle ID: $APP_BUNDLE_ID"
-
           # Launch the app using the dynamic UUID
           xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
-
       - name: Take a Screenshot
         run: |
           SCREENSHOT_PATH="./screenshots"
           mkdir -p "$SCREENSHOT_PATH"
-
           # Wait for the app to load
           sleep 120
           
@@ -117,11 +104,8 @@ jobs:
                
           # Capture a screenshot of the Login screen
           xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
-
           sleep 120
-
           # Navigate to the Dashboard screen using deep link
-
           # Capture a screenshot of the Dashboard screen
           xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
           
@@ -158,7 +142,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots
           
           # Move screenshots from the full download path to the specified directories
-          for screenshot in "$DOWNLOAD_PATH"/*.png; do
+          for screenshot in downloaded_screenshots/*.png; do
             if [[ $screenshot == *screenshot_login.png ]]; then
               mv "$screenshot" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_login.png
               mv "$screenshot" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
@@ -177,7 +161,6 @@ jobs:
         run: |
           sudo gem install bundler
           sudo gem install fastlane
-
       # Change directory to Android before running Fastlane
       - name: Upload Metadata and Screenshots to Google Play
         run: |

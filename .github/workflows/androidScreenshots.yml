@@ -156,11 +156,11 @@ jobs:
           mv "$DOWNLOAD_PATH/screenshot_dashboard.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_dashboard.png
                                                                                                       
           # Copy the same screenshots to other directories if needed
-          cp "$DOWNLOAD_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
-          cp "$DOWNLOAD_PATH/screenshot_dashboard.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_dashboard.png
+          mv "$DOWNLOAD_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_login.png
+          mv "$DOWNLOAD_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/screenshot_dashboard.png
       
-          cp "$DOWNLOAD_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_login.png
-          cp "$DOWNLOAD_PATH/screenshot_dashboard.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_dashboard.png
+          mv "$DOWNLOAD_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_login.png
+          mv "$DOWNLOAD_PATH/screenshot_login.png" ${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/screenshot_dashboard.png
 
 
       # Set up Fastlane and Bundler for deployment

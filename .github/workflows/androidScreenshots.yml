@@ -138,6 +138,14 @@ jobs:
           name: SimulatorScreenshots
           path: ./downloaded_screenshots
 
+      - name: List Downloaded Screenshots
+        run: |
+          echo "Downloaded Screenshots:"
+          ls -l ${GITHUB_WORKSPACE}
+          echo "Downloaded Screenshots:"
+          ls -l ${GITHUB_WORKSPACE}/downloaded_screenshots
+
+          
 
       - name: Move Screenshots to Fastlane Directories
         run: |

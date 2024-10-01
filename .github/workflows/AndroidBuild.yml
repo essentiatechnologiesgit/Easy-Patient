@@ -3,7 +3,7 @@ name: Android Build and Deploy
 on:
   push:
     branches:
-      - FixesForiOSBuild
+      - FixesForiOSBuilds
 
 jobs:
   upload_screenshots:

@@ -1,10 +1,7 @@
 name: iOS Certificate Automation
 on:
-  push:
-    branches:
-      - 'update-config*'   # Matches branches starting with "BuildBranches"
-    paths:
-      - 'config.jss'
+  repository_dispatch:
+    types: [iOS]
 
 jobs:
   build:

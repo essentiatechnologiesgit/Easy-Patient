@@ -3,6 +3,11 @@ name: iOS Certificate Automation
 #   repository_dispatch:
 #     types: [iOS]
 
+on:
+  push:
+    branches:
+      - ScreenshotBuilds
+
 jobs:
   build:
     runs-on: macos-latest

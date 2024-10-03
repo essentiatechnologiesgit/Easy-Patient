@@ -2,7 +2,6 @@ name: iOS Certificate Automation
 # on:
 #   repository_dispatch:
 #     types: [iOS]
-
 on:
   push:
     branches:

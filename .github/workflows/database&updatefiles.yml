@@ -11,31 +11,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up JDK version 17 using Temurin distribution
-      # - name: Set Up JDK
-      #   uses: actions/setup-java@v2
-      #   with:
-      #     java-version: '17'
-      #     distribution: 'temurin'
-
-      # # Install Node.js and NPM dependencies
-      # - name: Set up Node.js 18.x
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: '18'
-
-      # Install Dependencies
-      # - name: Install Dependencies
-      #   run: npm install --force
-
+      # Access the client payload (extract the bundle ID)
       - name: Access client payload
         run: |
           echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
-      - name: Fetch APIs data
-        run: curl --location 'http://localhost:4000/getData'
-        
-      
-
-
-      
+      # Fetch API data and log the response
+      - name: Fetch API data
+        run: |
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://5713-2400-adc1-1aa-d500-c822-86fc-8187-644d.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"

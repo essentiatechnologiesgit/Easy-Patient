@@ -1,5 +1,4 @@
 name: Database Connect and update config
-
 on:
   repository_dispatch:
     types: [iOS]

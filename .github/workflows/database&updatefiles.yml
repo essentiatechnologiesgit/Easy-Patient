@@ -30,7 +30,7 @@ jobs:
 
       - name: Access client payload
         run: |
-          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
       - name: Fetch APIs data
         run: curl --location 'http://localhost:4000/getData'

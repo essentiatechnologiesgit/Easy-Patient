@@ -29,20 +29,56 @@ jobs:
           echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
           echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
           echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonFile')" >> $GITHUB_ENV
 
       # Create assets directory
-      - name: Create assets directory
-        run: mkdir -p ${{ github.workspace }}/src/assets
-
-      # Download images to the assets folder
+      # Download images to the assets folder if they don't already exist
       - name: Download splash screen
-        run: curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+            echo "Downloaded splash screen."
+          else
+            echo "Splash screen already exists."
+          fi
+
       - name: Download logo
-        run: curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+            echo "Downloaded logo."
+          else
+            echo "Logo already exists."
+          fi
+
       - name: Download background image
-        run: curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+            echo "Downloaded background image."
+          else
+            echo "Background image already exists."
+          fi
+
       - name: Download sub logo
-        run: curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
+
+      - name: Download json file
+        run: |
+          if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
+
+
 
       # Update config.js file with the new image paths (using require)
       - name: Update config.js

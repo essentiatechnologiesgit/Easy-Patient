@@ -24,6 +24,26 @@ jobs:
           RESPONSE=$(curl --location 'https://5713-2400-adc1-1aa-d500-c822-86fc-8187-644d.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
 
+          
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].tertiarycolor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
+          echo "BUNDLE_ID=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.[0].marketingurl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].iosappname')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
+
           # Parse and export relevant fields from the JSON response using jq
           echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
           echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV

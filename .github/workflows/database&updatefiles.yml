@@ -23,21 +23,21 @@ jobs:
           echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
           RESPONSE=$(curl --location 'https://5713-2400-adc1-1aa-d500-c822-86fc-8187-644d.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
-          echo "::set-output name=response::$RESPONSE"
+          echo "response=$RESPONSE" >> $GITHUB_ENV  # Use environment file for output
       
       # Update config.js file with the API response
       - name: Update config.js
         run: |
           # Safely retrieve the API response and ensure JSON handling
-          API_RESPONSE="${{ steps.fetch_api_data.outputs.response }}"
-      
-          # Parse values from the JSON response using jq
+          API_RESPONSE="${{ env.response }}"
+
+          # Parse values from the JSON response using jq, and handle spaces in URLs
           SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')
           PRIMARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].primarycolor // "#000000"')
           SECONDARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].secondarycolor // "#000000"')
           TERTIARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].tertiarycolor // "#000000"')
-          LOGO=$(echo "$API_RESPONSE" | jq -r '.[0].logo // ""')
-          BACKGROUND_IMAGE=$(echo "$API_RESPONSE" | jq -r '.[0].backgroundimage // ""')
+          LOGO=$(echo "$API_RESPONSE" | jq -r '.[0].logo // ""' | sed 's/ /%20/g')
+          BACKGROUND_IMAGE=$(echo "$API_RESPONSE" | jq -r '.[0].backgroundimage // ""' | sed 's/ /%20/g')
           BACKGROUND_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')
           MODAL_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].modalcolor // "#FFFFFF"')
           BUTTON_TEXT_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].buttontext // "#FFFFFF"')
@@ -52,44 +52,44 @@ jobs:
           ISSUER_ID=$(echo "$API_RESPONSE" | jq -r '.[0].issuer_id // ""')
           KEY_ID=$(echo "$API_RESPONSE" | jq -r '.[0].key_id // ""')
           PRIVATE_KEY=$(echo "$API_RESPONSE" | jq -r '.[0].private_key // ""')
-      
-          # Write the config.js file using proper quotes and EOF for multi-line strings
-          cat > "${{ github.workspace }}/config.js" <<EOL
-          const config = {
-            splashScreen: '${SPLASH_SCREEN}',  // Use URL directly
-            primaryColor: '${PRIMARY_COLOR}',
+
+          # Write the config.js file safely
+          printf "const config = {
+            splashScreen: '%s',
+            primaryColor: '%s',
             textColorHeadings: '#2A2A31',
-            secondaryColor: '${SECONDARY_COLOR}',
-            tertiaryColor: '${TERTIARY_COLOR}',
-            logo: '${LOGO}',  // Use URL directly
-            backgroundImage: '${BACKGROUND_IMAGE}',  // Use URL directly
+            secondaryColor: '%s',
+            tertiaryColor: '%s',
+            logo: '%s',
+            backgroundImage: '%s',
             backgroundColorImage: '',
             backgroundImageType: 'png',
-            subLogo: '${LOGO}',  // Fix subLogo to use LOGO instead of backgroundImage
-            backgroundColor: '${BACKGROUND_COLOR}',
-            modalColor: '${MODAL_COLOR}',
-            buttonText: '${BUTTON_TEXT_COLOR}',
-            headerColor: '${HEADER_COLOR}',
-            BUNDLE_ID: '${BUNDLE_ID}',
-            keywords: '${KEYWORDS}',
-            promotionalText: '${PROMOTIONAL_TEXT}',
-            supportUrl: '${SUPPORT_URL}',
-            marketingUrl: '${MARKETING_URL}',
-            Name: '${IOS_APP_NAME}',
-            description: '${DESCRIPTION}',
-            ISSUER_ID: '${ISSUER_ID}',
-            KEY_ID: '${KEY_ID}',
+            subLogo: '%s',
+            backgroundColor: '%s',
+            modalColor: '%s',
+            buttonText: '%s',
+            headerColor: '%s',
+            BUNDLE_ID: '%s',
+            keywords: '%s',
+            promotionalText: '%s',
+            supportUrl: '%s',
+            marketingUrl: '%s',
+            Name: '%s',
+            description: '%s',
+            ISSUER_ID: '%s',
+            KEY_ID: '%s',
             private_key: \`
-          ${PRIVATE_KEY}
-          \`
-          };
-          
-          console.log('Config data:', config);
-          
-          module.exports = config;
-          EOL
+            %s
+            \`
+          };\n\nconsole.log('Config data:', config);\n\nmodule.exports = config;" \
+          "$SPLASH_SCREEN" "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" "$LOGO" "$BACKGROUND_IMAGE" \
+          "$LOGO" "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" "$HEADER_COLOR" "$BUNDLE_ID" \
+          "$KEYWORDS" "$PROMOTIONAL_TEXT" "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+          "$ISSUER_ID" "$KEY_ID" "$PRIVATE_KEY" > "${{ github.workspace }}/config.js"
+
       # Print the updated config.js file to the console
       - name: Print updated config.js
         run: |
           echo "Contents of the updated config.js:"
           cat ${{ github.workspace }}/config.js
+

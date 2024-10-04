@@ -25,35 +25,37 @@ jobs:
           echo "API Response: $RESPONSE"
           echo "::set-output name=response::$RESPONSE"
       
-      # Update config.js file with the API response
+        # Update config.js file with the API response
+        # Update config.js file with the API response
       - name: Update config.js
         run: |
+          # Safely retrieve the API response and ensure JSON handling
           API_RESPONSE="${{ steps.fetch_api_data.outputs.response }}"
+          
+          # Parse values from the JSON response using jq
+          SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')
+          PRIMARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].primarycolor // "#000000"')
+          SECONDARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].secondarycolor // "#000000"')
+          TERTIARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].tertiarycolor // "#000000"')
+          LOGO=$(echo "$API_RESPONSE" | jq -r '.[0].logo // ""')
+          BACKGROUND_IMAGE=$(echo "$API_RESPONSE" | jq -r '.[0].backgroundimage // ""')
+          BACKGROUND_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')
+          MODAL_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].modalcolor // "#FFFFFF"')
+          BUTTON_TEXT_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].buttontext // "#FFFFFF"')
+          HEADER_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].headercolor // "#FFFFFF"')
+          BUNDLE_ID=$(echo "$API_RESPONSE" | jq -r '.[0].bundle_id // ""')
+          KEYWORDS=$(echo "$API_RESPONSE" | jq -r '.[0].keywords // ""')
+          PROMOTIONAL_TEXT=$(echo "$API_RESPONSE" | jq -r '.[0].promotionaltext // ""')
+          SUPPORT_URL=$(echo "$API_RESPONSE" | jq -r '.[0].supporturl // ""')
+          MARKETING_URL=$(echo "$API_RESPONSE" | jq -r '.[0].marketingurl // ""')
+          IOS_APP_NAME=$(echo "$API_RESPONSE" | jq -r '.[0].iosappname // ""')
+          DESCRIPTION=$(echo "$API_RESPONSE" | jq -r '.[0].description // ""')
+          ISSUER_ID=$(echo "$API_RESPONSE" | jq -r '.[0].issuer_id // ""')
+          KEY_ID=$(echo "$API_RESPONSE" | jq -r '.[0].key_id // ""')
+          PRIVATE_KEY=$(echo "$API_RESPONSE" | jq -r '.[0].private_key // ""')
       
-          # Use 'jq' to extract values from JSON API response
-          SPLASH_SCREEN=$(echo $API_RESPONSE | jq -r '.[0].splashscreen // ""')
-          PRIMARY_COLOR=$(echo $API_RESPONSE | jq -r '.[0].primarycolor // "#000000"')
-          SECONDARY_COLOR=$(echo $API_RESPONSE | jq -r '.[0].secondarycolor // "#000000"')
-          TERTIARY_COLOR=$(echo $API_RESPONSE | jq -r '.[0].tertiarycolor // "#000000"')
-          LOGO=$(echo $API_RESPONSE | jq -r '.[0].logo // ""')
-          BACKGROUND_IMAGE=$(echo $API_RESPONSE | jq -r '.[0].backgroundimage // ""')
-          BACKGROUND_COLOR=$(echo $API_RESPONSE | jq -r '.[0].backgroundcolor // "#FFFFFF"')
-          MODAL_COLOR=$(echo $API_RESPONSE | jq -r '.[0].modalcolor // "#FFFFFF"')
-          BUTTON_TEXT_COLOR=$(echo $API_RESPONSE | jq -r '.[0].buttontext // "#FFFFFF"')
-          HEADER_COLOR=$(echo $API_RESPONSE | jq -r '.[0].headercolor // "#FFFFFF"')
-          BUNDLE_ID=$(echo $API_RESPONSE | jq -r '.[0].bundle_id // ""')
-          KEYWORDS=$(echo $API_RESPONSE | jq -r '.[0].keywords // ""')
-          PROMOTIONAL_TEXT=$(echo $API_RESPONSE | jq -r '.[0].promotionaltext // ""')
-          SUPPORT_URL=$(echo $API_RESPONSE | jq -r '.[0].supporturl // ""')
-          MARKETING_URL=$(echo $API_RESPONSE | jq -r '.[0].marketingurl // ""')
-          IOS_APP_NAME=$(echo $API_RESPONSE | jq -r '.[0].iosappname // ""')
-          DESCRIPTION=$(echo $API_RESPONSE | jq -r '.[0].description // ""')
-          ISSUER_ID=$(echo $API_RESPONSE | jq -r '.[0].issuer_id // ""')
-          KEY_ID=$(echo $API_RESPONSE | jq -r '.[0].key_id // ""')
-          PRIVATE_KEY=$(echo $API_RESPONSE | jq -r '.[0].private_key // ""')
-      
-          # Write to the config.js file using absolute path
-          cat > ${{ github.workspace }}/config.js <<EOL
+          # Write the config.js file
+          cat > "${{ github.workspace }}/config.js" <<EOL
           const config = {
             splashScreen: '${SPLASH_SCREEN}',  // Use URL directly
             primaryColor: '${PRIMARY_COLOR}',
@@ -64,7 +66,7 @@ jobs:
             backgroundImage: '${BACKGROUND_IMAGE}',  // Use URL directly
             backgroundColorImage: '',
             backgroundImageType: 'png',
-            subLogo: '${BACKGROUND_IMAGE}',  // Use URL directly
+            subLogo: '${LOGO}',  // Fix subLogo to use LOGO instead of backgroundImage
             backgroundColor: '${BACKGROUND_COLOR}',
             modalColor: '${MODAL_COLOR}',
             buttonText: '${BUTTON_TEXT_COLOR}',
@@ -82,7 +84,7 @@ jobs:
             ${PRIVATE_KEY}
             \`
           };
-          
+      
           console.log('Config data:', config);
       
           module.exports = config;

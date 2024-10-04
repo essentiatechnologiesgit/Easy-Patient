@@ -31,7 +31,7 @@ jobs:
         run: |
           # Safely retrieve the API response and ensure JSON handling
           API_RESPONSE="${{ steps.fetch_api_data.outputs.response }}"
-          
+      
           # Parse values from the JSON response using jq
           SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')
           PRIMARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].primarycolor // "#000000"')
@@ -89,6 +89,7 @@ jobs:
       
           module.exports = config;
           EOL
+
 
 
       # Print the updated config.js file to the console

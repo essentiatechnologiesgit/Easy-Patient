@@ -30,7 +30,7 @@ jobs:
       # Update config.js file with the API response
       - name: Update config.js
         run: |
-          echo "${{ env.response }}" | jq '.'
+
       
           # Parse values from the JSON response using jq, and handle spaces in URLs
           SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')

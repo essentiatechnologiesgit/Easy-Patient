@@ -135,14 +135,13 @@ jobs:
             description: \"%s\",
             ANDROID_APP_NAME: \"%s\",
             shortDescription: \"%s\",
-            longDescription: \"%s\",
-            jsonfile: \"%s\"
+            longDescription: \"%s\"
           };\n\n\nmodule.exports = config;" \
           "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
           "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
           "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
           "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
-          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" "$JSON_FILE" > "${{ github.workspace }}/config.js"
+          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
 
       # Print the updated config.js file to the console
       - name: Print updated config.js

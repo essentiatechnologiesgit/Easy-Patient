@@ -55,40 +55,40 @@ jobs:
           PRIVATE_KEY=$(echo "$API_RESPONSE" | jq -r '.[0].private_key // ""')
       
           # Write the config.js file
-          cat > "${{ github.workspace }}/config.js" <<EOL
-          const config = {
-            splashScreen: '${SPLASH_SCREEN}',  // Use URL directly
-            primaryColor: '${PRIMARY_COLOR}',
-            textColorHeadings: '#2A2A31',
-            secondaryColor: '${SECONDARY_COLOR}',
-            tertiaryColor: '${TERTIARY_COLOR}',
-            logo: '${LOGO}',  // Use URL directly
-            backgroundImage: '${BACKGROUND_IMAGE}',  // Use URL directly
-            backgroundColorImage: '',
-            backgroundImageType: 'png',
-            subLogo: '${LOGO}',  // Fix subLogo to use LOGO instead of backgroundImage
-            backgroundColor: '${BACKGROUND_COLOR}',
-            modalColor: '${MODAL_COLOR}',
-            buttonText: '${BUTTON_TEXT_COLOR}',
-            headerColor: '${HEADER_COLOR}',
-            BUNDLE_ID: '${BUNDLE_ID}',
-            keywords: '${KEYWORDS}',
-            promotionalText: '${PROMOTIONAL_TEXT}',
-            supportUrl: '${SUPPORT_URL}',
-            marketingUrl: '${MARKETING_URL}',
-            Name: '${IOS_APP_NAME}',
-            description: '${DESCRIPTION}',
-            ISSUER_ID: '${ISSUER_ID}',
-            KEY_ID: '${KEY_ID}',
-            private_key: \`
-            ${PRIVATE_KEY}
-            \`
-          };
+          # cat > "${{ github.workspace }}/config.js" <<EOL
+          # const config = {
+          #   splashScreen: '${SPLASH_SCREEN}',  // Use URL directly
+          #   primaryColor: '${PRIMARY_COLOR}',
+          #   textColorHeadings: '#2A2A31',
+          #   secondaryColor: '${SECONDARY_COLOR}',
+          #   tertiaryColor: '${TERTIARY_COLOR}',
+          #   logo: '${LOGO}',  // Use URL directly
+          #   backgroundImage: '${BACKGROUND_IMAGE}',  // Use URL directly
+          #   backgroundColorImage: '',
+          #   backgroundImageType: 'png',
+          #   subLogo: '${LOGO}',  // Fix subLogo to use LOGO instead of backgroundImage
+          #   backgroundColor: '${BACKGROUND_COLOR}',
+          #   modalColor: '${MODAL_COLOR}',
+          #   buttonText: '${BUTTON_TEXT_COLOR}',
+          #   headerColor: '${HEADER_COLOR}',
+          #   BUNDLE_ID: '${BUNDLE_ID}',
+          #   keywords: '${KEYWORDS}',
+          #   promotionalText: '${PROMOTIONAL_TEXT}',
+          #   supportUrl: '${SUPPORT_URL}',
+          #   marketingUrl: '${MARKETING_URL}',
+          #   Name: '${IOS_APP_NAME}',
+          #   description: '${DESCRIPTION}',
+          #   ISSUER_ID: '${ISSUER_ID}',
+          #   KEY_ID: '${KEY_ID}',
+          #   private_key: \`
+          #   ${PRIVATE_KEY}
+          #   \`
+          # };
       
-          console.log('Config data:', config);
+          # console.log('Config data:', config);
       
-          module.exports = config;
-          EOL
+          # module.exports = config;
+          # EOL
 
 
 

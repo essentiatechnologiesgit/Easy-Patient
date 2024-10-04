@@ -93,12 +93,20 @@ jobs:
         run: |
           if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
             curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $SUB_LOGO
-            echo "Downloaded sub logo."
+            echo "Downloaded Json file."
           else
-            echo "Sub logo already exists."
+            echo "Json file already exists."
           fi
 
-
+      - name: Listing json file 
+        run: |
+          if [ -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            cat ${{ github.workspace }}/android/fastlane/jsonFile.json
+          else
+            echo "Json file does not exist."
+          fi
+            
+          
 
       # Update config.js file with the new image paths (using require)
       - name: Update config.js

@@ -28,10 +28,13 @@ jobs:
           echo "response=$RESPONSE" >> $GITHUB_ENV  # Use environment file for output
 
       # Update config.js file with the API response
+      # Update config.js file with the API response
       - name: Update config.js
         run: |
 
-      
+          # Use the correct environment variable for API response
+          API_RESPONSE="$RESPONSE"
+
           # Parse values from the JSON response using jq, and handle spaces in URLs
           SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')
           PRIMARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].primarycolor // "#000000"')

@@ -16,22 +16,22 @@ jobs:
         run: |
           echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
-      # Fetch API data and log the response
+      # Fetch API data and save the response to an environment variable
       - name: Fetch API data
         id: fetch_api_data
         run: |
           echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
           RESPONSE=$(curl --location 'https://5713-2400-adc1-1aa-d500-c822-86fc-8187-644d.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
-          echo "::set-output name=api_response::$RESPONSE"  # Use set-output to pass the response to the next step
+          echo "$RESPONSE" > $GITHUB_ENV  # Save API response to environment variable for use in the next step
 
       # Update config.js file with the API response
       - name: Update config.js
         run: |
-          # Get the response from the previous step
-          API_RESPONSE="${{ steps.fetch_api_data.outputs.api_response }}"
+          # Get the response from the environment variable
+          API_RESPONSE=$(cat $GITHUB_ENV)
 
-          # Parse values from the JSON response using jq, and handle spaces in URLs
+          # Parse values from the JSON response using jq
           SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')
           PRIMARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].primarycolor // "#000000"')
           SECONDARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].secondarycolor // "#000000"')
@@ -53,7 +53,7 @@ jobs:
           SHORT_DESCRIPTION=$(echo "$API_RESPONSE" | jq -r '.[0].short_description // ""')
           LONG_DESCRIPTION=$(echo "$API_RESPONSE" | jq -r '.[0].long_description // ""')
 
-          # Safely write the config.js file
+          # Write the config.js file
           printf "const config = {
             splashScreen: \"%s\",
             primaryColor: \"%s\",
@@ -80,9 +80,10 @@ jobs:
             shortDescription: \"%s\",
             longDescription: \"%s\"
           };\n\nconsole.log('Config data:', config);\n\nmodule.exports = config;" \
-          "$SPLASH_SCREEN" "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" "$LOGO" "$BACKGROUND_IMAGE" "$LOGO" \
-          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
-          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+          "$SPLASH_SCREEN" "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" "$LOGO" "$BACKGROUND_IMAGE" \
+          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" \
+          "$PROMOTIONAL_TEXT" "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
 
       # Print the updated config.js file to the console
       - name: Print updated config.js

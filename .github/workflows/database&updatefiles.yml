@@ -16,6 +16,8 @@ jobs:
         run: |
           echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
+
+      
       # Fetch API data and log the response
       - name: Fetch API data
         id: fetch_api_data
@@ -24,13 +26,12 @@ jobs:
           RESPONSE=$(curl --location 'https://5713-2400-adc1-1aa-d500-c822-86fc-8187-644d.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
           echo "response=$RESPONSE" >> $GITHUB_ENV  # Use environment file for output
-      
+
       # Update config.js file with the API response
       - name: Update config.js
         run: |
-          # Safely retrieve the API response and ensure JSON handling
           API_RESPONSE="${{ env.response }}"
-
+      
           # Parse values from the JSON response using jq, and handle spaces in URLs
           SPLASH_SCREEN=$(echo "$API_RESPONSE" | jq -r '.[0].splashscreen // ""')
           PRIMARY_COLOR=$(echo "$API_RESPONSE" | jq -r '.[0].primarycolor // "#000000"')
@@ -49,43 +50,41 @@ jobs:
           MARKETING_URL=$(echo "$API_RESPONSE" | jq -r '.[0].marketingurl // ""')
           IOS_APP_NAME=$(echo "$API_RESPONSE" | jq -r '.[0].iosappname // ""')
           DESCRIPTION=$(echo "$API_RESPONSE" | jq -r '.[0].description // ""')
-          ISSUER_ID=$(echo "$API_RESPONSE" | jq -r '.[0].issuer_id // ""')
-          KEY_ID=$(echo "$API_RESPONSE" | jq -r '.[0].key_id // ""')
-          PRIVATE_KEY=$(echo "$API_RESPONSE" | jq -r '.[0].private_key // ""')
-
-          # Write the config.js file safely
+          ANDROID_APP_NAME=$(echo "$API_RESPONSE" | jq -r '.[0].androidappname // ""')
+          SHORT_DESCRIPTION=$(echo "$API_RESPONSE" | jq -r '.[0].short_description // ""')
+          LONG_DESCRIPTION=$(echo "$API_RESPONSE" | jq -r '.[0].long_description // ""')
+      
+          # Safely write the config.js file
           printf "const config = {
-            splashScreen: '%s',
-            primaryColor: '%s',
+            splashScreen: \"%s\",
+            primaryColor: \"%s\",
             textColorHeadings: '#2A2A31',
-            secondaryColor: '%s',
-            tertiaryColor: '%s',
-            logo: '%s',
-            backgroundImage: '%s',
+            secondaryColor: \"%s\",
+            tertiaryColor: \"%s\",
+            logo: \"%s\",
+            backgroundImage: \"%s\",
             backgroundColorImage: '',
             backgroundImageType: 'png',
-            subLogo: '%s',
-            backgroundColor: '%s',
-            modalColor: '%s',
-            buttonText: '%s',
-            headerColor: '%s',
-            BUNDLE_ID: '%s',
-            keywords: '%s',
-            promotionalText: '%s',
-            supportUrl: '%s',
-            marketingUrl: '%s',
-            Name: '%s',
-            description: '%s',
-            ISSUER_ID: '%s',
-            KEY_ID: '%s',
-            private_key: \`
-            %s
-            \`
+            subLogo: \"%s\",
+            backgroundColor: \"%s\",
+            modalColor: \"%s\",
+            buttonText: \"%s\",
+            headerColor: \"%s\",
+            BUNDLE_ID: \"%s\",
+            keywords: \"%s\",
+            promotionalText: \"%s\",
+            supportUrl: \"%s\",
+            marketingUrl: \"%s\",
+            Name: \"%s\",
+            description: \"%s\",
+            ANDROID_APP_NAME: \"%s\",
+            shortDescription: \"%s\",
+            longDescription: \"%s\"
           };\n\nconsole.log('Config data:', config);\n\nmodule.exports = config;" \
-          "$SPLASH_SCREEN" "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" "$LOGO" "$BACKGROUND_IMAGE" \
-          "$LOGO" "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" "$HEADER_COLOR" "$BUNDLE_ID" \
-          "$KEYWORDS" "$PROMOTIONAL_TEXT" "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
-          "$ISSUER_ID" "$KEY_ID" "$PRIVATE_KEY" > "${{ github.workspace }}/config.js"
+          "$SPLASH_SCREEN" "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" "$LOGO" "$BACKGROUND_IMAGE" "$LOGO" \
+          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+
 
       # Print the updated config.js file to the console
       - name: Print updated config.js

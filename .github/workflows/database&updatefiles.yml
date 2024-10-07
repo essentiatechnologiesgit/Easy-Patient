@@ -16,56 +16,59 @@ jobs:
         uses: actions/checkout@v2
 
       # Update the app name in AndroidManifest.xml and strings.xml for Android
-      - name: Update app name in AndroidManifest.xml (Android)
+      # - name: Update app name in AndroidManifest.xml (Android)
+      #   run: |
+      #     # Declare the new app name
+      #     NEW_APP_NAME="New App Name"
+
+      #     # Update the app name in strings.xml
+      #     sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$NEW_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
+
+      #     # Ensure AndroidManifest.xml references the correct string resource (no need for a direct change unless the string reference is missing)
+      #     sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
+
+      #   shell: bash
+
+      # # Print AndroidManifest.xml and strings.xml to verify changes
+      # - name: Print AndroidManifest.xml and strings.xml
+      #   run: |
+      #     echo "----- AndroidManifest.xml -----"
+      #     cat android/app/src/main/AndroidManifest.xml
+
+      #     echo "----- strings.xml -----"
+      #     cat android/app/src/main/res/values/strings.xml
+
+      #   shell: bash
+
+      # # Check if Info.plist exists
+      # - name: Check Info.plist existence
+      #   run: |
+      #     if [ -f ios/EasyPatientDynamic/Info.plist ]; then
+      #       echo "Info.plist exists."
+      #     else
+      #       echo "Info.plist does not exist."
+      #       exit 1
+      #     fi
+
+      #   shell: bash
+
+      - name: Ensure perl is installed
         run: |
-          # Declare the new app name
-          NEW_APP_NAME="New App Name"
+          which perl || brew install perl
 
-          # Update the app name in strings.xml
-          sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$NEW_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
 
-          # Ensure AndroidManifest.xml references the correct string resource (no need for a direct change unless the string reference is missing)
-          sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
-
-        shell: bash
-
-      # Print AndroidManifest.xml and strings.xml to verify changes
-      - name: Print AndroidManifest.xml and strings.xml
-        run: |
-          echo "----- AndroidManifest.xml -----"
-          cat android/app/src/main/AndroidManifest.xml
-
-          echo "----- strings.xml -----"
-          cat android/app/src/main/res/values/strings.xml
-
-        shell: bash
-
-      # Check if Info.plist exists
-      - name: Check Info.plist existence
-        run: |
-          if [ -f ios/EasyPatientDynamic/Info.plist ]; then
-            echo "Info.plist exists."
-          else
-            echo "Info.plist does not exist."
-            exit 1
-          fi
-
-        shell: bash
-
-      # Update app name in Info.plist for iOS
       - name: Update app name in Info.plist (iOS)
         run: |
           # Declare the new app name
-          NEW_APP_NAME="NewAppName"
-
+          NEW_APP_NAME="New App Name"
+          
           # Path to Info.plist
           PLIST_PATH="ios/EasyPatientDynamic/Info.plist"
+          
+          # Replace CFBundleDisplayName and CFBundleName using perl
+          perl -pi -e "s|(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)|\$1$NEW_APP_NAME\$2|" "$PLIST_PATH"
+          perl -pi -e "s|(<key>CFBundleName</key>\s*<string>)[^<]*(</string>)|\$1$NEW_APP_NAME\$2|" "$PLIST_PATH"
 
-          # Update CFBundleDisplayName
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $NEW_APP_NAME" "$PLIST_PATH"
-
-          # Update CFBundleName (if necessary)
-          /usr/libexec/PlistBuddy -c "Set :CFBundleName $NEW_APP_NAME" "$PLIST_PATH"
 
       # Print Info.plist to verify the change
       - name: Print Info.plist

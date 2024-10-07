@@ -39,8 +39,18 @@ jobs:
 
         shell: bash
 
-      # Update the app name in Info.plist for iOS
-      # Update app name in Info.plist for iOS
+      # Check if Info.plist exists
+      - name: Check Info.plist existence
+        run: |
+          if [ -f ios/EasyPatientDynamic/Info.plist ]; then
+            echo "Info.plist exists."
+          else
+            echo "Info.plist does not exist."
+            exit 1
+          fi
+
+        shell: bash
+
       # Update app name in Info.plist for iOS
       - name: Update app name in Info.plist (iOS)
         run: |
@@ -48,9 +58,10 @@ jobs:
           NEW_APP_NAME="New App Name"
 
           # Replace CFBundleName placeholder with the new app name
-          sed -i '' "s|\(<key>CFBundleName</key>[[:space:]]*<string>\)[^<]*\(</string>\)|\1$NEW_APP_NAME\2|" ios/EasyPatientDynamic/Info.plist
+          sed -i '' "s|<key>CFBundleName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleName</key>\n\t<string>$NEW_APP_NAME</string>|" ios/EasyPatientDynamic/Info.plist
           
         shell: bash
+
 
 
       # Print Info.plist to verify the change

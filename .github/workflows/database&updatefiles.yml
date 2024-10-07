@@ -65,19 +65,17 @@ jobs:
           # Path to Info.plist
           PLIST_PATH="ios/EasyPatientDynamic/Info.plist"
           
-          # Replace CFBundleDisplayName and CFBundleName using perl
-          perl -pi -e "s|(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)|\$1$NEW_APP_NAME\$2|" "$PLIST_PATH"
-          perl -pi -e "s|(<key>CFBundleName</key>\s*<string>)[^<]*(</string>)|\$1$NEW_APP_NAME\$2|" "$PLIST_PATH"
-
-      - name: Sleep for 2 seconds
+          # Find and replace the values of CFBundleDisplayName and CFBundleName
+          sed -i '' 's|<key>CFBundleDisplayName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleDisplayName</key>\n\t<string>'"$NEW_APP_NAME"'</string>|' "$PLIST_PATH"
+          sed -i '' 's|<key>CFBundleName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleName</key>\n\t<string>'"$NEW_APP_NAME"'</string>|' "$PLIST_PATH"
+      
+      - name: Sleep for 2 seconds (optional)
         run: sleep 2
-
-      # Print Info.plist to verify the change
-      - name: Print Info.plist
+      
+      - name: Print Info.plist to verify the change
         run: |
           echo "----- Info.plist -----"
           cat ios/EasyPatientDynamic/Info.plist
-
         shell: bash
 
 

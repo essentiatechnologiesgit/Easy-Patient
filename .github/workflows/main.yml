@@ -71,7 +71,9 @@ jobs:
 
           echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
-          echo "PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
+          echo "PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key' | tr -d '[:space:]')" >> $GITHUB_ENV
+
+
           
 
       # Download images to the assets folder if they don't already exist

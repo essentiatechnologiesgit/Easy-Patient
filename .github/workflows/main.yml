@@ -213,6 +213,10 @@ jobs:
             KEY
             )
       
+            # Debug: print the private key for inspection
+            puts 'Private Key Content:'
+            puts private_key_obj.to_pem
+      
             # Generate the JWT token
             token = JWT.encode(
               {
@@ -228,11 +232,13 @@ jobs:
             )
       
             # Output the generated token
+            puts 'Generated Token:'
             puts token
           ")
       
           # Store the generated token as a GitHub environment variable
           echo "token=$token" >> $GITHUB_ENV
+
 
 
       - name: Save private key to default location

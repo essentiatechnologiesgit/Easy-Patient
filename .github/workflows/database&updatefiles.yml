@@ -61,8 +61,7 @@ jobs:
       - name: Update app name in AndroidManifest.xml (Android)
         run: |
           # Declare the new app name
-          ANDROID_APP_NAME="New App Name"  # Make sure to set your app name here
-      
+     
           # Update the app name in strings.xml
           sed -i '' "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$ANDROID_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
       

@@ -197,8 +197,8 @@ jobs:
       - name: Generate JWT Token
         run: |
           ruby -r openssl -r jwt -e "
-          ISSUER_ID=${{ env.ISSUER_ID }}
-          KEY_ID=${{ env.KEY_ID }}
+          ISSUER_ID="${{ env.ISSUER_ID }}"
+          KEY_ID="${{ env.KEY_ID }}"
 
           private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
 

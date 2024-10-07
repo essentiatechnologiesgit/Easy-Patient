@@ -40,19 +40,22 @@ jobs:
         shell: bash
 
       # Update the app name in Info.plist for iOS
+      # Update app name in Info.plist for iOS
       - name: Update app name in Info.plist (iOS)
         run: |
           # Declare the new app name
           NEW_APP_NAME="New App Name"
 
-          # Update the app name in Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName '$NEW_APP_NAME'" ios/YourAppName/Info.plist
+          # Update Info.plist with the new app name
+          sed -i '' "s|<key>CFBundleName</key>\n\t<string>[^<]*</string>|<key>CFBundleName</key>\n\t<string>$NEW_APP_NAME</string>|" ios/EasyPatientDynamic/Info.plist
 
         shell: bash
 
-      # Print Info.plist to verify changes
+      # Print Info.plist to verify the change
       - name: Print Info.plist
-        run: cat ios/YourAppName/Info.plist
+        run: |
+          echo "----- Info.plist -----"
+          cat ios/EasyPatientDynamic/Info.plist
 
         shell: bash
 

@@ -52,22 +52,18 @@ jobs:
 
       #   shell: bash
 
-      - name: Ensure perl is installed
-        run: |
-          which perl || brew install perl
 
-
+      
       - name: Update app name in Info.plist (iOS)
         run: |
           # Declare the new app name
-          NEW_APP_NAME="New App Name"
+          NEW_APP_NAME="NewAppName"
           
           # Path to Info.plist
           PLIST_PATH="ios/EasyPatientDynamic/Info.plist"
           
-          # Find and replace the values of CFBundleDisplayName and CFBundleName
-          sed -i '' 's|<key>CFBundleDisplayName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleDisplayName</key>\n\t<string>'"$NEW_APP_NAME"'</string>|' "$PLIST_PATH"
-          sed -i '' 's|<key>CFBundleName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleName</key>\n\t<string>'"$NEW_APP_NAME"'</string>|' "$PLIST_PATH"
+          # Replace the first occurrence of "EasyPatientDynamic" with the new app name
+          sed -i '' '0,/EasyPatientDynamic/s//'"$NEW_APP_NAME"'/' "$PLIST_PATH"
       
       - name: Sleep for 2 seconds (optional)
         run: sleep 2

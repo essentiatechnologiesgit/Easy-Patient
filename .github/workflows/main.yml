@@ -72,14 +72,19 @@ jobs:
           echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
           # Extract the private key, replace escaped newline sequences with real newlines
-          echo "PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key' | sed 's/\\r\\n/\n/g')" >> $GITHUB_ENV
+          # Extract the private key, replacing '\r\n' with real newlines
+          PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key' | sed 's/\\r\\n/\n/g')
+          
+          # Verify private key content (Optional: remove or comment this in production)
+          echo "Private Key Content for Debugging:"
+          echo "$PRIVATE_KEY"
           
           # Write the private key to a .pem file
           echo "$PRIVATE_KEY" > private_key.pem
           
-          # Optional: Print the private key content for verification (remove or comment this in production)
-          echo "Private key content:"
-          cat private_key.pem
+          # Export the private key into GitHub environment
+          echo "PRIVATE_KEY=$(echo "$PRIVATE_KEY" | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
+
 
 
 

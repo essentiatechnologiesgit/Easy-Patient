@@ -3,7 +3,7 @@ name: Generate JWT
 on:
   push:
     branches:
-      - main
+      - FixesForiOSBuild
 
 jobs:
   generate_jwt:

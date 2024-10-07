@@ -26,6 +26,11 @@ jobs:
 
         shell: bash
 
+      - name: Print AndroidManifest.xml
+        run: cat android/app/src/main/AndroidManifest.xml
+
+        shell: bash
+
       # *******************************************************************************************
 
       # Access the client payload (extract the bundle ID)

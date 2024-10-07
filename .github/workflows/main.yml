@@ -75,14 +75,16 @@ jobs:
           # Extract the private key, replacing '\r\n' with real newlines
           PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key' | sed 's/\\r\\n/\n/g')
           
-          # Verify private key content (Optional: remove or comment this in production)
+          # Verify private key content for debugging
           echo "Private Key Content for Debugging:"
           echo "$PRIVATE_KEY"
           
           # Write the private key to a .pem file
           echo "$PRIVATE_KEY" > private_key.pem
           
-  
+          # Set the private key path as an environment variable
+          echo "PRIVATE_KEY_PATH=$(pwd)/private_key.pem" >> $GITHUB_ENV
+
       - name: Print private key
         run: |
           echo "Private key content:"

@@ -82,13 +82,7 @@ jobs:
           # Write the private key to a .pem file
           echo "$PRIVATE_KEY" > private_key.pem
           
-          # Export the private key into GitHub environment
-          echo "PRIVATE_KEY=$(echo "$PRIVATE_KEY" | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_ENV
-
-
-
-
-
+  
       - name: Print private key
         run: |
           echo "Private key content:"

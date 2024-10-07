@@ -1,7 +1,5 @@
 name: Database Connect and update config
-# on:
-#   repository_dispatch:
-#     types: [iOS]
+
 on:
   push:
     branches:
@@ -11,7 +9,6 @@ jobs:
   upload_screenshots:
     runs-on: macos-latest
     steps:
-      # Checkout code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -29,12 +26,13 @@ jobs:
         run: |
           gem install jwt
           pip install requests
+
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID=ad39d400-3314-48f8-977c-29a272eebad0
           KEY_ID=74H4QHFPVP
-      
+
           # Define the private key as a multi-line variable
           private_key=$(cat <<EOF
           -----BEGIN PRIVATE KEY-----
@@ -46,14 +44,11 @@ jobs:
           EOF
           )
       
-          # Generate JWT using Ruby
+          # Generate JWT using Ruby by passing the private key as an environment variable
           token=$(ruby -rjwt -ropenssl -e "
             require 'openssl'
             require 'jwt'
-            private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
-            #{private_key}
-            KEY
-            )
+            private_key_obj = OpenSSL::PKey::EC.new(ENV['PRIVATE_KEY'])
             token = JWT.encode(
               {
                 iss: '#{ISSUER_ID}',
@@ -67,8 +62,8 @@ jobs:
               }
             )
             puts token
-          ")
-      
+          " PRIVATE_KEY=\"$private_key\")
+
           # Store the generated token as a GitHub environment variable
           echo "token=$token" >> $GITHUB_ENV
 

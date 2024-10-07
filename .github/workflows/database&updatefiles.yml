@@ -1,9 +1,10 @@
-name: Database Connect and update config
+name: Generate JWT
 
 on:
   push:
     branches:
-      - FixesForiOSBuild
+      - main
+
 jobs:
   generate_jwt:
     runs-on: ubuntu-latest
@@ -18,35 +19,35 @@ jobs:
 
       - name: Generate JWT Token
         run: |
-          require 'openssl'
-          require 'jwt'
+          ruby -r openssl -r jwt -e "
+            issuer_id = 'ad39d400-3314-48f8-977c-29a272eebad0'  # Replace with your actual ISSUER_ID
+            key_id = '74H4QHFPVP'  # Replace with your actual KEY_ID
 
-          issuer_id = 'ad39d400-3314-48f8-977c-29a272eebad0'  # Replace with your actual ISSUER_ID
-          key_id = '74H4QHFPVP'  # Replace with your actual KEY_ID
+            private_key = <<~KEY
+            -----BEGIN PRIVATE KEY-----
+            MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+            pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+            6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+            +EG+nw8t
+            -----END PRIVATE KEY-----
+            KEY
 
-          private_key = <<~KEY
-          -----BEGIN PRIVATE KEY-----
-          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
-          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
-          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
-          +EG+nw8t
-          -----END PRIVATE KEY-----
-          KEY
+            private_key_obj = OpenSSL::PKey::EC.new(private_key)
 
-          private_key_obj = OpenSSL::PKey::EC.new(private_key)
+            token = JWT.encode(
+              {
+                iss: issuer_id,
+                exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              kid: key_id
+            )
 
-          token = JWT.encode(
-            {
-              iss: issuer_id,
-              exp: Time.now.to_i + 20 * 60,
-              aud: 'appstoreconnect-v1'
-            },
-            private_key_obj,
-            'ES256',
-            kid: key_id
-          )
+            puts token
+          "
 
-          puts token
 # jobs:
 #   upload_screenshots:
 #     runs-on: macos-latest

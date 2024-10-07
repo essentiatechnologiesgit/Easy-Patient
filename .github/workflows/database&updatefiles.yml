@@ -48,31 +48,31 @@ jobs:
           echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
           echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
 
-      # - name: Generate JWT
-      #   id: generate_jwt
-      #   run: |
-      #     ISSUER_ID=${{ env.ISSUER_ID }}
-      #     KEY_ID=${{ env.KEY_ID }}
-      #     private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
+      - name: Generate JWT
+        id: generate_jwt
+        run: |
+          ISSUER_ID=${{ env.ISSUER_ID }}
+          KEY_ID=${{ env.KEY_ID }}
+          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
 
-      #     token=$(ruby -rjwt -ropenssl -e "
-      #       private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-      #       token = JWT.encode(
-      #         {
-      #           iss: '$ISSUER_ID',
-      #           exp: Time.now.to_i + 20 * 60,
-      #           aud: 'appstoreconnect-v1'
-      #         },
-      #         private_key_obj,
-      #         'ES256',
-      #         header_fields = {
-      #           kid: '$KEY_ID'
-      #         }
-      #       )
-      #       puts token
-      #     ")
+          token=$(ruby -rjwt -ropenssl -e "
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            token = JWT.encode(
+              {
+                iss: '$ISSUER_ID',
+                exp: Time.now.to_i + 20 * 60,
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              header_fields = {
+                kid: '$KEY_ID'
+              }
+            )
+            puts token
+          ")
           
-      #     echo "token=$token" >> $GITHUB_ENV
+          echo "token=$token" >> $GITHUB_ENV
 # jobs:
 #   upload_screenshots:
 #     runs-on: macos-latest

@@ -68,10 +68,11 @@ jobs:
           echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
           echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
           echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV      
-          # Print private key for verification (remove or comment this in production)
-          echo "Private key content:"
-          cat private_key.pem
-      
+
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
+          echo "PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
+          
 
       # Download images to the assets folder if they don't already exist
       - name: Download splash screen
@@ -181,7 +182,7 @@ jobs:
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+          private_key=$(cat "${{ env.PRIVATE_KEY }}")
       
           token=$(ruby -rjwt -ropenssl -e "
             require 'openssl'

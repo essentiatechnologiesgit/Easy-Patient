@@ -5,74 +5,48 @@ on:
     branches:
       - FixesForiOSBuild
 jobs:
-  build:
-    runs-on: macos-latest
+  generate_jwt:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.x'
+        uses: actions/checkout@v2
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3
+          ruby-version: '3.0'  # Specify your Ruby version
 
-      - name: Install dependencies
+      - name: Generate JWT Token
         run: |
-          gem install jwt
-          pip install requests
+          require 'openssl'
+          require 'jwt'
 
-      - name: Extract variables from config.js
-        id: extract-variables
-        run: |
-          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep 'ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
-          KEY_ID=$(grep 'KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
-      
-          # Handle the private key separately and save it to a file
-          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
-      
-          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
-          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
-          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV    
+          issuer_id = 'ad39d400-3314-48f8-977c-29a272eebad0'  # Replace with your actual ISSUER_ID
+          key_id = '74H4QHFPVP'  # Replace with your actual KEY_ID
 
-      - name: Echo extracted variables
-        run: |
-          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
-          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
-          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
-          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+          private_key = <<~KEY
+          -----BEGIN PRIVATE KEY-----
+          MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+          pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+          6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+          +EG+nw8t
+          -----END PRIVATE KEY-----
+          KEY
 
-      - name: Generate JWT
-        id: generate_jwt
-        run: |
-          ISSUER_ID=${{ env.ISSUER_ID }}
-          KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")  
+          private_key_obj = OpenSSL::PKey::EC.new(private_key)
 
-          token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
-          
-          echo "token=$token" >> $GITHUB_ENV
+          token = JWT.encode(
+            {
+              iss: issuer_id,
+              exp: Time.now.to_i + 20 * 60,
+              aud: 'appstoreconnect-v1'
+            },
+            private_key_obj,
+            'ES256',
+            kid: key_id
+          )
+
+          puts token
 # jobs:
 #   upload_screenshots:
 #     runs-on: macos-latest

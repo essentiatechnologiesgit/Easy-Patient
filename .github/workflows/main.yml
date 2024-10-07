@@ -184,7 +184,7 @@ jobs:
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY }}")
+          private_key="${{ env.PRIVATE_KEY }}"
       
           token=$(ruby -rjwt -ropenssl -e "
             require 'openssl'

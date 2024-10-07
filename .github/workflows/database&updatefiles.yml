@@ -9,7 +9,7 @@ on:
 
 jobs:
   upload_screenshots:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       # Checkout code from the repository
       - name: Checkout code

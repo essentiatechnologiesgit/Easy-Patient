@@ -20,37 +20,44 @@ jobs:
         run: |
           ISSUER_ID=ad39d400-3314-48f8-977c-29a272eebad0
           KEY_ID=74H4QHFPVP
-          private_key=
+      
+          # Define the private key as a multi-line variable
+          private_key=$(cat <<EOF
           -----BEGIN PRIVATE KEY-----
           MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
           pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
           6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
           +EG+nw8t
           -----END PRIVATE KEY-----
+      EOF
+          )
       
+          # Generate JWT using Ruby
           token=$(ruby -rjwt -ropenssl -e "
             require 'openssl'
             require 'jwt'
             private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
-            $private_key
+            #{private_key}
             KEY
             )
             token = JWT.encode(
               {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
+                iss: '#{ISSUER_ID}',
+                exp: Time.now.to_i + 20 * 60, # Token expires in 20 minutes
                 aud: 'appstoreconnect-v1'
               },
               private_key_obj,
               'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
+              {
+                kid: '#{KEY_ID}'
               }
             )
             puts token
           ")
       
+          # Store the generated token as a GitHub environment variable
           echo "token=$token" >> $GITHUB_ENV
+
 
 
               # Access the client payload (extract the bundle ID)
@@ -159,41 +166,41 @@ jobs:
 
       # Create assets directory
       # Download images to the assets folder if they don't already exist
-      - name: Download splash screen
-        run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
-            echo "Downloaded splash screen."
-          else
-            echo "Splash screen already exists."
-          fi
+      # - name: Download splash screen
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+      #       echo "Downloaded splash screen."
+      #     else
+      #       echo "Splash screen already exists."
+      #     fi
 
-      - name: Download logo
-        run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
-            echo "Downloaded logo."
-          else
-            echo "Logo already exists."
-          fi
+      # - name: Download logo
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+      #       echo "Downloaded logo."
+      #     else
+      #       echo "Logo already exists."
+      #     fi
 
-      - name: Download background image
-        run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
-            echo "Downloaded background image."
-          else
-            echo "Background image already exists."
-          fi
+      # - name: Download background image
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+      #       echo "Downloaded background image."
+      #     else
+      #       echo "Background image already exists."
+      #     fi
 
-      - name: Download sub logo
-        run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
-            echo "Downloaded sub logo."
-          else
-            echo "Sub logo already exists."
-          fi
+      # - name: Download sub logo
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+      #       echo "Downloaded sub logo."
+      #     else
+      #       echo "Sub logo already exists."
+      #     fi
 
       # - name: Download json file
       #   run: |
@@ -215,42 +222,42 @@ jobs:
           
 
       # Update config.js file with the new image paths (using require)
-      - name: Update config.js
-        run: |
-          printf "const config = {
-            splashScreen: require('./src/assets/splashScreen.png'),
-            logo: require('./src/assets/logo.png'),
-            backgroundImage: require('./src/assets/backgroundImage.png'),
-            subLogo: require('./src/assets/subLogo.png'),
-            primaryColor: \"%s\",
-            textColorHeadings: '#2A2A31',
-            secondaryColor: \"%s\",
-            tertiaryColor: \"%s\",
-            backgroundColorImage: '',
-            backgroundImageType: 'png',
-            backgroundColor: \"%s\",
-            modalColor: \"%s\",
-            buttonText: \"%s\",
-            headerColor: \"%s\",
-            BUNDLE_ID: \"%s\",
-            keywords: \"%s\",
-            promotionalText: \"%s\",
-            supportUrl: \"%s\",
-            marketingUrl: \"%s\",
-            Name: \"%s\",
-            description: \"%s\",
-            ANDROID_APP_NAME: \"%s\",
-            shortDescription: \"%s\",
-            longDescription: \"%s\"
-          };\n\n\nmodule.exports = config;" \
-          "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
-          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
-          "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
-          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
-          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+      # - name: Update config.js
+      #   run: |
+      #     printf "const config = {
+      #       splashScreen: require('./src/assets/splashScreen.png'),
+      #       logo: require('./src/assets/logo.png'),
+      #       backgroundImage: require('./src/assets/backgroundImage.png'),
+      #       subLogo: require('./src/assets/subLogo.png'),
+      #       primaryColor: \"%s\",
+      #       textColorHeadings: '#2A2A31',
+      #       secondaryColor: \"%s\",
+      #       tertiaryColor: \"%s\",
+      #       backgroundColorImage: '',
+      #       backgroundImageType: 'png',
+      #       backgroundColor: \"%s\",
+      #       modalColor: \"%s\",
+      #       buttonText: \"%s\",
+      #       headerColor: \"%s\",
+      #       BUNDLE_ID: \"%s\",
+      #       keywords: \"%s\",
+      #       promotionalText: \"%s\",
+      #       supportUrl: \"%s\",
+      #       marketingUrl: \"%s\",
+      #       Name: \"%s\",
+      #       description: \"%s\",
+      #       ANDROID_APP_NAME: \"%s\",
+      #       shortDescription: \"%s\",
+      #       longDescription: \"%s\"
+      #     };\n\n\nmodule.exports = config;" \
+      #     "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
+      #     "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
+      #     "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+      #     "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+      #     "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
 
-      # Print the updated config.js file to the console
-      - name: Print updated config.js
-        run: |
-          echo "Contents of the updated config.js:"
-          cat ${{ github.workspace }}/config.js
+      # # Print the updated config.js file to the console
+      # - name: Print updated config.js
+      #   run: |
+      #     echo "Contents of the updated config.js:"
+      #     cat ${{ github.workspace }}/config.js

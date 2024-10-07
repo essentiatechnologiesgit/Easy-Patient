@@ -1,11 +1,11 @@
 name: Database Connect and update config
-# on:
-#   repository_dispatch:
-#     types: [iOS]
 on:
-  push:
-    branches:
-      - FixesForiOSBuild
+  repository_dispatch:
+    types: [iOS]
+# on:
+#   push:
+#     branches:
+#       - FixesForiOSBuild
 
 jobs:
   upload_screenshots:

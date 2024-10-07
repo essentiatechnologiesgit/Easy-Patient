@@ -17,6 +17,10 @@ jobs:
         with:
           ruby-version: '3.0'  # Specify your Ruby version
 
+      - name: Install JWT gem
+        run: |
+          gem install jwt
+
       - name: Generate JWT Token
         run: |
           ruby -r openssl -r jwt -e "
@@ -47,6 +51,7 @@ jobs:
 
             puts token
           "
+
 
 # jobs:
 #   upload_screenshots:

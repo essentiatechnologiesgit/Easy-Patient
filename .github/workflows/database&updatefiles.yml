@@ -15,69 +15,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Update the app name in AndroidManifest.xml and strings.xml for Android
-      # - name: Update app name in AndroidManifest.xml (Android)
-      #   run: |
-      #     # Declare the new app name
-      #     NEW_APP_NAME="New App Name"
 
-      #     # Update the app name in strings.xml
-      #     sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$NEW_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
-
-      #     # Ensure AndroidManifest.xml references the correct string resource (no need for a direct change unless the string reference is missing)
-      #     sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
-
-      #   shell: bash
-
-      # # Print AndroidManifest.xml and strings.xml to verify changes
-      # - name: Print AndroidManifest.xml and strings.xml
-      #   run: |
-      #     echo "----- AndroidManifest.xml -----"
-      #     cat android/app/src/main/AndroidManifest.xml
-
-      #     echo "----- strings.xml -----"
-      #     cat android/app/src/main/res/values/strings.xml
-
-      #   shell: bash
-
-      # # Check if Info.plist exists
-      # - name: Check Info.plist existence
-      #   run: |
-      #     if [ -f ios/EasyPatientDynamic/Info.plist ]; then
-      #       echo "Info.plist exists."
-      #     else
-      #       echo "Info.plist does not exist."
-      #       exit 1
-      #     fi
-
-      #   shell: bash
-
-
-      
-      # - name: Update app name in Info.plist (iOS)
-      #   run: |
-      #     # Declare the new app name
-      #     NEW_APP_NAME="NewAppName"
-          
-      #     # Path to Info.plist
-      #     PLIST_PATH="ios/EasyPatientDynamic/Info.plist"
-          
-      #     # Replace the first occurrence of "EasyPatientDynamic" with the new app name
-      #     sed -i '' '0,/EasyPatientDynamic/s//'"$NEW_APP_NAME"'/' "$PLIST_PATH"
-      
-      # - name: Sleep for 2 seconds (optional)
-      #   run: sleep 2
-      
-      # - name: Print Info.plist to verify the change
-      #   run: |
-      #     echo "----- Info.plist -----"
-      #     cat ios/EasyPatientDynamic/Info.plist
-      #   shell: bash
-
-
-      # *******************************************************************************************
-
-      # Access the client payload (extract the bundle ID)
+              # Access the client payload (extract the bundle ID)
       - name: Access client payload
         run: |
           echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
@@ -87,7 +26,7 @@ jobs:
         id: fetch_api_data
         run: |
           echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
-          RESPONSE=$(curl --location 'https://5713-2400-adc1-1aa-d500-c822-86fc-8187-644d.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
 
           
@@ -116,6 +55,70 @@ jobs:
           echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
           echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
           echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV
+
+
+      # Update the app name in AndroidManifest.xml and strings.xml for Android
+      - name: Update app name in AndroidManifest.xml (Android)
+        run: |
+          # Declare the new app name
+         
+
+          # Update the app name in strings.xml
+          sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$ANDROID_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
+
+          # Ensure AndroidManifest.xml references the correct string resource (no need for a direct change unless the string reference is missing)
+          sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
+
+        shell: bash
+
+      # Print AndroidManifest.xml and strings.xml to verify changes
+      - name: Print AndroidManifest.xml and strings.xml
+        run: |
+          echo "----- AndroidManifest.xml -----"
+          cat android/app/src/main/AndroidManifest.xml
+
+          echo "----- strings.xml -----"
+          cat android/app/src/main/res/values/strings.xml
+
+        shell: bash
+
+      # Check if Info.plist exists
+      - name: Check Info.plist existence
+        run: |
+          if [ -f ios/EasyPatientDynamic/Info.plist ]; then
+            echo "Info.plist exists."
+          else
+            echo "Info.plist does not exist."
+            exit 1
+          fi
+
+        shell: bash
+
+
+      
+      # - name: Update app name in Info.plist (iOS)
+      #   run: |
+      #     # Declare the new app name
+      #     NEW_APP_NAME="NewAppName"
+          
+      #     # Path to Info.plist
+      #     PLIST_PATH="ios/EasyPatientDynamic/Info.plist"
+          
+      #     # Replace the first occurrence of "EasyPatientDynamic" with the new app name
+      #     sed -i '' '0,/EasyPatientDynamic/s//'"$NEW_APP_NAME"'/' "$PLIST_PATH"
+      
+      # - name: Sleep for 2 seconds (optional)
+      #   run: sleep 2
+      
+      # - name: Print Info.plist to verify the change
+      #   run: |
+      #     echo "----- Info.plist -----"
+      #     cat ios/EasyPatientDynamic/Info.plist
+      #   shell: bash
+
+
+      # *******************************************************************************************
+
 
       # Create assets directory
       # Download images to the assets folder if they don't already exist

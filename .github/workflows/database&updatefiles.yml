@@ -21,14 +21,13 @@ jobs:
           # Declare the new app name
           NEW_APP_NAME="New App Name"
 
-          # Update the app name in strings.xml using '#' as the delimiter instead of '/'
-          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">'$NEW_APP_NAME'</string>#' android/app/src/main/res/values/strings.xml
+          # Update the app name in strings.xml
+          sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$NEW_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
 
-          # Ensure AndroidManifest.xml references the correct string resource (if needed)
-          sed -i 's#android:label="[^"]*"#android:label="@string/app_name"#' android/app/src/main/AndroidManifest.xml
+          # Ensure AndroidManifest.xml references the correct string resource (no need for a direct change unless the string reference is missing)
+          sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
 
         shell: bash
-
       # Print AndroidManifest.xml and strings.xml to verify changes
       - name: Print AndroidManifest.xml and strings.xml
         run: |

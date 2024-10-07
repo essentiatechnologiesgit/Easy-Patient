@@ -28,6 +28,7 @@ jobs:
           sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
 
         shell: bash
+
       # Print AndroidManifest.xml and strings.xml to verify changes
       - name: Print AndroidManifest.xml and strings.xml
         run: |
@@ -52,19 +53,15 @@ jobs:
         shell: bash
 
       # Update app name in Info.plist for iOS
-      # Update app name in Info.plist for iOS
       - name: Update app name in Info.plist (iOS)
         run: |
           # Declare the new app name
           NEW_APP_NAME="New App Name"
 
-          # Replace CFBundleName placeholder with the new app name
-          /usr/bin/sed -i '' "s|<key>CFBundleDisplayName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleDisplayName</key>\n\t<string>$NEW_APP_NAME</string>|" ios/EasyPatientDynamic/Info.plist
+          # Replace CFBundleDisplayName placeholder with the new app name
+          sed -i "s|<key>CFBundleDisplayName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleDisplayName</key>\n\t<string>$NEW_APP_NAME</string>|" ios/EasyPatientDynamic/Info.plist
           
         shell: bash
-
-
-
 
       # Print Info.plist to verify the change
       - name: Print Info.plist

@@ -46,8 +46,8 @@ jobs:
           # Declare the new app name
           NEW_APP_NAME="New App Name"
 
-          # Update Info.plist with the new app name
-          sed -i '' "s|<key>CFBundleName</key>\n\t<string>[^<]*</string>|<key>CFBundleName</key>\n\t<string>$NEW_APP_NAME</string>|" ios/EasyPatientDynamic/Info.plist
+          # Update Info.plist with the new app name, without relying on newlines and tabs for matching
+          sed -i "s|<key>CFBundleName</key>[[:space:]]*<string>[^<]*</string>|<key>CFBundleName</key><string>$NEW_APP_NAME</string>|" ios/EasyPatientDynamic/Info.plist
 
         shell: bash
 

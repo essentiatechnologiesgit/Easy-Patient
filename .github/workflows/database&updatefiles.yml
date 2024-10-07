@@ -69,6 +69,8 @@ jobs:
           perl -pi -e "s|(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)|\$1$NEW_APP_NAME\$2|" "$PLIST_PATH"
           perl -pi -e "s|(<key>CFBundleName</key>\s*<string>)[^<]*(</string>)|\$1$NEW_APP_NAME\$2|" "$PLIST_PATH"
 
+      - name: Sleep for 2 seconds
+        run: sleep 2
 
       # Print Info.plist to verify the change
       - name: Print Info.plist

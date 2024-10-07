@@ -77,7 +77,7 @@ jobs:
 
       # *******************************************************************************************
 
-      Access the client payload (extract the bundle ID)
+      # Access the client payload (extract the bundle ID)
       - name: Access client payload
         run: |
           echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"

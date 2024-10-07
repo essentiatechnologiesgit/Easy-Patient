@@ -196,34 +196,43 @@ jobs:
       - name: Generate JWT
         id: generate_jwt
         run: |
-          ISSUER_ID=${{ env.ISSUER_ID }}
-          KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
-      
-          token=$(ruby -rjwt -ropenssl -e "
-            require 'openssl'
-            require 'jwt'
-            private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
-            $private_key
-            KEY
-            )
-            token = JWT.encode(
-              {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
-              }
-            )
-            puts token
-          ")
-      
-          echo "token=$token" >> $GITHUB_ENV
+            ISSUER_ID=${{ env.ISSUER_ID }}
+            KEY_ID=${{ env.KEY_ID }}
+            
+            # Read the private key file and store it in a variable
+            private_key=$(cat "/Users/runner/work/Easy-Patient/Easy-Patient/private_key.pem")
+            
+            # Use Ruby to generate the JWT token
+            token=$(ruby -rjwt -ropenssl -e "
+              require 'openssl'
+              require 'jwt'
+              
+              # Read and load the EC private key
+              private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
+              $private_key
+              KEY
+              )
+              
+              # Generate the JWT token
+              token = JWT.encode(
+                {
+                  iss: '$ISSUER_ID',
+                  exp: Time.now.to_i + 20 * 60, # Token expiry set to 20 minutes
+                  aud: 'appstoreconnect-v1'
+                },
+                private_key_obj,
+                'ES256',
+                {
+                  kid: '$KEY_ID'
+                }
+              )
+              
+              # Output the generated token
+              puts token
+            ")
 
+# Store the token as an environment variable
+echo "token=$token" >> $GITHUB_ENV
 
       - name: Save private key to default location
         run: |

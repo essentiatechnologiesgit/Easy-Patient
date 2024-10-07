@@ -198,31 +198,46 @@ jobs:
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
+          
+          # Read the private key from the file
           private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
       
+          # Print the private key for debugging
+          echo "Private Key Content for Debugging:"
+          echo "$private_key"
+          
+          # Generate JWT using Ruby
           token=$(ruby -rjwt -ropenssl -e "
             require 'openssl'
             require 'jwt'
+      
+            # Load the EC private key from the shell variable
             private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
-            $private_key
+            ${private_key}
             KEY
             )
+      
+            # Generate the JWT token
             token = JWT.encode(
               {
-                iss: '$ISSUER_ID',
-                exp: Time.now.to_i + 20 * 60,
+                iss: '${ISSUER_ID}',
+                exp: Time.now.to_i + 20 * 60, # Token expires in 20 minutes
                 aud: 'appstoreconnect-v1'
               },
               private_key_obj,
               'ES256',
-              header_fields = {
-                kid: '$KEY_ID'
+              {
+                kid: '${KEY_ID}'
               }
             )
+      
+            # Output the generated token
             puts token
           ")
       
+          # Store the generated token as a GitHub environment variable
           echo "token=$token" >> $GITHUB_ENV
+
 
 
 

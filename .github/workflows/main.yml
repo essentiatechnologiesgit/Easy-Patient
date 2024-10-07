@@ -71,17 +71,15 @@ jobs:
 
           echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
-          echo "PRIVATE_KEY=$(echo \"$RESPONSE\" | jq -r '.[0].private_key' | awk '{gsub(/\\n/, "\n"); print}')" >> $GITHUB_ENV
+          echo "PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
           
-          # Now write the private key to a .pem file
-          echo "$PRIVATE_KEY" > private_key.pem
+          # Now write the private key to a .pem file, replacing \r\n with actual newlines
+          echo "$PRIVATE_KEY" | awk '{gsub(/\\r\\n/, "\n"); print}' > private_key.pem
           
           # Optional: Print the private key content for verification (remove or comment this in production)
           echo "Private key content:"
           cat private_key.pem
-      
-          # Optionally, set the path to the .pem file as an environment variable
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
+
 
 
       - name: Print private key

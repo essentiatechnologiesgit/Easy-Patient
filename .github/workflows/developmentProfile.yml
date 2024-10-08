@@ -15,7 +15,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: 'iOS Screenshot Upload'  
-          ref: 'refs/heads/ScreenshotBuild' 
+          ref: 'refs/heads/blob/ScreenshotBuild' 
           inputs: '{ "message": "blah blah", "something": true }'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}

@@ -1,7 +1,14 @@
 name: iOS Screenshot Upload
 on:
-  repository_dispatch:
-    types: [iOSS]
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'A message input'
+        required: true
+      something:
+        description: 'Boolean input'
+        required: true
+        
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -11,10 +18,6 @@ jobs:
 
       - name: Install Node.js Dependencies
         run: npm install axios --force
-
-      - name: Use custom DNS
-        run: |
-          echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
 
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -26,10 +29,17 @@ jobs:
         with:
           ruby-version: 3.3
 
-          # *********************************  Feching Data from Database and updating config **************************************
-      - name: Access client payload
+      # Echo the inputs received
+      - name: Echo workflow inputs
         run: |
-          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
+          echo "Message: ${{ github.event.inputs.message }}"
+          echo "Something: ${{ github.event.inputs.something }}"
+
+
+       # *********************************  Feching Data from Database and updating config **************************************
+      # - name: Access client payload
+      #   run: |
+      #     echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
       # Fetch API data and save relevant parts to environment variables
       - name: Fetch API data

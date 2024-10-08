@@ -17,7 +17,6 @@ jobs:
           inputs: '{ "message": "blah blah", "something": true }'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-
       # - name: Generate JWT
       #   id: generate_jwt
       #   run: |

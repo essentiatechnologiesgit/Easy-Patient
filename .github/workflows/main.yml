@@ -128,6 +128,11 @@ jobs:
           
           echo "Private key downloaded and renamed dynamically to AuthKey_${{ env.KEY_ID }}.p8"
 
+      - name: Check if AuthKey file exists
+        run: |
+          ls -l "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
+
+
 
       # Download images to the assets folder if they don't already exist
       - name: Download splash screen
@@ -653,6 +658,8 @@ jobs:
           </plist>
           EOF
 
+    
+
         # *************************************** Prerequisetries End ********************************************
 
 
@@ -837,7 +844,7 @@ jobs:
             -t ios \
             --apiKey ${{ env.KEY_ID }} \
             --apiIssuer ${{ env.ISSUER_ID }} \
-            --apiKeyPath "${{ github.workspace }}/private_key.p8"
+
  
 
 

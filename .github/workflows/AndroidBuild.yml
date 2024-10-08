@@ -1,9 +1,8 @@
 name: Android Build and Deploy
 
 on:
-  push:
-    branches:
-      - FixesForiOSBuilds
+  repository_dispatch:
+    types: [Android]
 
 jobs:
   upload_screenshots:
@@ -25,6 +24,70 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+
+            # Access the client payload (extract the bundle ID)
+      - name: Access client payload
+        run: |
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
+
+      # Fetch API data and save relevant parts to environment variables
+      - name: Fetch API data
+        id: fetch_api_data
+        run: |
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"
+
+          
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].tertiarycolor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.[0].marketingurl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].iosappname')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
+
+          # Parse and export relevant fields from the JSON response using jq
+          echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
+          echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
+          echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
+          echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV      
+
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
+
+
+      - name: Download json file
+        run: |
+          if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
+            echo "Downloaded Json file."
+          else
+            echo "Json file already exists."
+          fi
+
+      - name: Listing json file 
+        run: |
+          if [ -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            cat ${{ github.workspace }}/android/fastlane/jsonFile.json
+          else
+            echo "Json file does not exist."
+          fi
+
+
 
       # Install Dependencies
       - name: Install Dependencies
@@ -48,15 +111,15 @@ jobs:
           path: android/app/build/outputs/bundle/release/app-release.aab
 
       # Set up Fastlane and Bundler for deployment
-      - name: Install Fastlane and Bundler
-        run: |
-          sudo gem install bundler
-          sudo gem install fastlane
+      # - name: Install Fastlane and Bundler
+      #   run: |
+      #     sudo gem install bundler
+      #     sudo gem install fastlane
 
-      # Change directory to Android before running Fastlane
-      - name: Upload Metadata and Build to Google Play
-        run: |
-          cd android
-          sudo bundle install
-          bundle exec fastlane production         # Publish AAB to internal track
-          bundle exec fastlane upload_metadata
+      # # Change directory to Android before running Fastlane
+      # - name: Upload Metadata and Build to Google Play
+      #   run: |
+      #     cd android
+      #     sudo bundle install
+      #     bundle exec fastlane production         # Publish AAB to internal track
+      #     bundle exec fastlane upload_metadata

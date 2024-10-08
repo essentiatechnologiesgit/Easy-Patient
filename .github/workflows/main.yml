@@ -112,6 +112,8 @@ jobs:
           puts token
           "
 
+          echo "token=$token" >> $GITHUB_ENV
+
 
 
       # Download images to the assets folder if they don't already exist

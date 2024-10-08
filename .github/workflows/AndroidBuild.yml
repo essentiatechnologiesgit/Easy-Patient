@@ -70,6 +70,48 @@ jobs:
           echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
 
 
+            # Update config.js file with the new image paths (using require)
+      - name: Update config.js
+        run: |
+          printf "const config = {
+            splashScreen: require('./src/assets/splashScreen.png'),
+            logo: require('./src/assets/logo.png'),
+            backgroundImage: require('./src/assets/backgroundImage.png'),
+            subLogo: require('./src/assets/subLogo.png'),
+            primaryColor: \"%s\",
+            textColorHeadings: '#2A2A31',
+            secondaryColor: \"%s\",
+            tertiaryColor: \"%s\",
+            backgroundColorImage: '',
+            backgroundImageType: 'png',
+            backgroundColor: \"%s\",
+            modalColor: \"%s\",
+            buttonText: \"%s\",
+            headerColor: \"%s\",
+            BUNDLE_ID: \"%s\",
+            keywords: \"%s\",
+            promotionalText: \"%s\",
+            supportUrl: \"%s\",
+            marketingUrl: \"%s\",
+            Name: \"%s\",
+            description: \"%s\",
+            ANDROID_APP_NAME: \"%s\",
+            shortDescription: \"%s\",
+            longDescription: \"%s\"
+          };\n\n\nmodule.exports = config;" \
+          "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
+          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
+          "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+
+      # Print the updated config.js file to the console
+      - name: Print updated config.js
+        run: |
+          echo "Contents of the updated config.js:"
+          cat ${{ github.workspace }}/config.js
+
+
       - name: Download json file
         run: |
           if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
@@ -109,27 +151,53 @@ jobs:
         shell: bash
 
 
+            # Update fastlane metadata files
+      - name: Update fastlane metadata files
+        run: |
+          # Write the short description to short_description.txt
+          echo "$SHORT_DESCRIPTION" > "${{ github.workspace }}/android/fastlane/metadata/android/en-US/short_description.txt"
+          
+          # Write the long description to full_description.txt
+          echo "$LONG_DESCRIPTION" > "${{ github.workspace }}/android/fastlane/metadata/android/en-US/full_description.txt"
+          
+          # Write the app name to title.txt
+          echo "$ANDROID_APP_NAME" > "${{ github.workspace }}/android/fastlane/metadata/android/en-US/title.txt"
+          
+      # Display the contents of the files after updating
+      - name: Show updated fastlane metadata files
+        run: |
+          echo "Contents of short_description.txt:"
+          cat "${{ github.workspace }}/android/fastlane/metadata/android/en-US/short_description.txt"
+          
+          echo "Contents of full_description.txt:"
+          cat "${{ github.workspace }}/android/fastlane/metadata/android/en-US/full_description.txt"
+          
+          echo "Contents of title.txt:"
+          cat "${{ github.workspace }}/android/fastlane/metadata/android/en-US/title.txt"
+
+
+
 
       # Install Dependencies
-      - name: Install Dependencies
-        run: npm install --force
+      # - name: Install Dependencies
+      #   run: npm install --force
 
-      # Ensure that gradlew has execution permissions
-      - name: Ensure gradlew is executable
-        run: chmod +x android/gradlew
+      # # Ensure that gradlew has execution permissions
+      # - name: Ensure gradlew is executable
+      #   run: chmod +x android/gradlew
 
-      # Build the AAB file
-      - name: Build AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease
+      # # Build the AAB file
+      # - name: Build AAB
+      #   run: |
+      #     cd android
+      #     ./gradlew bundleRelease
 
-      # Upload the AAB file as artifact
-      - name: Upload AAB file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release.aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+      # # Upload the AAB file as artifact
+      # - name: Upload AAB file as artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-release.aab
+      #     path: android/app/build/outputs/bundle/release/app-release.aab
 
       # Set up Fastlane and Bundler for deployment
       # - name: Install Fastlane and Bundler

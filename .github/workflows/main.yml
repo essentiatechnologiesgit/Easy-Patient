@@ -648,84 +648,83 @@ jobs:
 
       # ******************************************* Uploading Meta Data **************************************
 
-      # - name: Get App ID
-      #   id: get_app_id
-      #   run: |
-      #     bundle_id=${{ env.BUNDLE_IDentifier }}  # Replace with your app's Bundle ID
+      - name: Get App ID
+        id: get_app_id
+        run: |
+          bundle_id=${{ env.BUNDLE_IDentifier }}  # Replace with your app's Bundle ID
       
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
       
-      #     echo "Response: $response"
+          echo "Response: $response"
       
-      #     app_id=$(echo $response | jq -r '.data[0].id')
+          app_id=$(echo $response | jq -r '.data[0].id')
       
-      #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
-      #       echo "Failed to retrieve app ID."
-      #       exit 1
-      #     fi
+          if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+            echo "Failed to retrieve app ID."
+            exit 1
+          fi
       
-      #     echo "app_id=$app_id" >> $GITHUB_ENV
+          echo "app_id=$app_id" >> $GITHUB_ENV
 
-      # - name: Get App Store Version ID
-      #   id: get_app_store_version_id
-      #   run: |
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
+      - name: Get App Store Version ID
+        id: get_app_store_version_id
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
       
-      #     echo "Response: $response"
+          echo "Response: $response"
       
-      #     app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
+          app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
       
-      #     if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
-      #       echo "Failed to retrieve app store version ID."
-      #       exit 1
-      #     fi
+          if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
+            echo "Failed to retrieve app store version ID."
+            exit 1
+          fi
       
-      #     echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+          echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
 
-      # - name: Get App Store Version Localization ID
-      #   id: get_app_store_version_localization_id
-      #   run: |
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+      - name: Get App Store Version Localization ID
+        id: get_app_store_version_localization_id
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
       
-      #     echo "Response: $response"
+          echo "Response: $response"
       
-      #     app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
+          app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
       
-      #     if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
-      #       echo "Failed to retrieve app store version localization ID."
-      #       exit 1
-      #     fi
+          if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
+            echo "Failed to retrieve app store version localization ID."
+            exit 1
+          fi
       
-      #     echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
+          echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-      # - name: Update App Store Version Localization
-      #   id: update_app_store_version_localization
-      #   run: |
-      #     response=$(curl -X PATCH \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d '{
-      #         "data": {
-      #           "id": "'${{ env.app_store_version_localization_id }}'",
-      #           "type": "appStoreVersionLocalizations",
-      #           "attributes": {
-      #             "description": "here goes your app description...",
-      #             "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
-      #             "marketingUrl": null,
-      #             "promotionalText": "We introduce new features and improvements to improve your experience",
-      #             "supportUrl": "https://easy-health.app/landing-page/index.html"
-      #           }
-      #         }
-      #       }' \
-      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+      - name: Update App Store Version Localization
+        id: update_app_store_version_localization
+        run: |
+          response=$(curl -X PATCH \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "id": "'${{ env.app_store_version_localization_id }}'",
+                "type": "appStoreVersionLocalizations",
+                "attributes": {
+                  "description": "${{ env.DESCRIPTION }}",
+                  "keywords": "${{ env.KEYWORDS }}",
+                  "marketingUrl": "${{ env.MARKETING_URL }}",
+                  "promotionalText": "${{ env.PROMOTIONAL_TEXT }}",
+                  "supportUrl": "${{ env.SUPPORT_URL }}"
+                  }
+            }' \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
           
-      #     echo "Update App Store Version Localization Response: $response"
+          echo "Update App Store Version Localization Response: $response"
 
 
        # ******************************************* Uploading Meta Data END **************************************
@@ -802,18 +801,18 @@ jobs:
 
 
 
-      # - name: Find IPA file
-      #   id: find_ipa
-      #   run: |
-      #     ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
-      #     echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
+      - name: Find IPA file
+        id: find_ipa
+        run: |
+          ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
+          echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
       
-      # - name: Upload IPA to App Store Connect
-      #   run: |
-      #     xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
-      #       -t ios \
-      #       --apiKey ${{ env.KEY_ID }} \
-      #       --apiIssuer ${{ env.ISSUER_ID }}
+      - name: Upload IPA to App Store Connect
+        run: |
+          xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
+            -t ios \
+            --apiKey ${{ env.KEY_ID }} \
+            --apiIssuer ${{ env.ISSUER_ID }}
 
  
 

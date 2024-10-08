@@ -77,6 +77,11 @@ jobs:
         run: |
           echo "${{ env.PRIVATE_KEY }}" > ${{ github.workspace }}/private_key.p8
           echo "Downloaded private key."
+
+      - name: Print private key
+        run: |
+          echo "Private key content:"
+          cat ${{ github.workspace }}/private_key.p8
       
       - name: Generate JWT Token
         run: |

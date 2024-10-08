@@ -179,36 +179,36 @@ jobs:
 
 
       # Install Dependencies
-      # - name: Install Dependencies
-      #   run: npm install --force
+      - name: Install Dependencies
+        run: npm install --force
 
-      # # Ensure that gradlew has execution permissions
-      # - name: Ensure gradlew is executable
-      #   run: chmod +x android/gradlew
+      # Ensure that gradlew has execution permissions
+      - name: Ensure gradlew is executable
+        run: chmod +x android/gradlew
 
-      # # Build the AAB file
-      # - name: Build AAB
-      #   run: |
-      #     cd android
-      #     ./gradlew bundleRelease
+      # Build the AAB file
+      - name: Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
 
-      # # Upload the AAB file as artifact
-      # - name: Upload AAB file as artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: app-release.aab
-      #     path: android/app/build/outputs/bundle/release/app-release.aab
+      # Upload the AAB file as artifact
+      - name: Upload AAB file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
 
       # Set up Fastlane and Bundler for deployment
-      # - name: Install Fastlane and Bundler
-      #   run: |
-      #     sudo gem install bundler
-      #     sudo gem install fastlane
+      - name: Install Fastlane and Bundler
+        run: |
+          sudo gem install bundler
+          sudo gem install fastlane
 
-      # # Change directory to Android before running Fastlane
-      # - name: Upload Metadata and Build to Google Play
-      #   run: |
-      #     cd android
-      #     sudo bundle install
-      #     bundle exec fastlane production         # Publish AAB to internal track
-      #     bundle exec fastlane upload_metadata
+      # Change directory to Android before running Fastlane
+      - name: Upload Metadata and Build to Google Play
+        run: |
+          cd android
+          sudo bundle install
+          bundle exec fastlane production        
+          bundle exec fastlane upload_metadata

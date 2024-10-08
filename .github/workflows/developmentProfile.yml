@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - FixesForiOSBuild
-
 jobs:
   build:
     runs-on: macos-latest

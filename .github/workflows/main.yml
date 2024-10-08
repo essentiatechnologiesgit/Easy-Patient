@@ -83,37 +83,40 @@ jobs:
           echo "Private key content:"
           cat ${{ github.workspace }}/private_key.p8
       
-      - name: Generate JWT Token
+
+      - name: Generate JWT
+        id: generate_jwt
         run: |
-          # Print the environment variables and the private key file for debugging
-          echo "ISSUER_ID: $ISSUER_ID"
-          echo "KEY_ID: $KEY_ID"
-          cat ${{ github.workspace }}/private_key.p8
+          ISSUER_ID=${{ env.ISSUER_ID }}
+          KEY_ID=${{ env.KEY_ID }}
           
-          # Ruby block to generate JWT
-          ruby -r openssl -r jwt -e "
-          issuer_id = ENV['ISSUER_ID']
-          key_id = ENV['KEY_ID']
-          private_key = File.read('${{ github.workspace }}/private_key.p8')
+          # Load the private key content from the file
+          private_key=$(cat "${{ github.workspace }}/private_key.p8")
       
-          private_key_obj = OpenSSL::PKey::EC.new(private_key)
+          # Ensure the private key is correctly formatted
+          token=$(ruby -rjwt -ropenssl -e "
+            require 'openssl'
+            require 'jwt'
+            
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            
+            token = JWT.encode(
+              {
+                iss: '$ISSUER_ID',
+                exp: Time.now.to_i + 20 * 60,
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              header_fields = {
+                kid: '$KEY_ID'
+              }
+            )
+            puts token
+          ")
       
-          token = JWT.encode(
-            {
-              iss: issuer_id,
-              exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
-              aud: 'appstoreconnect-v1'
-            },
-            private_key_obj,
-            'ES256',
-            kid: key_id
-          )
-      
-          puts token
-          "
-
+          # Save the generated token in the GitHub Actions environment for later steps
           echo "token=$token" >> $GITHUB_ENV
-
 
 
       # Download images to the assets folder if they don't already exist

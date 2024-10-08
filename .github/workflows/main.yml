@@ -75,7 +75,7 @@ jobs:
 
       - name: Download private key
         run: |
-          echo "${{ env.PRIVATE_KEY }}" > ${{ github.workspace }}/private_key.p8
+          curl -o ${{ github.workspace }}/private_key.p8 $private_key
           echo "Downloaded private key."
 
       - name: Print private key

@@ -123,21 +123,22 @@ jobs:
 
       - name: Download and move private key
         run: |
+          # Create the directory if it doesn't exist
+          mkdir -p ~/.private_keys
+          
           # Download the private key
           curl -o "${{ github.workspace }}/private_key.p8" $private_key
           
           # Move and rename it dynamically based on KEY_ID
-          mv "${{ github.workspace }}/private_key.p8" "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
+          mv "${{ github.workspace }}/private_key.p8" "~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
           
-          echo "Private key downloaded and renamed dynamically to AuthKey_${{ env.KEY_ID }}.p8"
+          # Set the permissions for the private key
+          chmod 600 "~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+          
+          echo "Private key downloaded and moved to ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
 
-      - name: Check if AuthKey file exists
-        run: |
-          ls -l "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
 
-      - name: Set permissions for AuthKey
-        run: |
-          chmod 600 "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
+
 
 
       # - name: Save private key to default location

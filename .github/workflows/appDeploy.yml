@@ -1,8 +1,7 @@
 name: iOS Screenshot Upload
 on:
-  push:
-    branches:
-      - ScreenshotBuilds
+  repository_dispatch:
+    types: [iOSS]
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -27,173 +26,78 @@ jobs:
         with:
           ruby-version: 3.3
 
-
-      # ************************************ Taking screenshots ****************************************
-
-      - name: Install CocoaPods
-        run: gem install cocoapods
-
-      - name: Cache CocoaPods
-        uses: actions/cache@v3
-        with:
-          path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      - name: Install Node.js dependencies
-        run: npm install --force
-
-      - name: Install Pods
+          # *********************************  Feching Data from Database and updating config **************************************
+      - name: Access client payload
         run: |
-          cd ios
-          pod deintegrate
-          rm -rf Pods Podfile.lock
-          pod update
-          pod install
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
-      - name: Install Xcode 15.3
+      # Fetch API data and save relevant parts to environment variables
+      - name: Fetch API data
+        id: fetch_api_data
         run: |
-          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-          xcodebuild -version
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"
 
-      - name: Clean Derived Data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
-
-     
-      - name: Clean Build Folder
-        run: |
-          cd ios
-          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
-
-      - name: Build for Simulator
-        run: |
-          xcodebuild clean build \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
-            -configuration Debug \
-            -derivedDataPath ios/build/DerivedData
-
-
-      - name: List Contents of Build Directory
-        run: |
-          echo "Listing contents of the Products directory:"
-          ls ios/build/DerivedData/Build/Products
-
-      - name: Start Metro Bundler
-        run: |
-          npx react-native start &
-
-
-      - name: Find iOS Simulator UUID
-        id: find_simulator
-        run: |
-          SIMULATOR_NAME="iPhone 15 Pro Max" # Change to the desired simulator name
-          UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
-          echo "Simulator UUID: $UUID"
-          echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
-
-      - name: Boot iOS Simulator
-        run: |
-          xcrun simctl boot ${{ env.SIMULATOR_UUID }}
-        
-
-      - name: Install .app File on Simulator
-        run: |
-          APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
-          echo "App path: $APP_PATH"
-
-          # Install the .app file on the booted simulator
-          xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
-
-      - name: Launch the App on Simulator
-        run: |
-          APP_BUNDLE_ID="com.org.easypatientdynamic"
-          echo "App Bundle ID: $APP_BUNDLE_ID"
-
-          # Launch the app using the dynamic UUID
-          xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
-
-      - name: Take a Screenshot
-        run: |
-          SCREENSHOT_PATH="./screenshots"
-          mkdir -p "$SCREENSHOT_PATH"
-
-          # Wait for the app to load
-          sleep 120
           
-          # Navigate to the Login screen using deep link
-               
-          # Capture a screenshot of the Login screen
-          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].tertiarycolor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.[0].marketingurl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].iosappname')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
 
-          sleep 120
+          # Parse and export relevant fields from the JSON response using jq
+          echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
+          echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
+          echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
+          echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV      
 
-          # Navigate to the Dashboard screen using deep link
-
-          # Capture a screenshot of the Dashboard screen
-          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
-          
-      - name: Upload Screenshots as Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: SimulatorScreenshots
-          path: ./screenshots
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
 
 
-      - name: Download Screenshots from Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: SimulatorScreenshots
-          path: ./downloaded_screenshots
-          
-    # ************************************ End screenshots ****************************************
-
-      - name: Extract variables from config.js
-        id: extract-variables
+      - name: Download private key
         run: |
-          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep -E '^  ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          KEY_ID=$(grep -E '^  KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+          curl -o ${{ github.workspace }}/private_key.p8 $private_key
+          echo "Downloaded private key."
+
+      - name: Print private key
+        run: |
+          echo "Private key content:"
+          cat ${{ github.workspace }}/private_key.p8
       
-          # Handle the private key separately and save it to a file
-          awk '/^  private_key:/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key://g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
-      
-          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
-          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
-          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
-      
-      - name: Echo extracted variables
-        run: |
-          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
-          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
-          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
-          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
-
-      - name: Use Private Key
-        run: |
-          cat ${{ env.PRIVATE_KEY_PATH }}
-
-      - name: Install dependencies
-        run: |
-          gem install jwt
-          pip install requests jq
 
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
-
-          # Properly escape and format the private key to avoid issues with newlines
-          private_key_formatted=$(echo "$private_key" | sed ':a;N;$!ba;s/\n/\\n/g')
-
+          
+          # Load the private key content from the file
+          private_key=$(cat "${{ github.workspace }}/private_key.p8")
+      
+          # Ensure the private key is correctly formatted
           token=$(ruby -rjwt -ropenssl -e "
-            private_key_obj = OpenSSL::PKey::EC.new('$private_key_formatted')
+            require 'openssl'
+            require 'jwt'
+            
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            
             token = JWT.encode(
               {
                 iss: '$ISSUER_ID',
@@ -208,436 +112,713 @@ jobs:
             )
             puts token
           ")
-          
+      
+          # Save the generated token in the GitHub Actions environment for later steps
           echo "token=$token" >> $GITHUB_ENV
 
-
-      # - name: Get App ID
-      #   id: get_app_id
-      #   run: |
-      #     bundle_id="${{ env.BUNDLE_IDentifier }}"  
-      
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
-      
-      #     echo "Response: $response"
-      
-      #     app_id=$(echo $response | jq -r '.data[0].id')
-      
-      #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
-      #       echo "Failed to retrieve app ID."
-      #       exit 1
-      #     fi
-
-      - name: Get App ID
-        id: get_app_id
+      - name: Download and move private key
         run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/apps")
-      
-          echo "Full API Response: $response"
-      
-          app_id=$(echo $response | jq -r '.data[] | select(.attributes.bundleId=="'${{ env.BUNDLE_IDentifier }}'") | .id')
-      
-          if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
-            echo "Failed to retrieve app ID."
-            exit 1
+          # Download the private key
+          curl -o "${{ github.workspace }}/private_key.p8" $private_key
+          
+          # Move and rename it dynamically based on KEY_ID
+          mv "${{ github.workspace }}/private_key.p8" "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
+          
+          echo "Private key downloaded and renamed dynamically to AuthKey_${{ env.KEY_ID }}.p8"
+
+
+      # Download images to the assets folder if they don't already exist
+      - name: Download splash screen
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+            echo "Downloaded splash screen."
           else
-            echo "App ID: $app_id"
+            echo "Splash screen already exists."
           fi
 
-      
-          echo "app_id=$app_id" >> $GITHUB_ENV
 
-      - name: Get App Store Version ID
-        id: get_app_store_version_id
+
+      - name: Download logo
         run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
-      
-          echo "Response: $response"
-      
-          app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
-      
-          if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
-            echo "Failed to retrieve app store version ID."
-            exit 1
+          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+            echo "Downloaded logo."
+          else
+            echo "Logo already exists."
           fi
-      
-          echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
 
-      - name: Get App Store Version Localization ID
-        id: get_app_store_version_localization_id
+      - name: Download background image
         run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
-      
-          echo "Response: $response"
-      
-          app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
-      
-          if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
-            echo "Failed to retrieve app store version localization ID."
-            exit 1
+          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+            echo "Downloaded background image."
+          else
+            echo "Background image already exists."
           fi
-      
-          echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-
-
-
-      - name: Create Screenshot Set
-        id: create_screenshot_set
+      - name: Download sub logo
         run: |
-          response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "appScreenshotSets",
-                "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_67"
-                },
-                "relationships": {
-                  "appStoreVersionLocalization": {
-                    "data": {
-                      "id": "'${{ env.app_store_version_localization_id }}'",
-                      "type": "appStoreVersionLocalizations"
-                    }
-                  }
-                }
-              }
-            }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
+          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
 
-          echo "Create Screenshot Set Response: $response"
-          screenshot_set_id=$(echo $response | jq -r '.data.id')
-          echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+      # Update config.js file with the new image paths (using require)
+      - name: Update config.js
+        run: |
+          printf "const config = {
+            splashScreen: require('./src/assets/splashScreen.png'),
+            logo: require('./src/assets/logo.png'),
+            backgroundImage: require('./src/assets/backgroundImage.png'),
+            subLogo: require('./src/assets/subLogo.png'),
+            primaryColor: \"%s\",
+            textColorHeadings: '#2A2A31',
+            secondaryColor: \"%s\",
+            tertiaryColor: \"%s\",
+            backgroundColorImage: '',
+            backgroundImageType: 'png',
+            backgroundColor: \"%s\",
+            modalColor: \"%s\",
+            buttonText: \"%s\",
+            headerColor: \"%s\",
+            BUNDLE_ID: \"%s\",
+            keywords: \"%s\",
+            promotionalText: \"%s\",
+            supportUrl: \"%s\",
+            marketingUrl: \"%s\",
+            Name: \"%s\",
+            description: \"%s\",
+            ANDROID_APP_NAME: \"%s\",
+            shortDescription: \"%s\",
+            longDescription: \"%s\"
+          };\n\n\nmodule.exports = config;" \
+          "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
+          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
+          "$HEADER_COLOR" "$BUNDLE_IDentifier" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
 
-      - name: Upload Screenshots to App Store Connect
+      # Print the updated config.js file to the console
+      - name: Print updated config.js
         run: |
-          # Array to hold screenshot IDs
-          screenshot_ids=()
-          # Create a mapping file
-          touch screenshot_mapping.txt
+          echo "Contents of the updated config.js:"
+          cat ${{ github.workspace }}/config.js
+          
+
+
+      # ************************************ Taking screenshots ****************************************
+
+    #   - name: Install CocoaPods
+    #     run: gem install cocoapods
+
+    #   - name: Cache CocoaPods
+    #     uses: actions/cache@v3
+    #     with:
+    #       path: ios/Pods
+    #       key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+    #       restore-keys: |
+    #         ${{ runner.os }}-pods-
+
+    #   - name: Install Node.js dependencies
+    #     run: npm install --force
+
+    #   - name: Install Pods
+    #     run: |
+    #       cd ios
+    #       pod deintegrate
+    #       rm -rf Pods Podfile.lock
+    #       pod update
+    #       pod install
+
+    #   - name: Install Xcode 15.3
+    #     run: |
+    #       sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+    #       xcodebuild -version
+
+    #   - name: Clean Derived Data
+    #     run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
+     
+    #   - name: Clean Build Folder
+    #     run: |
+    #       cd ios
+    #       xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+
+    #   - name: Build for Simulator
+    #     run: |
+    #       xcodebuild clean build \
+    #         -workspace ios/EasyPatientDynamic.xcworkspace \
+    #         -scheme EasyPatientDynamic \
+    #         -sdk iphonesimulator \
+    #         -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+    #         -configuration Debug \
+    #         -derivedDataPath ios/build/DerivedData
+
+
+    #   - name: List Contents of Build Directory
+    #     run: |
+    #       echo "Listing contents of the Products directory:"
+    #       ls ios/build/DerivedData/Build/Products
+
+    #   - name: Start Metro Bundler
+    #     run: |
+    #       npx react-native start &
+
+
+    #   - name: Find iOS Simulator UUID
+    #     id: find_simulator
+    #     run: |
+    #       SIMULATOR_NAME="iPhone 15 Pro Max" # Change to the desired simulator name
+    #       UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
+    #       echo "Simulator UUID: $UUID"
+    #       echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
+
+    #   - name: Boot iOS Simulator
+    #     run: |
+    #       xcrun simctl boot ${{ env.SIMULATOR_UUID }}
+        
+
+    #   - name: Install .app File on Simulator
+    #     run: |
+    #       APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
+    #       echo "App path: $APP_PATH"
+
+    #       # Install the .app file on the booted simulator
+    #       xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
+
+    #   - name: Launch the App on Simulator
+    #     run: |
+    #       APP_BUNDLE_ID="com.org.easypatientdynamic"
+    #       echo "App Bundle ID: $APP_BUNDLE_ID"
+
+    #       # Launch the app using the dynamic UUID
+    #       xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
+
+    #   - name: Take a Screenshot
+    #     run: |
+    #       SCREENSHOT_PATH="./screenshots"
+    #       mkdir -p "$SCREENSHOT_PATH"
+
+    #       # Wait for the app to load
+    #       sleep 120
+          
+    #       # Navigate to the Login screen using deep link
+               
+    #       # Capture a screenshot of the Login screen
+    #       xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+
+    #       sleep 120
+
+    #       # Navigate to the Dashboard screen using deep link
+
+    #       # Capture a screenshot of the Dashboard screen
+    #       xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
+          
+    #   - name: Upload Screenshots as Artifacts
+    #     uses: actions/upload-artifact@v3
+    #     with:
+    #       name: SimulatorScreenshots
+    #       path: ./screenshots
+
+
+    #   - name: Download Screenshots from Artifacts
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: SimulatorScreenshots
+    #       path: ./downloaded_screenshots
+          
+    # # ************************************ End screenshots ****************************************
+
+    #   - name: Extract variables from config.js
+    #     id: extract-variables
+    #     run: |
+    #       BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+    #       ISSUER_ID=$(grep -E '^  ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
+    #       KEY_ID=$(grep -E '^  KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
       
-          for screenshot in downloaded_screenshots/*.png; do
-            # Step 1: Create the screenshot entity
-            response=$(curl -X POST \
-              -H "Authorization: Bearer ${{ env.token }}" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "data": {
-                  "type": "appScreenshots",
-                  "attributes": {
-                    "fileName": "'"$(basename "$screenshot")"'",
-                    "fileSize": '"$(stat -f%z "$screenshot")"'
-                  },
-                  "relationships": {
-                    "appScreenshotSet": {
-                      "data": {
-                        "id": "'${{ env.screenshot_set_id }}'",
-                        "type": "appScreenshotSets"
-                      }
-                    }
-                  }
-                }
-              }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
+    #       # Handle the private key separately and save it to a file
+    #       awk '/^  private_key:/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key://g' -e 's/^ *//g' -e '/^$/d' > private_key.pem
       
-            # Parse the upload URL and other details from the response
-            uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
-            contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
-            screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
+    #       echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
+    #       echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
+    #       echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
+    #       echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
       
-            # Add screenshot ID to array
-            screenshot_ids+=("$screenshotId")
+    #   - name: Echo extracted variables
+    #     run: |
+    #       echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
+    #       echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
+    #       echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
+    #       echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+
+    #   - name: Use Private Key
+    #     run: |
+    #       cat ${{ env.PRIVATE_KEY_PATH }}
+
+    #   - name: Install dependencies
+    #     run: |
+    #       gem install jwt
+    #       pip install requests jq
+
+    #   - name: Generate JWT
+    #     id: generate_jwt
+    #     run: |
+    #       ISSUER_ID=${{ env.ISSUER_ID }}
+    #       KEY_ID=${{ env.KEY_ID }}
+    #       private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+
+    #       # Properly escape and format the private key to avoid issues with newlines
+    #       private_key_formatted=$(echo "$private_key" | sed ':a;N;$!ba;s/\n/\\n/g')
+
+    #       token=$(ruby -rjwt -ropenssl -e "
+    #         private_key_obj = OpenSSL::PKey::EC.new('$private_key_formatted')
+    #         token = JWT.encode(
+    #           {
+    #             iss: '$ISSUER_ID',
+    #             exp: Time.now.to_i + 20 * 60,
+    #             aud: 'appstoreconnect-v1'
+    #           },
+    #           private_key_obj,
+    #           'ES256',
+    #           header_fields = {
+    #             kid: '$KEY_ID'
+    #           }
+    #         )
+    #         puts token
+    #       ")
+          
+    #       echo "token=$token" >> $GITHUB_ENV
+
+
+    #   # - name: Get App ID
+    #   #   id: get_app_id
+    #   #   run: |
+    #   #     bundle_id="${{ env.BUNDLE_IDentifier }}"  
       
-            # Save the mapping between screenshotId and filename
-            echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
+    #   #     response=$(curl -X GET \
+    #   #       -H "Authorization: Bearer ${{ env.token }}" \
+    #   #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
       
-            # Step 2: Upload the screenshot file to the provided URL
-            curl -X PUT \
-              -H "Content-Type: $contentType" \
-              --upload-file "$screenshot" \
-              "$uploadUrl"
+    #   #     echo "Response: $response"
       
-            echo "Uploaded screenshot $(basename "$screenshot")"
-          done
+    #   #     app_id=$(echo $response | jq -r '.data[0].id')
       
-          # Export screenshot IDs to GitHub Actions environment
-          echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+    #   #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+    #   #       echo "Failed to retrieve app ID."
+    #   #       exit 1
+    #   #     fi
+
+    #   - name: Get App ID
+    #     id: get_app_id
+    #     run: |
+    #       response=$(curl -X GET \
+    #         -H "Authorization: Bearer ${{ env.token }}" \
+    #         "https://api.appstoreconnect.apple.com/v1/apps")
       
-      - name: Commit Screenshot Reservation
-        run: |
-          node -e "
-            const axios = require('axios');
-            const crypto = require('crypto');
-            const fs = require('fs');
-            const path = require('path');
-            const token = '${{ env.token }}';  // Using the extracted token
-            const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
-            const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
+    #       echo "Full API Response: $response"
+      
+    #       app_id=$(echo $response | jq -r '.data[] | select(.attributes.bundleId=="'${{ env.BUNDLE_IDentifier }}'") | .id')
+      
+    #       if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+    #         echo "Failed to retrieve app ID."
+    #         exit 1
+    #       else
+    #         echo "App ID: $app_id"
+    #       fi
+
+      
+    #       echo "app_id=$app_id" >> $GITHUB_ENV
+
+    #   - name: Get App Store Version ID
+    #     id: get_app_store_version_id
+    #     run: |
+    #       response=$(curl -X GET \
+    #         -H "Authorization: Bearer ${{ env.token }}" \
+    #         "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
+      
+    #       echo "Response: $response"
+      
+    #       app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
+      
+    #       if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
+    #         echo "Failed to retrieve app store version ID."
+    #         exit 1
+    #       fi
+      
+    #       echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+
+    #   - name: Get App Store Version Localization ID
+    #     id: get_app_store_version_localization_id
+    #     run: |
+    #       response=$(curl -X GET \
+    #         -H "Authorization: Bearer ${{ env.token }}" \
+    #         "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+      
+    #       echo "Response: $response"
+      
+    #       app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
+      
+    #       if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
+    #         echo "Failed to retrieve app store version localization ID."
+    #         exit 1
+    #       fi
+      
+    #       echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
+
+
+
+
+    #   - name: Create Screenshot Set
+    #     id: create_screenshot_set
+    #     run: |
+    #       response=$(curl -X POST \
+    #         -H "Authorization: Bearer ${{ env.token }}" \
+    #         -H "Content-Type: application/json" \
+    #         -d '{
+    #           "data": {
+    #             "type": "appScreenshotSets",
+    #             "attributes": {
+    #               "screenshotDisplayType": "APP_IPHONE_67"
+    #             },
+    #             "relationships": {
+    #               "appStoreVersionLocalization": {
+    #                 "data": {
+    #                   "id": "'${{ env.app_store_version_localization_id }}'",
+    #                   "type": "appStoreVersionLocalizations"
+    #                 }
+    #               }
+    #             }
+    #           }
+    #         }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
+
+    #       echo "Create Screenshot Set Response: $response"
+    #       screenshot_set_id=$(echo $response | jq -r '.data.id')
+    #       echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+
+    #   - name: Upload Screenshots to App Store Connect
+    #     run: |
+    #       # Array to hold screenshot IDs
+    #       screenshot_ids=()
+    #       # Create a mapping file
+    #       touch screenshot_mapping.txt
+      
+    #       for screenshot in downloaded_screenshots/*.png; do
+    #         # Step 1: Create the screenshot entity
+    #         response=$(curl -X POST \
+    #           -H "Authorization: Bearer ${{ env.token }}" \
+    #           -H "Content-Type: application/json" \
+    #           -d '{
+    #             "data": {
+    #               "type": "appScreenshots",
+    #               "attributes": {
+    #                 "fileName": "'"$(basename "$screenshot")"'",
+    #                 "fileSize": '"$(stat -f%z "$screenshot")"'
+    #               },
+    #               "relationships": {
+    #                 "appScreenshotSet": {
+    #                   "data": {
+    #                     "id": "'${{ env.screenshot_set_id }}'",
+    #                     "type": "appScreenshotSets"
+    #                   }
+    #                 }
+    #               }
+    #             }
+    #           }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
+      
+    #         # Parse the upload URL and other details from the response
+    #         uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
+    #         contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
+    #         screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
+      
+    #         # Add screenshot ID to array
+    #         screenshot_ids+=("$screenshotId")
+      
+    #         # Save the mapping between screenshotId and filename
+    #         echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
+      
+    #         # Step 2: Upload the screenshot file to the provided URL
+    #         curl -X PUT \
+    #           -H "Content-Type: $contentType" \
+    #           --upload-file "$screenshot" \
+    #           "$uploadUrl"
+      
+    #         echo "Uploaded screenshot $(basename "$screenshot")"
+    #       done
+      
+    #       # Export screenshot IDs to GitHub Actions environment
+    #       echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+      
+    #   - name: Commit Screenshot Reservation
+    #     run: |
+    #       node -e "
+    #         const axios = require('axios');
+    #         const crypto = require('crypto');
+    #         const fs = require('fs');
+    #         const path = require('path');
+    #         const token = '${{ env.token }}';  // Using the extracted token
+    #         const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
+    #         const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
             
-            // Parse the screenshot mappings
-            const mappings = {};
-            screenshotMappings.forEach(line => {
-              const [screenshotId, fileName] = line.split(':');
-              mappings[screenshotId] = fileName;
-            });
+    #         // Parse the screenshot mappings
+    #         const mappings = {};
+    #         screenshotMappings.forEach(line => {
+    #           const [screenshotId, fileName] = line.split(':');
+    #           mappings[screenshotId] = fileName;
+    #         });
       
-            async function commitReservation(screenshotId, screenshotPath) {
-              const calculateMD5Checksum = (filePath) => {
-                const fileBuffer = fs.readFileSync(filePath);
-                const hashSum = crypto.createHash('md5');
-                hashSum.update(fileBuffer);
-                return hashSum.digest('hex');
-              };
+    #         async function commitReservation(screenshotId, screenshotPath) {
+    #           const calculateMD5Checksum = (filePath) => {
+    #             const fileBuffer = fs.readFileSync(filePath);
+    #             const hashSum = crypto.createHash('md5');
+    #             hashSum.update(fileBuffer);
+    #             return hashSum.digest('hex');
+    #           };
       
-              const checksum = calculateMD5Checksum(screenshotPath);
-              const requestBody = {
-                data: {
-                  type: 'appScreenshots',
-                  id: screenshotId,
-                  attributes: {
-                    uploaded: true,
-                    sourceFileChecksum: checksum,
-                  },
-                },
-              };
+    #           const checksum = calculateMD5Checksum(screenshotPath);
+    #           const requestBody = {
+    #             data: {
+    #               type: 'appScreenshots',
+    #               id: screenshotId,
+    #               attributes: {
+    #                 uploaded: true,
+    #                 sourceFileChecksum: checksum,
+    #               },
+    #             },
+    #           };
       
-              try {
-                const response = await axios.patch(
-                  \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
-                  requestBody,
-                  {
-                    headers: {
-                      Authorization: \`Bearer \${token}\`,
-                      'Content-Type': 'application/json',
-                    },
-                  }
-                );
-                console.log('Commit successful for screenshot ID', screenshotId, ':', response.data);
-              } catch (error) {
-                console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
-              }
-            }
+    #           try {
+    #             const response = await axios.patch(
+    #               \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
+    #               requestBody,
+    #               {
+    #                 headers: {
+    #                   Authorization: \`Bearer \${token}\`,
+    #                   'Content-Type': 'application/json',
+    #                 },
+    #               }
+    #             );
+    #             console.log('Commit successful for screenshot ID', screenshotId, ':', response.data);
+    #           } catch (error) {
+    #             console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
+    #           }
+    #         }
       
-            // Loop through each screenshot ID from the mappings and commit reservation
-            (async () => {
-              for (const [screenshotId, fileName] of Object.entries(mappings)) {
-                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
-                await commitReservation(screenshotId, screenshotPath);
-              }
-            })();
-          "
+    #         // Loop through each screenshot ID from the mappings and commit reservation
+    #         (async () => {
+    #           for (const [screenshotId, fileName] of Object.entries(mappings)) {
+    #             const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
+    #             await commitReservation(screenshotId, screenshotPath);
+    #           }
+    #         })();
+          # "
 # ********************************************** 5.5 ********************************************************* 
 
 
-      - name: Find iOS Simulator UUID
-        id: find_simulator2
-        run: |
-          SIMULATOR_NAME="iPhone 8 Plus" # Changed to the desired simulator name
-          UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
-          echo "Simulator UUID: $UUID"
-          echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
+      # - name: Find iOS Simulator UUID
+      #   id: find_simulator2
+      #   run: |
+      #     SIMULATOR_NAME="iPhone 8 Plus" # Changed to the desired simulator name
+      #     UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
+      #     echo "Simulator UUID: $UUID"
+      #     echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
 
-      - name: Boot iOS Simulator
-        run: |
-          xcrun simctl boot ${{ env.SIMULATOR_UUID }}
+      # - name: Boot iOS Simulator
+      #   run: |
+      #     xcrun simctl boot ${{ env.SIMULATOR_UUID }}
 
-      - name: Install .app File on Simulator
-        run: |
-          APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
-          echo "App path: $APP_PATH"
+      # - name: Install .app File on Simulator
+      #   run: |
+      #     APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
+      #     echo "App path: $APP_PATH"
 
-          # Install the .app file on the booted simulator
-          xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
+      #     # Install the .app file on the booted simulator
+      #     xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
 
-      - name: Launch the App on Simulator
-        run: |
-          APP_BUNDLE_ID="com.org.easypatientdynamic"
-          echo "App Bundle ID: $APP_BUNDLE_ID"
+      # - name: Launch the App on Simulator
+      #   run: |
+      #     APP_BUNDLE_ID="com.org.easypatientdynamic"
+      #     echo "App Bundle ID: $APP_BUNDLE_ID"
 
-          # Launch the app using the dynamic UUID
-          xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
+      #     # Launch the app using the dynamic UUID
+      #     xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
 
-      - name: Take a Screenshot
-        run: |
-          SCREENSHOT_PATH="./screenshots"
-          mkdir -p "$SCREENSHOT_PATH"
+      # - name: Take a Screenshot
+      #   run: |
+      #     SCREENSHOT_PATH="./screenshots"
+      #     mkdir -p "$SCREENSHOT_PATH"
 
-          # Wait for the app to load
-          sleep 120
+      #     # Wait for the app to load
+      #     sleep 120
           
-          # Navigate to the Login screen using deep link
+      #     # Navigate to the Login screen using deep link
                
-          # Capture a screenshot of the Login screen
-          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+      #     # Capture a screenshot of the Login screen
+      #     xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
 
-          sleep 120
+      #     sleep 120
 
-          # Navigate to the Dashboard screen using deep link
+      #     # Navigate to the Dashboard screen using deep link
 
-          # Capture a screenshot of the Dashboard screen
-          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
+      #     # Capture a screenshot of the Dashboard screen
+      #     xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
 
-      - name: Upload Screenshots as Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: iOS_Simulator_Screenshots # Changed artifact name
-          path: ./screenshots
+      # - name: Upload Screenshots as Artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: iOS_Simulator_Screenshots # Changed artifact name
+      #     path: ./screenshots
 
-      - name: Download Screenshots from Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: iOS_Simulator_Screenshots # Changed artifact name
-          path: ./downloaded_screenshots
+      # - name: Download Screenshots from Artifacts
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: iOS_Simulator_Screenshots # Changed artifact name
+      #     path: ./downloaded_screenshots
 
-      - name: Create Screenshot Set
-        id: create_screenshot_set2
-        run: |
-          response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "type": "appScreenshotSets",
-                "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_67"
-                },
-                "relationships": {
-                  "appStoreVersionLocalization": {
-                    "data": {
-                      "id": "'${{ env.app_store_version_localization_id }}'",
-                      "type": "appStoreVersionLocalizations"
-                    }
-                  }
-                }
-              }
-            }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
+      # - name: Create Screenshot Set
+      #   id: create_screenshot_set2
+      #   run: |
+      #     response=$(curl -X POST \
+      #       -H "Authorization: Bearer ${{ env.token }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d '{
+      #         "data": {
+      #           "type": "appScreenshotSets",
+      #           "attributes": {
+      #             "screenshotDisplayType": "APP_IPHONE_67"
+      #           },
+      #           "relationships": {
+      #             "appStoreVersionLocalization": {
+      #               "data": {
+      #                 "id": "'${{ env.app_store_version_localization_id }}'",
+      #                 "type": "appStoreVersionLocalizations"
+      #               }
+      #             }
+      #           }
+      #         }
+      #       }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
 
-          echo "Create Screenshot Set Response: $response"
-          screenshot_set_id=$(echo $response | jq -r '.data.id')
-          echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+      #     echo "Create Screenshot Set Response: $response"
+      #     screenshot_set_id=$(echo $response | jq -r '.data.id')
+      #     echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
 
-      - name: Upload Screenshots to App Store Connect
-        run: |
-          # Array to hold screenshot IDs
-          screenshot_ids=()
-          # Create a mapping file
-          touch screenshot_mapping.txt
+      # - name: Upload Screenshots to App Store Connect
+      #   run: |
+      #     # Array to hold screenshot IDs
+      #     screenshot_ids=()
+      #     # Create a mapping file
+      #     touch screenshot_mapping.txt
       
-          for screenshot in downloaded_screenshots/*.png; do
-            # Step 1: Create the screenshot entity
-            response=$(curl -X POST \
-              -H "Authorization: Bearer ${{ env.token }}" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "data": {
-                  "type": "appScreenshots",
-                  "attributes": {
-                    "fileName": "'"$(basename "$screenshot")"'",
-                    "fileSize": '"$(stat -f%z "$screenshot")"'
-                  },
-                  "relationships": {
-                    "appScreenshotSet": {
-                      "data": {
-                        "id": "'${{ env.screenshot_set_id }}'",
-                        "type": "appScreenshotSets"
-                      }
-                    }
-                  }
-                }
-              }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
+      #     for screenshot in downloaded_screenshots/*.png; do
+      #       # Step 1: Create the screenshot entity
+      #       response=$(curl -X POST \
+      #         -H "Authorization: Bearer ${{ env.token }}" \
+      #         -H "Content-Type: application/json" \
+      #         -d '{
+      #           "data": {
+      #             "type": "appScreenshots",
+      #             "attributes": {
+      #               "fileName": "'"$(basename "$screenshot")"'",
+      #               "fileSize": '"$(stat -f%z "$screenshot")"'
+      #             },
+      #             "relationships": {
+      #               "appScreenshotSet": {
+      #                 "data": {
+      #                   "id": "'${{ env.screenshot_set_id }}'",
+      #                   "type": "appScreenshotSets"
+      #                 }
+      #               }
+      #             }
+      #           }
+      #         }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
       
-            # Parse the upload URL and other details from the response
-            uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
-            contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
-            screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
+      #       # Parse the upload URL and other details from the response
+      #       uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
+      #       contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
+      #       screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
       
-            # Add screenshot ID to array
-            screenshot_ids+=("$screenshotId")
+      #       # Add screenshot ID to array
+      #       screenshot_ids+=("$screenshotId")
       
-            # Save the mapping between screenshotId and filename
-            echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
+      #       # Save the mapping between screenshotId and filename
+      #       echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
       
-            # Step 2: Upload the screenshot file to the provided URL
-            curl -X PUT \
-              -H "Content-Type: $contentType" \
-              --upload-file "$screenshot" \
-              "$uploadUrl"
+      #       # Step 2: Upload the screenshot file to the provided URL
+      #       curl -X PUT \
+      #         -H "Content-Type: $contentType" \
+      #         --upload-file "$screenshot" \
+      #         "$uploadUrl"
       
-            echo "Uploaded screenshot $(basename "$screenshot")"
-          done
+      #       echo "Uploaded screenshot $(basename "$screenshot")"
+      #     done
       
-          # Export screenshot IDs to GitHub Actions environment
-          echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+      #     # Export screenshot IDs to GitHub Actions environment
+      #     echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
 
-      - name: Commit Screenshot Reservation
-        run: |
-          node -e "
-            const axios = require('axios');
-            const crypto = require('crypto');
-            const fs = require('fs');
-            const path = require('path');
-            const token = '${{ env.token }}';  // Using the extracted token
-            const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
-            const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
+      # - name: Commit Screenshot Reservation
+      #   run: |
+      #     node -e "
+      #       const axios = require('axios');
+      #       const crypto = require('crypto');
+      #       const fs = require('fs');
+      #       const path = require('path');
+      #       const token = '${{ env.token }}';  // Using the extracted token
+      #       const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
+      #       const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
             
-            // Parse the screenshot mappings
-            const mappings = {};
-            screenshotMappings.forEach(line => {
-              const [screenshotId, fileName] = line.split(':');
-              mappings[screenshotId] = fileName;
-            });
+      #       // Parse the screenshot mappings
+      #       const mappings = {};
+      #       screenshotMappings.forEach(line => {
+      #         const [screenshotId, fileName] = line.split(':');
+      #         mappings[screenshotId] = fileName;
+      #       });
       
-            async function commitReservation(screenshotId, screenshotPath) {
-              const calculateMD5Checksum = (filePath) => {
-                const fileBuffer = fs.readFileSync(filePath);
-                const hashSum = crypto.createHash('md5');
-                hashSum.update(fileBuffer);
-                return hashSum.digest('hex');
-              };
+      #       async function commitReservation(screenshotId, screenshotPath) {
+      #         const calculateMD5Checksum = (filePath) => {
+      #           const fileBuffer = fs.readFileSync(filePath);
+      #           const hashSum = crypto.createHash('md5');
+      #           hashSum.update(fileBuffer);
+      #           return hashSum.digest('hex');
+      #         };
       
-              const checksum = calculateMD5Checksum(screenshotPath);
-              const requestBody = {
-                data: {
-                  type: 'appScreenshots',
-                  id: screenshotId,
-                  attributes: {
-                    uploaded: true,
-                    sourceFileChecksum: checksum,
-                  },
-                },
-              };
+      #         const checksum = calculateMD5Checksum(screenshotPath);
+      #         const requestBody = {
+      #           data: {
+      #             type: 'appScreenshots',
+      #             id: screenshotId,
+      #             attributes: {
+      #               uploaded: true,
+      #               sourceFileChecksum: checksum,
+      #             },
+      #           },
+      #         };
       
-              try {
-                const response = await axios.patch(
-                  \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
-                  requestBody,
-                  {
-                    headers: {
-                      Authorization: \`Bearer \${token}\`,
-                      'Content-Type': 'application/json',
-                    },
-                  }
-                );
-                console.log('Commit successful for screenshot ID', screenshotId, ':', response.data);
-              } catch (error) {
-                console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
-              }
-            }
+      #         try {
+      #           const response = await axios.patch(
+      #             \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
+      #             requestBody,
+      #             {
+      #               headers: {
+      #                 Authorization: \`Bearer \${token}\`,
+      #                 'Content-Type': 'application/json',
+      #               },
+      #             }
+      #           );
+      #           console.log('Commit successful for screenshot ID', screenshotId, ':', response.data);
+      #         } catch (error) {
+      #           console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
+      #         }
+      #       }
       
-            // Loop through each screenshot ID from the mappings and commit reservation
-            (async () => {
-              for (const [screenshotId, fileName] of Object.entries(mappings)) {
-                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
-                await commitReservation(screenshotId, screenshotPath);
-              }
-            })();
-          "
+      #       // Loop through each screenshot ID from the mappings and commit reservation
+      #       (async () => {
+      #         for (const [screenshotId, fileName] of Object.entries(mappings)) {
+      #           const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
+      #           await commitReservation(screenshotId, screenshotPath);
+      #         }
+      #       })();
+      #     "
 
 

@@ -721,6 +721,7 @@ jobs:
                   "promotionalText": "${{ env.PROMOTIONAL_TEXT }}",
                   "supportUrl": "${{ env.SUPPORT_URL }}"
                   }
+                }
             }' \
             "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
           

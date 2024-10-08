@@ -51,7 +51,7 @@ jobs:
           echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
           echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
           echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
-          echo "BUNDLE_ID=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
           echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
           echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
           echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
@@ -208,7 +208,7 @@ jobs:
           };\n\n\nmodule.exports = config;" \
           "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
           "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
-          "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+          "$HEADER_COLOR" "$BUNDLE_IDentifier" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
           "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
           "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
 
@@ -238,7 +238,7 @@ jobs:
           import requests
       
           # Define the Bundle Identifier
-          bundle_id = os.getenv("BUNDLE_ID") 
+          bundle_id = os.getenv("BUNDLE_IDentifier") 
       
           # Define the URL for the App Store Connect API to fetch bundle details
           url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[identifier]={bundle_id}"

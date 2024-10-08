@@ -14,11 +14,9 @@ jobs:
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: 'iOS Screenshot Upload'  
-          ref: 'refs/heads/blob/ScreenshotBuild' 
-          inputs: '{ "message": "blah blah", "something": true }'
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          workflow: appDeploy.yml
+          inputs: '{ "message": "blah blah", "something": false }'
+          token: "${{ secrets.PAT_TOKEN }}"
       # - name: Generate JWT
       #   id: generate_jwt
       #   run: |

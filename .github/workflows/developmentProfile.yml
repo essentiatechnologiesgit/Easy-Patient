@@ -2,7 +2,7 @@ name: iOS Certificate Automation
 on:
   push:
     branches:
-      - FixesForiOSBuilds
+      - FixesForiOSBuild
 
 jobs:
   build:
@@ -11,42 +11,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Invoke workflow with inputs
+        uses: benc-uk/workflow-dispatch@v1
         with:
-          python-version: '3.x'
+          workflow: iOS Screenshot Upload
+          inputs: '{ "message": "blah blah", "something": true }'
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.3
-
-      - name: Install dependencies
-        run: |
-          gem install jwt
-          pip install requests
-
-      - name: Extract variables from config.js
-        id: extract-variables
-        run: |
-          BUNDLE_IDentifier=$(grep -E '^  BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep 'ISSUER_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
-          KEY_ID=$(grep 'KEY_ID=' ${{ github.workspace }}/config.js | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d \' | tr -d ',')
-      
-          # Handle the private key separately and save it to a file
-          awk '/^  private_key="/,/^  "/' ${{ github.workspace }}/config.js | sed -e 's/private_key="//' -e 's/^  //' -e 's/"$//' -e 's/^ *//g' -e '/^$/d' > private_key.pem
-      
-          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
-          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
-          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV    
-
-      - name: Echo extracted variables
-        run: |
-          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
-          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
-          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
-          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
 
       # - name: Generate JWT
       #   id: generate_jwt
@@ -510,41 +480,41 @@ jobs:
       # *************************************** Build Start ******************************************************
   
 
-      - name: Install CocoaPods
-        run: gem install cocoapods
+      # - name: Install CocoaPods
+      #   run: gem install cocoapods
 
-      - name: Cache CocoaPods
-        uses: actions/cache@v3
-        with:
-          path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+      # - name: Cache CocoaPods
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ios/Pods
+      #     key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pods-
 
-      - name: Install Node.js dependencies
-        run: npm install --force
+      # - name: Install Node.js dependencies
+      #   run: npm install --force
 
-      - name: Install Pods
-        run: |
-          cd ios
-          pod deintegrate
-          rm -rf Pods Podfile.lock
-          pod update
-          pod install
+      # - name: Install Pods
+      #   run: |
+      #     cd ios
+      #     pod deintegrate
+      #     rm -rf Pods Podfile.lock
+      #     pod update
+      #     pod install
 
-      - name: Install Xcode 15.3
-        run: |
-          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-          xcodebuild -version
+      # - name: Install Xcode 15.3
+      #   run: |
+      #     sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+      #     xcodebuild -version
 
-      - name: Clean Derived Data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+      # - name: Clean Derived Data
+      #   run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
      
-      - name: Clean Build Folder
-        run: |
-          cd ios
-          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+      # - name: Clean Build Folder
+      #   run: |
+      #     cd ios
+      #     xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
       # - name: Build Archive
       #   run: |
@@ -573,87 +543,87 @@ jobs:
       #     path: ios/build/archive/TestingIPA/*.ipa
 
 
-      - name: Build for Simulator
-        run: |
-          xcodebuild clean build \
-            -workspace ios/EasyPatientDynamic.xcworkspace \
-            -scheme EasyPatientDynamic \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
-            -configuration Debug \
-            -derivedDataPath ios/build/DerivedData
+      # - name: Build for Simulator
+      #   run: |
+      #     xcodebuild clean build \
+      #       -workspace ios/EasyPatientDynamic.xcworkspace \
+      #       -scheme EasyPatientDynamic \
+      #       -sdk iphonesimulator \
+      #       -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest' \
+      #       -configuration Debug \
+      #       -derivedDataPath ios/build/DerivedData
 
 
-      - name: List Contents of Build Directory
-        run: |
-          echo "Listing contents of the Products directory:"
-          ls ios/build/DerivedData/Build/Products
+      # - name: List Contents of Build Directory
+      #   run: |
+      #     echo "Listing contents of the Products directory:"
+      #     ls ios/build/DerivedData/Build/Products
 
-      - name: Start Metro Bundler
-        run: |
-          npx react-native start &
+      # - name: Start Metro Bundler
+      #   run: |
+      #     npx react-native start &
 
 
-      - name: Find iOS Simulator UUID
-        id: find_simulator
-        run: |
-          SIMULATOR_NAME="iPhone 15" # Change to the desired simulator name
-          UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
-          echo "Simulator UUID: $UUID"
-          echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
+      # - name: Find iOS Simulator UUID
+      #   id: find_simulator
+      #   run: |
+      #     SIMULATOR_NAME="iPhone 15" # Change to the desired simulator name
+      #     UUID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME" | grep "Shutdown" | head -n 1 | awk -F '[()]' '{print $2}')
+      #     echo "Simulator UUID: $UUID"
+      #     echo "SIMULATOR_UUID=$UUID" >> $GITHUB_ENV
 
-      - name: Boot iOS Simulator
-        run: |
-          xcrun simctl boot ${{ env.SIMULATOR_UUID }}
+      # - name: Boot iOS Simulator
+      #   run: |
+      #     xcrun simctl boot ${{ env.SIMULATOR_UUID }}
         
 
-      - name: Install .app File on Simulator
-        run: |
-          APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
-          echo "App path: $APP_PATH"
+      # - name: Install .app File on Simulator
+      #   run: |
+      #     APP_PATH="ios/build/DerivedData/Build/Products/Debug-iphonesimulator/EasyPatientDynamic.app"
+      #     echo "App path: $APP_PATH"
 
-          # Install the .app file on the booted simulator
-          xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
+      #     # Install the .app file on the booted simulator
+      #     xcrun simctl install ${{ env.SIMULATOR_UUID }} "$APP_PATH"
 
-      - name: Launch the App on Simulator
-        run: |
-          APP_BUNDLE_ID="com.org.easypatientdynamic"
-          echo "App Bundle ID: $APP_BUNDLE_ID"
+      # - name: Launch the App on Simulator
+      #   run: |
+      #     APP_BUNDLE_ID="com.org.easypatientdynamic"
+      #     echo "App Bundle ID: $APP_BUNDLE_ID"
 
-          # Launch the app using the dynamic UUID
-          xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
+      #     # Launch the app using the dynamic UUID
+      #     xcrun simctl launch ${{ env.SIMULATOR_UUID }} $APP_BUNDLE_ID
 
-      - name: Take a Screenshot
-        run: |
-          SCREENSHOT_PATH="./screenshots"
-          mkdir -p "$SCREENSHOT_PATH"
+      # - name: Take a Screenshot
+      #   run: |
+      #     SCREENSHOT_PATH="./screenshots"
+      #     mkdir -p "$SCREENSHOT_PATH"
 
-          # Wait for the app to load
-          sleep 120
+      #     # Wait for the app to load
+      #     sleep 120
           
-          # Navigate to the Login screen using deep link
-          npx uri-scheme open "easypatientdynamic://Login" --ios
+      #     # Navigate to the Login screen using deep link
+      #     npx uri-scheme open "easypatientdynamic://Login" --ios
 
-          sleep 10
+      #     sleep 10
           
-          # Capture a screenshot of the Login screen
-          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
+      #     # Capture a screenshot of the Login screen
+      #     xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_login.png"
 
-          sleep 10
+      #     sleep 10
 
-          # Navigate to the Dashboard screen using deep link
-          npx uri-scheme open "easypatientdynamic://Dashboard" --ios
+      #     # Navigate to the Dashboard screen using deep link
+      #     npx uri-scheme open "easypatientdynamic://Dashboard" --ios
 
-          sleep 10
+      #     sleep 10
 
-          # Capture a screenshot of the Dashboard screen
-          xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
+      #     # Capture a screenshot of the Dashboard screen
+      #     xcrun simctl io ${{ env.SIMULATOR_UUID }} screenshot "$SCREENSHOT_PATH/screenshot_dashboard.png"
 
-      - name: Upload Screenshots as Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: SimulatorScreenshots
-          path: ./screenshots
+      # - name: Upload Screenshots as Artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: SimulatorScreenshots
+      #     path: ./screenshots
 
 
 

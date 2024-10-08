@@ -691,39 +691,39 @@ jobs:
         run: |
           # Initialize the payload with required attributes
           payload=$(cat <<EOF
-      {
-        "data": {
-          "id": "${{ env.app_store_version_localization_id }}",
-          "type": "appStoreVersionLocalizations",
-          "attributes": {
-            "description": "${{ env.DESCRIPTION }}",
-            "keywords": "${{ env.KEYWORDS }}",
-            "promotionalText": "${{ env.PROMOTIONAL_TEXT }}"
-      EOF
-          )
-      
-          # Conditionally add marketingUrl if it's defined
-          if [ -n "${{ env.MARKETING_URL }}" ]; then
-            payload=$(echo "$payload,"$(cat <<EOF
-            "marketingUrl": "${{ env.MARKETING_URL }}"
-      EOF
-            ))
-          fi
-      
-          # Conditionally add supportUrl if it's defined
-          if [ -n "${{ env.SUPPORT_URL }}" ]; then
-            payload=$(echo "$payload,"$(cat <<EOF
-            "supportUrl": "${{ env.SUPPORT_URL }}"
-      EOF
-            ))
-          fi
-      
-          # Close the JSON payload
-          payload=$(echo "$payload"$(cat <<EOF
+          {
+            "data": {
+              "id": "${{ env.app_store_version_localization_id }}",
+              "type": "appStoreVersionLocalizations",
+              "attributes": {
+                "description": "${{ env.DESCRIPTION }}",
+                "keywords": "${{ env.KEYWORDS }}",
+                "promotionalText": "${{ env.PROMOTIONAL_TEXT }}"
+          EOF
+              )
+          
+              # Conditionally add marketingUrl if it's defined
+              if [ -n "${{ env.MARKETING_URL }}" ]; then
+                payload=$(echo "$payload,"$(cat <<EOF
+                "marketingUrl": "${{ env.MARKETING_URL }}"
+          EOF
+                ))
+              fi
+          
+              # Conditionally add supportUrl if it's defined
+              if [ -n "${{ env.SUPPORT_URL }}" ]; then
+                payload=$(echo "$payload,"$(cat <<EOF
+                "supportUrl": "${{ env.SUPPORT_URL }}"
+          EOF
+                ))
+              fi
+          
+              # Close the JSON payload
+              payload=$(echo "$payload"$(cat <<EOF
+              }
+            }
           }
-        }
-      }
-      EOF
+          EOF
           ))
       
           # Debugging to verify payload

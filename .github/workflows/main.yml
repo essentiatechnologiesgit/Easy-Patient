@@ -826,8 +826,8 @@ jobs:
           xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
             -t ios \
             --apiKey ${{ env.KEY_ID }} \
-            --apiIssuer ${{ env.ISSUER_ID }}
-
+            --apiIssuer ${{ env.ISSUER_ID }} \
+            --apiKeyPath "${{ github.workspace }}/private_key.p8"
  
 
 

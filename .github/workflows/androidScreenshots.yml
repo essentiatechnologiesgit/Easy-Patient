@@ -1,14 +1,9 @@
-name: iOS Screenshot Upload
+
+name: Android
 on:
-  workflow_dispatch:
-    inputs:
-      message:
-        description: 'A message input'
-        required: true
-      something:
-        description: 'Boolean input'
-        required: true
-        
+  push:
+    branches:
+      - ScreenshotBuilds
 jobs:
   upload-screenshot:
     runs-on: macos-latest
@@ -28,36 +23,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3
-
-      # Echo the inputs received
-      - name: Echo workflow inputs
-        run: |
-          echo "Message: ${{ github.event.inputs.message }}"
-          echo "Something: ${{ github.event.inputs.something }}"
-# name: Android
-# on:
-#   push:
-#     branches:
-#       - ScreenshotBuilds
-# jobs:
-#   upload-screenshot:
-#     runs-on: macos-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Install Node.js Dependencies
-#         run: npm install axios --force
-
-#       - name: Set up Python
-#         uses: actions/setup-python@v3
-#         with:
-#           python-version: '3.x'
-
-#       - name: Set up Ruby
-#         uses: ruby/setup-ruby@v1
-#         with:
-#           ruby-version: 3.3
 
 
       # ************************************ Taking screenshots ****************************************

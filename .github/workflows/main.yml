@@ -197,26 +197,26 @@ jobs:
       - name: Generate JWT Token
         run: |
           ruby -r openssl -r jwt -e "
-          ISSUER_ID="${{ env.ISSUER_ID }}"
-          KEY_ID="${{ env.KEY_ID }}"
-
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
-
+          issuer_id = ENV['ISSUER_ID']
+          key_id = ENV['KEY_ID']
+          private_key = File.read(ENV['PRIVATE_KEY_PATH'])
+      
           private_key_obj = OpenSSL::PKey::EC.new(private_key)
-
-            token = JWT.encode(
-              {
-                iss: issuer_id,
-                exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
-                aud: 'appstoreconnect-v1'
-              },
-              private_key_obj,
-              'ES256',
-              kid: key_id
-            )
-
-            puts token
+      
+          token = JWT.encode(
+            {
+              iss: issuer_id,
+              exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
+              aud: 'appstoreconnect-v1'
+            },
+            private_key_obj,
+            'ES256',
+            kid: key_id
+          )
+      
+          puts token
           "
+
 
 
       - name: Save private key to default location

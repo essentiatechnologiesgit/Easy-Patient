@@ -80,15 +80,16 @@ jobs:
       
       - name: Generate JWT Token
         run: |
+          # Print the environment variables and the private key file for debugging
+          echo "ISSUER_ID: $ISSUER_ID"
+          echo "KEY_ID: $KEY_ID"
+          cat ${{ github.workspace }}/private_key.p8
+          
+          # Ruby block to generate JWT
           ruby -r openssl -r jwt -e "
           issuer_id = ENV['ISSUER_ID']
           key_id = ENV['KEY_ID']
           private_key = File.read('${{ github.workspace }}/private_key.p8')
-          
-          echo "ISSUER_ID: $ISSUER_ID"
-          echo "KEY_ID: $KEY_ID"
-          cat ${{ github.workspace }}/private_key.p8
-
       
           private_key_obj = OpenSSL::PKey::EC.new(private_key)
       
@@ -105,6 +106,7 @@ jobs:
       
           puts token
           "
+
 
 
       # Download images to the assets folder if they don't already exist

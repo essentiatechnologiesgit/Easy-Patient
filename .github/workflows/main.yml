@@ -82,6 +82,9 @@ jobs:
         run: |
           echo "Private key content:"
           cat ${{ github.workspace }}/private_key.p8
+
+
+
       
 
       - name: Generate JWT
@@ -132,7 +135,20 @@ jobs:
         run: |
           ls -l "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
 
+      - name: Set permissions for AuthKey
+        run: |
+          chmod 600 "${{ github.workspace }}/AuthKey_${{ env.KEY_ID }}.p8"
 
+
+      # - name: Save private key to default location
+      #   run: |
+      #     mkdir -p ~/.private_keys
+      #     cp ${{ env.PRIVATE_KEY_PATH }} ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+      #     chmod 600 ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+      
+      - name: Print private key contents (debugging, remove in production)
+        run: |
+          cat ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
 
       # Download images to the assets folder if they don't already exist
       - name: Download splash screen
@@ -234,15 +250,7 @@ jobs:
           cat ${{ github.workspace }}/config.js
 
 
-      # - name: Save private key to default location
-      #   run: |
-      #     mkdir -p ~/.private_keys
-      #     cp ${{ env.PRIVATE_KEY_PATH }} ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
-      #     chmod 600 ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
-      
-      # - name: Print private key contents (debugging, remove in production)
-      #   run: |
-      #     cat ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+
 
 
 

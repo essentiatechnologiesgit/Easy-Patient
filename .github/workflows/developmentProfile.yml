@@ -13,7 +13,7 @@ jobs:
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: 'iOS Upload'  # Ensure this matches the name of the target workflow
+          workflow: 'iOS Screenshot Upload'  
           ref: 'refs/heads/ScreenshotBuild' 
           inputs: '{ "message": "blah blah", "something": true }'
         env:

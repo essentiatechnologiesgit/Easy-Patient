@@ -13,7 +13,7 @@ jobs:
       - name: Invoke workflow with inputs
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: iOS Screenshot Upload
+          workflow: 'iOS Screenshot Upload'
           inputs: '{ "message": "blah blah", "something": true }'
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}

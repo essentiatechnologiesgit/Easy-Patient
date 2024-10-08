@@ -84,6 +84,11 @@ jobs:
           issuer_id = ENV['ISSUER_ID']
           key_id = ENV['KEY_ID']
           private_key = File.read('${{ github.workspace }}/private_key.p8')
+          
+          echo "ISSUER_ID: $ISSUER_ID"
+          echo "KEY_ID: $KEY_ID"
+          cat ${{ github.workspace }}/private_key.p8
+
       
           private_key_obj = OpenSSL::PKey::EC.new(private_key)
       

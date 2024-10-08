@@ -71,24 +71,36 @@ jobs:
 
           echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
-          # Extract the private key, replace escaped newline sequences with real newlines
-          # Extract the private key, replacing '\r\n' with real newlines
-          PRIVATE_KEY=$(echo "$RESPONSE" | jq -r '.[0].private_key' | sed 's/\\r\\n/\n/g')
-          
-          # Verify private key content for debugging
-          echo "Private Key Content for Debugging:"
-          echo "$PRIVATE_KEY"
-          
-          # Write the private key to a .pem file
-          echo "$PRIVATE_KEY" > private_key.pem
-          
-          # Set the private key path as an environment variable
-          echo "PRIVATE_KEY_PATH=$(pwd)/private_key.pem" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
 
-      - name: Print private key
+      - name: Download private key
         run: |
-          echo "Private key content:"
-          cat ${{ env.PRIVATE_KEY_PATH }}
+          echo "${{ env.PRIVATE_KEY }}" > ${{ github.workspace }}/private_key.p8
+          echo "Downloaded private key."
+      
+      - name: Generate JWT Token
+        run: |
+          ruby -r openssl -r jwt -e "
+          issuer_id = ENV['ISSUER_ID']
+          key_id = ENV['KEY_ID']
+          private_key = File.read('${{ github.workspace }}/private_key.p8')
+      
+          private_key_obj = OpenSSL::PKey::EC.new(private_key)
+      
+          token = JWT.encode(
+            {
+              iss: issuer_id,
+              exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
+              aud: 'appstoreconnect-v1'
+            },
+            private_key_obj,
+            'ES256',
+            kid: key_id
+          )
+      
+          puts token
+          "
+
 
       # Download images to the assets folder if they don't already exist
       - name: Download splash screen
@@ -99,6 +111,8 @@ jobs:
           else
             echo "Splash screen already exists."
           fi
+
+
 
       - name: Download logo
         run: |
@@ -194,28 +208,7 @@ jobs:
           cat ${{ env.PRIVATE_KEY_PATH }}
       
 
-      - name: Generate JWT Token
-        run: |
-          ruby -r openssl -r jwt -e "
-          issuer_id = ENV['ISSUER_ID']
-          key_id = ENV['KEY_ID']
-          private_key = File.read(ENV['PRIVATE_KEY_PATH'])
-      
-          private_key_obj = OpenSSL::PKey::EC.new(private_key)
-      
-          token = JWT.encode(
-            {
-              iss: issuer_id,
-              exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
-              aud: 'appstoreconnect-v1'
-            },
-            private_key_obj,
-            'ES256',
-            kid: key_id
-          )
-      
-          puts token
-          "
+
 
 
 

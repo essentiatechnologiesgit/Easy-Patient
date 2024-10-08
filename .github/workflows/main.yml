@@ -704,28 +704,55 @@ jobs:
       
           echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
 
-      - name: Update App Store Version Localization
-        id: update_app_store_version_localization
-        run: |
-          response=$(curl -X PATCH \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "data": {
-                "id": "'${{ env.app_store_version_localization_id }}'",
-                "type": "appStoreVersionLocalizations",
-                "attributes": {
-                  "description": "${{ env.DESCRIPTION }}",
-                  "keywords": "${{ env.KEYWORDS }}",
-                  "marketingUrl": "${{ env.MARKETING_URL }}",
-                  "promotionalText": "${{ env.PROMOTIONAL_TEXT }}",
-                  "supportUrl": "${{ env.SUPPORT_URL }}"
-                  }
-                }
-            }' \
-            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+          - name: Update App Store Version Localization
+            id: update_app_store_version_localization
+            run: |
+              # Initialize the payload with required attributes
+              payload=$(cat <<EOF
+          {
+            "data": {
+              "id": "${{ env.app_store_version_localization_id }}",
+              "type": "appStoreVersionLocalizations",
+              "attributes": {
+                "description": "${{ env.DESCRIPTION }}",
+                "keywords": "${{ env.KEYWORDS }}",
+                "promotionalText": "${{ env.PROMOTIONAL_TEXT }}"
+          EOF
+              )
           
-          echo "Update App Store Version Localization Response: $response"
+              # Conditionally add marketingUrl if it's defined
+              if [ -n "${{ env.MARKETING_URL }}" ]; then
+                payload=$(echo "$payload,"$(cat <<EOF
+                "marketingUrl": "${{ env.MARKETING_URL }}"
+          EOF
+                ))
+              fi
+          
+              # Conditionally add supportUrl if it's defined
+              if [ -n "${{ env.SUPPORT_URL }}" ]; then
+                payload=$(echo "$payload,"$(cat <<EOF
+                "supportUrl": "${{ env.SUPPORT_URL }}"
+          EOF
+                ))
+              fi
+          
+              # Close the JSON payload
+              payload=$(echo "$payload"$(cat <<EOF
+              }
+            }
+          }
+          EOF
+              ))
+          
+              # Execute the curl request
+              response=$(curl -X PATCH \
+                -H "Authorization: Bearer ${{ env.token }}" \
+                -H "Content-Type: application/json" \
+                -d "$payload" \
+                "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+          
+              echo "Update App Store Version Localization Response: $response"
+
 
 
        # ******************************************* Uploading Meta Data END **************************************

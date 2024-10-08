@@ -15,6 +15,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: appDeploy.yml
+          ref: 'refs/ScreenshotBuild'
           inputs: '{ "message": "blah blah", "something": false }'
           token: "${{ secrets.PAT_TOKEN }}"
       # - name: Generate JWT

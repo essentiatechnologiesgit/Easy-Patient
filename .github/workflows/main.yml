@@ -121,21 +121,23 @@ jobs:
           # Save the generated token in the GitHub Actions environment for later steps
           echo "token=$token" >> $GITHUB_ENV
 
+
       - name: Download and move private key
         run: |
           # Create the directory if it doesn't exist
-          mkdir -p ~/.private_keys
+          mkdir -p "$HOME/.private_keys"
           
           # Download the private key
           curl -o "${{ github.workspace }}/private_key.p8" $private_key
           
           # Move and rename it dynamically based on KEY_ID
-          mv "${{ github.workspace }}/private_key.p8" "~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+          mv "${{ github.workspace }}/private_key.p8" "$HOME/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
           
           # Set the permissions for the private key
-          chmod 600 "~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+          chmod 600 "$HOME/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
           
-          echo "Private key downloaded and moved to ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+          echo "Private key downloaded and moved to $HOME/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+
 
 
 

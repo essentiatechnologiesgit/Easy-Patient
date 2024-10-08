@@ -686,72 +686,58 @@ jobs:
       
           echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
 
-      - name: Get App Store Version Localization ID
-        id: get_app_store_version_localization_id
+      - name: Update App Store Version Localization
+        id: update_app_store_version_localization
         run: |
-          response=$(curl -X GET \
-            -H "Authorization: Bearer ${{ env.token }}" \
-            "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+          # Initialize the payload with required attributes
+          payload=$(cat <<EOF
+      {
+        "data": {
+          "id": "${{ env.app_store_version_localization_id }}",
+          "type": "appStoreVersionLocalizations",
+          "attributes": {
+            "description": "${{ env.DESCRIPTION }}",
+            "keywords": "${{ env.KEYWORDS }}",
+            "promotionalText": "${{ env.PROMOTIONAL_TEXT }}"
+      EOF
+          )
       
-          echo "Response: $response"
-      
-          app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
-      
-          if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
-            echo "Failed to retrieve app store version localization ID."
-            exit 1
+          # Conditionally add marketingUrl if it's defined
+          if [ -n "${{ env.MARKETING_URL }}" ]; then
+            payload=$(echo "$payload,"$(cat <<EOF
+            "marketingUrl": "${{ env.MARKETING_URL }}"
+      EOF
+            ))
           fi
       
-          echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
-
-          - name: Update App Store Version Localization
-            id: update_app_store_version_localization
-            run: |
-              # Initialize the payload with required attributes
-              payload=$(cat <<EOF
-          {
-            "data": {
-              "id": "${{ env.app_store_version_localization_id }}",
-              "type": "appStoreVersionLocalizations",
-              "attributes": {
-                "description": "${{ env.DESCRIPTION }}",
-                "keywords": "${{ env.KEYWORDS }}",
-                "promotionalText": "${{ env.PROMOTIONAL_TEXT }}"
-          EOF
-              )
-          
-              # Conditionally add marketingUrl if it's defined
-              if [ -n "${{ env.MARKETING_URL }}" ]; then
-                payload=$(echo "$payload,"$(cat <<EOF
-                "marketingUrl": "${{ env.MARKETING_URL }}"
-          EOF
-                ))
-              fi
-          
-              # Conditionally add supportUrl if it's defined
-              if [ -n "${{ env.SUPPORT_URL }}" ]; then
-                payload=$(echo "$payload,"$(cat <<EOF
-                "supportUrl": "${{ env.SUPPORT_URL }}"
-          EOF
-                ))
-              fi
-          
-              # Close the JSON payload
-              payload=$(echo "$payload"$(cat <<EOF
-              }
-            }
+          # Conditionally add supportUrl if it's defined
+          if [ -n "${{ env.SUPPORT_URL }}" ]; then
+            payload=$(echo "$payload,"$(cat <<EOF
+            "supportUrl": "${{ env.SUPPORT_URL }}"
+      EOF
+            ))
+          fi
+      
+          # Close the JSON payload
+          payload=$(echo "$payload"$(cat <<EOF
           }
-          EOF
-              ))
-          
-              # Execute the curl request
-              response=$(curl -X PATCH \
-                -H "Authorization: Bearer ${{ env.token }}" \
-                -H "Content-Type: application/json" \
-                -d "$payload" \
-                "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
-          
-              echo "Update App Store Version Localization Response: $response"
+        }
+      }
+      EOF
+          ))
+      
+          # Debugging to verify payload
+          echo "Payload: $payload"
+      
+          # Execute the curl request
+          response=$(curl -X PATCH \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+      
+          echo "Update App Store Version Localization Response: $response"
+
 
 
 

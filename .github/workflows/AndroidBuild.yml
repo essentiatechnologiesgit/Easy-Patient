@@ -87,17 +87,13 @@ jobs:
             echo "Json file does not exist."
           fi
 
-      # Update the app name in AndroidManifest.xml and strings.xml for Android
       - name: Update app name in AndroidManifest.xml (Android)
         run: |
-          # Declare the new app name
-     
           # Update the app name in strings.xml
-          sed -i '' "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$ANDROID_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
+          sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$ANDROID_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
       
           # Ensure AndroidManifest.xml references the correct string resource
-          sed -i '' 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
-      
+          sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
         shell: bash
 
 

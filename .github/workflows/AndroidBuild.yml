@@ -112,6 +112,43 @@ jobs:
           cat ${{ github.workspace }}/config.js
 
 
+      - name: Download splash screen
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+            echo "Downloaded splash screen."
+          else
+            echo "Splash screen already exists."
+          fi
+
+      - name: Download logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+            echo "Downloaded logo."
+          else
+            echo "Logo already exists."
+          fi
+
+      - name: Download background image
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+            echo "Downloaded background image."
+          else
+            echo "Background image already exists."
+          fi
+
+      - name: Download sub logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
+
+
       - name: Download json file
         run: |
           if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then

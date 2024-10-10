@@ -100,8 +100,8 @@ jobs:
 
       - name: Download splash screen
         run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+          if [ ! -f ${{ github.workspace }}/.github/workflows/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/splashScreen.png $SPLASH_SCREEN
             echo "Downloaded splash screen."
           else
             echo "Splash screen already exists."
@@ -109,8 +109,8 @@ jobs:
 
       - name: Download logo
         run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+          if [ ! -f ${{ github.workspace }}/.github/workflows/logo.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/logo.png $LOGO
             echo "Downloaded logo."
           else
             echo "Logo already exists."
@@ -118,8 +118,8 @@ jobs:
 
       - name: Download background image
         run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+          if [ ! -f ${{ github.workspace }}/.github/workflows/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/backgroundImage.png $BACKGROUND_IMAGE
             echo "Downloaded background image."
           else
             echo "Background image already exists."
@@ -127,16 +127,17 @@ jobs:
 
       - name: Download sub logo
         run: |
-          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
-            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+          if [ ! -f ${{ github.workspace }}/.github/workflows/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/subLogo.png $SUB_LOGO
             echo "Downloaded sub logo."
           else
             echo "Sub logo already exists."
           fi
 
-      - name: print colors.css
+      - name: List files in .github/workflows directory
         run: |
-          cat "${{ github.workspace }}/.github/workflows/styles.css"
+          ls "${{ github.workspace }}/.github/workflows"
+
 
       # Install puppeteer directly
       - name: Install Puppeteer

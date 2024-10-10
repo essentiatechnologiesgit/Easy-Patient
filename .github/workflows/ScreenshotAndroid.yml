@@ -100,7 +100,7 @@ jobs:
 
       - name: print colors.css
         run: |
-          cat "${{ github.workspace }}/.github/workflows/colors.css"
+          cat "${{ github.workspace }}/.github/workflows/styles.css"
 
       # Install puppeteer directly
       - name: Install Puppeteer

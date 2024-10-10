@@ -157,8 +157,9 @@ jobs:
           
           # Move screenshots to the appropriate directories
           mv downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"
-          mv downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/"
-          mv downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/"
+          # If you need to copy the same screenshots to tabletScreenshots, you can use `cp`
+          cp downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/"
+          cp downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots/"
           
           echo "Screenshots moved to Fastlane directories successfully."
 

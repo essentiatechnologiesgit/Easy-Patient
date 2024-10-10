@@ -156,11 +156,10 @@ jobs:
           mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots"
           
           # Move screenshots to the appropriate directories
-          mv downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"
-          # If you need to copy the same screenshots to tabletScreenshots, you can use `cp`
+          cp downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"
           cp downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/"
           cp downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots/"
-          
+   
           echo "Screenshots moved to Fastlane directories successfully."
 
 

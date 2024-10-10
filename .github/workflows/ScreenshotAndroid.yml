@@ -3,7 +3,7 @@ name: Take Screenshots and Upload Artifacts
 on:
   push:
     branches:
-      - FixesForiOSBuild
+      - FixesForiOSBuilds
 
 jobs:
   take_screenshots:

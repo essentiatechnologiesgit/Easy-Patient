@@ -1,49 +1,52 @@
-/* colors.css */
-
 
 body {
   font-family: Arial, sans-serif;
-
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: var(--backgroundColorImage);
+  position: relative;
 }
 
-#splashScreen {
-  background-color: var(--splash-background-color);
-  text-align: center;
-  padding: 50px;
+/* LOGIN PAGE */
+.login-page{
+   display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 125px;
+    padding: .3rem;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+  width: 60%;
 }
 
-#container {
-  display: flex;
+.img-wrapper{
+  display: flex; 
   flex-direction: column;
-  gap: 30px;
-  margin-top: 100px;
-}
-
-#logo {
-  display: flex;
+  gap: 1.3rem;
   justify-content: center;
-  align-self: center;
   align-items: center;
 }
 
-#subLogo{
-    display: flex;
-    justify-content: center;
-    align-self: center;
-    align-items: center;
+.context-wrapper{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-
-#heading {
-  color: var(--text-color-headings);
+.heading {
+  color: var(--primary-heading-color);
   text-align: center;
-  margin-top: 10px;
-  font-size: 32px;
+  margin-top: 1.6rem;
+  font-size: 1.2rem;
 }
 
 .borderless-input {
   border: none;
-  border-bottom: 2px solid var(--secondary-color); /* Adds a bottom border */
+  border-bottom: 2px solid var(--secondaryColor); /* Adds a bottom border */
   padding: 10px;
   outline: none;
   background-color: transparent;
@@ -58,48 +61,223 @@ body {
 }
 
 .button {
-  width: 80%;
+  width: 85%;
   height: 40px;
-  border-color: var(--secondary-color);
-  background-color: var(--secondary-color);
+  border-color: var(--secondaryColor);
+  background-color: var(--secondaryColor);
   color: var(--buttonText);
   border-radius: 16px;
-  outline: none;
+  border: none;
+  font-weight: 700;
+  margin-top: .6rem;
 }
 
 .forgot-password{
-  display: flex;
-  justify-content: end;
-  margin-right: 30px;
+  margin-right: 38px;
+  margin-top: .6rem;
   text-decoration: underline;
-  color: var(--primary-color)
+  color: var(--primaryColor);
+  text-align: end;
 }
 
 .register{
-  display: flex;
-  justify-content: center;
-  color: var(--secondary-color);
+  text-align: center;
+  color: var(--secondaryColor);
   text-decoration: underline;
+  margin-top: 1.4rem;
 }
 
+@media (max-width:500px){
+  .container {
+    width: 100%;
+  }
+}
 
-/* *************************************************************************** */
-#DashboardContainer{
+/* HOME PAGE */
+
+.DashboardContainer{
   display: flex;
   flex-direction: column;
-  margin-top: 30px;
+  margin-top: 1rem;
+  padding: 10px 30px;
+  margin-bottom: 6rem;
 }
 
 .parentDiv{
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+}
+.parentDiv .user-img img{
+  width: 40px;
+}
+
+.headingDashboard{
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-size: 1.8rem;
+}
+
+.Subheading{
+  font-weight: 500;
+    font-size: 1.4rem;
+    margin-top: .6rem;
+    margin-bottom: 0;
+}
+.files{
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-top: 1.4rem;
+    margin-bottom: .4rem;
+}
+/*  */
+.file-wrapper{
+  display: flex;
+    gap: 30px;
+    overflow-x: auto;
+    padding-top: 2rem;
 }
 
 
-#logoDashboard{
+.file-design{
+  background: white;
+    border-radius: 10px;
+    position: relative;
+    flex-shrink: 0;
+    min-width: 16%;
+    max-width: 16%;
+    width: 16%;
+}
+
+.file-img-wrapper{
+  background-color: white;
+  display: inline-block;
+  position: absolute;
+  top: -10px;
+  padding: .5rem 1rem .5rem .5rem;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.file-content{
+  padding: .5rem;
+  margin-top: 1.4rem;
+
+}
+.file-img-wrapper .file-img-1{
+  width: 20px;
+}
+.file-img-wrapper .file-img-2{
+  width: 22px;
+}
+.file-img-wrapper .file-img-3{
+  width: 26px;
+}  
+.file-img-wrapper .file-img-4{
+  width: 18px;
+} 
+.file-img-wrapper .file-img-5{
+  width: 8px;
+} 
+.file-img-wrapper .file-img-6{
+  width: 18px;
+} 
+.file-img-wrapper .file-img-7{
+  width: 18px;
+} 
+.file-heading{
+  margin: .4rem 0;
+  font-size: .8rem;
+  font-weight: 600;
+  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.file-para{
+  font-size: .7rem;
+}
+.file-content p{
+  margin: 0;
+}
+.medication{
+  background-color: white;
+    border-radius: 10px;
+    padding: 8px 25px;
+    text-align: center;
+}
+.medication-icon{
+  display: inline-flex;
+  padding: 10px;
+  margin: 0;
+  background: goldenrod;
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+  font-size: 1.7rem;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+.footer{
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+.footer .active{
+  width: 100%;
+  height: 4px;
+  background: red;
+}
+.footer .foot-bar{
+  width: 14%;
+  height: 3px;
+  background: black;
+  position: absolute;
+    top: 0;
+}
+.foot-wrapper{
   display: flex;
-  
-  height: 35px;
-  width: 35px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 30px;
+}
+.foot{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 14%;
+}
+.foot-wrapper .foot .foot-img{
+  width: 22px;
+}
+.foot-wrapper .foot .foot-para{
+  margin: 0;
+  font-size: .7rem;
+}
+
+@media (max-width:578px){
+  .headingDashboard{
+    margin-top: 1.4rem;
+  }
+  .Subheading{
+    font-size: 1.2rem;
+  }
+  .files {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+    margin-bottom: .8rem;
+}
+.file-heading {
+  font-size: .8rem;
+}
+.file-para {
+  font-size: .7rem;
+}
+.file-design {
+  min-width: 32%;
+  width: 32%;
+}
+.file-wrapper {
+  gap: 16px;
+}
 }

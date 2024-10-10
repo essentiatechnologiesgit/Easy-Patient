@@ -23,8 +23,10 @@ jobs:
           const puppeteer = require('puppeteer');
           const fs = require('fs');
           const path = require('path');
-          const devices = puppeteer.devices;
-          const iPhone = devices['iPhone 14'];
+          
+          // Use KnownDevices to get the iPhone 14 device
+          const KnownDevices = puppeteer.KnownDevices;
+          const iPhone = KnownDevices['iPhone 14'];
 
           (async () => {
             const browser = await puppeteer.launch();
@@ -47,6 +49,7 @@ jobs:
             console.log('Screenshots taken successfully!');
           })();
           EOF
+
 
       - name: Run Puppeteer Script
         run: node takeScreenshots.js

@@ -83,6 +83,15 @@ jobs:
           printf "  --buttonText: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
           printf "}\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
 
+      - name: Download json file
+        run: |
+          if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
+            echo "Downloaded Json file."
+          else
+            echo "Json file already exists."
+          fi
+
       - name: print colors.css
         run: |
           cat "${{ github.workspace }}/.github/workflows/colors.css"

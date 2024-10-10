@@ -3,7 +3,7 @@ name: Take Screenshots and Upload Artifacts
 on:
   push:
     branches:
-      - FixesForiOSBuilds
+      - FixesForiOSBuild
 
 jobs:
   take_screenshots:
@@ -20,13 +20,13 @@ jobs:
         with:
           node-version: '16' # Specify the Node.js version
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install --force
+      # # Step 3: Install dependencies
+      # - name: Install dependencies
+      #   run: npm install --force
 
       # Step 4: Run Puppeteer script
       - name: Run Puppeteer screenshot script
-        run: node takeScreenshots.js
+        run: node ${{ github.workspace }}/.github/workflows/takeScreenshots.js
 
       # Step 5: Upload screenshots as artifacts
       - name: Upload screenshots

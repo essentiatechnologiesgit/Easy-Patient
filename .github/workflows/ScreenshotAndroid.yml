@@ -12,7 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-
       # Set up JDK version 17 using Temurin distribution
       - name: Set Up JDK
         uses: actions/setup-java@v2
@@ -56,14 +55,11 @@ jobs:
           echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
           echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
           echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
-
-          # Parse and export relevant fields from the JSON response using jq
           echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
           echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
           echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
           echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
           echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV      
-
           echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
           echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
@@ -91,7 +87,6 @@ jobs:
         run: |
           cat "${{ github.workspace }}/.github/workflows/colors.css"
 
-  # ******************************  Work for pupeteer ***********************************************
       # Install puppeteer directly
       - name: Install Puppeteer
         run: npm install puppeteer --force
@@ -129,7 +124,6 @@ jobs:
           })();
           EOF
 
-
       - name: Run Puppeteer Script
         run: node takeScreenshots.js
 
@@ -138,3 +132,20 @@ jobs:
         with:
           name: screenshots
           path: screenshot-iphone14-*.png
+
+      - name: Download screenshots
+        uses: actions/download-artifact@v3
+        with:
+          name: screenshots
+          path: downloaded_screenshots
+
+      - name: Move Screenshots to Fastlane Directories
+        run: |
+          # Create directories if they don't exist
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots"
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots"
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots"
+          
+          # Move screenshots to the appropriate directories
+          mv downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"
+          echo "Screenshots moved to Fastlane directories successfully."

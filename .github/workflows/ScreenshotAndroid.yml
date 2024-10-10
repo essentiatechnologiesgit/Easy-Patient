@@ -149,3 +149,16 @@ jobs:
           # Move screenshots to the appropriate directories
           mv downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"
           echo "Screenshots moved to Fastlane directories successfully."
+
+
+            # Set up Fastlane and Bundler for deployment
+      - name: Install Fastlane and Bundler
+        run: |
+          sudo gem install bundler
+          sudo gem install fastlane
+      # Change directory to Android before running Fastlane
+      - name: Upload Metadata and Screenshots to Google Play
+        run: |
+          cd android
+          sudo bundle install
+          bundle exec fastlane upload_screenshots

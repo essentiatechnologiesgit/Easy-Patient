@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: npm install puppeteer
@@ -50,7 +50,7 @@ jobs:
           "
 
       - name: Upload screenshots as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3 # Updated version
         with:
           name: screenshots
           path: |

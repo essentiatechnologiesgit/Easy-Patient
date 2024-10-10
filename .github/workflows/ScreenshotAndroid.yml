@@ -153,7 +153,7 @@ jobs:
           # Create directories if they don't exist
           mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots"
           mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots"
-          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots"
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots"
           
           # Move screenshots to the appropriate directories
           cp downloaded_screenshots/screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"

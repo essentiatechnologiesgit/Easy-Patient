@@ -152,7 +152,7 @@ jobs:
         run: |
           # Create directories if they don't exist
           mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots"
-          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots"
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots"
           mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots"
           
           # Move screenshots to the appropriate directories
@@ -219,7 +219,7 @@ jobs:
 
           
           # Move screenshots to the appropriate directories
-          cp downloaded_screenshots/screenshot-nexus7-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/" # Move to tablet screenshots directory
+          cp downloaded_screenshots/screenshot-nexus7-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/" # Move to tablet screenshots directory
         
           echo "Screenshots moved to Fastlane directories successfully."
 

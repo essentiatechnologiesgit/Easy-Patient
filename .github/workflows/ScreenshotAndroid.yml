@@ -92,49 +92,49 @@ jobs:
           cat "${{ github.workspace }}/.github/workflows/colors.css"
 
   # ******************************  Work for pupeteer ***********************************************
-      # # Install puppeteer directly
-      # - name: Install Puppeteer
-      #   run: npm install puppeteer --force
+      # Install puppeteer directly
+      - name: Install Puppeteer
+        run: npm install puppeteer --force
 
-      # - name: Run Puppeteer to take screenshots
-      #   run: |
-      #     cat <<EOF > takeScreenshots.js
-      #     const puppeteer = require('puppeteer');
-      #     const fs = require('fs');
-      #     const path = require('path');
+      - name: Run Puppeteer to take screenshots
+        run: |
+          cat <<EOF > takeScreenshots.js
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
           
-      #     // Use KnownDevices to get the iPhone 14 device
-      #     const KnownDevices = puppeteer.KnownDevices;
-      #     const iPhone = KnownDevices['iPhone 14'];
+          // Use KnownDevices to get the iPhone 14 device
+          const KnownDevices = puppeteer.KnownDevices;
+          const iPhone = KnownDevices['iPhone 14'];
 
-      #     (async () => {
-      #       const browser = await puppeteer.launch();
-      #       const page = await browser.newPage();
-      #       await page.emulate(iPhone);
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.emulate(iPhone);
 
-      #       // Use GitHub workspace environment variable for the file path
-      #       const filePaths = [path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html')];
+            // Use GitHub workspace environment variable for the file path
+            const filePaths = [path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html')];
 
-      #       const screenshots = [];
+            const screenshots = [];
 
-      #       for (let i = 0; i < filePaths.length; i++) {
-      #         await page.goto('file://' + filePaths[i]);
-      #         const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
-      #         await page.screenshot({ path: screenshotFileName });
-      #         screenshots.push(screenshotFileName);
-      #       }
+            for (let i = 0; i < filePaths.length; i++) {
+              await page.goto('file://' + filePaths[i]);
+              const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
+              await page.screenshot({ path: screenshotFileName });
+              screenshots.push(screenshotFileName);
+            }
 
-      #       await browser.close();
-      #       console.log('Screenshots taken successfully!');
-      #     })();
-      #     EOF
+            await browser.close();
+            console.log('Screenshots taken successfully!');
+          })();
+          EOF
 
 
-      # - name: Run Puppeteer Script
-      #   run: node takeScreenshots.js
+      - name: Run Puppeteer Script
+        run: node takeScreenshots.js
 
-      # - name: Upload screenshots as artifacts
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: screenshots
-      #     path: screenshot-iphone14-*.png
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: screenshot-iphone14-*.png

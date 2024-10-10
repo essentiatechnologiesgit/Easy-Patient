@@ -64,29 +64,29 @@ jobs:
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
           echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
 
-      - name: Update styles.css
-        run: |
-          # Create a temporary file to store the variables
-          printf "/* colors.css */\n:root {\n" > temp_colors.css
-          printf "  --primary-color: \"%s\";\n" "$PRIMARY_COLOR" >> temp_colors.css
-          printf "  --text-color-headings: '#2A2A31';\n" >> temp_colors.css
-          printf "  --secondary-color: \"%s\";\n" "$SECONDARY_COLOR" >> temp_colors.css
-          printf "  --background-color-image: '';\n" >> temp_colors.css
-          printf "  --background-color: \"%s\";\n" "$BACKGROUND_COLOR" >> temp_colors.css
-          printf "  --modal-color: \"%s\";\n" "$MODAL_COLOR" >> temp_colors.css
-          printf "  --button-text-color: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> temp_colors.css
-          printf "  --header-color: \"%s\";\n" "$HEADER_COLOR" >> temp_colors.css
-          printf "  --font-style: 'OpenSans-Regular';\n" >> temp_colors.css
-          printf "  --primary-heading-color: #030303; /* Example color */\n" >> temp_colors.css
-          printf "  --splash-background-color: #f1c40f;\n" >> temp_colors.css
-          printf "  --logo-color: #e74c3c;\n" >> temp_colors.css
-          printf "  --splash-screen: url('./%s');\n" "$SPLASH_SCREEN" >> temp_colors.css
-          printf "  --buttonText: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> temp_colors.css
-          printf "}\n" >> temp_colors.css
+      # - name: Update styles.css
+      #   run: |
+      #     # Create a temporary file to store the variables
+      #     printf "/* colors.css */\n:root {\n" > temp_colors.css
+      #     printf "  --primary-color: \"%s\";\n" "$PRIMARY_COLOR" >> temp_colors.css
+      #     printf "  --text-color-headings: '#2A2A31';\n" >> temp_colors.css
+      #     printf "  --secondary-color: \"%s\";\n" "$SECONDARY_COLOR" >> temp_colors.css
+      #     printf "  --background-color-image: '';\n" >> temp_colors.css
+      #     printf "  --background-color: \"%s\";\n" "$BACKGROUND_COLOR" >> temp_colors.css
+      #     printf "  --modal-color: \"%s\";\n" "$MODAL_COLOR" >> temp_colors.css
+      #     printf "  --button-text-color: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> temp_colors.css
+      #     printf "  --header-color: \"%s\";\n" "$HEADER_COLOR" >> temp_colors.css
+      #     printf "  --font-style: 'OpenSans-Regular';\n" >> temp_colors.css
+      #     printf "  --primary-heading-color: #030303; /* Example color */\n" >> temp_colors.css
+      #     printf "  --splash-background-color: #f1c40f;\n" >> temp_colors.css
+      #     printf "  --logo-color: #e74c3c;\n" >> temp_colors.css
+      #     printf "  --splash-screen: url('./%s');\n" "$SPLASH_SCREEN" >> temp_colors.css
+      #     printf "  --buttonText: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> temp_colors.css
+      #     printf "}\n" >> temp_colors.css
       
-          # Append the temp_colors.css to the top of styles.css
-          cat "${{ github.workspace }}/.github/workflows/styles.css" >> temp_colors.css
-          mv temp_colors.css "${{ github.workspace }}/.github/workflows/styles.css"
+      #     # Append the temp_colors.css to the top of styles.css
+      #     cat "${{ github.workspace }}/.github/workflows/styles.css" >> temp_colors.css
+      #     mv temp_colors.css "${{ github.workspace }}/.github/workflows/styles.css"
 
 
       - name: Download json file

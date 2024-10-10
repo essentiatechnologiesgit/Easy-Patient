@@ -215,10 +215,8 @@ jobs:
 
       - name: Move Screenshots to Fastlane Directories
         run: |
-          # Create directories if they don't exist
-          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots"
-          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots"
-          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/wearScreenshots"
+          # # Create directories if they don't exist
+
           
           # Move screenshots to the appropriate directories
           cp downloaded_screenshots/screenshot-nexus7-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/" # Move to tablet screenshots directory

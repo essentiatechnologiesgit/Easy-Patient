@@ -223,6 +223,64 @@ jobs:
         
           echo "Screenshots moved to Fastlane directories successfully."
 
+   # ****************************************************** 10 Inch **********************************************************
+
+
+      - name: Run Puppeteer to take 10-inch screenshots
+        run: |
+          cat <<EOF > takeScreenshots.js
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Use KnownDevices to get the Nexus 10 device
+          const KnownDevices = puppeteer.KnownDevices;
+          const nexus10 = KnownDevices['Nexus 10'];
+
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.emulate(nexus10);
+
+            // Use GitHub workspace environment variable for the file path
+            const filePaths = [path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html')];
+
+            const screenshots = [];
+
+            for (let i = 0; i < filePaths.length; i++) {
+              await page.goto('file://' + filePaths[i]);
+              const screenshotFileName = path.join(process.env.GITHUB_WORKSPACE, 'screenshot-nexus10-' + (i + 1) + '.png'); // Full path for screenshot
+              await page.screenshot({ path: screenshotFileName });
+              screenshots.push(screenshotFileName);
+              console.log('Screenshot saved:', screenshotFileName); // Debugging information
+            }
+
+            await browser.close();
+            console.log('Screenshots taken successfully!');
+          })();
+          EOF
+
+      - name: Run Puppeteer Script for Nexus 10
+        run: node takeScreenshots.js
+
+      - name: Upload 10-inch screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: screenshot-nexus10-*.png  # Update to match the new screenshot file name pattern
+
+      - name: Download 10-inch screenshots
+        uses: actions/download-artifact@v3
+        with:
+          name: screenshots
+          path: downloaded_screenshots
+
+      - name: Move 10-inch Screenshots to Fastlane Directories
+        run: |
+          # Move screenshots to the appropriate directories
+          cp downloaded_screenshots/screenshot-nexus10-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/" # Move to 10-inch tablet screenshots directory
+        
+          echo "10-inch screenshots moved to Fastlane directories successfully."
 
 
             # Set up Fastlane and Bundler for deployment

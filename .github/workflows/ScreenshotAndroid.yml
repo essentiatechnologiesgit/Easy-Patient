@@ -1,4 +1,4 @@
-name: Take Screenshots and Upload Artifacts
+name: Take Screenshots
 
 on:
   push:
@@ -14,44 +14,44 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: npm install puppeteer --force
+        run: npm ci
 
-      - name: Take screenshots with Puppeteer
+      - name: Run Puppeteer to take screenshots
         run: |
-          node -e "
+          cat <<EOF > takeScreenshots.js
           const puppeteer = require('puppeteer');
           const fs = require('fs');
           const path = require('path');
           const devices = puppeteer.devices;
-          const KnownDevices = puppeteer.KnownDevices;
-          const iPhone = KnownDevices['iPhone 14'];
+          const iPhone = devices['iPhone 14'];
 
           (async () => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.emulate(iPhone);
 
-            // File paths for local HTML files
-            const filePaths = [path.resolve(process.cwd(), 'page1.html')];
+            // Use GitHub workspace environment variable for the file path
+            const filePaths = [path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html')];
 
             const screenshots = [];
 
             for (let i = 0; i < filePaths.length; i++) {
-              await page.goto(`file://${filePaths[i]}`);
-              const screenshotFileName = `screenshot-iphone14-${i + 1}.png`;
+              await page.goto('file://' + filePaths[i]);
+              const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
 
             await browser.close();
-
             console.log('Screenshots taken successfully!');
           })();
-          "
+          EOF
+
+      - name: Run Puppeteer Script
+        run: node takeScreenshots.js
 
       - name: Upload screenshots as artifacts
-        uses: actions/upload-artifact@v3 # Updated version
+        uses: actions/upload-artifact@v3
         with:
           name: screenshots
-          path: |
-            screenshot-iphone14-*.png
+          path: screenshot-iphone14-*.png

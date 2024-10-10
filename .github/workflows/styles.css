@@ -35,7 +35,7 @@ body {
 
 
 #heading {
-  color: var(--primary-heading-color);
+  color: var(--text-color-headings);
   text-align: center;
   margin-top: 10px;
   font-size: 32px;

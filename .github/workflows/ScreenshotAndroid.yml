@@ -13,49 +13,117 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Install puppeteer directly
-      - name: Install Puppeteer
-        run: npm install puppeteer --force
 
-      - name: Run Puppeteer to take screenshots
+      - name: Access client payload
         run: |
-          cat <<EOF > takeScreenshots.js
-          const puppeteer = require('puppeteer');
-          const fs = require('fs');
-          const path = require('path');
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
+
+      # Fetch API data and save relevant parts to environment variables
+      - name: Fetch API data
+        id: fetch_api_data
+        run: |
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"
+
           
-          // Use KnownDevices to get the iPhone 14 device
-          const KnownDevices = puppeteer.KnownDevices;
-          const iPhone = KnownDevices['iPhone 14'];
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].tertiarycolor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.[0].marketingurl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].iosappname')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
 
-          (async () => {
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.emulate(iPhone);
+          # Parse and export relevant fields from the JSON response using jq
+          echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
+          echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
+          echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
+          echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV      
 
-            // Use GitHub workspace environment variable for the file path
-            const filePaths = [path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html')];
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
 
-            const screenshots = [];
+      - name: Update colors.css
+        run: |
+          printf "/* colors.css */\n:root {\n" > "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --primary-color: \"%s\";\n" "$PRIMARY_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --text-color-headings: '#2A2A31';\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --secondary-color: \"%s\";\n" "$SECONDARY_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --background-color-image: '';\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --background-color: \"%s\";\n" "$BACKGROUND_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --modal-color: \"%s\";\n" "$MODAL_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --button-text-color: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --header-color: \"%s\";\n" "$HEADER_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --font-style: 'OpenSans-Regular';\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --primary-heading-color: #030303; /* Example color */\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --splash-background-color: #f1c40f;\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --logo-color: #e74c3c;\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --splash-screen: url('./%s');\n" "$SPLASH_SCREEN" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "  --buttonText: \"%s\";\n" "$BUTTON_TEXT_COLOR" >> "${{ github.workspace }}/.github/workflows/colors.css"
+          printf "}\n" >> "${{ github.workspace }}/.github/workflows/colors.css"
 
-            for (let i = 0; i < filePaths.length; i++) {
-              await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
-              await page.screenshot({ path: screenshotFileName });
-              screenshots.push(screenshotFileName);
-            }
+      - name: print colors.css
+        run: |
+          cat "${{ github.workspace }}/.github/workflows/colors.css"
 
-            await browser.close();
-            console.log('Screenshots taken successfully!');
-          })();
-          EOF
+  # ******************************  Work for pupeteer ***********************************************
+      # # Install puppeteer directly
+      # - name: Install Puppeteer
+      #   run: npm install puppeteer --force
+
+      # - name: Run Puppeteer to take screenshots
+      #   run: |
+      #     cat <<EOF > takeScreenshots.js
+      #     const puppeteer = require('puppeteer');
+      #     const fs = require('fs');
+      #     const path = require('path');
+          
+      #     // Use KnownDevices to get the iPhone 14 device
+      #     const KnownDevices = puppeteer.KnownDevices;
+      #     const iPhone = KnownDevices['iPhone 14'];
+
+      #     (async () => {
+      #       const browser = await puppeteer.launch();
+      #       const page = await browser.newPage();
+      #       await page.emulate(iPhone);
+
+      #       // Use GitHub workspace environment variable for the file path
+      #       const filePaths = [path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html')];
+
+      #       const screenshots = [];
+
+      #       for (let i = 0; i < filePaths.length; i++) {
+      #         await page.goto('file://' + filePaths[i]);
+      #         const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
+      #         await page.screenshot({ path: screenshotFileName });
+      #         screenshots.push(screenshotFileName);
+      #       }
+
+      #       await browser.close();
+      #       console.log('Screenshots taken successfully!');
+      #     })();
+      #     EOF
 
 
-      - name: Run Puppeteer Script
-        run: node takeScreenshots.js
+      # - name: Run Puppeteer Script
+      #   run: node takeScreenshots.js
 
-      - name: Upload screenshots as artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: screenshots
-          path: screenshot-iphone14-*.png
+      # - name: Upload screenshots as artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: screenshots
+      #     path: screenshot-iphone14-*.png

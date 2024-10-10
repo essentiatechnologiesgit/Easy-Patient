@@ -187,9 +187,10 @@ jobs:
 
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-nexus7-' + (i + 1) + '.png'; // Update screenshot file name
+              const screenshotFileName = path.join(process.env.GITHUB_WORKSPACE, 'screenshot-nexus7-' + (i + 1) + '.png'); // Full path for screenshot
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
+              console.log('Screenshot saved:', screenshotFileName); // Debugging information
             }
 
             await browser.close();
@@ -200,6 +201,11 @@ jobs:
       - name: Run Puppeteer Script
         run: node takeScreenshots.js
 
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: screenshot-nexus7-*.png  # Update to match the new screenshot file name pattern
 
       - name: Download screenshots
         uses: actions/download-artifact@v3
@@ -218,6 +224,7 @@ jobs:
           cp downloaded_screenshots/screenshot-nexus7-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tabletScreenshots/" # Move to tablet screenshots directory
         
           echo "Screenshots moved to Fastlane directories successfully."
+
 
 
             # Set up Fastlane and Bundler for deployment

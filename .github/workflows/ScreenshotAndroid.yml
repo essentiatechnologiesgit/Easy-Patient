@@ -133,13 +133,14 @@ jobs:
               // Check if file exists
               if (fs.existsSync(filePaths[i])) {
                 await page.goto('file://' + filePaths[i]);
-                const screenshotFileName = `screenshot-iphone14-${i + 1}.png`;
+                const screenshotFileName = `screenshot-iphone14-${i + 1}.png`;  // Fix here
                 await page.screenshot({ path: screenshotFileName });
                 screenshots.push(screenshotFileName);
               } else {
                 console.error(`File not found: ${filePaths[i]}`);
               }
             }
+
 
             await browser.close();
             console.log('Screenshots taken successfully:', screenshots);

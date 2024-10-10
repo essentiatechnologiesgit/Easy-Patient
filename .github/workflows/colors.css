@@ -1,0 +1,23 @@
+/* colors.css */
+:root {
+  --primary-color: #82848D;
+  --text-color-headings: red;
+  --secondary-color: #C1AB60;
+  --background-color-image: #EEF6F8;
+  --background-color: #FFFFFF;
+  --modal-color: #FFFFFF;
+  --button-text-color: #FFFFFF;
+  --header-color: #FFFFFF;
+  --font-style: 'OpenSans-Regular';
+  --primary-heading-color: #030303; /* Example color */
+  --splash-background-color: #f1c40f;
+  --logo-color: #e74c3c;
+  --primaryColor: #82848D;
+  --secondaryColor: #C1AB60;
+  --splash-screen: url('./splash.png');
+  --buttonText: #FFFFFF;
+  /* --logo-image: url('./src/assets/logo.png');
+  --background-image: url('./src/assets/background-image.png');
+  --sub-logo: url('./src/assets/sub-logo.png'); */
+  }
+  

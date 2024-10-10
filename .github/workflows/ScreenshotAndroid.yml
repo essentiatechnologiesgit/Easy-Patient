@@ -6,33 +6,52 @@ on:
       - FixesForiOSBuild
 
 jobs:
-  take_screenshots:
+  take-screenshots:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16' # Specify the Node.js version
+      - name: Install dependencies
+        run: npm install puppeteer
 
-      # # Step 3: Install dependencies
-      # - name: Install dependencies
-      #   run: npm install --force
+      - name: Take screenshots with Puppeteer
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          const devices = puppeteer.devices;
+          const KnownDevices = puppeteer.KnownDevices;
+          const iPhone = KnownDevices['iPhone 14'];
 
-      # Step 4: Run Puppeteer script
-      - name: Run Puppeteer screenshot script
-        run: node ${{ github.workspace }}/.github/workflows/takeScreenshots.js
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.emulate(iPhone);
 
-      # Step 5: Upload screenshots as artifacts
-      - name: Upload screenshots
-        uses: actions/upload-artifact@v3
+            // File paths for local HTML files
+            const filePaths = [path.resolve(process.cwd(), 'page1.html')];
+
+            const screenshots = [];
+
+            for (let i = 0; i < filePaths.length; i++) {
+              await page.goto(`file://${filePaths[i]}`);
+              const screenshotFileName = `screenshot-iphone14-${i + 1}.png`;
+              await page.screenshot({ path: screenshotFileName });
+              screenshots.push(screenshotFileName);
+            }
+
+            await browser.close();
+
+            console.log('Screenshots taken successfully!');
+          })();
+          "
+
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: screenshots
           path: |
-            screenshot-iphone14-1.png
-            screenshot-iphone14-2.png
+            screenshot-iphone14-*.png

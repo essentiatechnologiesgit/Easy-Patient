@@ -43,7 +43,7 @@ body {
 
 .borderless-input {
   border: none;
-  border-bottom: 2px solid var(--secondaryColor); /* Adds a bottom border */
+  border-bottom: 2px solid var(--secondary-color); /* Adds a bottom border */
   padding: 10px;
   outline: none;
   background-color: transparent;
@@ -60,8 +60,8 @@ body {
 .button {
   width: 80%;
   height: 40px;
-  border-color: var(--secondaryColor);
-  background-color: var(--secondaryColor);
+  border-color: var(--secondary-color);
+  background-color: var(--secondary-color);
   color: var(--buttonText);
   border-radius: 16px;
   outline: none;
@@ -72,13 +72,13 @@ body {
   justify-content: end;
   margin-right: 30px;
   text-decoration: underline;
-  color: var(--primaryColor)
+  color: var(--primary-color)
 }
 
 .register{
   display: flex;
   justify-content: center;
-  color: var(--secondaryColor);
+  color: var(--secondary-color);
   text-decoration: underline;
 }
 

@@ -1,9 +1,8 @@
 name: Take Screenshots
 
 on:
-  push:
-    branches:
-      - FixesForiOSBuild
+  repository_dispatch:
+    types: [ScreenshotAndroid]
 
 jobs:
   take-screenshots:

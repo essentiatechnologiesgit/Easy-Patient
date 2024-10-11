@@ -168,7 +168,7 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
+              const screenshotFileName = 'downloaded_screenshots/screenshot-iphone14-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
@@ -205,7 +205,7 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-nexus7-' + (i + 1) + '.png';
+              const screenshotFileName = 'downloaded_screenshots/screenshot-nexus7-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
@@ -242,7 +242,7 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-nexus10-' + (i + 1) + '.png';
+              const screenshotFileName = 'downloaded_screenshots/screenshot-nexus10-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }

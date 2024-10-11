@@ -393,7 +393,7 @@ jobs:
               "data": {
                 "type": "appScreenshotSets",
                 "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_67"
+                  "screenshotDisplayType": "APP_IPHONE_69"
                 },
                 "relationships": {
                   "appStoreVersionLocalization": {

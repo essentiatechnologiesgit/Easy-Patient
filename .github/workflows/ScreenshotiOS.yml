@@ -143,17 +143,15 @@ jobs:
       - name: Install Puppeteer
         run: npm install puppeteer --force
       
-      # Step 2: Run Puppeteer to take iPhone 14 screenshots (6.7 inches)
-      - name: Run Puppeteer to take iPhone 14 screenshots
+      - name: Run Puppeteer Script for iPhone 14
         run: |
           cat <<EOF > takeScreenshots.js
           const puppeteer = require('puppeteer');
           const fs = require('fs');
           const path = require('path');
           
-          // Use KnownDevices to get the iPhone 14 device (6.7 inch)
           const KnownDevices = puppeteer.KnownDevices;
-          const iPhone14 = KnownDevices['iPhone 14 Pro Max'];  // iPhone 14 Pro Max for 6.7" size
+          const iPhone14 = KnownDevices['iPhone 14'];
           
           (async () => {
             const browser = await puppeteer.launch();
@@ -168,7 +166,10 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
+              
+              // Update the path here
               const screenshotFileName = 'downloaded_screenshots/screenshot-iphone14-' + (i + 1) + '.png';
+              
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
@@ -177,11 +178,12 @@ jobs:
             console.log('iPhone 14 screenshots taken successfully:', screenshots);
           })();
           EOF
+
+
       
       - name: Run Puppeteer Script for iPhone 14
         run: node takeScreenshots.js
-      
-      # Step 3: Nexus 7 Screenshots (7 inches)
+            
       - name: Run Puppeteer to take Nexus 7 screenshots
         run: |
           cat <<EOF > takeScreenshots.js
@@ -205,7 +207,10 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
+              
+              // Update the path here
               const screenshotFileName = 'downloaded_screenshots/screenshot-nexus7-' + (i + 1) + '.png';
+              
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
@@ -217,8 +222,7 @@ jobs:
       
       - name: Run Puppeteer Script for Nexus 7
         run: node takeScreenshots.js
-      
-      # Step 4: Nexus 10 Screenshots (10 inches)
+
       - name: Run Puppeteer to take Nexus 10 screenshots
         run: |
           cat <<EOF > takeScreenshots.js
@@ -242,18 +246,22 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
+              
+              // Update the path here
               const screenshotFileName = 'downloaded_screenshots/screenshot-nexus10-' + (i + 1) + '.png';
+              
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
             
             await browser.close();
-            console.log('Nexus 10 screenshots taken successfully!', screenshots);
+            console.log('Nexus 10 screenshots taken successfully:', screenshots);
           })();
           EOF
       
       - name: Run Puppeteer Script for Nexus 10
         run: node takeScreenshots.js
+
       
       # Step 5: Upload screenshots as artifacts
       - name: Upload all screenshots as artifacts

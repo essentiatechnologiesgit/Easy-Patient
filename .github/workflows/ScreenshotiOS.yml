@@ -385,7 +385,7 @@ jobs:
         run: |
           response=$(curl -X GET \
             -H "Authorization: Bearer ${{ env.token }}" \
-            https://api.appstoreconnect.apple.com/v1/appScreenshotSets?filter[appStoreVersionLocalization]=${{ env.app_store_version_localization_id }}&filter[screenshotDisplayType]=APP_IPHONE_65)
+            https://api.appstoreconnect.apple.com/v1/appScreenshotSets?filter[appStoreVersionLocalization]=${{ env.app_store_version_localization_id }}&filter[screenshotDisplayType]=APP_IPHONE_67)
 
           echo "Check Screenshot Set Response: $response"
           screenshot_set_id=$(echo $response | jq -r '.data[0].id')
@@ -410,7 +410,7 @@ jobs:
               "data": {
                 "type": "appScreenshotSets",
                 "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_65"
+                  "screenshotDisplayType": "APP_IPHONE_67"
                 },
                 "relationships": {
                   "appStoreVersionLocalization": {

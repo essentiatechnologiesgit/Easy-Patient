@@ -143,7 +143,7 @@ jobs:
           
           // Use KnownDevices to get the iPhone 14 device (6.7 inch)
           const KnownDevices = puppeteer.KnownDevices;
-          const iPhone14 = KnownDevices['iPhone 14 Pro Max'];  // iPhone 14 Pro Max for 6.7" size
+          const iPhone14 = KnownDevices['iPhone 11 Pro Max'];  // iPhone 14 Pro Max for 6.7" size
           
           (async () => {
             const browser = await puppeteer.launch();
@@ -390,7 +390,7 @@ jobs:
               "data": {
                 "type": "appScreenshotSets",
                 "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_67"
+                  "screenshotDisplayType": "APP_IPHONE_65"
                 },
                 "relationships": {
                   "appStoreVersionLocalization": {

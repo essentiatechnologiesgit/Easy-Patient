@@ -428,7 +428,7 @@ jobs:
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "'d13a1e82-cc18-4a64-b778-efba8452516b'",
+                         "id": "'${{ env.screenshot_set_id }}'",
                         "type": "appScreenshotSets"
                       }
                     }
@@ -485,14 +485,16 @@ jobs:
               mappings[screenshotId] = fileName;
             });
       
-            async function commitReservation(screenshotId, screenshotPath) {
-              const calculateMD5Checksum = (filePath) => {
-                const fileBuffer = fs.readFileSync(filePath);
-                const hashSum = crypto.createHash('md5');
-                hashSum.update(fileBuffer);
-                return hashSum.digest('hex');
-              };
+            // Function to calculate MD5 checksum of a file
+            const calculateMD5Checksum = (filePath) => {
+              const fileBuffer = fs.readFileSync(filePath);
+              const hashSum = crypto.createHash('md5');
+              hashSum.update(fileBuffer);
+              return hashSum.digest('hex');
+            };
       
+            // Function to commit the reservation for a screenshot
+            async function commitReservation(screenshotId, screenshotPath) {
               const checksum = calculateMD5Checksum(screenshotPath);
               const requestBody = {
                 data: {
@@ -522,11 +524,12 @@ jobs:
               }
             }
       
-            // Loop through each screenshot ID from the mappings and commit reservation
+            // Loop through the mappings and commit the reservation for each screenshot
             (async () => {
               for (const [screenshotId, fileName] of Object.entries(mappings)) {
-                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
+                const screenshotPath = path.join(__dirname, fileName);  // Use the filename directly in the current directory
                 await commitReservation(screenshotId, screenshotPath);
               }
             })();
           "
+

@@ -152,7 +152,7 @@ jobs:
           const path = require('path');
           
           // Use KnownDevices to get the iPhone 14 device (6.7 inch)
-          const KnownDevices = puppeteer.devices;
+          const KnownDevices = puppeteer.KnownDevices;
           const iPhone14 = KnownDevices['iPhone 14 Pro Max'];  // iPhone 14 Pro Max for 6.7" size
           
           (async () => {
@@ -189,7 +189,7 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           
-          const KnownDevices = puppeteer.devices;
+          const KnownDevices = puppeteer.KnownDevices;
           const nexus7 = KnownDevices['Nexus 7'];
           
           (async () => {
@@ -226,7 +226,7 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           
-          const KnownDevices = puppeteer.devices;
+          const KnownDevices = puppeteer.KnownDevices;
           const nexus10 = KnownDevices['Nexus 10'];
           
           (async () => {

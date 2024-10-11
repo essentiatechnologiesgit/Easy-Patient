@@ -394,147 +394,148 @@ jobs:
 
       #     # ***************************************************** SCREENSHOT UPLOAD START 67 *******************************************
 
-      # - name: Create Screenshot Set
-      #   id: create_screenshot_set
-      #   run: |
-      #     response=$(curl -X POST \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d '{
-      #         "data": {
-      #           "type": "appScreenshotSets",
-      #           "attributes": {
-      #             "screenshotDisplayType": "APP_IPHONE_67"
-      #           },
-      #           "relationships": {
-      #             "appStoreVersionLocalization": {
-      #               "data": {
-      #                 "id": "'${{ env.app_store_version_localization_id }}'",
-      #                 "type": "appStoreVersionLocalizations"
-      #               }
-      #             }
-      #           }
-      #         }
-      #       }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
+      - name: Create Screenshot Set
+        id: create_screenshot_set
+        run: |
+          response=$(curl -X POST \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data": {
+                "type": "appScreenshotSets",
+                "attributes": {
+                  "screenshotDisplayType": "APP_IPHONE_67"
+                },
+                "relationships": {
+                  "appStoreVersionLocalization": {
+                    "data": {
+                      "id": "'${{ env.app_store_version_localization_id }}'",
+                      "type": "appStoreVersionLocalizations"
+                    }
+                  }
+                }
+              }
+            }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
 
-      #     echo "Create Screenshot Set Response: $response"
-      #     screenshot_set_id=$(echo $response | jq -r '.data.id')
-      #     echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+          echo "Create Screenshot Set Response: $response"
+          screenshot_set_id=$(echo $response | jq -r '.data.id')
+          echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
 
-      # - name: Upload Screenshots to App Store Connect
-      #   run: |
-      #     # Array to hold screenshot IDs
-      #     screenshot_ids=()
-      #     # Create a mapping file
-      #     touch screenshot_mapping.txt
+      - name: Upload Screenshots to App Store Connect
+        run: |
+          # Array to hold screenshot IDs
+          screenshot_ids=()
+          # Create a mapping file
+          touch screenshot_mapping.txt
       
-      #     for screenshot in downloaded_screenshots/*.png; do
-      #       # Step 1: Create the screenshot entity
-      #       response=$(curl -X POST \
-      #         -H "Authorization: Bearer ${{ env.token }}" \
-      #         -H "Content-Type: application/json" \
-      #         -d '{
-      #           "data": {
-      #             "type": "appScreenshots",
-      #             "attributes": {
-      #               "fileName": "'"$(basename "$screenshot")"'",
-      #               "fileSize": '"$(stat -f%z "$screenshot")"'
-      #             },
-      #             "relationships": {
-      #               "appScreenshotSet": {
-      #                 "data": {
-      #                   "id": "'${{ env.screenshot_set_id }}'",
-      #                   "type": "appScreenshotSets"
-      #                 }
-      #               }
-      #             }
-      #           }
-      #         }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
+          for screenshot in downloaded_screenshots/screenshot-iphone14-*.png; do
+            # Step 1: Create the screenshot entity
+            response=$(curl -X POST \
+              -H "Authorization: Bearer ${{ env.token }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                "data": {
+                  "type": "appScreenshots",
+                  "attributes": {
+                    "fileName": "'"$(basename "$screenshot")"'",
+                    "fileSize": '"$(stat -f%z "$screenshot")"'
+                  },
+                  "relationships": {
+                    "appScreenshotSet": {
+                      "data": {
+                        "id": "'${{ env.screenshot_set_id }}'",
+                        "type": "appScreenshotSets"
+                      }
+                    }
+                  }
+                }
+              }' https://api.appstoreconnect.apple.com/v1/appScreenshots)
       
-      #       # Parse the upload URL and other details from the response
-      #       uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
-      #       contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
-      #       screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
+            # Parse the upload URL and other details from the response
+            uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
+            contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
+            screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
       
-      #       # Add screenshot ID to array
-      #       screenshot_ids+=("$screenshotId")
+            # Add screenshot ID to array
+            screenshot_ids+=("$screenshotId")
       
-      #       # Save the mapping between screenshotId and filename
-      #       echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
+            # Save the mapping between screenshotId and filename
+            echo "$screenshotId:$(basename "$screenshot")" >> screenshot_mapping.txt
       
-      #       # Step 2: Upload the screenshot file to the provided URL
-      #       curl -X PUT \
-      #         -H "Content-Type: $contentType" \
-      #         --upload-file "$screenshot" \
-      #         "$uploadUrl"
+            # Step 2: Upload the screenshot file to the provided URL
+            curl -X PUT \
+              -H "Content-Type: $contentType" \
+              --upload-file "$screenshot" \
+              "$uploadUrl"
       
-      #       echo "Uploaded screenshot $(basename "$screenshot")"
-      #     done
+            echo "Uploaded screenshot $(basename "$screenshot")"
+          done
       
-      #     # Export screenshot IDs to GitHub Actions environment
-      #     echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+          # Export screenshot IDs to GitHub Actions environment
+          echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+
       
-      # - name: Commit Screenshot Reservation
-      #   run: |
-      #     node -e "
-      #       const axios = require('axios');
-      #       const crypto = require('crypto');
-      #       const fs = require('fs');
-      #       const path = require('path');
-      #       const token = '${{ env.token }}';  // Using the extracted token
-      #       const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
-      #       const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
+      - name: Commit Screenshot Reservation
+        run: |
+          node -e "
+            const axios = require('axios');
+            const crypto = require('crypto');
+            const fs = require('fs');
+            const path = require('path');
+            const token = '${{ env.token }}';  // Using the extracted token
+            const screenshotMappingFile = path.join(__dirname, 'screenshot_mapping.txt');  // Path to the mapping file
+            const screenshotMappings = fs.readFileSync(screenshotMappingFile, 'utf-8').trim().split('\\n');
             
-      #       // Parse the screenshot mappings
-      #       const mappings = {};
-      #       screenshotMappings.forEach(line => {
-      #         const [screenshotId, fileName] = line.split(':');
-      #         mappings[screenshotId] = fileName;
-      #       });
+            // Parse the screenshot mappings
+            const mappings = {};
+            screenshotMappings.forEach(line => {
+              const [screenshotId, fileName] = line.split(':');
+              mappings[screenshotId] = fileName;
+            });
       
-      #       async function commitReservation(screenshotId, screenshotPath) {
-      #         const calculateMD5Checksum = (filePath) => {
-      #           const fileBuffer = fs.readFileSync(filePath);
-      #           const hashSum = crypto.createHash('md5');
-      #           hashSum.update(fileBuffer);
-      #           return hashSum.digest('hex');
-      #         };
+            async function commitReservation(screenshotId, screenshotPath) {
+              const calculateMD5Checksum = (filePath) => {
+                const fileBuffer = fs.readFileSync(filePath);
+                const hashSum = crypto.createHash('md5');
+                hashSum.update(fileBuffer);
+                return hashSum.digest('hex');
+              };
       
-      #         const checksum = calculateMD5Checksum(screenshotPath);
-      #         const requestBody = {
-      #           data: {
-      #             type: 'appScreenshots',
-      #             id: screenshotId,
-      #             attributes: {
-      #               uploaded: true,
-      #               sourceFileChecksum: checksum,
-      #             },
-      #           },
-      #         };
+              const checksum = calculateMD5Checksum(screenshotPath);
+              const requestBody = {
+                data: {
+                  type: 'appScreenshots',
+                  id: screenshotId,
+                  attributes: {
+                    uploaded: true,
+                    sourceFileChecksum: checksum,
+                  },
+                },
+              };
       
-      #         try {
-      #           const response = await axios.patch(
-      #             \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
-      #             requestBody,
-      #             {
-      #               headers: {
-      #                 Authorization: \`Bearer \${token}\`,
-      #                 'Content-Type': 'application/json',
-      #               },
-      #             }
-      #           );
-      #           console.log('Commit successful for screenshot ID', screenshotId, ':', response.data);
-      #         } catch (error) {
-      #           console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
-      #         }
-      #       }
+              try {
+                const response = await axios.patch(
+                  \`https://api.appstoreconnect.apple.com/v1/appScreenshots/\${screenshotId}\`,
+                  requestBody,
+                  {
+                    headers: {
+                      Authorization: \`Bearer \${token}\`,
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                );
+                console.log('Commit successful for screenshot ID', screenshotId, ':', response.data);
+              } catch (error) {
+                console.error('Error committing reservation for screenshot ID', screenshotId, ':', error.response ? error.response.data : error.message);
+              }
+            }
       
-      #       // Loop through each screenshot ID from the mappings and commit reservation
-      #       (async () => {
-      #         for (const [screenshotId, fileName] of Object.entries(mappings)) {
-      #           const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
-      #           await commitReservation(screenshotId, screenshotPath);
-      #         }
-      #       })();
-      #     "
+            // Loop through each screenshot ID from the mappings and commit reservation
+            (async () => {
+              for (const [screenshotId, fileName] of Object.entries(mappings)) {
+                const screenshotPath = path.join(__dirname, 'downloaded_screenshots', fileName);
+                await commitReservation(screenshotId, screenshotPath);
+              }
+            })();
+          "
 

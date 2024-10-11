@@ -133,28 +133,36 @@ jobs:
       - name: Install Puppeteer
         run: npm install puppeteer --force
       
-      # Step 2: Run Puppeteer to take iPhone 14 screenshots (6.7 inches)
       - name: Run Puppeteer to take iPhone 14 screenshots
         run: |
           cat <<EOF > takeScreenshots.js
           const puppeteer = require('puppeteer');
           const fs = require('fs');
           const path = require('path');
-          
-          // Use KnownDevices to get the iPhone 14 device (6.7 inch)
-          const KnownDevices = puppeteer.KnownDevices;
-          const iPhone14 = KnownDevices['iPhone 15 Pro Max'];  // iPhone 14 Pro Max for 6.7" size
-          
+
+          // Define a custom device with desired dimensions
+          const customDevice = {
+            name: 'Custom iPhone Size',
+            userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+            viewport: {
+              width: 1320,  // Change this to your desired width
+              height: 2868, // Change this to your desired height
+              isMobile: true,
+              hasTouch: true,
+              isLandscape: false,
+            },
+          };
+
           (async () => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
-            await page.emulate(iPhone14);
-            
+            await page.emulate(customDevice);  // Emulate the custom device
+
             const filePaths = [
               path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
               path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
             ];
-            
+
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
@@ -162,11 +170,14 @@ jobs:
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
-            
+
             await browser.close();
             console.log('iPhone 14 screenshots taken successfully:', screenshots);
           })();
           EOF
+
+
+
       
       - name: Run Puppeteer Script for iPhone 14
         run: node takeScreenshots.js
@@ -393,7 +404,7 @@ jobs:
               "data": {
                 "type": "appScreenshotSets",
                 "attributes": {
-                  "screenshotDisplayType": "APP_IPHONE_69"
+                  "screenshotDisplayType": "APP_IPHONE_67"
                 },
                 "relationships": {
                   "appStoreVersionLocalization": {

@@ -28,7 +28,6 @@ jobs:
       - name: Access client payload
         run: |
           echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
-
       # Fetch API data and save relevant parts to environment variables
       - name: Fetch API data
         id: fetch_api_data
@@ -36,7 +35,6 @@ jobs:
           echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
           RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
-
           # Parse and export relevant fields from the JSON response using jq
           echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
           echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
@@ -63,7 +61,6 @@ jobs:
           echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
           echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
           echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
-
       - name: Update styles.css
         run: |
           # Create a temporary file to store the variables
@@ -97,7 +94,6 @@ jobs:
           else
             echo "Json file already exists."
           fi
-
       - name: Download splash screen
         run: |
           if [ ! -f ${{ github.workspace }}/.github/workflows/splashScreen.png ]; then
@@ -106,7 +102,6 @@ jobs:
           else
             echo "Splash screen already exists."
           fi
-
       - name: Download logo
         run: |
           if [ ! -f ${{ github.workspace }}/.github/workflows/logo.png ]; then
@@ -115,7 +110,6 @@ jobs:
           else
             echo "Logo already exists."
           fi
-
       - name: Download background image
         run: |
           if [ ! -f ${{ github.workspace }}/.github/workflows/backgroundImage.png ]; then
@@ -124,7 +118,6 @@ jobs:
           else
             echo "Background image already exists."
           fi
-
       - name: Download sub logo
         run: |
           if [ ! -f ${{ github.workspace }}/.github/workflows/subLogo.png ]; then
@@ -133,25 +126,24 @@ jobs:
           else
             echo "Sub logo already exists."
           fi
-
       - name: List files in .github/workflows directory
         run: |
           ls "${{ github.workspace }}/.github/workflows"
-
-
       # Step 1: Install Puppeteer
       - name: Install Puppeteer
         run: npm install puppeteer --force
       
-      - name: Run Puppeteer Script for iPhone 14
+      # Step 2: Run Puppeteer to take iPhone 14 screenshots (6.7 inches)
+      - name: Run Puppeteer to take iPhone 14 screenshots
         run: |
           cat <<EOF > takeScreenshots.js
           const puppeteer = require('puppeteer');
           const fs = require('fs');
           const path = require('path');
           
+          // Use KnownDevices to get the iPhone 14 device (6.7 inch)
           const KnownDevices = puppeteer.KnownDevices;
-          const iPhone14 = KnownDevices['iPhone 14'];
+          const iPhone14 = KnownDevices['iPhone 14 Pro Max'];  // iPhone 14 Pro Max for 6.7" size
           
           (async () => {
             const browser = await puppeteer.launch();
@@ -166,10 +158,7 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              
-              // Update the path here
-              const screenshotFileName = 'downloaded_screenshots/screenshot-iphone14-' + (i + 1) + '.png';
-              
+              const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
@@ -178,12 +167,11 @@ jobs:
             console.log('iPhone 14 screenshots taken successfully:', screenshots);
           })();
           EOF
-
-
       
       - name: Run Puppeteer Script for iPhone 14
         run: node takeScreenshots.js
-            
+      
+      # Step 3: Nexus 7 Screenshots (7 inches)
       - name: Run Puppeteer to take Nexus 7 screenshots
         run: |
           cat <<EOF > takeScreenshots.js
@@ -207,10 +195,7 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              
-              // Update the path here
-              const screenshotFileName = 'downloaded_screenshots/screenshot-nexus7-' + (i + 1) + '.png';
-              
+              const screenshotFileName = 'screenshot-nexus7-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
@@ -222,7 +207,8 @@ jobs:
       
       - name: Run Puppeteer Script for Nexus 7
         run: node takeScreenshots.js
-
+      
+      # Step 4: Nexus 10 Screenshots (10 inches)
       - name: Run Puppeteer to take Nexus 10 screenshots
         run: |
           cat <<EOF > takeScreenshots.js
@@ -246,22 +232,18 @@ jobs:
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
-              
-              // Update the path here
-              const screenshotFileName = 'downloaded_screenshots/screenshot-nexus10-' + (i + 1) + '.png';
-              
+              const screenshotFileName = 'screenshot-nexus10-' + (i + 1) + '.png';
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
             
             await browser.close();
-            console.log('Nexus 10 screenshots taken successfully:', screenshots);
+            console.log('Nexus 10 screenshots taken successfully!', screenshots);
           })();
           EOF
       
       - name: Run Puppeteer Script for Nexus 10
         run: node takeScreenshots.js
-
       
       # Step 5: Upload screenshots as artifacts
       - name: Upload all screenshots as artifacts
@@ -290,18 +272,14 @@ jobs:
         run: |
           gem install jwt
           pip install requests
-
       - name: Download private key
         run: |
           curl -o ${{ github.workspace }}/private_key.p8 $private_key
           echo "Downloaded private key."   
-
       - name: Print private key
         run: |
           echo "Private key content:"
           cat ${{ github.workspace }}/private_key.p8
-
-
       - name: Generate JWT
         id: generate_jwt
         run: |
@@ -424,11 +402,9 @@ jobs:
                 }
               }
             }' https://api.appstoreconnect.apple.com/v1/appScreenshotSets)
-
           echo "Create Screenshot Set Response: $response"
           screenshot_set_id=$(echo $response | jq -r '.data.id')
           echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
-
       - name: Upload Screenshots to App Store Connect
         run: |
           # Array to hold screenshot IDs
@@ -437,12 +413,6 @@ jobs:
           touch screenshot_mapping.txt
       
           for screenshot in downloaded_screenshots/screenshot-iphone14-*.png; do
-            # Ensure file exists
-            if [ ! -f "$screenshot" ]; then
-              echo "File $screenshot not found!"
-              continue
-            fi
-      
             # Step 1: Create the screenshot entity
             response=$(curl -X POST \
               -H "Authorization: Bearer ${{ env.token }}" \
@@ -452,12 +422,12 @@ jobs:
                   "type": "appScreenshots",
                   "attributes": {
                     "fileName": "'"$(basename "$screenshot")"'",
-                    "fileSize": '$(stat --format=%s "$screenshot")'
+                    "fileSize": '"$(stat -f%z "$screenshot")"'
                   },
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "'"d13a1e82-cc18-4a64-b778-efba8452516b"'",
+                        "id": "'${{ env.screenshot_set_id }}'",
                         "type": "appScreenshotSets"
                       }
                     }
@@ -487,8 +457,6 @@ jobs:
       
           # Export screenshot IDs to GitHub Actions environment
           echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
-
-
 
       
       - name: Commit Screenshot Reservation
@@ -554,4 +522,3 @@ jobs:
               }
             })();
           "
-

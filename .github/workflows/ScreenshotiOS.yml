@@ -412,7 +412,7 @@ jobs:
           # Create a mapping file
           touch screenshot_mapping.txt
       
-          for screenshot in downloaded_screenshots/screenshot-iphone14-*.png; do
+          for screenshot in screenshot-iphone14-*.png; do
             # Step 1: Create the screenshot entity
             response=$(curl -X POST \
               -H "Authorization: Bearer ${{ env.token }}" \

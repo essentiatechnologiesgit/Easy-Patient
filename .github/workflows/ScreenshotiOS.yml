@@ -429,6 +429,12 @@ jobs:
           touch screenshot_mapping.txt
       
           for screenshot in downloaded_screenshots/screenshot-iphone14-*.png; do
+            # Ensure file exists
+            if [ ! -f "$screenshot" ]; then
+              echo "File $screenshot not found!"
+              continue
+            fi
+      
             # Step 1: Create the screenshot entity
             response=$(curl -X POST \
               -H "Authorization: Bearer ${{ env.token }}" \
@@ -443,7 +449,7 @@ jobs:
                   "relationships": {
                     "appScreenshotSet": {
                       "data": {
-                        "id": "'${{ env.screenshot_set_id }}'",
+                        "id": "'d13a1e82-cc18-4a64-b778-efba8452516b'",
                         "type": "appScreenshotSets"
                       }
                     }
@@ -473,6 +479,7 @@ jobs:
       
           # Export screenshot IDs to GitHub Actions environment
           echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+
 
       
       - name: Commit Screenshot Reservation

@@ -380,7 +380,27 @@ jobs:
 
       #     # ***************************************************** SCREENSHOT UPLOAD START 67 *******************************************
 
-      - name: Create Screenshot Set
+      - name: Check for Existing Screenshot Set
+        id: check_screenshot_set
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            https://api.appstoreconnect.apple.com/v1/appScreenshotSets?filter[appStoreVersionLocalization]=${{ env.app_store_version_localization_id }}&filter[screenshotDisplayType]=APP_IPHONE_65)
+
+          echo "Check Screenshot Set Response: $response"
+          screenshot_set_id=$(echo $response | jq -r '.data[0].id')
+
+          if [[ -n "$screenshot_set_id" && "$screenshot_set_id" != "null" ]]; then
+            echo "Screenshot set already exists: $screenshot_set_id"
+            echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+          else
+            echo "No existing screenshot set found."
+            echo "screenshot_set_id=null" >> $GITHUB_ENV
+          fi
+
+
+      - name: Create Screenshot Set (if none exists)
+        if: steps.check_screenshot_set.outputs.screenshot_set_id == 'null'
         id: create_screenshot_set
         run: |
           response=$(curl -X POST \
@@ -405,6 +425,7 @@ jobs:
           echo "Create Screenshot Set Response: $response"
           screenshot_set_id=$(echo $response | jq -r '.data.id')
           echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+
           
       - name: Upload Screenshots to App Store Connect
         run: |

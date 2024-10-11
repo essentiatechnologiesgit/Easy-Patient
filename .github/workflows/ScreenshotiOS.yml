@@ -405,6 +405,7 @@ jobs:
           echo "Create Screenshot Set Response: $response"
           screenshot_set_id=$(echo $response | jq -r '.data.id')
           echo "screenshot_set_id=$screenshot_set_id" >> $GITHUB_ENV
+          
       - name: Upload Screenshots to App Store Connect
         run: |
           # Array to hold screenshot IDs
@@ -422,7 +423,7 @@ jobs:
                   "type": "appScreenshots",
                   "attributes": {
                     "fileName": "'"$(basename "$screenshot")"'",
-                    "fileSize": '"$(stat -f%z "$screenshot")"'
+                    "fileSize": '"$(stat --format=%s "$screenshot")"'
                   },
                   "relationships": {
                     "appScreenshotSet": {
@@ -439,6 +440,12 @@ jobs:
             uploadUrl=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].url')
             contentType=$(echo "$response" | jq -r '.data.attributes.uploadOperations[0].requestHeaders[0].value')
             screenshotId=$(echo "$response" | jq -r '.data.id') # Extract the screenshot ID
+      
+            # Check if uploadUrl is null or empty
+            if [[ -z "$uploadUrl" ]]; then
+              echo "Error: Could not get a valid upload URL for screenshot $(basename "$screenshot")"
+              exit 1
+            fi
       
             # Add screenshot ID to array
             screenshot_ids+=("$screenshotId")
@@ -457,6 +464,7 @@ jobs:
       
           # Export screenshot IDs to GitHub Actions environment
           echo "SCREENSHOT_IDS=${screenshot_ids[*]}" >> $GITHUB_ENV
+
 
       
       - name: Commit Screenshot Reservation

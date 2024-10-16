@@ -39,7 +39,7 @@ jobs:
         id: fetch_api_data
         run: |
           echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
-          RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          RESPONSE=$(curl --location 'https://34e5-2400-adc1-1aa-d500-7029-32e7-5dcb-ea03.ngrok-free.app/fetchData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
 
           

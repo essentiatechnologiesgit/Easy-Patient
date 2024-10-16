@@ -140,7 +140,7 @@ jobs:
           const puppeteer = require('puppeteer');
           const fs = require('fs');
           const path = require('path');
-
+      
           // Define a custom device with desired dimensions
           const customDevice = {
             name: 'Custom iPhone Size',
@@ -153,17 +153,19 @@ jobs:
               isLandscape: false,
             },
           };
-
+      
           (async () => {
-            const browser = await puppeteer.launch();
+            const browser = await puppeteer.launch({
+              args: ['--no-sandbox', '--disable-setuid-sandbox'],  // Bypass sandbox restrictions
+            });
             const page = await browser.newPage();
             await page.emulate(customDevice);  // Emulate the custom device
-
+      
             const filePaths = [
               path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
               path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
             ];
-
+      
             const screenshots = [];
             for (let i = 0; i < filePaths.length; i++) {
               await page.goto('file://' + filePaths[i]);
@@ -171,91 +173,89 @@ jobs:
               await page.screenshot({ path: screenshotFileName });
               screenshots.push(screenshotFileName);
             }
-
+      
             await browser.close();
             console.log('iPhone 14 screenshots taken successfully:', screenshots);
           })();
           EOF
-
-
-
       
       - name: Run Puppeteer Script for iPhone 14
         run: node takeScreenshots.js
+
       
-      # Step 3: Nexus 7 Screenshots (7 inches)
-      - name: Run Puppeteer to take Nexus 7 screenshots
-        run: |
-          cat <<EOF > takeScreenshots.js
-          const puppeteer = require('puppeteer');
-          const fs = require('fs');
-          const path = require('path');
+      # # Step 3: Nexus 7 Screenshots (7 inches)
+      # - name: Run Puppeteer to take Nexus 7 screenshots
+      #   run: |
+      #     cat <<EOF > takeScreenshots.js
+      #     const puppeteer = require('puppeteer');
+      #     const fs = require('fs');
+      #     const path = require('path');
           
-          const KnownDevices = puppeteer.KnownDevices;
-          const nexus7 = KnownDevices['Nexus 7'];
+      #     const KnownDevices = puppeteer.KnownDevices;
+      #     const nexus7 = KnownDevices['Nexus 7'];
           
-          (async () => {
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.emulate(nexus7);
+      #     (async () => {
+      #       const browser = await puppeteer.launch();
+      #       const page = await browser.newPage();
+      #       await page.emulate(nexus7);
             
-            const filePaths = [
-              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
-              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
-            ];
+      #       const filePaths = [
+      #         path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
+      #         path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
+      #       ];
             
-            const screenshots = [];
-            for (let i = 0; i < filePaths.length; i++) {
-              await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-nexus7-' + (i + 1) + '.png';
-              await page.screenshot({ path: screenshotFileName });
-              screenshots.push(screenshotFileName);
-            }
+      #       const screenshots = [];
+      #       for (let i = 0; i < filePaths.length; i++) {
+      #         await page.goto('file://' + filePaths[i]);
+      #         const screenshotFileName = 'screenshot-nexus7-' + (i + 1) + '.png';
+      #         await page.screenshot({ path: screenshotFileName });
+      #         screenshots.push(screenshotFileName);
+      #       }
             
-            await browser.close();
-            console.log('Nexus 7 screenshots taken successfully:', screenshots);
-          })();
-          EOF
+      #       await browser.close();
+      #       console.log('Nexus 7 screenshots taken successfully:', screenshots);
+      #     })();
+      #     EOF
       
-      - name: Run Puppeteer Script for Nexus 7
-        run: node takeScreenshots.js
+      # - name: Run Puppeteer Script for Nexus 7
+      #   run: node takeScreenshots.js
       
-      # Step 4: Nexus 10 Screenshots (10 inches)
-      - name: Run Puppeteer to take Nexus 10 screenshots
-        run: |
-          cat <<EOF > takeScreenshots.js
-          const puppeteer = require('puppeteer');
-          const fs = require('fs');
-          const path = require('path');
+      # # Step 4: Nexus 10 Screenshots (10 inches)
+      # - name: Run Puppeteer to take Nexus 10 screenshots
+      #   run: |
+      #     cat <<EOF > takeScreenshots.js
+      #     const puppeteer = require('puppeteer');
+      #     const fs = require('fs');
+      #     const path = require('path');
           
-          const KnownDevices = puppeteer.KnownDevices;
-          const nexus10 = KnownDevices['Nexus 10'];
+      #     const KnownDevices = puppeteer.KnownDevices;
+      #     const nexus10 = KnownDevices['Nexus 10'];
           
-          (async () => {
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.emulate(nexus10);
+      #     (async () => {
+      #       const browser = await puppeteer.launch();
+      #       const page = await browser.newPage();
+      #       await page.emulate(nexus10);
             
-            const filePaths = [
-              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
-              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
-            ];
+      #       const filePaths = [
+      #         path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
+      #         path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
+      #       ];
             
-            const screenshots = [];
-            for (let i = 0; i < filePaths.length; i++) {
-              await page.goto('file://' + filePaths[i]);
-              const screenshotFileName = 'screenshot-nexus10-' + (i + 1) + '.png';
-              await page.screenshot({ path: screenshotFileName });
-              screenshots.push(screenshotFileName);
-            }
+      #       const screenshots = [];
+      #       for (let i = 0; i < filePaths.length; i++) {
+      #         await page.goto('file://' + filePaths[i]);
+      #         const screenshotFileName = 'screenshot-nexus10-' + (i + 1) + '.png';
+      #         await page.screenshot({ path: screenshotFileName });
+      #         screenshots.push(screenshotFileName);
+      #       }
             
-            await browser.close();
-            console.log('Nexus 10 screenshots taken successfully!', screenshots);
-          })();
-          EOF
+      #       await browser.close();
+      #       console.log('Nexus 10 screenshots taken successfully!', screenshots);
+      #     })();
+      #     EOF
       
-      - name: Run Puppeteer Script for Nexus 10
-        run: node takeScreenshots.js
+      # - name: Run Puppeteer Script for Nexus 10
+      #   run: node takeScreenshots.js
       
       # Step 5: Upload screenshots as artifacts
       - name: Upload all screenshots as artifacts
@@ -264,8 +264,8 @@ jobs:
           name: screenshots
           path: |
             screenshot-iphone14-*.png
-            screenshot-nexus7-*.png
-            screenshot-nexus10-*.png
+            # screenshot-nexus7-*.png
+            # screenshot-nexus10-*.png
       
 
       # Step 7: Upload screenshots to App Store Connect (your existing code should work here)

@@ -87,14 +87,6 @@ jobs:
           mv temp_colors.css "${{ github.workspace }}/.github/workflows/styles.css"
 
 
-      - name: Download json file
-        run: |
-          if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
-            curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
-            echo "Downloaded Json file."
-          else
-            echo "Json file already exists."
-          fi
       - name: Download splash screen
         run: |
           if [ ! -f ${{ github.workspace }}/.github/workflows/splashScreen.png ]; then

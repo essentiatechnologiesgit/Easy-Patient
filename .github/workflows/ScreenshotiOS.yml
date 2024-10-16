@@ -280,10 +280,15 @@ jobs:
         with:
           ruby-version: 3.3
 
-      - name: Install dependencies
+      - name: Install Ruby JWT gem
+        run: gem install jwt
+      
+      - name: Set up Python virtual environment and install requests
         run: |
-          gem install jwt
-          pip install requests
+          python3 -m venv venv  # Create a virtual environment
+          source venv/bin/activate  # Activate the virtual environment
+          pip install requests  # Install requests in the virtual environment
+
       - name: Download private key
         run: |
           curl -o ${{ github.workspace }}/private_key.p8 $private_key

@@ -1,13 +1,13 @@
-import React, {useEffect,useState} from 'react';
-import {Image, View, StyleSheet, ImageBackground, Text} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, View, StyleSheet, ImageBackground, Text } from 'react-native';
 import config from '../../config.js';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-
+// import splashImage from '../assets/splash.jpg';
 const SplashScreen = () => {
-  const navigation=useNavigation();
+  const navigation = useNavigation();
   const [permissionsGranted, setPermissionsGranted] = useState({
     location: false,
     camera: false,
@@ -16,7 +16,7 @@ const SplashScreen = () => {
   useEffect(() => {
     setTimeout(() => {
       checkLoginResponse();
-      }, 2000);
+    }, 2000);
   }, []);
 
   const checkLocationPermission = async () => {
@@ -37,7 +37,7 @@ const SplashScreen = () => {
       result = await check(PERMISSIONS.IOS.CAMERA);
     }
     return result;
-  };  
+  };
 
   const checkStoragePermission = async () => {
     let result;
@@ -63,7 +63,7 @@ const SplashScreen = () => {
         //   navigation.navigate('Login');
         // }
         //  else {
-          navigation.navigate('IntroScreens');
+        navigation.navigate('IntroScreens');
         // }
       }
     } catch (error) {
@@ -72,11 +72,18 @@ const SplashScreen = () => {
   };
 
   return (
-    <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}> 
-      <Image source={config.logo} style={styles.image} />
-      <Image source={config.subLogo} style={styles.image} />
-    </ImageBackground>
+    <>
+      {config.splashScreen ? (
+        <ImageBackground source={config.splashScreen} style={styles.backgroundImage}></ImageBackground>
+      ) : (
+        <ImageBackground source={config.backgroundImage} style={styles.backgroundImage}>
+          <Image source={config.logo} style={styles.image} />
+          <Image source={config.subLogo} style={styles.image} />
+        </ImageBackground>
+      )}
+    </>
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -86,15 +93,15 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom:25,
+    paddingBottom: 25,
   },
   image: {
-    marginBottom:15,
+    marginBottom: 15,
     // width: Dimensions.get('window').width,
     // height: Dimensions.get('window').height,
   },
-  text:{
-    color:'#e74c3c'
+  text: {
+    color: '#e74c3c'
   }
 });
 

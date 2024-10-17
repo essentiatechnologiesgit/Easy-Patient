@@ -34,6 +34,7 @@ const LoginScreen = () => {
   const [showAuth, setShowAuth] = useState(false);
   const [IOSError, setIOSError] = useState(false);
   const [noEmail, setNoEmail] = useState(false);
+  const {secondaryColor,primaryColor} = config;
   const handleLogin = () => {
     setUsernameError(false);
     setPasswordError(false);

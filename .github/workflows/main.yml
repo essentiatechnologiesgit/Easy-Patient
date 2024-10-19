@@ -780,86 +780,86 @@ jobs:
       # *************************************** Build Start ******************************************************
   
 
-      # - name: Install CocoaPods
-      #   run: gem install cocoapods
+      - name: Install CocoaPods
+        run: gem install cocoapods
 
-      # - name: Cache CocoaPods
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ios/Pods
-      #     key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pods-
+      - name: Cache CocoaPods
+        uses: actions/cache@v3
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
-      # - name: Install Node.js dependencies
-      #   run: npm install --force
+      - name: Install Node.js dependencies
+        run: npm install --force
 
-      # - name: Install Pods
-      #   run: |
-      #     cd ios
-      #     pod deintegrate
-      #     rm -rf Pods Podfile.lock
-      #     pod update
-      #     pod install
+      - name: Install Pods
+        run: |
+          cd ios
+          pod deintegrate
+          rm -rf Pods Podfile.lock
+          pod update
+          pod install
 
-      # - name: Install Xcode 15.3
-      #   run: |
-      #     sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
-      #     xcodebuild -version
+      - name: Install Xcode 15.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+          xcodebuild -version
 
-      # - name: Clean Derived Data
-      #   run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
+      - name: Clean Derived Data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
      
-      # - name: Clean Build Folder
-      #   run: |
-      #     cd ios
-      #     xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
+      - name: Clean Build Folder
+        run: |
+          cd ios
+          xcodebuild clean -workspace EasyPatientDynamic.xcworkspace -scheme EasyPatientDynamic -configuration Release
 
-      # - name: Build Archive
-      #   run: |
-      #     echo "PRODUCT_BUNDLE_IDENTIFIER is: ${{ env.BUNDLE_IDentifier }}"
-      #     xcodebuild clean archive \
-      #       -workspace ios/EasyPatientDynamic.xcworkspace \
-      #       -scheme EasyPatientDynamic \
-      #       -sdk iphoneos \
-      #       -destination generic/platform=iOS \
-      #       -configuration Release \
-      #       -derivedDataPath ios/build/DerivedData \
-      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 17" \
-      #       CODE_SIGN_IDENTITY="${{ env.CERTIFICATE_NAME }}" \
-      #       DEVELOPMENT_TEAM="${{ env.TEAM_ID }}" \
-      #       PRODUCT_BUNDLE_IDENTIFIER="${{ env.BUNDLE_IDentifier }}"
+      - name: Build Archive
+        run: |
+          echo "PRODUCT_BUNDLE_IDENTIFIER is: ${{ env.BUNDLE_IDentifier }}"
+          xcodebuild clean archive \
+            -workspace ios/EasyPatientDynamic.xcworkspace \
+            -scheme EasyPatientDynamic \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            -configuration Release \
+            -derivedDataPath ios/build/DerivedData \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            PROVISIONING_PROFILE_SPECIFIER="MyApp Distribution Profile 17" \
+            CODE_SIGN_IDENTITY="${{ env.CERTIFICATE_NAME }}" \
+            DEVELOPMENT_TEAM="${{ env.TEAM_ID }}" \
+            PRODUCT_BUNDLE_IDENTIFIER="${{ env.BUNDLE_IDentifier }}"
 
 
-      # - name: Export IPA
-      #   run: |
-      #     xcodebuild -exportArchive \
-      #       -archivePath ios/build/archive/TestingArchive.xcarchive \
-      #       -exportOptionsPlist ios/ExportOptions.plist \
-      #       -exportPath ios/build/archive/TestingIPA
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath ios/build/archive/TestingArchive.xcarchive \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath ios/build/archive/TestingIPA
       
-      # - name: Upload IPA as Artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: TestingIPA
-      #     path: ios/build/archive/TestingIPA/*.ipa
+      - name: Upload IPA as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestingIPA
+          path: ios/build/archive/TestingIPA/*.ipa
 
 
 
-      # - name: Find IPA file
-      #   id: find_ipa
-      #   run: |
-      #     ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
-      #     echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
+      - name: Find IPA file
+        id: find_ipa
+        run: |
+          ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
+          echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
       
-      # - name: Upload IPA to App Store Connect
-      #   run: |
-      #     xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
-      #       -t ios \
-      #       --apiKey ${{ env.KEY_ID }} \
-      #       --apiIssuer ${{ env.ISSUER_ID }} \
+      - name: Upload IPA to App Store Connect
+        run: |
+          xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
+            -t ios \
+            --apiKey ${{ env.KEY_ID }} \
+            --apiIssuer ${{ env.ISSUER_ID }} \
 
  
 

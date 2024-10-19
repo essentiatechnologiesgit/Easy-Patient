@@ -6,7 +6,7 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: var(--background-image); no-repeat center center, var(--primary-color);
+  background: url('backgroundImage.png'); no-repeat center center, var(--primary-color);
   background-size: cover; /* Ensure the background image covers the entire area */
   position: relative;
 }

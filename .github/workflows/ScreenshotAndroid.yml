@@ -1,0 +1,343 @@
+name: Take Screenshots
+
+on:
+  repository_dispatch:
+    types: [ScreenshotAndroid]
+
+jobs:
+  take-screenshots:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up JDK version 17 using Temurin distribution
+      - name: Set Up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Install Node.js and NPM dependencies
+      - name: Set up Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Access client payload
+        run: |
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
+
+      # Fetch API data and save relevant parts to environment variables
+      - name: Fetch API data
+        id: fetch_api_data
+        run: |
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"
+
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].tertiarycolor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.[0].marketingurl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].iosappname')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
+          echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
+          echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
+          echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
+          echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV      
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.[0].issuer_id')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.[0].key_id')" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.[0].private_key')" >> $GITHUB_ENV
+
+      - name: Update styles.css
+        run: |
+          # Create a temporary file to store the variables
+          printf "/* colors.css */\n:root {\n" > temp_colors.css
+          printf "  --primary-color: %s;\n" "$PRIMARY_COLOR" >> temp_colors.css
+          printf "  --text-color-headings: '#2A2A31';\n" >> temp_colors.css
+          printf "  --secondary-color: %s;\n" "$SECONDARY_COLOR" >> temp_colors.css
+          printf "  --background-color-image: '';\n" >> temp_colors.css
+          printf "  --background-color: %s;\n" "$BACKGROUND_COLOR" >> temp_colors.css
+          printf "  --modal-color: %s;\n" "$MODAL_COLOR" >> temp_colors.css
+          printf "  --button-text-color: %s;\n" "$BUTTON_TEXT_COLOR" >> temp_colors.css
+          printf "  --header-color: %s;\n" "$HEADER_COLOR" >> temp_colors.css
+          printf "  --font-style: 'OpenSans-Regular';\n" >> temp_colors.css
+          printf "  --primary-heading-color: #030303; /* Example color */\n" >> temp_colors.css
+          printf "  --splash-background-color: #f1c40f;\n" >> temp_colors.css
+          printf "  --logo-color: #e74c3c;\n" >> temp_colors.css
+          printf "  --splash-screen: url('./%s');\n" "$SPLASH_SCREEN" >> temp_colors.css
+          printf "  --buttonText: %s;\n" "$BUTTON_TEXT_COLOR" >> temp_colors.css
+          printf "}\n" >> temp_colors.css
+      
+          # Append the temp_colors.css to the top of styles.css
+          cat "${{ github.workspace }}/.github/workflows/styles.css" >> temp_colors.css
+          mv temp_colors.css "${{ github.workspace }}/.github/workflows/styles.css"
+
+
+      - name: Download json file
+        run: |
+          if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
+            echo "Downloaded Json file."
+          else
+            echo "Json file already exists."
+          fi
+
+      - name: Download splash screen
+        run: |
+          if [ ! -f ${{ github.workspace }}/.github/workflows/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/splashScreen.png $SPLASH_SCREEN
+            echo "Downloaded splash screen."
+          else
+            echo "Splash screen already exists."
+          fi
+
+      - name: Download logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/.github/workflows/logo.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/logo.png $LOGO
+            echo "Downloaded logo."
+          else
+            echo "Logo already exists."
+          fi
+
+      - name: Download background image
+        run: |
+          if [ ! -f ${{ github.workspace }}/.github/workflows/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/backgroundImage.png $BACKGROUND_IMAGE
+            echo "Downloaded background image."
+          else
+            echo "Background image already exists."
+          fi
+
+      - name: Download sub logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/.github/workflows/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/.github/workflows/subLogo.png $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
+
+      - name: List files in .github/workflows directory
+        run: |
+          ls "${{ github.workspace }}/.github/workflows"
+
+
+      # Install puppeteer directly
+      - name: Install Puppeteer
+        run: npm install puppeteer --force
+
+      - name: Run Puppeteer to take screenshots
+        run: |
+          cat <<EOF > takeScreenshots.js
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Use KnownDevices to get the iPhone 14 device
+          const KnownDevices = puppeteer.KnownDevices;
+          const iPhone = KnownDevices['iPhone 14'];
+          
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.emulate(iPhone);
+            
+            // Use GitHub workspace environment variable for the file paths
+            const filePaths = [
+              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
+              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
+            ];
+            
+            const screenshots = [];
+            for (let i = 0; i < filePaths.length; i++) {
+              await page.goto('file://' + filePaths[i]);
+              const screenshotFileName = 'screenshot-iphone14-' + (i + 1) + '.png';
+              await page.screenshot({ path: screenshotFileName });
+              screenshots.push(screenshotFileName);
+            }
+            
+            await browser.close();
+            console.log('Screenshots taken successfully:', screenshots);
+          })();
+          EOF
+
+
+      - name: Run Puppeteer Script
+        run: node takeScreenshots.js
+
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: screenshot-iphone14-*.png
+
+      - name: Move Screenshots to Fastlane Directories
+        run: |
+          # Create directories if they don't exist
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots"
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots"
+          mkdir -p "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots"
+          
+          # Move screenshots to the appropriate directories
+          mv screenshot-iphone14-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/phoneScreenshots/"
+        
+          echo "Screenshots moved to Fastlane directories successfully."
+
+
+
+      # ************************************************************* New Device ***************************************************** 
+
+      - name: Run Puppeteer to take screenshots
+        run: |
+          cat <<EOF > takeScreenshots.js
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Use KnownDevices to get the Nexus 7 device
+          const KnownDevices = puppeteer.KnownDevices;
+          const nexus7 = KnownDevices['Nexus 7'];
+
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.emulate(nexus7);
+
+            // Use GitHub workspace environment variable for the file paths
+            const filePaths = [
+              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
+              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
+            ];
+
+            const screenshots = [];
+
+            for (let i = 0; i < filePaths.length; i++) {
+              await page.goto('file://' + filePaths[i]);
+              const screenshotFileName = path.join(process.env.GITHUB_WORKSPACE, 'screenshot-nexus7-' + (i + 1) + '.png'); // Full path for screenshot
+              await page.screenshot({ path: screenshotFileName });
+              screenshots.push(screenshotFileName);
+              console.log('Screenshot saved:', screenshotFileName); // Debugging information
+            }
+
+            await browser.close();
+            console.log('Screenshots taken successfully:', screenshots);
+          })();
+          EOF
+
+
+      - name: Run Puppeteer Script
+        run: node takeScreenshots.js
+
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: screenshot-nexus7-*.png  # Update to match the new screenshot file name pattern
+
+      - name: Download screenshots
+        uses: actions/download-artifact@v3
+        with:
+          name: screenshots
+          path: downloaded_screenshots
+
+      - name: Move Screenshots to Fastlane Directories
+        run: |
+          # # Create directories if they don't exist
+
+          
+          # Move screenshots to the appropriate directories
+          cp downloaded_screenshots/screenshot-nexus7-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/sevenInchScreenshots/" # Move to tablet screenshots directory
+        
+          echo "Screenshots moved to Fastlane directories successfully."
+
+   # # ****************************************************** 10 Inch **********************************************************
+
+
+      - name: Run Puppeteer to take 10-inch screenshots
+        run: |
+          cat <<EOF > takeScreenshots.js
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Use KnownDevices to get the Nexus 10 device
+          const KnownDevices = puppeteer.KnownDevices;
+          const nexus10 = KnownDevices['Nexus 10'];
+
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.emulate(nexus10);
+
+            // Use GitHub workspace environment variable for the file paths
+            const filePaths = [
+              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page1.html'),
+              path.resolve(process.env.GITHUB_WORKSPACE, '.github/workflows', 'page2.html')
+            ];
+
+            const screenshots = [];
+
+            for (let i = 0; i < filePaths.length; i++) {
+              await page.goto('file://' + filePaths[i]);
+              const screenshotFileName = path.join(process.env.GITHUB_WORKSPACE, 'screenshot-nexus10-' + (i + 1) + '.png'); // Full path for screenshot
+              await page.screenshot({ path: screenshotFileName });
+              screenshots.push(screenshotFileName);
+              console.log('Screenshot saved:', screenshotFileName); // Debugging information
+            }
+
+            await browser.close();
+            console.log('Screenshots taken successfully!', screenshots);
+          })();
+          EOF
+
+      - name: Run Puppeteer Script for Nexus 10
+        run: node takeScreenshots.js
+
+      - name: Upload 10-inch screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots
+          path: screenshot-nexus10-*.png  # Update to match the new screenshot file name pattern
+
+      - name: Download 10-inch screenshots
+        uses: actions/download-artifact@v3
+        with:
+          name: screenshots
+          path: downloaded_screenshots
+
+      - name: Move 10-inch Screenshots to Fastlane Directories
+        run: |
+          # Move screenshots to the appropriate directories
+          cp downloaded_screenshots/screenshot-nexus10-*.png "${{ github.workspace }}/android/fastlane/metadata/android/en-US/images/tenInchScreenshots/" # Move to 10-inch tablet screenshots directory
+        
+          echo "10-inch screenshots moved to Fastlane directories successfully."
+
+
+   #          # Set up Fastlane and Bundler for deployment
+      - name: Install Fastlane and Bundler
+        run: |
+          sudo gem install bundler
+          sudo gem install fastlane
+      # Change directory to Android before running Fastlane
+      - name: Upload Metadata and Screenshots to Google Play
+        run: |
+          cd android
+          sudo bundle install
+          bundle exec fastlane upload_screenshots

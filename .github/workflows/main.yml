@@ -1,10 +1,11 @@
 name: iOS Certificate Automation
 on:
-  push:
-    branches:
-      - 'update-config*'   # Matches branches starting with "BuildBranches"
-    paths:
-      - 'config.jss'
+  repository_dispatch:
+    types: [iOS]
+# on:
+#   push:
+#     branches:
+#       - FixesForiOSBuild
 
 jobs:
   build:
@@ -28,52 +29,72 @@ jobs:
           gem install jwt
           pip install requests
 
-      - name: Extract variables from config.js
-        id: extract-variables
+      # Access the client payload (extract the bundle ID)
+      - name: Access client payload
         run: |
-          BUNDLE_IDentifier=$(grep -E '^ *BUNDLE_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          ISSUER_ID=$(grep -E '^ *ISSUER_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          KEY_ID=$(grep -E '^ *KEY_ID:' ${{ github.workspace }}/config.js | awk -F '[:,]' '{print $2}' | tr -d '[:space:]' | tr -d \')
-          
-          # Extract the private key block correctly
-          awk '/private_key: /,/\n *`/' ${{ github.workspace }}/config.js | sed -e 's/private_key: //g' -e 's/^ *//g' -e 's/`//g' -e '/^$/d' > private_key.pem
-      
-          # Print private key for verification (remove or comment this in production)
-          echo "Private key content:"
-          cat private_key.pem
-      
-          echo "BUNDLE_IDentifier=$BUNDLE_IDentifier" >> $GITHUB_ENV
-          echo "ISSUER_ID=$ISSUER_ID" >> $GITHUB_ENV
-          echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
-          echo "PRIVATE_KEY_PATH=$PWD/private_key.pem" >> $GITHUB_ENV
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
 
-      
-      - name: Echo extracted variables
+      # Fetch API data and save relevant parts to environment variables
+      - name: Fetch API data
+        id: fetch_api_data
         run: |
-          echo "Extracted BUNDLE_IDentifier is ${{ env.BUNDLE_IDentifier }}"
-          echo "Extracted ISSUER_ID is ${{ env.ISSUER_ID }}"
-          echo "Extracted KEY_ID is ${{ env.KEY_ID }}"
-          echo "Private key stored at ${{ env.PRIVATE_KEY_PATH }}"
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://api-kqasdv4bcq-uc.a.run.app/fetchData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.primaryColor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.secondaryColor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.tertiaryColor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.backgroundColor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.modalColor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.buttonTextColor')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.headerColor')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.BUNDLE_ID')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.promotionalText')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.supportUrl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.marketingUrl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.iOSAppName')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.androidAppName')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.long_description')" >> $GITHUB_ENV
+          echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.splashScreenUrl')" >> $GITHUB_ENV
+          echo "LOGO=$(echo "$RESPONSE" | jq -r '.logoUrl')" >> $GITHUB_ENV
+          echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.backgroundImageUrl')" >> $GITHUB_ENV
+          echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.subLogoUrl')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.jsonFileUrl')" >> $GITHUB_ENV
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.ISSUER_ID')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.KEY_ID')" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.privateKeyURL')" >> $GITHUB_ENV
+
+      - name: Download private key
+        run: |
+          curl -o ${{ github.workspace }}/private_key.p8 $private_key
+          echo "Downloaded private key."
 
       - name: Print private key
         run: |
           echo "Private key content:"
-          cat ${{ env.PRIVATE_KEY_PATH }}
-      
+          cat ${{ github.workspace }}/private_key.p8
+
+
       - name: Generate JWT
         id: generate_jwt
         run: |
           ISSUER_ID=${{ env.ISSUER_ID }}
           KEY_ID=${{ env.KEY_ID }}
-          private_key=$(cat "${{ env.PRIVATE_KEY_PATH }}")
+          
+          # Load the private key content from the file
+          private_key=$(cat "${{ github.workspace }}/private_key.p8")
       
+          # Ensure the private key is correctly formatted
           token=$(ruby -rjwt -ropenssl -e "
             require 'openssl'
             require 'jwt'
-            private_key_obj = OpenSSL::PKey::EC.new(<<~KEY
-            $private_key
-            KEY
-            )
+            
+            private_key_obj = OpenSSL::PKey::EC.new('$private_key')
+            
             token = JWT.encode(
               {
                 iss: '$ISSUER_ID',
@@ -89,17 +110,142 @@ jobs:
             puts token
           ")
       
+          # Save the generated token in the GitHub Actions environment for later steps
           echo "token=$token" >> $GITHUB_ENV
 
-      - name: Save private key to default location
+
+      - name: Download and move private key
         run: |
-          mkdir -p ~/.private_keys
-          cp ${{ env.PRIVATE_KEY_PATH }} ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
-          chmod 600 ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+          # Create the directory if it doesn't exist
+          mkdir -p "$HOME/.private_keys"
+          
+          # Download the private key
+          curl -o "${{ github.workspace }}/private_key.p8" $private_key
+          
+          # Move and rename it dynamically based on KEY_ID
+          mv "${{ github.workspace }}/private_key.p8" "$HOME/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+          
+          # Set the permissions for the private key
+          chmod 600 "$HOME/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+          
+          echo "Private key downloaded and moved to $HOME/.private_keys/AuthKey_${{ env.KEY_ID }}.p8"
+
+
+
+
+
+
+      # - name: Save private key to default location
+      #   run: |
+      #     mkdir -p ~/.private_keys
+      #     cp ${{ env.PRIVATE_KEY_PATH }} ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+      #     chmod 600 ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
       
       - name: Print private key contents (debugging, remove in production)
         run: |
           cat ~/.private_keys/AuthKey_${{ env.KEY_ID }}.p8
+
+      # Download images to the assets folder if they don't already exist
+      - name: Download splash screen
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+            echo "Downloaded splash screen."
+          else
+            echo "Splash screen already exists."
+          fi
+
+
+
+      - name: Download logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+            echo "Downloaded logo."
+          else
+            echo "Logo already exists."
+          fi
+
+      - name: Download background image
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+            echo "Downloaded background image."
+          else
+            echo "Background image already exists."
+          fi
+
+      - name: Download sub logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
+
+      # - name: Download json file
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+      #       curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
+      #       echo "Downloaded Json file."
+      #     else
+      #       echo "Json file already exists."
+      #     fi
+
+      # - name: Listing json file 
+      #   run: |
+      #     if [ -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+      #       cat ${{ github.workspace }}/android/fastlane/jsonFile.json
+      #     else
+      #       echo "Json file does not exist."
+      #     fi
+            
+          
+
+      # Update config.js file with the new image paths (using require)
+      - name: Update config.js
+        run: |
+          printf "const config = {
+            splashScreen: require('./src/assets/splashScreen.png'),
+            logo: require('./src/assets/logo.png'),
+            backgroundImage: require('./src/assets/backgroundImage.png'),
+            subLogo: require('./src/assets/subLogo.png'),
+            primaryColor: \"%s\",
+            textColorHeadings: '#2A2A31',
+            secondaryColor: \"%s\",
+            tertiaryColor: \"%s\",
+            backgroundColorImage: '',
+            backgroundImageType: 'png',
+            backgroundColor: \"%s\",
+            modalColor: \"%s\",
+            buttonText: \"%s\",
+            headerColor: \"%s\",
+            BUNDLE_ID: \"%s\",
+            keywords: \"%s\",
+            promotionalText: \"%s\",
+            supportUrl: \"%s\",
+            marketingUrl: \"%s\",
+            Name: \"%s\",
+            description: \"%s\",
+            ANDROID_APP_NAME: \"%s\",
+            shortDescription: \"%s\",
+            longDescription: \"%s\"
+          };\n\n\nmodule.exports = config;" \
+          "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
+          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
+          "$HEADER_COLOR" "$BUNDLE_IDentifier" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+
+      # Print the updated config.js file to the console
+      - name: Print updated config.js
+        run: |
+          echo "Contents of the updated config.js:"
+          cat ${{ github.workspace }}/config.js
+
+
+
 
 
 
@@ -110,7 +256,7 @@ jobs:
           import requests
       
           # Define the Bundle Identifier
-          bundle_id = os.getenv("BUNDLE_IDentifier") # Replace with your actual Bundle Identifier
+          bundle_id = os.getenv("BUNDLE_IDentifier") 
       
           # Define the URL for the App Store Connect API to fetch bundle details
           url = f"https://api.appstoreconnect.apple.com/v1/bundleIds?filter[identifier]={bundle_id}"
@@ -515,89 +661,117 @@ jobs:
           </plist>
           EOF
 
+    
+
         # *************************************** Prerequisetries End ********************************************
 
 
       # ******************************************* Uploading Meta Data **************************************
 
-      # - name: Get App ID
-      #   id: get_app_id
-      #   run: |
-      #     bundle_id=${{ env.BUNDLE_IDentifier }}  # Replace with your app's Bundle ID
+      - name: Get App ID
+        id: get_app_id
+        run: |
+          bundle_id=${{ env.BUNDLE_IDentifier }}  # Replace with your app's Bundle ID
       
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps?filter%5BbundleId%5D=$bundle_id")
       
-      #     echo "Response: $response"
+          echo "Response: $response"
       
-      #     app_id=$(echo $response | jq -r '.data[0].id')
+          app_id=$(echo $response | jq -r '.data[0].id')
       
-      #     if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
-      #       echo "Failed to retrieve app ID."
-      #       exit 1
-      #     fi
+          if [ "$app_id" == "null" ] || [ -z "$app_id" ]; then
+            echo "Failed to retrieve app ID."
+            exit 1
+          fi
       
-      #     echo "app_id=$app_id" >> $GITHUB_ENV
+          echo "app_id=$app_id" >> $GITHUB_ENV
 
-      # - name: Get App Store Version ID
-      #   id: get_app_store_version_id
-      #   run: |
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
-      
-      #     echo "Response: $response"
-      
-      #     app_store_version_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first version
-      
-      #     if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
-      #       echo "Failed to retrieve app store version ID."
-      #       exit 1
-      #     fi
-      
-      #     echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
-
-      # - name: Get App Store Version Localization ID
-      #   id: get_app_store_version_localization_id
-      #   run: |
-      #     response=$(curl -X GET \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
-      
-      #     echo "Response: $response"
-      
-      #     app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')  # Assuming you want the first localization
-      
-      #     if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
-      #       echo "Failed to retrieve app store version localization ID."
-      #       exit 1
-      #     fi
-      
-      #     echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
-
-      # - name: Update App Store Version Localization
-      #   id: update_app_store_version_localization
-      #   run: |
-      #     response=$(curl -X PATCH \
-      #       -H "Authorization: Bearer ${{ env.token }}" \
-      #       -H "Content-Type: application/json" \
-      #       -d '{
-      #         "data": {
-      #           "id": "'${{ env.app_store_version_localization_id }}'",
-      #           "type": "appStoreVersionLocalizations",
-      #           "attributes": {
-      #             "description": "here goes your app description...",
-      #             "keywords": "medicine reminder, lembrete de medicamentos, easy patient, easy health, gestão da saúde",
-      #             "marketingUrl": null,
-      #             "promotionalText": "We introduce new features and improvements to improve your experience",
-      #             "supportUrl": "https://easy-health.app/landing-page/index.html"
-      #           }
-      #         }
-      #       }' \
-      #       "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+      - name: Get App Store Version ID
+        id: get_app_store_version_id
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/apps/${{ env.app_id }}/appStoreVersions")
           
-      #     echo "Update App Store Version Localization Response: $response"
+          echo "Response: $response"
+          
+          # Assuming you want the first version
+          app_store_version_id=$(echo $response | jq -r '.data[0].id')
+          
+          if [ "$app_store_version_id" == "null" ] || [ -z "$app_store_version_id" ]; then
+            echo "Failed to retrieve app store version ID."
+            exit 1
+          fi
+          
+          echo "app_store_version_id=$app_store_version_id" >> $GITHUB_ENV
+      
+      - name: Get App Store Version Localization ID
+        id: get_app_store_version_localization_id
+        run: |
+          response=$(curl -X GET \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersions/${{ env.app_store_version_id }}/appStoreVersionLocalizations")
+          
+          echo "Response: $response"
+          
+          # Assuming you want the first localization (adjust as needed)
+          app_store_version_localization_id=$(echo $response | jq -r '.data[0].id')
+          
+          if [ "$app_store_version_localization_id" == "null" ] || [ -z "$app_store_version_localization_id" ]; then
+            echo "Failed to retrieve app store version localization ID."
+            exit 1
+          fi
+          
+          echo "app_store_version_localization_id=$app_store_version_localization_id" >> $GITHUB_ENV
+      
+      - name: Update App Store Version Localization
+        id: update_app_store_version_localization
+        run: |
+          # Initialize the payload with required attributes
+          payload=$(jq -n --arg id "${{ env.app_store_version_localization_id }}" \
+                          --arg type "appStoreVersionLocalizations" \
+                          --arg description "${{ env.DESCRIPTION }}" \
+                          --arg keywords "${{ env.KEYWORDS }}" \
+                          --arg promotionalText "${{ env.PROMOTIONAL_TEXT }}" \
+                          '{
+                            data: {
+                              id: $id,
+                              type: $type,
+                              attributes: {
+                                description: $description,
+                                keywords: $keywords,
+                                promotionalText: $promotionalText
+                              }
+                            }
+                          }')
+          
+          # Conditionally add marketingUrl if it's defined
+          if [ -n "${{ env.MARKETING_URL }}" ]; then
+            payload=$(echo "$payload" | jq --arg marketingUrl "${{ env.MARKETING_URL }}" \
+                                           '.data.attributes.marketingUrl = $marketingUrl')
+          fi
+      
+          # Conditionally add supportUrl if it's defined
+          if [ -n "${{ env.SUPPORT_URL }}" ]; then
+            payload=$(echo "$payload" | jq --arg supportUrl "${{ env.SUPPORT_URL }}" \
+                                           '.data.attributes.supportUrl = $supportUrl')
+          fi
+      
+          # Debugging to verify payload
+          echo "Payload: $payload"
+      
+          # Execute the curl request
+          response=$(curl -X PATCH \
+            -H "Authorization: Bearer ${{ env.token }}" \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
+            "https://api.appstoreconnect.apple.com/v1/appStoreVersionLocalizations/${{ env.app_store_version_localization_id }}")
+      
+          echo "Update App Store Version Localization Response: $response"
+
+
 
 
        # ******************************************* Uploading Meta Data END **************************************
@@ -674,18 +848,18 @@ jobs:
 
 
 
-      # - name: Find IPA file
-      #   id: find_ipa
-      #   run: |
-      #     ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
-      #     echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
+      - name: Find IPA file
+        id: find_ipa
+        run: |
+          ipa_path=$(find ios/build/archive/TestingIPA -name "*.ipa" | head -n 1)
+          echo "IPA_PATH=$ipa_path" >> $GITHUB_ENV
       
-      # - name: Upload IPA to App Store Connect
-      #   run: |
-      #     xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
-      #       -t ios \
-      #       --apiKey ${{ env.KEY_ID }} \
-      #       --apiIssuer ${{ env.ISSUER_ID }}
+      - name: Upload IPA to App Store Connect
+        run: |
+          xcrun altool --upload-app -f "${{ env.IPA_PATH }}" \
+            -t ios \
+            --apiKey ${{ env.KEY_ID }} \
+            --apiIssuer ${{ env.ISSUER_ID }} \
 
  
 

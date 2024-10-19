@@ -1,9 +1,8 @@
 name: Android Build and Deploy
 
 on:
-  push:
-    branches:
-      - FixesForiOSBuilds
+  repository_dispatch:
+    types: [Android]
 
 jobs:
   upload_screenshots:
@@ -25,6 +24,191 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+
+            # Access the client payload (extract the bundle ID)
+      - name: Access client payload
+        run: |
+          echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
+
+      # Fetch API data and save relevant parts to environment variables
+      - name: Fetch API data
+        id: fetch_api_data
+        run: |
+          echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+          RESPONSE=$(curl --location 'https://api-kqasdv4bcq-uc.a.run.app/fetchData/${{ github.event.client_payload.bundleID }}')
+          echo "API Response: $RESPONSE"
+          # Parse and export relevant fields from the JSON response using jq
+          echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.primaryColor')" >> $GITHUB_ENV
+          echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.secondaryColor')" >> $GITHUB_ENV
+          echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.tertiaryColor')" >> $GITHUB_ENV
+          echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.backgroundColor // "#FFFFFF"')" >> $GITHUB_ENV
+          echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.modalColor')" >> $GITHUB_ENV
+          echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.buttonTextColor')" >> $GITHUB_ENV
+          echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.headerColor')" >> $GITHUB_ENV
+          echo "BUNDLE_IDentifier=$(echo "$RESPONSE" | jq -r '.BUNDLE_ID')" >> $GITHUB_ENV
+          echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.keywords')" >> $GITHUB_ENV
+          echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.promotionalText')" >> $GITHUB_ENV
+          echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.supportUrl // ""')" >> $GITHUB_ENV
+          echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.marketingUrl // ""')" >> $GITHUB_ENV
+          echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.iOSAppName')" >> $GITHUB_ENV
+          echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.description')" >> $GITHUB_ENV
+          echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.androidAppName')" >> $GITHUB_ENV
+          echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.short_description')" >> $GITHUB_ENV
+          echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.long_description')" >> $GITHUB_ENV
+          echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.splashScreenUrl')" >> $GITHUB_ENV
+          echo "LOGO=$(echo "$RESPONSE" | jq -r '.logoUrl')" >> $GITHUB_ENV
+          echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.backgroundImageUrl')" >> $GITHUB_ENV
+          echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.subLogoUrl')" >> $GITHUB_ENV
+          echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.jsonFileUrl')" >> $GITHUB_ENV
+          echo "ISSUER_ID=$(echo "$RESPONSE" | jq -r '.ISSUER_ID')" >> $GITHUB_ENV
+          echo "KEY_ID=$(echo "$RESPONSE" | jq -r '.KEY_ID')" >> $GITHUB_ENV
+          echo "private_key=$(echo "$RESPONSE" | jq -r '.privateKeyURL')" >> $GITHUB_ENV
+
+
+            # Update config.js file with the new image paths (using require)
+      - name: Update config.js
+        run: |
+          printf "const config = {
+            splashScreen: require('./src/assets/splashScreen.png'),
+            logo: require('./src/assets/logo.png'),
+            backgroundImage: require('./src/assets/backgroundImage.png'),
+            subLogo: require('./src/assets/subLogo.png'),
+            primaryColor: \"%s\",
+            textColorHeadings: '#2A2A31',
+            secondaryColor: \"%s\",
+            tertiaryColor: \"%s\",
+            backgroundColorImage: '',
+            backgroundImageType: 'png',
+            backgroundColor: \"%s\",
+            modalColor: \"%s\",
+            buttonText: \"%s\",
+            headerColor: \"%s\",
+            BUNDLE_ID: \"%s\",
+            keywords: \"%s\",
+            promotionalText: \"%s\",
+            supportUrl: \"%s\",
+            marketingUrl: \"%s\",
+            Name: \"%s\",
+            description: \"%s\",
+            ANDROID_APP_NAME: \"%s\",
+            shortDescription: \"%s\",
+            longDescription: \"%s\"
+          };\n\n\nmodule.exports = config;" \
+          "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
+          "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
+          "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+          "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+          "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+
+      # Print the updated config.js file to the console
+      - name: Print updated config.js
+        run: |
+          echo "Contents of the updated config.js:"
+          cat ${{ github.workspace }}/config.js
+
+
+      - name: Download splash screen
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+            echo "Downloaded splash screen."
+          else
+            echo "Splash screen already exists."
+          fi
+
+      - name: Download logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+            echo "Downloaded logo."
+          else
+            echo "Logo already exists."
+          fi
+
+      - name: Download background image
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+            echo "Downloaded background image."
+          else
+            echo "Background image already exists."
+          fi
+
+      - name: Download sub logo
+        run: |
+          if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+            curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+            echo "Downloaded sub logo."
+          else
+            echo "Sub logo already exists."
+          fi
+
+
+      - name: Download json file
+        run: |
+          if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
+            echo "Downloaded Json file."
+          else
+            echo "Json file already exists."
+          fi
+
+      - name: Listing json file 
+        run: |
+          if [ -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+            cat ${{ github.workspace }}/android/fastlane/jsonFile.json
+          else
+            echo "Json file does not exist."
+          fi
+
+      - name: Update app name in AndroidManifest.xml (Android)
+        run: |
+          # Update the app name in strings.xml
+          sed -i "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$ANDROID_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
+      
+          # Ensure AndroidManifest.xml references the correct string resource
+          sed -i 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
+        shell: bash
+
+
+      # Print AndroidManifest.xml and strings.xml to verify changes
+      - name: Print AndroidManifest.xml and strings.xml
+        run: |
+          echo "----- AndroidManifest.xml -----"
+          cat android/app/src/main/AndroidManifest.xml
+
+          echo "----- strings.xml -----"
+          cat android/app/src/main/res/values/strings.xml
+
+        shell: bash
+
+
+            # Update fastlane metadata files
+      - name: Update fastlane metadata files
+        run: |
+          # Write the short description to short_description.txt
+          echo "$SHORT_DESCRIPTION" > "${{ github.workspace }}/android/fastlane/metadata/android/en-US/short_description.txt"
+          
+          # Write the long description to full_description.txt
+          echo "$LONG_DESCRIPTION" > "${{ github.workspace }}/android/fastlane/metadata/android/en-US/full_description.txt"
+          
+          # Write the app name to title.txt
+          echo "$ANDROID_APP_NAME" > "${{ github.workspace }}/android/fastlane/metadata/android/en-US/title.txt"
+          
+      # Display the contents of the files after updating
+      - name: Show updated fastlane metadata files
+        run: |
+          echo "Contents of short_description.txt:"
+          cat "${{ github.workspace }}/android/fastlane/metadata/android/en-US/short_description.txt"
+          
+          echo "Contents of full_description.txt:"
+          cat "${{ github.workspace }}/android/fastlane/metadata/android/en-US/full_description.txt"
+          
+          echo "Contents of title.txt:"
+          cat "${{ github.workspace }}/android/fastlane/metadata/android/en-US/title.txt"
+
+
+
 
       # Install Dependencies
       - name: Install Dependencies
@@ -58,5 +242,5 @@ jobs:
         run: |
           cd android
           sudo bundle install
-          bundle exec fastlane production         # Publish AAB to internal track
+          bundle exec fastlane production        
           bundle exec fastlane upload_metadata

@@ -1,0 +1,323 @@
+name: Generate JWT
+
+on:
+  push:
+    branches:
+      - FixesForiOSBuilds
+
+jobs:
+  generate_jwt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'  # Specify your Ruby version
+
+      - name: Install JWT gem
+        run: |
+          gem install jwt
+
+      - name: Generate JWT Token
+        run: |
+          ruby -r openssl -r jwt -e "
+            issuer_id = 'ad39d400-3314-48f8-977c-29a272eebad0'  # Replace with your actual ISSUER_ID
+            key_id = '74H4QHFPVP'  # Replace with your actual KEY_ID
+
+            private_key = <<~KEY
+            -----BEGIN PRIVATE KEY-----
+            MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+            pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+            6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+            +EG+nw8t
+            -----END PRIVATE KEY-----
+            KEY
+
+            private_key_obj = OpenSSL::PKey::EC.new(private_key)
+
+            token = JWT.encode(
+              {
+                iss: issuer_id,
+                exp: Time.now.to_i + 20 * 60,  # 20-minute expiration time
+                aud: 'appstoreconnect-v1'
+              },
+              private_key_obj,
+              'ES256',
+              kid: key_id
+            )
+
+            puts token
+          "
+
+
+# jobs:
+#   upload_screenshots:
+#     runs-on: macos-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v3
+#         with:
+#           python-version: '3.x'
+
+#       - name: Set up Ruby
+#         uses: ruby/setup-ruby@v1
+#         with:
+#           ruby-version: 3.3
+
+#       - name: Install dependencies
+#         run: |
+#           gem install jwt
+#           pip install requests
+
+#       - name: Generate JWT
+#         id: generate_jwt
+#         run: |
+#           ISSUER_ID=ad39d400-3314-48f8-977c-29a272eebad0
+#           KEY_ID=74H4QHFPVP
+
+#           # Define the private key as a multi-line variable
+#           private_key=$(cat <<EOF
+#           -----BEGIN PRIVATE KEY-----
+#           MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgmtzyTVPL1cphRZjf
+#           pzIlE/6pV5OFCS6zaUoyqBIHflygCgYIKoZIzj0DAQehRANCAASQxfZ0NyqZre50
+#           6NGowYahQsvqEQew5MStUc94chxoi8QqtVNTOcsgzqflnQ/v7YeETnnUX+P+2+2E
+#           +EG+nw8t
+#           -----END PRIVATE KEY-----
+#           EOF
+#           )
+      
+#           # Generate JWT using Ruby by passing the private key as an environment variable
+#           token=$(ruby -rjwt -ropenssl -e "
+#             require 'openssl'
+#             require 'jwt'
+#             private_key_obj = OpenSSL::PKey::EC.new(ENV['PRIVATE_KEY'])
+#             token = JWT.encode(
+#               {
+#                 iss: '#{ISSUER_ID}',
+#                 exp: Time.now.to_i + 20 * 60, # Token expires in 20 minutes
+#                 aud: 'appstoreconnect-v1'
+#               },
+#               private_key_obj,
+#               'ES256',
+#               {
+#                 kid: '#{KEY_ID}'
+#               }
+#             )
+#             puts token
+#           " PRIVATE_KEY=\"$private_key\")
+
+#           # Store the generated token as a GitHub environment variable
+#           echo "token=$token" >> $GITHUB_ENV
+
+
+
+              # Access the client payload (extract the bundle ID)
+      # - name: Access client payload
+      #   run: |
+      #     echo "The bundle ID is: ${{ github.event.client_payload.bundleID }}"
+
+      # # Fetch API data and save relevant parts to environment variables
+      # - name: Fetch API data
+      #   id: fetch_api_data
+      #   run: |
+      #     echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
+      #     RESPONSE=$(curl --location 'https://1531-2400-adc1-1aa-d500-6082-2b22-3d23-7860.ngrok-free.app/getData/${{ github.event.client_payload.bundleID }}')
+      #     echo "API Response: $RESPONSE"
+
+          
+      #     # Parse and export relevant fields from the JSON response using jq
+      #     echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].primarycolor')" >> $GITHUB_ENV
+      #     echo "SECONDARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].secondarycolor')" >> $GITHUB_ENV
+      #     echo "TERTIARY_COLOR=$(echo "$RESPONSE" | jq -r '.[0].tertiarycolor')" >> $GITHUB_ENV
+      #     echo "BACKGROUND_COLOR=$(echo "$RESPONSE" | jq -r '.[0].backgroundcolor // "#FFFFFF"')" >> $GITHUB_ENV
+      #     echo "MODAL_COLOR=$(echo "$RESPONSE" | jq -r '.[0].modalcolor')" >> $GITHUB_ENV
+      #     echo "BUTTON_TEXT_COLOR=$(echo "$RESPONSE" | jq -r '.[0].buttontext')" >> $GITHUB_ENV
+      #     echo "HEADER_COLOR=$(echo "$RESPONSE" | jq -r '.[0].headercolor')" >> $GITHUB_ENV
+      #     echo "BUNDLE_ID=$(echo "$RESPONSE" | jq -r '.[0].bundle_id')" >> $GITHUB_ENV
+      #     echo "KEYWORDS=$(echo "$RESPONSE" | jq -r '.[0].keywords')" >> $GITHUB_ENV
+      #     echo "PROMOTIONAL_TEXT=$(echo "$RESPONSE" | jq -r '.[0].promotionaltext')" >> $GITHUB_ENV
+      #     echo "SUPPORT_URL=$(echo "$RESPONSE" | jq -r '.[0].supporturl // ""')" >> $GITHUB_ENV
+      #     echo "MARKETING_URL=$(echo "$RESPONSE" | jq -r '.[0].marketingurl // ""')" >> $GITHUB_ENV
+      #     echo "IOS_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].iosappname')" >> $GITHUB_ENV
+      #     echo "DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].description')" >> $GITHUB_ENV
+      #     echo "ANDROID_APP_NAME=$(echo "$RESPONSE" | jq -r '.[0].androidappname')" >> $GITHUB_ENV
+      #     echo "SHORT_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].short_description')" >> $GITHUB_ENV
+      #     echo "LONG_DESCRIPTION=$(echo "$RESPONSE" | jq -r '.[0].long_description')" >> $GITHUB_ENV
+
+      #     # Parse and export relevant fields from the JSON response using jq
+      #     echo "SPLASH_SCREEN=$(echo "$RESPONSE" | jq -r '.[0].splashscreen')" >> $GITHUB_ENV
+      #     echo "LOGO=$(echo "$RESPONSE" | jq -r '.[0].logo')" >> $GITHUB_ENV
+      #     echo "BACKGROUND_IMAGE=$(echo "$RESPONSE" | jq -r '.[0].backgroundimage')" >> $GITHUB_ENV
+      #     echo "SUB_LOGO=$(echo "$RESPONSE" | jq -r '.[0].sublogo')" >> $GITHUB_ENV
+      #     echo "JSON_FILE=$(echo "$RESPONSE" | jq -r '.[0].jsonfile')" >> $GITHUB_ENV
+
+
+      # # Update the app name in AndroidManifest.xml and strings.xml for Android
+      # - name: Update app name in AndroidManifest.xml (Android)
+      #   run: |
+      #     # Declare the new app name
+     
+      #     # Update the app name in strings.xml
+      #     sed -i '' "s|<string name=\"app_name\">[^<]*</string>|<string name=\"app_name\">$ANDROID_APP_NAME</string>|" android/app/src/main/res/values/strings.xml
+      
+      #     # Ensure AndroidManifest.xml references the correct string resource
+      #     sed -i '' 's|android:label="[^"]*"|android:label="@string/app_name"|' android/app/src/main/AndroidManifest.xml
+      
+      #   shell: bash
+
+
+      # # Print AndroidManifest.xml and strings.xml to verify changes
+      # - name: Print AndroidManifest.xml and strings.xml
+      #   run: |
+      #     echo "----- AndroidManifest.xml -----"
+      #     cat android/app/src/main/AndroidManifest.xml
+
+      #     echo "----- strings.xml -----"
+      #     cat android/app/src/main/res/values/strings.xml
+
+      #   shell: bash
+
+      # # Check if Info.plist exists
+      # - name: Check Info.plist existence
+      #   run: |
+      #     if [ -f ios/EasyPatientDynamic/Info.plist ]; then
+      #       echo "Info.plist exists."
+      #     else
+      #       echo "Info.plist does not exist."
+      #       exit 1
+      #     fi
+
+      #   shell: bash
+
+
+      
+      # - name: Update app name in Info.plist (iOS)
+      #   run: |
+      #     # Declare the new app name
+      #     NEW_APP_NAME="NewAppName"
+          
+      #     # Path to Info.plist
+      #     PLIST_PATH="ios/EasyPatientDynamic/Info.plist"
+          
+      #     # Replace the first occurrence of "EasyPatientDynamic" with the new app name
+      #     sed -i '' '0,/EasyPatientDynamic/s//'"$NEW_APP_NAME"'/' "$PLIST_PATH"
+      
+      # - name: Sleep for 2 seconds (optional)
+      #   run: sleep 2
+      
+      # - name: Print Info.plist to verify the change
+      #   run: |
+      #     echo "----- Info.plist -----"
+      #     cat ios/EasyPatientDynamic/Info.plist
+      #   shell: bash
+
+
+      # *******************************************************************************************
+
+
+      # Create assets directory
+      # Download images to the assets folder if they don't already exist
+      # - name: Download splash screen
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/splashScreen.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/splashScreen.png $SPLASH_SCREEN
+      #       echo "Downloaded splash screen."
+      #     else
+      #       echo "Splash screen already exists."
+      #     fi
+
+      # - name: Download logo
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/logo.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/logo.png $LOGO
+      #       echo "Downloaded logo."
+      #     else
+      #       echo "Logo already exists."
+      #     fi
+
+      # - name: Download background image
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/backgroundImage.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/backgroundImage.png $BACKGROUND_IMAGE
+      #       echo "Downloaded background image."
+      #     else
+      #       echo "Background image already exists."
+      #     fi
+
+      # - name: Download sub logo
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/src/assets/subLogo.png ]; then
+      #       curl -o ${{ github.workspace }}/src/assets/subLogo.png $SUB_LOGO
+      #       echo "Downloaded sub logo."
+      #     else
+      #       echo "Sub logo already exists."
+      #     fi
+
+      # - name: Download json file
+      #   run: |
+      #     if [ ! -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+      #       curl -o ${{ github.workspace }}/android/fastlane/jsonFile.json $JSON_FILE
+      #       echo "Downloaded Json file."
+      #     else
+      #       echo "Json file already exists."
+      #     fi
+
+      # - name: Listing json file 
+      #   run: |
+      #     if [ -f ${{ github.workspace }}/android/fastlane/jsonFile.json ]; then
+      #       cat ${{ github.workspace }}/android/fastlane/jsonFile.json
+      #     else
+      #       echo "Json file does not exist."
+      #     fi
+            
+          
+
+      # Update config.js file with the new image paths (using require)
+      # - name: Update config.js
+      #   run: |
+      #     printf "const config = {
+      #       splashScreen: require('./src/assets/splashScreen.png'),
+      #       logo: require('./src/assets/logo.png'),
+      #       backgroundImage: require('./src/assets/backgroundImage.png'),
+      #       subLogo: require('./src/assets/subLogo.png'),
+      #       primaryColor: \"%s\",
+      #       textColorHeadings: '#2A2A31',
+      #       secondaryColor: \"%s\",
+      #       tertiaryColor: \"%s\",
+      #       backgroundColorImage: '',
+      #       backgroundImageType: 'png',
+      #       backgroundColor: \"%s\",
+      #       modalColor: \"%s\",
+      #       buttonText: \"%s\",
+      #       headerColor: \"%s\",
+      #       BUNDLE_ID: \"%s\",
+      #       keywords: \"%s\",
+      #       promotionalText: \"%s\",
+      #       supportUrl: \"%s\",
+      #       marketingUrl: \"%s\",
+      #       Name: \"%s\",
+      #       description: \"%s\",
+      #       ANDROID_APP_NAME: \"%s\",
+      #       shortDescription: \"%s\",
+      #       longDescription: \"%s\"
+      #     };\n\n\nmodule.exports = config;" \
+      #     "$PRIMARY_COLOR" "$SECONDARY_COLOR" "$TERTIARY_COLOR" \
+      #     "$BACKGROUND_COLOR" "$MODAL_COLOR" "$BUTTON_TEXT_COLOR" \
+      #     "$HEADER_COLOR" "$BUNDLE_ID" "$KEYWORDS" "$PROMOTIONAL_TEXT" \
+      #     "$SUPPORT_URL" "$MARKETING_URL" "$IOS_APP_NAME" "$DESCRIPTION" \
+      #     "$ANDROID_APP_NAME" "$SHORT_DESCRIPTION" "$LONG_DESCRIPTION" > "${{ github.workspace }}/config.js"
+
+      # # Print the updated config.js file to the console
+      # - name: Print updated config.js
+      #   run: |
+      #     echo "Contents of the updated config.js:"
+      #     cat ${{ github.workspace }}/config.js

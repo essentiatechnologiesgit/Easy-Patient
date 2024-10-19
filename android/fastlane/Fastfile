@@ -25,7 +25,7 @@ platform :android do
       skip_upload_screenshots: true,  # Skip screenshots
       skip_upload_changelogs: true,   # Skip changelog upload
       skip_upload_metadata: false,     # Ensure metadata is uploaded
-      json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json",  # Path to your JSON key file
+      json_key: "fastlane/jsonFile.json",  # Path to your JSON key file
       package_name: "com.easypatientdynamic"  # Your app's package name
     )
   end
@@ -65,7 +65,7 @@ lane :production do
     skip_upload_metadata: true,  # Skip metadata upload if not updating
     skip_upload_images: true,     # Skip image upload if not updating
     skip_upload_screenshots: true, # Skip screenshots upload if not updating
-    json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file for authentication
+    json_key: "fastlane/jsonFile.json", # Path to your JSON key file for authentication
     package_name: "com.easypatientdynamic"  # Your app's package name (ensure this is correct)
   )
 end
@@ -81,7 +81,7 @@ end
       skip_upload_images: false,        # Ensure images are uploaded
       skip_upload_screenshots: false,   # Ensure screenshots are uploaded
       skip_upload_changelogs: true,     # Skip changelog upload
-      json_key: "fastlane/easy-patient-a6d4e-8bff30fb735c.json", # Path to your JSON key file
+      json_key: "fastlane/jsonFile.json", # Path to your JSON key file
       package_name: "com.easypatientdynamic"  # Your app's package name
     )
   end

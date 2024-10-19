@@ -56,22 +56,14 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("again here");
             const access_token = await getAccessToken();
             setAccessToken(access_token);
             getUserDetails(access_token);
         };
+    
         fetchData();
-    }, [route])
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const access_token = await getAccessToken();
-            setAccessToken(access_token);
-            getUserDetails(access_token);
-        };
-        fetchData();
-    }, []);
+    }, [route]);
+    
 
     const getAccessToken = async () => {
         const loginResponse = await AsyncStorage.getItem('loginResponse');

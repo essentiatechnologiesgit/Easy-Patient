@@ -18,16 +18,13 @@ import {
     GoogleSigninButton,
     statusCodes,
 } from '@react-native-google-signin/google-signin';
-import { CircularProgressBase } from 'react-native-circular-progress-indicator';
+
 const HealthInformation = () => {
     const route = useRoute();
-    const isChanged = route.params?.isChanged;
     const navigation = useNavigation();
     const { t } = useTranslation();
     const scrollViewRef = useRef();
-    const [name, setFullName] = useState('');
     const errorRefs = useRef([]);
-    const [isEmailFocused, setIsEmailFocused] = useState(false);
     //validation feilds
     const [showLoader, setShowLoader] = useState(false);
     const [accessToken, setAccessToken] = useState('');
@@ -46,8 +43,7 @@ const HealthInformation = () => {
     const [dataId, setDataId] = useState('');
     const [bloodPressure, setBloodPressure] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [newHeight, setNewHeight] = useState('');
-
+   
 
     useEffect(() => {
 

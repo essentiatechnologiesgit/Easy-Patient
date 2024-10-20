@@ -52,11 +52,7 @@ lane :production do
 
   UI.message("Updated versionCode from #{current_version_code} to #{new_version_code}")
 
-  # Step 2: Build the AAB file using Gradle
-  gradle(
-    task: "bundle",
-    build_type: "Release"
-  )
+  
 
   # Step 3: Upload the AAB to Google Play using Supply
   supply(

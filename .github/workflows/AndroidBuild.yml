@@ -69,7 +69,7 @@ jobs:
       - name: Update config.js
         run: |
           printf "const config = {
-            splashScreen: require('./src/assets/splashScreen.png'),
+            splashScreen: require('./src/assets/splash.png'),
             logo: require('./src/assets/logo.png'),
             backgroundImage: require('./src/assets/backgroundImage.png'),
             subLogo: require('./src/assets/subLogo.png'),

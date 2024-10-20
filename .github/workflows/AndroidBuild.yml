@@ -210,18 +210,23 @@ jobs:
 
 
 
-      # Install Dependencies
-      - name: Install Dependencies
-        run: npm install --force
+      # # Install Dependencies
+      # - name: Install Dependencies
+      #   run: npm install --force
 
       # Ensure that gradlew has execution permissions
       - name: Ensure gradlew is executable
         run: chmod +x android/gradlew
 
       # Build the AAB file
+      - name: Verify splash screen image exists
+        run: |
+          if [ ! -f "android/app/build/generated/res/createBundleReleaseJsAndAssets/drawable-mdpi/src_assets_splashscreen.png" ]; then
+            echo "Splash screen image is missing!"
+            exit 1
+          fi
 
-
-      # Upload the AAB file as artifact
+      # Upload the AAB file as artifact  
       - name: Upload AAB file as artifact
         uses: actions/upload-artifact@v3
         with:

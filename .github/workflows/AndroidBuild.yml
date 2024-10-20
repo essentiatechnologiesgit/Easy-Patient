@@ -219,18 +219,18 @@ jobs:
         run: chmod +x android/gradlew
 
       # Build the AAB file
-      - name: Build AAB
-        run: |
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
-          cd android
-          ./gradlew bundleRelease
+      # - name: Build AAB
+      #   run: |
+      #     npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
+      #     cd android
+      #     ./gradlew bundleRelease
 
       # Upload the AAB file as artifact
-      - name: Upload AAB file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release.aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+      # - name: Upload AAB file as artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-release.aab
+      #     path: android/app/build/outputs/bundle/release/app-release.aab
 
       # Set up Fastlane and Bundler for deployment
       - name: Install Fastlane and Bundler

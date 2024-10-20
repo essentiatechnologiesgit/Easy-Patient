@@ -219,10 +219,7 @@ jobs:
         run: chmod +x android/gradlew
 
       # Build the AAB file
-      - name: Build AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease
+
 
       # Upload the AAB file as artifact
       - name: Upload AAB file as artifact

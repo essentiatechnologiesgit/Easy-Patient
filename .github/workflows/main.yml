@@ -39,7 +39,7 @@ jobs:
         id: fetch_api_data
         run: |
           echo "Fetching data for bundle ID: ${{ github.event.client_payload.bundleID }}"
-          RESPONSE=$(curl --location 'https://us-central1-easypatientdev-5f7e5.cloudfunctions.net/api/${{ github.event.client_payload.bundleID }}')
+          RESPONSE=$(curl --location 'https://us-central1-easypatientdev-5f7e5.cloudfunctions.net/api/fetchData/${{ github.event.client_payload.bundleID }}')
           echo "API Response: $RESPONSE"
           # Parse and export relevant fields from the JSON response using jq
           echo "PRIMARY_COLOR=$(echo "$RESPONSE" | jq -r '.primaryColor')" >> $GITHUB_ENV
